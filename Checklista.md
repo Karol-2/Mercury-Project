@@ -1,35 +1,61 @@
 # Mercury Project
 
-**TODO ASAP:**
+# Pomysły
+- aplikacja do komunikowania, najpiwer tekstowo,
+- zakłada się konta,
+- komunikacja wideo na żywo
+- darkmode
+- słuchanie wspólne muzyki z spotify
+- są pokoje, grupy
+- strefa rekreacji
+- mobilki 👍
 
-- [ ]  Repozytorium i do niego Github project (ta kolejność)
-- [ ]  Discord
-- [ ]  podział pracy na zespoły? (Może po 2 osoby, [typu frontend, backend, bazy itp], oczywiście pomagamy sobie we wszystkim, ale te 2 osoby zajmą się pomysłem implementecji, wyglądem np.)
-- [ ]  organizacja pracy ( wygląd commitów , branche itp) (i zapisać to gdzieś jakby ktoś miał wątpliwości)
-- [ ]  Czy spotykamy się jakoś regularnie, a jeśli tak to gdzie, kiedy, godzina, fizycznie czy online.
-- [ ]  Podział na większe etapy
-- [ ]  Logo i kolorki przewodnie
-- [ ]  Ogólny zarys projektu - jak on bedzie działał w teorii?
+# Skład
+Karol - kierownik ds. Frontend
+Piotrek - człowiek orkiestra, front i back i wszystko, drugie oczy, testowanie, 
+Janek -  człowiek orkiestra, front i back i wszystko, testowanie 
+Grzesiu - kierownik ds. Backendu
+
+
+# Plan działanai
+- commity po ang, czasownik, duża litera, bez kropki na końcu, <50 znaków,
+- main, dev,
+- chociaż 1 code review
+- priv
+- present simple
+
+# Niedziela wieczorkiem, okazjonalnie in real life
+
+# Etap 1
+- aplikacja do komunikowania, najpiwer tekstowo,
+- zakłada się konta,
+# Etap 2
+- komunikacja wideo na żywo
+# Etap 3
+ - są pokoje, grupy
+ # Etap 4
+ - Reszta głupotek
+
 
 ## Pytania do uzgodnienia
 
-Technologie: ??
+Technologie: React, TS, Tailwind, Neo4J, JavaScript, Python, Java, Keycloak
 
-Podział i metodyka pracy: ??
+Podział i metodyka pracy: Zespoł po 2 osoby, [typu frontend, backend, bazy itp], oczywiście pomagamy sobie we wszystkim, ale te 2 osoby zajmą się pomysłem implementecji, wyglądem np.
 
-Dockery czy inne kubernetesy: ??
+Dockery czy inne kubernetesy: Dobry docker, jak zostanie czas kubernetes
 
-Hostowanie albo chmury jakieś: ??
+Hostowanie albo chmury jakieś: Można w przyszłości
 
-Czy jakieś testowanie przewidziane ??
+Czy jakieś testowanie przewidziane: Yes of course
 
-Czy jakaś automatyzacja, pipeliney: ??
+Czy jakaś automatyzacja, pipeliney: formatowanie kodu, 
 
 Github projects Można użyć do śledzenia postępów - features, to do, co kto robi itp: ??
 
-Używamy ChatuGPT z rozwagą, tak żeby umieć wytłumaczyć co dany kod robi: ??
+Używamy ChatuGPT z rozwagą, tak żeby umieć wytłumaczyć co dany kod robi: mowimy prawde
 
-Czy napisy po english czy polish: ??
+Czy napisy po english czy polish: ENGLISH, załatwić tłumaczenie
 
 Upewnienie się że mamy wszystkiego wersje takie same( node itp): ??
 
