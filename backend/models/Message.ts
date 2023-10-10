@@ -1,10 +1,9 @@
-import User from "./User";
 import Reaction from "./Reaction";
 export default interface Message {
     id: string;
     date: Date;
-    from: User;
-    to: User;
+    from_id: string;
+    to_id: string;
     content: string;
     reactions: Reaction[];
 }
