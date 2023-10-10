@@ -1,0 +1,7 @@
+*** REMOVE THIS FILE AFTER USING ALL OF THIS DATA ***
+
+Nazwa: Mercury (Project)
+Skład: Karol Krawczykiewicz, Jan Król, Piotr Maszczak, Grzegorz Rogoziński
+Uzyte Technologie: React, TypeScript, Tailwind, Neo4J, Java, Keycloak, WebRTK, Express
+Opis: Projektem jest aplikacja webowa służąca do komunikacji tekstowej, oraz na żywo z użyciem wideo i dźwięku. Możliwa będzie komunikacja dwuosobowa, jak i dołączenie do większych pokoi bądź zespołów. Aplikacja będzie dostosowana pod przeglądarki internetowe w komputerze i telefonie.
+Link: https://github.com/Karol-2/Mercury-Project
