@@ -1,4 +1,3 @@
-
 function App() {
   return (
     <div>Mercury project</div>
