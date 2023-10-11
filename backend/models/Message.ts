@@ -1,4 +1,5 @@
 import Reaction from "./Reaction";
+
 export default interface Message {
     id: string;
     date: Date;

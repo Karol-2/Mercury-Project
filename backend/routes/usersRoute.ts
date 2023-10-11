@@ -1,4 +1,6 @@
 import { Router } from "express";
+import chatRouter from "./chatsRoute";
+
 const usersRouter = Router();
 
 usersRouter.get("/", (_req, res) => {
@@ -20,5 +22,7 @@ usersRouter.put("/:userId", (req, res) => {
 usersRouter.delete("/:userId", (req, res) => {
     return res.send(`User with ${req.params.userId} ID will be deleted`);
 });
+
+usersRouter.use("/:userId/chats", chatRouter);
 
 export default usersRouter;
