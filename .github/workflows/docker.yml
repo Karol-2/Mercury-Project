@@ -2,22 +2,23 @@ name: Docker Image CI
 
 on:
   pull_request:
-    branches: [ "main", "dev" ]
+    branches:
+      - main
+      - dev
 
 jobs:
-
   build:
-
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
+    - name: Checkout code
+      uses: actions/checkout@v2
     
-    - name: create .env file
-    - run: touch db/credentials.env
+    - name: Create .env file
+      run: touch db/credentials.env
 
-    - name: add login passes to env file
-    - run: echo "NEO4J_AUTH=neo4j/admin" >> db/credentials.env
-    
+    - name: Add login passes to env file
+      run: echo "NEO4J_AUTH=neo4j/admin" >> db/credentials.env
+
     - name: Compose the Docker-compose file
-      run: docker compose up
+      run: docker-compose up
