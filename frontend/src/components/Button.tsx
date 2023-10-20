@@ -10,10 +10,10 @@ function Button({ type, className = "", children }: ButtonProps) {
   console.log(type)
   const buttonColors: Record<ButtonType, string> = {
     "disabled": "bg-my-dark text-my-light",
-    "normal": "bg-my-light",
-    "cancel": "bg-my-cancel",
-    "accept": "bg-my-accept",
-    "highlight": "bg-my-orange"
+    "normal": "bg-my-light text-my-dark",
+    "cancel": "bg-my-cancel text-my-dark",
+    "accept": "bg-my-accept text-my-dark",
+    "highlight": "bg-my-orange text-my-dark"
   }
 
   const buttonColor = buttonColors[type]
