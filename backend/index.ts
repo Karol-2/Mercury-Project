@@ -8,6 +8,7 @@ app.get("/", (req: Request, res: Response) => {
   res.send("Mercury Project");
 });
 
+app.use(express.json());
 app.use("/users", usersRouter);
 
 app.listen(port, () => {
