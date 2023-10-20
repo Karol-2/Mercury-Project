@@ -1,6 +1,11 @@
+import ButtonShowcase from "./pages/ButtonShowcase"
+
+
 function App() {
   return (
-    <div>Mercury project</div>
+    <div className="w-full min-h-screen p-2 bg-my-darker">
+      <ButtonShowcase />
+    </div>
   )
 }
 
