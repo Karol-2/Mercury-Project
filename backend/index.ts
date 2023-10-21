@@ -7,7 +7,7 @@ const app: Express = express();
 const port: number = 5000;
 
 const corsOptions = {
-  origin: "http://localhost:4173",
+  origin: "http://localhost:5173",
   optionsSuccessStatus: 200
 }
 
