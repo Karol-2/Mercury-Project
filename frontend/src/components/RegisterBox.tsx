@@ -11,7 +11,7 @@ function RegisterBox() {
       body: JSON.stringify({})
     })
     const user = await response.json()
-    console.log("Register" + JSON.stringify(user))
+    console.log("Register " + JSON.stringify(user))
   }
 
   return (
