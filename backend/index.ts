@@ -2,6 +2,7 @@ import express, { Express, Request, Response } from 'express';
 import cors from 'cors';
 
 import usersRouter from './routes/usersRoute';
+import importInitialData from './data/importData';
 
 const app: Express = express();
 const port: number = 5000;
@@ -13,10 +14,13 @@ const corsOptions = {
 
 app.use(cors(corsOptions))
 
+importInitialData();
+
 app.get("/", (req: Request, res: Response) => {
   res.send("Mercury Project");
 });
 
+app.use(express.json());
 app.use("/users", usersRouter);
 
 app.listen(port, () => {
