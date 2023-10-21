@@ -1,7 +1,10 @@
+import { useNavigate } from "react-router-dom"
 import Button from "../components/Button"
 
 
 function LoginBox() {
+  const navigate = useNavigate()
+
   const loginFunc = async () => {
     const response = await fetch("http://localhost:5000/users/1")
     const user = await response.json()
@@ -10,6 +13,7 @@ function LoginBox() {
 
   const registerFunc = () => {
     console.log("Register")
+    navigate("/register")
   }
 
   return (
