@@ -3,11 +3,11 @@ type ButtonType = "disabled" | "normal" | "cancel" | "accept" | "highlight"
 interface ButtonProps {
   type: ButtonType,
   className?: string,
+  onClick?: React.MouseEventHandler<HTMLButtonElement>,
   children: React.ReactNode
 }
 
-function Button({ type, className = "", children }: ButtonProps) {
-  console.log(type)
+function Button({ type, className = "", onClick, children }: ButtonProps) {
   const buttonColors: Record<ButtonType, string> = {
     "disabled": "bg-my-dark text-my-light",
     "normal": "bg-my-light text-my-dark",
@@ -20,7 +20,7 @@ function Button({ type, className = "", children }: ButtonProps) {
   const finalClassName = `${buttonColor} rounded-full px-5 py-2 m-1` + className
 
   return (
-    <button className={finalClassName}>{children}</button>
+    <button className={finalClassName} onClick={onClick}>{children}</button>
   )
 }
 
