@@ -1,5 +1,5 @@
 import express, { Express, Request, Response } from 'express';
-import cors from 'cors';
+import cors from "cors";
 
 import usersRouter from './routes/usersRoute';
 import importInitialData from './data/importData';
@@ -12,11 +12,11 @@ const corsOptions = {
   optionsSuccessStatus: 200
 }
 
-app.use(cors(corsOptions))
+app.use(cors(corsOptions));
 
 importInitialData();
 
-app.get("/", (req: Request, res: Response) => {
+app.get("/", (_req: Request, res: Response) => {
   res.send("Mercury Project");
 });
 
