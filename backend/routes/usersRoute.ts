@@ -126,7 +126,7 @@ usersRouter.delete("/:userId", async (req, res) => {
         await session.close();
         return res.send("DELETED");
     } catch (err) {
-        return res.status(404).send("DELETED");
+        return res.status(404).send(err);
     }
 });
 
