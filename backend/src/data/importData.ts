@@ -1,10 +1,5 @@
-import neo4j from "neo4j-driver";
 import { readFileSync } from "fs";
-
-const driver = neo4j.driver(
-  "bolt://localhost:7687",
-  neo4j.auth.basic("neo4j", "password")
-);
+import driver from "../driver/driver";
 
 const jsonFilePath = "data/users.json";
 

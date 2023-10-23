@@ -7,7 +7,7 @@
   "author": "",
   "license": "ISC",
   "scripts": {
-    "start": "nodemon index.ts"
+    "start": "nodemon src/index.ts"
   },
   "dependencies": {
     "cors": "^2.8.5",
