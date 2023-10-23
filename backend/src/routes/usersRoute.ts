@@ -2,23 +2,28 @@ import { Router } from "express";
 import User from "../models/User";
 import chatRouter from "./chatsRoute";
 import driver from "../driver/driver";
+import Response from "../models/Response";
 
 const usersRouter = Router();
 
-usersRouter.get("/", async (_req, res) => {
-    const session = driver.session();
-    const usersRequest = await session.run(
-        `MATCH (u:User) RETURN ID(u), u`
-    );
-    const users = usersRequest.records.map(user => ({
-        id: user.get(0).low, 
-        ...user.get(1).properties 
-    }));
-    await session.close();
-    return res.send(users);
+usersRouter.get<{},Response,{},{}>("/", async (_req, res) => {
+    try {
+        const session = driver.session();
+        const usersRequest = await session.run(
+            `MATCH (u:User) RETURN ID(u), u`
+        );
+        const users = usersRequest.records.map(user => ({
+            id: user.get(0).low, 
+            ...user.get(1).properties 
+        }));
+        await session.close();
+        return res.json({status: "ok", result: users});
+    } catch (err) {
+        return res.status(404).json({status: "error", errors: [err as object]});
+    }
 });
 
-usersRouter.get("/:userId", async (req, res) => {
+usersRouter.get<{userId: number},Response,{},{}>("/:userId", async (req, res) => {
     try {
         const session = driver.session();
         const userId = Number(req.params.userId);
@@ -32,16 +37,16 @@ usersRouter.get("/:userId", async (req, res) => {
         }));
         await session.close();
         return user.length === 0
-        ? res.status(404).send(`NOT FOUND`)
-        : res.send(user[0]);
+        ? res.status(404).json({status: "error", errors: [{name: "NOT_FOUND"}]})
+        : res.json({status: "ok", result: [user[0]]});
     } catch (err) {
-        return res.status(404).send(err);
+        return res.status(404).json({status: "error", errors: [err as object]});
     }
 });
 
-usersRouter.post("/", async (req, res) => {
+usersRouter.post<{},Response,User,{}>("/", async (req, res) => {
     try {
-        const userConstuctor: User = req.body;
+        const userConstuctor = req.body;
         const {
             nick, 
             last_name, 
@@ -56,7 +61,7 @@ usersRouter.post("/", async (req, res) => {
         , {nick});
         if (userExists.records.length > 0) {
             await session.close();
-            return res.status(404).send("ALREADY EXISTS");
+            return res.status(404).json({status: "error", errors: [{name: "ALREADY_EXISTS"}]});
         }
         const newUserRequest = await session.run(
             `MERGE (u:User {nick: $nick, first_name: $first_name, 
@@ -69,15 +74,15 @@ usersRouter.post("/", async (req, res) => {
             ...user.get(1).properties 
         }))[0];
         await session.close();
-        return res.send(newUser);
+        return res.json({status: "ok", result: [newUser]});
     } catch (err) {
-        return res.status(404).send(err);
+        return res.status(404).json({status: "error", errors: [err as object]});
     }
 });
 
-usersRouter.put("/:userId", async (req, res) => {
+usersRouter.put<{userId:number},Response,User,{}>("/:userId", async (req, res) => {
     try {
-        const userPropertiesToUpdate: User = req.body;
+        const userPropertiesToUpdate = req.body;
         const {
             nick, 
             last_name, 
@@ -93,9 +98,8 @@ usersRouter.put("/:userId", async (req, res) => {
         , {userId});
         if (userExists.records.length === 0) {
             await session.close();
-            return res.status(404).send("NOT EXIST");
+            return res.status(404).json({status: "error", errors: [{name: "NOT_FOUND"}]});
         }
-        console.log({userId, nick, first_name, last_name, mail, country, profile_picture})
         await session.run(
             `MATCH (u:User) WHERE id(u)=$userId SET 
             u.nick=$nick, u.first_name=$first_name, 
@@ -103,13 +107,13 @@ usersRouter.put("/:userId", async (req, res) => {
             u.country=$country, u.profile_picture=$profile_picture`
         , {userId, nick, first_name, last_name, mail, country, profile_picture}); 
         await session.close();
-        return res.send("UPDATED");
+        return res.json({status: "ok"});
     } catch (err) {
-        return res.status(404).send(err);
+        return res.status(404).json({status: "error", errors: [err as object]});
     }
 });
 
-usersRouter.delete("/:userId", async (req, res) => {
+usersRouter.delete<{userId:number},Response,{},{}>("/:userId", async (req, res) => {
     try {
         const session = driver.session();
         const userId = Number(req.params.userId);
@@ -118,15 +122,15 @@ usersRouter.delete("/:userId", async (req, res) => {
         , {userId});
         if (userExists.records.length === 0) {
             await session.close();
-            return res.send("NOT EXISTS");
+            return res.status(404).json({status: "error", errors: [{name: "NOT_FOUND"}]});
         }
         await session.run(
             `MATCH (u:User) WHERE id(u) = $userId DETACH DELETE u`
         ,{userId});
         await session.close();
-        return res.send("DELETED");
+        return res.json({status: "ok"});
     } catch (err) {
-        return res.status(404).send(err);
+        return res.status(404).json({status: "error", errors: [err as object]});
     }
 });
 
