@@ -11,11 +11,12 @@ export default {
     colors: {
       "my-orange": "#FF8001",
       "my-purple": "#2E0B51",
+      "my-cancel": "#FF7976",
+      "my-accept": "#10D019",
       "my-dark":"#21262D",
       "my-darker":"#121519",
       "my-light":"#EDE9E9",
       "my-lighter": "#F4F4F4",
-
     },
     extend: {},
   },
