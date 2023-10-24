@@ -24,6 +24,15 @@
 
 }
 
+.clickable{
+    transition: 0.25s ease-in-out;
+    
+    &:hover{
+        transform: scale(1.05);
+    }
+    
+}
+
 .pulsate{
     animation: pulse 20s 2s ease-in-out infinite;
     // filter: drop-shadow(0 0 15px rgba(185, 43, 43, 0.8));

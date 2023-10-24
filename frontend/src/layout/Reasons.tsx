@@ -16,7 +16,7 @@ export default function Reasons() {
         <div className="flex flex-col md:flex-row justify-evenly mt-5">
           <div
             className=" hover:bg-my-light hover:text-my-dark p-5 rounded-xl
-           text-center transition duration-700 cursor-default my-5"
+           text-center clickable cursor-default my-5"
           >
             <FontAwesomeIcon
               icon={faShield}
@@ -26,7 +26,7 @@ export default function Reasons() {
           </div>
           <div
             className=" hover:bg-my-light hover:text-my-dark p-5 rounded-xl
-           text-center transition duration-700 cursor-default my-5"
+           text-center clickable cursor-default my-5"
           >
             <FontAwesomeIcon
               icon={faDesktop}
@@ -38,7 +38,7 @@ export default function Reasons() {
           </div>
           <div
             className=" hover:bg-my-light hover:text-my-dark p-5 rounded-xl
-           text-center transition duration-700 cursor-default my-5"
+           text-center clickable cursor-default my-5"
           >
             <FontAwesomeIcon
               icon={faUsers}
@@ -48,7 +48,7 @@ export default function Reasons() {
           </div>
           <div
             className=" hover:bg-my-light hover:text-my-dark p-5 rounded-xl
-           text-center transition duration-300 cursor-default my-5"
+           text-center clickable cursor-default my-5"
           >
             <FontAwesomeIcon
               icon={faGlobe}
