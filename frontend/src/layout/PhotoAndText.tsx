@@ -1,26 +1,37 @@
 export default function PhotoAndText() {
   return (
     <section className="min-h-screen text-my-darker  gap-10 min-w-fit ">
-      <div className="bg-my-dark relative" >
-      
+      <div className="bg-my-dark relative">
         <div className=" mx-50 lg:mx-72 flex items-center justify-center min-h-screen content-center  ">
-        <div className="bg-my-orange absolute right-0 top-10 rounded-l-xl">
+          <div className="bg-my-orange absolute right-0 top-10 rounded-l-xl">
             <p className=" font-semibold self-start text-4xl whitespace-nowrap pl-72">
-            BRAND NEW APPROACH
-            </p>    
-        </div>
+              BRAND NEW APPROACH
+            </p>
+          </div>
 
-        <div className="">
-            image
-        </div>
-        <div className="">
-            <p>Are you tired of struggling to keep in touch with friends, family, and colleagues? </p>
-            <p>Mercury is here to make communication effortless and enjoyable. Our powerful communication app is designed to connect people in a whole new way!</p>
+          <div className=" grid grid-cols-2 gap-10">
+            <div className="w-80 h-80 rounded-full p-2 bg-my-orange">
+              <div className="rounded-full w-full h-full bg-my-dark p-2">
+                <img
+                  src="https://images.inc.com/uploaded_files/image/1920x1080/getty_478389113_970647970450091_99776.jpg"
+                  alt="Happy working people"
+                  className="rounded-full w-full h-full object-cover"
+                />
+              </div>
+            </div>
 
-        </div>
-
-
-
+            <div className=" bg-my-orange p-5 rounded-xl text-lg">
+              <p>
+                Are you tired of struggling to keep in touch with friends,
+                family, and colleagues?{" "}
+              </p>
+              <p className=" mt-10">
+                Mercury is here to make communication effortless and enjoyable.
+                Our powerful communication app is designed to connect people in
+                a whole new way!
+              </p>
+            </div>
+          </div>
         </div>
       </div>
     </section>

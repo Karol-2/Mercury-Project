@@ -1,5 +1,6 @@
 import Footer from "../components/Footer";
 import PhotoAndText from "../layout/PhotoAndText";
+import Reasons from "../layout/Reasons";
 import WelcomeMessage from "../layout/WelcomeMessage";
 
 function HomePage() {
@@ -8,6 +9,7 @@ function HomePage() {
     <div className=" bg-my-darker min-h-screen ">
       <WelcomeMessage />
       <PhotoAndText />
+      <Reasons />
 
       <div className="lg:mx-64 mx-10 mt-10 p-10 flex flex-col rounded-3xl justify-center align-middle">
         <p className="text-my-light font-semibold text-5xl text-center">
