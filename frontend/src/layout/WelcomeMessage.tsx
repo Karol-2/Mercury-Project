@@ -1,5 +1,6 @@
 import * as React from "react";
 import LogoSVG from "/logo.svg";
+import { Link } from "react-router-dom";
 
 export default function WelcomeMessage() {
   return (
@@ -25,10 +26,16 @@ export default function WelcomeMessage() {
             </div>
             <div className=" text-my-darker flex flex-row justify-evenly mt-20 lg:mt-72">
               <div className=" z-50 flex flex-col lg:flex-row">
-                <button className="btn bg-my-orange m-5 fade-in ">Login</button>
-                <button className="btn bg-my-purple m-5 text-my-light fade-in">
-                  Register
-                </button>
+                <Link to="/login">
+                  <button className="btn bg-my-orange m-5 fade-in ">
+                    Login
+                  </button>
+                </Link>
+                <Link to="/register">
+                  <button className="btn bg-my-purple m-5 text-my-light fade-in">
+                    Register
+                  </button>
+                </Link>
               </div>
             </div>
           </div>
