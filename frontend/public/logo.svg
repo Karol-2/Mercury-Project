@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 24.3.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<svg version="1.1" id="Warstwa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 viewBox="0 0 585.185 585.185" style="enable-background:new 0 0 585.185 585.185;" xml:space="preserve">
+<style type="text/css">
+	.st0{fill:url(#SVGID_1_);}
+	.st1{fill:#FF8001;}
+	.st2{fill:#2E0B51;}
+</style>
+<g>
+	<linearGradient id="SVGID_1_" gradientUnits="userSpaceOnUse" x1="471.7148" y1="471.7526" x2="150.2586" y2="150.2964">
+		<stop  offset="0.1078" style="stop-color:#2E0B51"/>
+		<stop  offset="0.2403" style="stop-color:#4A164B"/>
+		<stop  offset="0.614" style="stop-color:#A24430"/>
+		<stop  offset="0.8755" style="stop-color:#E46D11"/>
+		<stop  offset="1" style="stop-color:#FF8001"/>
+	</linearGradient>
+	<path class="st0" d="M168.798,467.318c-10.872,0-19.767-8.895-19.767-19.767v-0.764c0-10.872,8.895-19.767,19.767-19.767h383.654
+		c8.556-16.505,15.583-33.918,20.9-52.073H261.056c-10.872,0-19.767-8.895-19.767-19.767v-0.764
+		c0-10.872,8.895-19.767,19.767-19.767h321.076c1.978-13.739,3.053-27.77,3.053-42.057c0-3.357-0.114-6.687-0.227-10.016h-365.35
+		c-10.872,0-19.767-8.895-19.767-19.767v-0.764c0-10.872,8.895-19.767,19.767-19.767h361.204
+		c-3.126-17.967-7.848-35.385-14.084-52.073H301.322c-10.872,0-19.767-8.895-19.767-19.767v-0.764
+		c0-10.872,8.895-19.767,19.767-19.767h246.699C497.958,60.483,402.363,0,292.593,0C130.998,0,0,130.998,0,292.592
+		c0,161.595,130.998,292.593,292.593,292.593c96.095,0,181.363-46.331,234.705-117.867H168.798z"/>
+	<circle class="st1" cx="276.262" cy="558.026" r="11.368"/>
+	<circle class="st1" cx="130.089" cy="484.852" r="15.816"/>
+	<circle class="st1" cx="235.24" cy="315.23" r="10.476"/>
+	<circle class="st1" cx="469.51" cy="114.515" r="11.368"/>
+	<circle class="st1" cx="56.82" cy="256.884" r="10.626"/>
+	<circle class="st1" cx="162.214" cy="223.248" r="21.252"/>
+	<circle class="st2" cx="91.911" cy="179.412" r="24.712"/>
+	<circle class="st2" cx="161.846" cy="73.274" r="14.209"/>
+	<circle class="st2" cx="151.418" cy="300.205" r="15.026"/>
+	<circle class="st2" cx="371.254" cy="103.148" r="11.368"/>
+	<circle class="st2" cx="35.568" cy="310.879" r="9.07"/>
+	<circle class="st2" cx="308.795" cy="24.628" r="8.315"/>
+	<circle class="st2" cx="337.646" cy="220.777" r="7.908"/>
+	<circle class="st2" cx="190.682" cy="525.653" r="7.908"/>
+	<circle class="st1" cx="78.716" cy="424.714" r="5.684"/>
+</g>
+</svg>
