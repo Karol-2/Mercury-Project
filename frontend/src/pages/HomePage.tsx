@@ -3,7 +3,7 @@ import Footer from "../components/Footer";
 import PhotoAndText from "../layout/PhotoAndText";
 import Reasons from "../layout/Reasons";
 import WelcomeMessage from "../layout/WelcomeMessage";
-import Stats from "../layout/Stats";
+// import Stats from "../layout/Stats";
 import CallToAction from "../layout/CallToAction";
 import Technologies from "../layout/Technologies";
 
@@ -16,7 +16,7 @@ function HomePage() {
       <Reasons />
       <Carousel />
       <Technologies />
-      <Stats />
+      {/* <Stats /> */}
       <CallToAction />
       <Footer />
     </div>

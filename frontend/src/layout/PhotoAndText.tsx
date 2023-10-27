@@ -5,7 +5,7 @@ export default function PhotoAndText() {
       <p className="text-center font-semibold text-3xl bg-my-orange p-5">
         Brand New Approach
       </p>
-        <div className=" mx-50 lg:mx-72 flex items-center justify-center py-20 content-center  ">
+        <div className=" mx-50 lg:mx-72 flex items-center justify-center py-40 content-center  ">
           
 
           <div className=" grid grid-cols-2 gap-10">

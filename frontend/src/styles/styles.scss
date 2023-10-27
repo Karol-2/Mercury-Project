@@ -59,5 +59,19 @@
 
 
 
+// scrollbar
 
+::-webkit-scrollbar {
+    width: 12px;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    background-color: darken(#FF8001, 10%);;
+    border-radius: 6px;
+  }
+  
+  ::-webkit-scrollbar-track {
+    background-color: darken(#121519, 10%);
+  }
+  
 
