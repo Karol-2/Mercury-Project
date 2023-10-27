@@ -22,7 +22,7 @@ async function isDatabaseEmpty() {
 async function importInitialData() {
   const isEmpty = await isDatabaseEmpty();
   if (!isEmpty) {
-    return;
+    return "Database is not empty";
   }
 
   const session = driver.session();
@@ -45,9 +45,9 @@ async function importInitialData() {
       `;
       await session.run(query, user);
     }
-    console.log("Initial data has been imported into database.");
+    return "Initial data has been imported into database.";
   } catch (error) {
-    console.error("Error importing data:", error);
+    return "Error importing data";
   } finally {
     session.close();
   }
