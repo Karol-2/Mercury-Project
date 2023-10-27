@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 
 function RegisterBox() {
   const [user, setUser] = useState({});
@@ -93,6 +94,11 @@ function RegisterBox() {
       <button className="btn bg-my-orange" onClick={() => registerFunc()}>
         Register
       </button>
+      <div className="text-center">
+      <p>Already have an account?</p>
+      <p className="font-bold"><Link to="/login">Login</Link></p>
+       
+       </div>
     </div>
   );
 }
