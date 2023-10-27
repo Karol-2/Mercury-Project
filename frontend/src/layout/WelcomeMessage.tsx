@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 export default function WelcomeMessage() {
   return (
     <div className="relative overflow-hidden  ">
-      <div className=" h-full absolute top-1/2 md:top-1/4 lg:left-1/4 lg:right-1/4 ">
+      <div className=" h-full absolute top-1/2 md:top-1/4   lg:left-1/4 lg:right-1/4 ">
         <img
           src={LogoSVG}
           alt="Mercury Logo"

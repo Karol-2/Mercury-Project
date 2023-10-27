@@ -44,7 +44,7 @@ export default function Technologies() {
         Modern Technologies
       </p>
 
-      <div className="grid grid-cols-4 gap-10 mx-5 lg:mx-72 mt-5">
+      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-10 mx-5 lg:mx-72 mt-5">
         {technologies.map((tech) => (
           <>
             <div className=" rounded-full p-2 bg-my-orange">
