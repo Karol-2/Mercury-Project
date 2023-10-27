@@ -1,4 +1,4 @@
-[
+const userData = [
   {
     "id": 0,
     "nick": "boejiden",
@@ -77,3 +77,5 @@
     "chats": []
   }
 ]
+
+export default userData;

@@ -14,7 +14,8 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 
-importInitialData();
+importInitialData().then((res) => console.log(res));
+
 
 app.get("/", (_req: Request, res: Response) => {
   res.send("Mercury Project");

@@ -1,7 +1,5 @@
-import { readFileSync } from "fs";
 import driver from "../driver/driver";
-
-const jsonFilePath = "data/users.json";
+import userData from './users';
 
 async function isDatabaseEmpty() {
   const session = driver.session();
@@ -27,8 +25,7 @@ async function importInitialData() {
 
   const session = driver.session();
   try {
-    const jsonData = JSON.parse(readFileSync(jsonFilePath, "utf-8"));
-    for (const user of jsonData) {
+    for (const user of userData) {
       const query = `
         CREATE (u:User {
           id: $id,
