@@ -1,59 +1,100 @@
-import { useEffect, useState } from "react"
-import Button from "../components/Button"
-
+import { useEffect, useState } from "react";
 
 function RegisterBox() {
-  const [user, setUser] = useState({})
+  const [user, setUser] = useState({});
   useEffect(() => {
-    console.log(user)
-  }, [user])
+    console.log(user);
+  }, [user]);
 
   const updateFormUser = (key: string) => {
-    const changeKey = updateUser(key)
-    return (e: React.ChangeEvent<HTMLInputElement>) => changeKey(e.target.value)
-  }
+    const changeKey = updateUser(key);
+    return (e: React.ChangeEvent<HTMLInputElement>) =>
+      changeKey(e.target.value);
+  };
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const updateUser = (key: string) => (value: any) => {
-    setUser({...user, [key]: value})
-  }
+    setUser({ ...user, [key]: value });
+  };
 
   const registerFunc = async () => {
     const response = await fetch("http://localhost:5000/users", {
       method: "POST",
       headers: {
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
       },
-      body: JSON.stringify(user)
-    })
-    const userJson = await response.json()
-    console.log("Register " + JSON.stringify(userJson))
-  }
+      body: JSON.stringify(user),
+    });
+    const userJson = await response.json();
+    console.log("Register " + JSON.stringify(userJson));
+  };
 
   return (
-    <div className="w-64 flex flex-col gap-2">
-      <div>Login:</div>
-      <input type="text" className="text-my-dark" onChange={updateFormUser("nick")} />
+    <div className=" w-80 flex flex-col gap-2 bg-my-dark p-10 rounded-xl">
+      
 
-      <div>First name:</div>
-      <input type="text" className="text-my-dark" onChange={updateFormUser("first_name")} />
-
-      <div>Last name:</div>
-      <input type="text" className="text-my-dark" onChange={updateFormUser("last_name")} />
+      <div>First and last name:</div>
+      <input
+        type="text"
+        className="text-my-dark form-input"
+        onChange={updateFormUser("first_name")}
+        placeholder="First name"
+      />
+      <input
+        type="text"
+        className="text-my-dark form-input"
+        onChange={updateFormUser("last_name")}
+        placeholder="Last name"
+      />
 
       <div>
         <span>Country:</span>
-        <input type="text" className="text-my-dark" onChange={updateFormUser("country")} />
+        <input
+          type="text"
+          className="text-my-dark form-input"
+          onChange={updateFormUser("country")}
+          placeholder="Country"
+        />
       </div>
 
       <div>Profile picture:</div>
-      <input type="file" className="text-my-dark" onChange={updateFormUser("profile_picture")} />
+      <input
+        type="file"
+        className="text-my-dark form-input"
+        onChange={updateFormUser("profile_picture")}
+      />
 
-      <div>E-mail:</div>
-      <input type="text" className="text-my-dark" onChange={updateFormUser("mail")} />
-      
-      <Button type="normal" onClick={() => registerFunc()}>Register</Button>
+      <div className=" py-10">
+        <div>E-mail:</div>
+        <input
+          type="text"
+          className="text-my-dark form-input"
+          onChange={updateFormUser("mail")}
+          placeholder="E-mail"
+        />
+
+<div>Login:</div>
+      <input
+        type="text"
+        className="text-my-dark form-input"
+        onChange={updateFormUser("nick")}
+        placeholder="Login"
+      />
+
+        <div>Password:</div>
+        <input
+          type="password"
+          className="text-my-dark form-input"
+          onChange={updateFormUser("mail")}
+          placeholder="Password"
+        />
+      </div>
+
+      <button className="btn bg-my-orange" onClick={() => registerFunc()}>
+        Register
+      </button>
     </div>
-  )
+  );
 }
 
-export default RegisterBox
+export default RegisterBox;
