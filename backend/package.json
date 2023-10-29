@@ -8,8 +8,8 @@
   "license": "ISC",
   "scripts": {
     "start": "nodemon src/index.ts",
-    "test": "vitest",
-    "coverage": "vitest run --coverage"
+    "test": "vitest --config vitest.config.ts",
+    "coverage": "vitest --config vitest.config.ts run --coverage"
   },
   "dependencies": {
     "cors": "^2.8.5",
