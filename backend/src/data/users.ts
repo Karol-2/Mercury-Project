@@ -49,7 +49,7 @@ const userData = [
     "first_name": "Elon",
     "last_name": "Musk",
     "country": "USA",
-    "profile_picture": "hhttps://images.tagesschau.de/image/910791bc-4343-4ceb-a176-9c0937f7c367/AAABhnRwqGc/AAABibBxyuw/1x1-256/musk-167.jpg",
+    "profile_picture": "https://images.tagesschau.de/image/910791bc-4343-4ceb-a176-9c0937f7c367/AAABhnRwqGc/AAABibBxyuw/1x1-256/musk-167.jpg",
     "mail": "elonmusk@spacex.com",
     "friend_ids": ["6"],
     "chats": []
