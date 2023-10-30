@@ -1,5 +1,5 @@
 import driver from "../driver/driver";
-import userData from './users';
+import userData from "./users";
 
 async function isDatabaseEmpty() {
   const session = driver.session();
@@ -26,21 +26,26 @@ async function importInitialData() {
   const session = driver.session();
   try {
     for (const user of userData) {
-      const query = `
-        CREATE (u:User {
-          id: $id,
-          nick: $nick,
-          first_name: $first_name,
-          last_name: $last_name,
-          country: $country,
-          profile_picture: $profile_picture,
-          mail: $mail,
-          friend_ids: $friend_ids,
-          chats: $chats
-        })
-        RETURN u.id AS userId
+      const friendIds = user.friend_ids.map((id) => Number(id));
+
+      const createUserQuery = `
+        CREATE (u:User $user)
+        RETURN ID(u) AS userId
       `;
-      await session.run(query, user);
+      const userResult = await session.run(createUserQuery, { user });
+      const userId = userResult.records[0].get("userId").toNumber();
+
+      for (const friendId of friendIds) {
+        const createRelationshipQuery = `
+          MATCH (u1:User) WHERE ID(u1) = $userId1
+          MATCH (u2:User) WHERE ID(u2) = $userId2
+          CREATE (u1)-[:FRIENDS]->(u2)
+        `;
+        await session.run(createRelationshipQuery, {
+          userId1: userId,
+          userId2: friendId,
+        });
+      }
     }
     return "Initial data has been imported into database.";
   } catch (error) {

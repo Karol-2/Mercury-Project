@@ -44,39 +44,53 @@ usersRouter.get<{userId: number},Response,{},{}>("/:userId", async (req, res) =>
     }
 });
 
-usersRouter.post<{},Response,User,{}>("/", async (req, res) => {
+usersRouter.post<{}, Response, User, {}>("/", async (req, res) => {
     try {
         const userConstuctor = req.body;
         const {
-            nick, 
-            last_name, 
-            first_name, 
-            mail, 
-            country, 
+            nick,
+            password,
+            last_name,
+            first_name,
+            mail,
+            country,
             profile_picture
         } = userConstuctor;
         const session = driver.session();
-        const userExists = await session.run(
-            `MATCH (u:User {nick: $nick}) RETURN u`
-        , {nick});
-        if (userExists.records.length > 0) {
-            await session.close();
-            return res.status(404).json({status: "error", errors: [{name: "ALREADY_EXISTS"}]});
-        }
+
+        const highestIdRequest = await session.run(
+            "MATCH (u:User) RETURN max(toInteger(u.id)) AS highestId"
+        );
+        const highestId = highestIdRequest.records[0].get("highestId");
+
+        const newUserId = highestId === null ? 0 : highestId + 1;
+
         const newUserRequest = await session.run(
-            `MERGE (u:User {nick: $nick, first_name: $first_name, 
-            last_name: $last_name, mail: $mail, 
+            `CREATE (u:User {id: $newUserId, nick: $nick, password: $password,
+            first_name: $first_name, last_name: $last_name, mail: $mail, 
             country: $country, profile_picture: $profile_picture}) 
-            RETURN ID(u),u`, 
-        {nick, first_name, last_name, mail, country, profile_picture});
+            RETURN ID(u), u`,
+            {
+                newUserId,
+                nick,
+                first_name,
+                last_name,
+                mail,
+                country,
+                profile_picture,
+                password
+            }
+        );
+
         const newUser = newUserRequest.records.map(user => ({
-            id: user.get(0).low, 
-            ...user.get(1).properties 
+            id: user.get(0).low,
+            ...user.get(1).properties
         }))[0];
+
         await session.close();
-        return res.json({status: "ok", result: [newUser]});
+        return res.json({ status: "ok", result: [newUser] });
     } catch (err) {
-        return res.status(404).json({status: "error", errors: [err as object]});
+        return res.status(404).json({ status: "error", errors: [err as object] });
     }
 });
 
@@ -84,7 +98,8 @@ usersRouter.put<{userId:number},Response,User,{}>("/:userId", async (req, res) =
     try {
         const userPropertiesToUpdate = req.body;
         const {
-            nick, 
+            nick,
+            password,
             last_name, 
             first_name, 
             mail, 
@@ -102,10 +117,11 @@ usersRouter.put<{userId:number},Response,User,{}>("/:userId", async (req, res) =
         }
         await session.run(
             `MATCH (u:User) WHERE id(u)=$userId SET 
-            u.nick=$nick, u.first_name=$first_name, 
-            u.last_name=$last_name, u.mail=$mail, 
-            u.country=$country, u.profile_picture=$profile_picture`
-        , {userId, nick, first_name, last_name, mail, country, profile_picture}); 
+            u.nick=$nick, u.password=$password, 
+            u.first_name=$first_name, u.last_name=$last_name, 
+            u.mail=$mail, u.country=$country,
+            u.profile_picture=$profile_picture`
+        , {userId, nick, password, first_name, last_name, mail, country, profile_picture}); 
         await session.close();
         return res.json({status: "ok"});
     } catch (err) {
