@@ -5,9 +5,9 @@ import { RouterProvider, createBrowserRouter } from 'react-router-dom';
 import HomePage from './pages/HomePage.tsx';
 import LoginPage from './pages/LoginPage.tsx';
 import RegisterPage from './pages/RegisterPage.tsx';
+import PageNotFound from './pages/PageNotFound.tsx';
 
 import "./styles/styles.scss";
-import PageNotFound from './pages/PageNotFound.tsx';
 
 const router = createBrowserRouter([
   {

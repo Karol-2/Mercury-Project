@@ -1,14 +1,21 @@
+import { motion } from "framer-motion";
+
 export default function PhotoAndText() {
   return (
     <section className=" text-my-darker  gap-10 min-w-fit ">
       <div className="bg-my-dark relative">
-      <p className="text-center font-semibold text-3xl bg-my-orange p-5">
-        Brand New Approach
-      </p>
+        <p className="text-center font-semibold text-3xl bg-my-orange p-5">
+          Brand New Approach
+        </p>
         <div className=" mx-50 lg:mx-72 flex items-center justify-center py-40 content-center  ">
-        
           <div className=" grid grid-cols-2 gap-10">
-            <div className="w-80 h-80 rounded-full p-2 bg-my-orange pulsate">
+            <motion.div
+              className="w-80 h-80 rounded-full p-2 bg-my-orange pulsate"
+              id="photo"
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              transition={{ duration: 1 }}
+            >
               <div className="rounded-full w-full h-full bg-my-dark p-2">
                 <img
                   src="https://images.inc.com/uploaded_files/image/1920x1080/getty_478389113_970647970450091_99776.jpg"
@@ -16,9 +23,15 @@ export default function PhotoAndText() {
                   className="rounded-full w-full h-full object-cover"
                 />
               </div>
-            </div>
+            </motion.div>
 
-            <div className=" bg-my-orange p-5 rounded-xl text-lg">
+            <motion.div
+              className=" bg-my-orange p-5 rounded-xl text-lg"
+              id="text"
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              transition={{ duration: 1 }}
+            >
               <p className="font-bold text-2xl">
                 Are you tired of struggling to keep in touch with friends,
                 family, and colleagues?{" "}
@@ -28,7 +41,7 @@ export default function PhotoAndText() {
                 Our powerful communication app is designed to connect people in
                 a whole new way!
               </p>
-            </div>
+            </motion.div>
           </div>
         </div>
       </div>
