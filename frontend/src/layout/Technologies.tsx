@@ -25,7 +25,7 @@ export default function Technologies() {
     {
       name: "NEO4J",
       imageSrc:
-        "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e5/Neo4j-logo_color.png/800px-Neo4j-logo_color.png",
+        "https://assets.stickpng.com/thumbs/6303a04bab1b900654aad39e.png",
       description:
         "Neo4J's graph database structure is instrumental in managing complex relationships and connections, which is vital for a communication app. This technology enables us to provide users with efficient and relevant search and recommendation features while maintaining data integrity and security.",
     },
@@ -40,32 +40,32 @@ export default function Technologies() {
 
   return (
     <section className="bg-my-dark py-10">
-      <p className="text-center font-semibold text-3xl bg-my-orange p-5  text-my-darker">
+      <p className="text-center font-semibold text-3xl bg-my-orange p-5 text-my-darker">
         Modern Technologies
       </p>
-
+  
       <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-10 mx-5 lg:mx-72 mt-5">
         {technologies.map((tech) => (
           <>
-            <div className=" rounded-full p-2 bg-my-orange">
-              <div className="rounded-full w-full h-full bg-my-dark p-2">
-                <img
-                  src={tech.imageSrc}
-                  alt={`${tech.name} logo`}
-                  className="rounded-full w-full h-full object-cover"
-                />
-              </div>
+          <div key={tech.name} className="relative w-[15vw] h-[15vw] rounded-full p-2 bg-my-orange">
+            <div className="rounded-full w-full h-full bg-my-dark p-2">
+              <div
+                style={{
+                  backgroundImage: `url(${tech.imageSrc})`,
+                  backgroundSize: 'cover',
+                  backgroundPosition: 'center',
+                }}
+                className="rounded-full w-full h-full border-my-orange border-2"
+              ></div>
             </div>
-            <div className="ml-4">
-              <h1 className="font-semibold text-lg text-my-orange">
-                {tech.name}
-              </h1>
-              <p className="font-thin text-sm mt-2">{tech.description}</p>
-            </div>
-          
+          </div>
+          <div className="ml-4 text-justify">
+            <h1 className="font-semibold text-2xl text-my-orange">{tech.name}</h1>
+            <p className="font-thin text-lg mt-2">{tech.description}</p>
+          </div>
           </>
         ))}
       </div>
     </section>
   );
-}
+              }

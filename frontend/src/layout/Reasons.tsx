@@ -9,11 +9,11 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 export default function Reasons() {
   return (
     <section className="  bg-my-purple text-my-light p-10">
-      <div className=" mx-10">
+      
         <h1 className=" text-center text-5xl font-bold">
           Why Should I Use Mercury?
         </h1>
-        <div className="flex flex-col md:flex-row justify-evenly mt-5">
+        <div className="flex flex-col md:grid md:grid-cols-4 md:gap-x-50  justify-evenly mt-5">
           <div
             className=" hover:bg-my-light hover:text-my-dark p-5 rounded-xl
            text-center clickable cursor-default my-5"
@@ -57,7 +57,7 @@ export default function Reasons() {
             <p className=" font-semibold text-lg">Global Reach</p>
           </div>
         </div>
-      </div>
+      
     </section>
   );
 }
