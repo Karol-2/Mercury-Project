@@ -8,11 +8,9 @@
 
 .btn{
     text-align: center;
-    padding: 1.5rem 6rem;
     font-size: 1.5rem;
     border-radius: 3rem;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-
     transition: 0.25s ease-in-out;
 
     &:hover{
@@ -23,6 +21,22 @@
         transform: translateY(5px);
     }
 
+}
+
+.primary{
+    border: 3px solid darken($color: #FF8001, $amount: 10%);
+    background-color: #FF8001;
+    padding: 1.5rem 6rem;
+}
+
+.secondary{
+    border: 3px solid darken($color: #3E0C70, $amount: 5%);
+    background-color: #3E0C70;
+    padding: 1.5rem 6rem;
+}
+
+.small{
+    padding: 0.75rem 3rem;
 }
 
 .clickable{
@@ -65,7 +79,7 @@
 }
 
 .fade-in{
-    animation: fade-in 1s 2s ease-in-out forwards;
+    animation: fade-in 0.5s 2s ease-in-out forwards;
     opacity: 0;
 
     &:after{

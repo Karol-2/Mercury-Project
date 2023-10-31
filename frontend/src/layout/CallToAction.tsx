@@ -15,7 +15,7 @@ export default function CallToAction() {
             future of communication now.
           </p>
           <Link to="/register">
-            <button className="btn bg-my-purple mt-5">Join Us!</button>
+            <button className="btn secondary mt-5">Join Us!</button>
           </Link>
         </div>
       </div>
