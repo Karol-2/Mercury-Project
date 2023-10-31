@@ -2,10 +2,14 @@ import * as React from "react";
 import LogoSVG from "/logo.svg";
 import { Link } from "react-router-dom";
 
+const scrollToTop = (): void => {
+  window.scrollTo(0, 0);
+}
+
 export default function WelcomeMessage() {
   return (
     <div className="relative overflow-hidden" id="background">
-      <div className=" h-full absolute top-1/2 md:top-1/4 md:left-1/4 lg:left-1/4 lg:right-1/4 select-none" id="logo">
+      <div className=" h-full absolute top-1/2 md:top-[30%] md:left-1/4 lg:left-1/4 lg:right-1/4 select-none" id="logo">
         <img
           src={LogoSVG}
           alt="Mercury Logo"
@@ -32,7 +36,7 @@ export default function WelcomeMessage() {
                   </button>
                 </Link>
                 <Link to="/register">
-                  <button className="btn secondary m-5 text-my-light fade-in" id="register-button">
+                  <button className="btn secondary m-5 text-my-light fade-in" id="register-button" onClick={scrollToTop}>
                     Register
                   </button>
                 </Link>
