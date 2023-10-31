@@ -7,19 +7,20 @@ import WelcomeMessage from "../layout/WelcomeMessage";
 import CallToAction from "../layout/CallToAction";
 import Technologies from "../layout/Technologies";
 
+
 function HomePage() {
+
   return (
 
-    <div className=" bg-my-darker min-h-screen ">
+    <main className=" bg-my-darker min-h-screen" >
       <WelcomeMessage />
       <PhotoAndText />
       <Reasons />
       <Carousel />
       <Technologies />
-      {/* <Stats /> */}
       <CallToAction />
       <Footer />
-    </div>
+    </main>
   );
 }
 
