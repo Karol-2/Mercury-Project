@@ -1,4 +1,3 @@
-import * as React from "react";
 import LogoSVG from "/logo.svg";
 import { Link } from "react-router-dom";
 
