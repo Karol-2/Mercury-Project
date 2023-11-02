@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import {
   faArrowCircleLeft,
   faArrowCircleRight,
@@ -17,7 +17,7 @@ function Slider() {
   ];
 
   useEffect(() => {
-    const lastIndex = photoBase.length -1;
+    const lastIndex = photoBase.length - 1;
     if (index < 0) {
       setIndex(lastIndex);
     }

@@ -1,5 +1,3 @@
-import React from "react";
-
 interface ISlider {
   photoThumb: string;
   photoIndex: number;
