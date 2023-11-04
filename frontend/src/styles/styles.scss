@@ -7,6 +7,7 @@
 // buttons
 
 .btn{
+    text-align: center;
     padding: 1.5rem 6rem;
     font-size: 1.5rem;
     border-radius: 3rem;
@@ -24,7 +25,6 @@
 
 }
 
-
 .clickable{
     transition: 0.25s ease-in-out;
     
@@ -33,6 +33,23 @@
     }
     
 }
+
+// forms
+
+.form-label{
+    font-weight:bold;
+}
+
+.form-input{
+    border-radius: 0.5rem;
+    padding: 1rem;
+    border: solid 1px black;
+    width: 100%;
+}
+
+
+// animations
+
 
 .pulsate{
     animation: pulse 20s 2s ease-in-out infinite;
