@@ -14,6 +14,7 @@ export default function PhotoAndText() {
               id="photo"
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}
+              viewport={{ once: true }}
               transition={{ duration: 1 }}
             >
               <div className="rounded-full w-full h-full bg-my-dark p-2">
@@ -30,6 +31,7 @@ export default function PhotoAndText() {
               id="text"
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}
+              viewport={{ once: true }}
               transition={{ duration: 1 }}
             >
               <p className="font-bold text-2xl">
