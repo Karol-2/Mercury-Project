@@ -1,6 +1,6 @@
 import { expect, test } from "vitest";
 
-const userId = 7;
+let userId: number;
 
 test("Create user", async () => {
   const userData = {
@@ -27,6 +27,7 @@ test("Create user", async () => {
 
   expect(status).toBe("ok");
 
+  userId = data[0].id;
 });
 
 test("Fetch user by ID", async () => {
