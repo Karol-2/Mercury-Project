@@ -1,16 +1,16 @@
 import { expect, test } from "vitest";
 
-let userId: number;
+const userId = 7;
 
 test("Create user", async () => {
   const userData = {
-    nick: "Bobby",
+    nick: "Tommy",
     password: "12345",
-    first_name: "Bob",
-    last_name: "Smith",
+    first_name: "Tom",
+    last_name: "Hanks",
     country: "USA",
-    profile_picture: "https://example.com/bobby.jpg",
-    mail: "bob.smith@example.com",
+    profile_picture: "https://example.com/tommy.jpg",
+    mail: "tom.hanks@example.com",
   };
 
   const response = await fetch("http://localhost:5000/users", {
@@ -27,10 +27,10 @@ test("Create user", async () => {
 
   expect(status).toBe("ok");
 
-  userId = data.id;
 });
 
 test("Fetch user by ID", async () => {
+  
   const response = await fetch(`http://localhost:5000/users/${userId}`);
   const responseData = await response.json();
   const status = responseData.status;
@@ -40,13 +40,13 @@ test("Fetch user by ID", async () => {
 
 test("Update user by ID", async () => {
   const userUpdateData = {
-    nick: "John",
+    nick: "Tommy",
     password: "54321",
-    first_name: "Bob",
-    last_name: "Smith",
+    first_name: "Tommy",
+    last_name: "Hanks",
     country: "Canada",
-    profile_picture: "https://example.com/johnbob.jpg",
-    mail: "bobjohn@example.com",
+    profile_picture: "https://example.com/tommy.jpg",
+    mail: "tommy.hanks@example.com",
   };
 
   const response = await fetch(`http://localhost:5000/users/${userId}`, {

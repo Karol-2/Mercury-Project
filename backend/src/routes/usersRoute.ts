@@ -19,6 +19,7 @@ usersRouter.get<{},Response,{},{}>("/", async (_req, res) => {
         await session.close();
         return res.json({status: "ok", result: users});
     } catch (err) {
+        console.log("Error:", err);
         return res.status(404).json({status: "error", errors: [err as object]});
     }
 });
@@ -40,6 +41,7 @@ usersRouter.get<{userId: number},Response,{},{}>("/:userId", async (req, res) =>
         ? res.status(404).json({status: "error", errors: [{name: "NOT_FOUND"}]})
         : res.json({status: "ok", result: [user[0]]});
     } catch (err) {
+        console.log("Error:", err);
         return res.status(404).json({status: "error", errors: [err as object]});
     }
 });
@@ -50,35 +52,27 @@ usersRouter.post<{}, Response, User, {}>("/", async (req, res) => {
         const {
             nick,
             password,
-            last_name,
             first_name,
-            mail,
+            last_name,
             country,
-            profile_picture
+            profile_picture,
+            mail
         } = userConstuctor;
         const session = driver.session();
 
-        const highestIdRequest = await session.run(
-            "MATCH (u:User) RETURN max(toInteger(u.id)) AS highestId"
-        );
-        const highestId = highestIdRequest.records[0].get("highestId");
-
-        const newUserId = highestId === null ? 0 : highestId + 1;
-
         const newUserRequest = await session.run(
-            `CREATE (u:User {id: $newUserId, nick: $nick, password: $password,
-            first_name: $first_name, last_name: $last_name, mail: $mail, 
-            country: $country, profile_picture: $profile_picture}) 
+            `CREATE (u:User {nick: $nick, password: $password,
+            first_name: $first_name, last_name: $last_name, country: $country, 
+            profile_picture: $profile_picture, mail: $mail}) 
             RETURN ID(u), u`,
             {
-                newUserId,
                 nick,
+                password,
                 first_name,
                 last_name,
-                mail,
                 country,
                 profile_picture,
-                password
+                mail
             }
         );
 
@@ -90,6 +84,7 @@ usersRouter.post<{}, Response, User, {}>("/", async (req, res) => {
         await session.close();
         return res.json({ status: "ok", result: [newUser] });
     } catch (err) {
+        console.log("Error:", err);
         return res.status(404).json({ status: "error", errors: [err as object] });
     }
 });
@@ -100,11 +95,11 @@ usersRouter.put<{userId:number},Response,User,{}>("/:userId", async (req, res) =
         const {
             nick,
             password,
-            last_name, 
             first_name, 
+            last_name, 
+            country,
+            profile_picture,
             mail, 
-            country, 
-            profile_picture
         } = userPropertiesToUpdate;
         const session = driver.session();
         const userId = Number(req.params.userId);
@@ -119,12 +114,13 @@ usersRouter.put<{userId:number},Response,User,{}>("/:userId", async (req, res) =
             `MATCH (u:User) WHERE id(u)=$userId SET 
             u.nick=$nick, u.password=$password, 
             u.first_name=$first_name, u.last_name=$last_name, 
-            u.mail=$mail, u.country=$country,
-            u.profile_picture=$profile_picture`
-        , {userId, nick, password, first_name, last_name, mail, country, profile_picture}); 
+            u.country=$country,u.profile_picture=$profile_picture, 
+            u.mail=$mail`
+        , {userId, nick, password, first_name, last_name, country, profile_picture, mail}); 
         await session.close();
         return res.json({status: "ok"});
     } catch (err) {
+        console.log("Error:", err);
         return res.status(404).json({status: "error", errors: [err as object]});
     }
 });
@@ -146,6 +142,7 @@ usersRouter.delete<{userId:number},Response,{},{}>("/:userId", async (req, res) 
         await session.close();
         return res.json({status: "ok"});
     } catch (err) {
+        console.log("Error:", err);
         return res.status(404).json({status: "error", errors: [err as object]});
     }
 });
