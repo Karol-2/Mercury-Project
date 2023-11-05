@@ -1,6 +1,6 @@
 import Footer from "../components/Footer";
 import LoginBox from "../components/LoginBox";
-import Banner from "../layout/Banner";
+import Banner from "../components/Banner";
 
 function LoginPage() {
   return (

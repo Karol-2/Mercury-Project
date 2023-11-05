@@ -6,13 +6,9 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { motion } from "framer-motion";
-import { useInView } from 'react-intersection-observer';
 
 export default function Reasons() {
 
-  const [ref, inView] = useInView({
-    triggerOnce: true,
-  });
 
   return (
     
@@ -22,10 +18,10 @@ export default function Reasons() {
           Why Should I Use Mercury?
         </h1>
         <motion.div
-      ref={ref}
-      initial={{ x: -1000 }}
-      animate={{ x: inView ? 0 : -1000 }}
-      transition={{ duration: 1 }}
+       initial={{ x: -200 }}
+       whileInView={{ x: 0 }}
+       viewport={{ once: true }}
+       transition={{ duration: 1 }}
     >
         <div className="flex flex-col md:grid md:grid-cols-4 md:gap-x-50  justify-evenly mt-5">
           <div
@@ -58,7 +54,7 @@ export default function Reasons() {
               icon={faUsers}
               className=" text-my-orange text-8xl mb-5"
             />
-            <p className=" font-semibold text-lg">User-Friendly Interfacey</p>
+            <p className=" font-semibold text-lg">User-Friendly Interface</p>
           </div>
           <div
             className=" hover:bg-my-light hover:text-my-dark p-5 rounded-xl

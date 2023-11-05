@@ -1,6 +1,6 @@
 
 import { Link } from "react-router-dom";
-import Banner from "../layout/Banner";
+import Banner from "../components/Banner";
 
 function PageNotFound() {
   return (
