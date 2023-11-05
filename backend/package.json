@@ -9,7 +9,7 @@
   "scripts": {
     "start": "nodemon src/index.ts",
     "test": "vitest",
-    "coverage": "vitest --coverage"
+    "coverage": "vitest --coverage",
     "build": "tsc",
     "prod": "node build/index.js"
   },
