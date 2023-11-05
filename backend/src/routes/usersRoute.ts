@@ -19,6 +19,7 @@ usersRouter.get<{},Response,{},{}>("/", async (_req, res) => {
         await session.close();
         return res.json({status: "ok", result: users});
     } catch (err) {
+        console.log("Error:", err);
         return res.status(404).json({status: "error", errors: [err as object]});
     }
 });
@@ -40,43 +41,51 @@ usersRouter.get<{userId: number},Response,{},{}>("/:userId", async (req, res) =>
         ? res.status(404).json({status: "error", errors: [{name: "NOT_FOUND"}]})
         : res.json({status: "ok", result: [user[0]]});
     } catch (err) {
+        console.log("Error:", err);
         return res.status(404).json({status: "error", errors: [err as object]});
     }
 });
 
-usersRouter.post<{},Response,User,{}>("/", async (req, res) => {
+usersRouter.post<{}, Response, User, {}>("/", async (req, res) => {
     try {
         const userConstuctor = req.body;
         const {
-            nick, 
-            last_name, 
-            first_name, 
-            mail, 
-            country, 
-            profile_picture
+            nick,
+            password,
+            first_name,
+            last_name,
+            country,
+            profile_picture,
+            mail
         } = userConstuctor;
         const session = driver.session();
-        const userExists = await session.run(
-            `MATCH (u:User {nick: $nick}) RETURN u`
-        , {nick});
-        if (userExists.records.length > 0) {
-            await session.close();
-            return res.status(404).json({status: "error", errors: [{name: "ALREADY_EXISTS"}]});
-        }
+
         const newUserRequest = await session.run(
-            `MERGE (u:User {nick: $nick, first_name: $first_name, 
-            last_name: $last_name, mail: $mail, 
-            country: $country, profile_picture: $profile_picture}) 
-            RETURN ID(u),u`, 
-        {nick, first_name, last_name, mail, country, profile_picture});
+            `CREATE (u:User {nick: $nick, password: $password,
+            first_name: $first_name, last_name: $last_name, country: $country, 
+            profile_picture: $profile_picture, mail: $mail}) 
+            RETURN ID(u), u`,
+            {
+                nick,
+                password,
+                first_name,
+                last_name,
+                country,
+                profile_picture,
+                mail
+            }
+        );
+
         const newUser = newUserRequest.records.map(user => ({
-            id: user.get(0).low, 
-            ...user.get(1).properties 
+            id: user.get(0).low,
+            ...user.get(1).properties
         }))[0];
+
         await session.close();
-        return res.json({status: "ok", result: [newUser]});
+        return res.json({ status: "ok", result: [newUser] });
     } catch (err) {
-        return res.status(404).json({status: "error", errors: [err as object]});
+        console.log("Error:", err);
+        return res.status(404).json({ status: "error", errors: [err as object] });
     }
 });
 
@@ -84,12 +93,13 @@ usersRouter.put<{userId:number},Response,User,{}>("/:userId", async (req, res) =
     try {
         const userPropertiesToUpdate = req.body;
         const {
-            nick, 
-            last_name, 
+            nick,
+            password,
             first_name, 
+            last_name, 
+            country,
+            profile_picture,
             mail, 
-            country, 
-            profile_picture
         } = userPropertiesToUpdate;
         const session = driver.session();
         const userId = Number(req.params.userId);
@@ -102,13 +112,15 @@ usersRouter.put<{userId:number},Response,User,{}>("/:userId", async (req, res) =
         }
         await session.run(
             `MATCH (u:User) WHERE id(u)=$userId SET 
-            u.nick=$nick, u.first_name=$first_name, 
-            u.last_name=$last_name, u.mail=$mail, 
-            u.country=$country, u.profile_picture=$profile_picture`
-        , {userId, nick, first_name, last_name, mail, country, profile_picture}); 
+            u.nick=$nick, u.password=$password, 
+            u.first_name=$first_name, u.last_name=$last_name, 
+            u.country=$country,u.profile_picture=$profile_picture, 
+            u.mail=$mail`
+        , {userId, nick, password, first_name, last_name, country, profile_picture, mail}); 
         await session.close();
         return res.json({status: "ok"});
     } catch (err) {
+        console.log("Error:", err);
         return res.status(404).json({status: "error", errors: [err as object]});
     }
 });
@@ -130,6 +142,7 @@ usersRouter.delete<{userId:number},Response,{},{}>("/:userId", async (req, res) 
         await session.close();
         return res.json({status: "ok"});
     } catch (err) {
+        console.log("Error:", err);
         return res.status(404).json({status: "error", errors: [err as object]});
     }
 });
