@@ -1,6 +1,6 @@
 import Footer from "../components/Footer";
 import RegisterBox from "../components/RegisterBox";
-import Banner from "../layout/Banner";
+import Banner from "../components/Banner";
 
 function RegisterPage() {
   return (
