@@ -8,7 +8,7 @@ function LoginBox() {
   };
 
   return (
-    <div className=" w-80 flex flex-col gap-2 bg-my-dark p-10 m-10 rounded-xl">
+    <div className=" medium:w-[25vw] flex flex-col gap-2 bg-my-dark p-10 px-20 rounded-xl" id="login-box">
       <div>Login:</div>
       <input
         type="text"
@@ -23,7 +23,7 @@ function LoginBox() {
         placeholder="Password"
       />
 
-      <button className="btn bg-my-orange" onClick={() => loginFunc()}>
+      <button className="btn small bg-my-orange" onClick={() => loginFunc()}>
         Login
       </button>
       <div className="text-center">

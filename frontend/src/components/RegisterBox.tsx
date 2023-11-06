@@ -31,7 +31,7 @@ function RegisterBox() {
   };
 
   return (
-    <div className=" w-80 flex flex-col gap-2 bg-my-dark p-10 rounded-xl">
+    <div className=" medium:w-[25vw] flex flex-col gap-2 bg-my-dark p-10 px-20 rounded-xl" id="register-box">
       
 
       <div>First and last name:</div>
@@ -91,7 +91,7 @@ function RegisterBox() {
         />
       </div>
 
-      <button className="btn bg-my-orange" onClick={() => registerFunc()}>
+      <button className="btn small bg-my-orange" onClick={() => registerFunc()}>
         Register
       </button>
       <div className="text-center">
