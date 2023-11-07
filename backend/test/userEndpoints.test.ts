@@ -22,16 +22,15 @@ test("Create user", async () => {
   });
 
   const responseData = await response.json();
-  const data = responseData.result;
+  const user = responseData.user;
   const status = responseData.status;
 
   expect(status).toBe("ok");
 
-  userId = data[0].id;
+  userId = user.id;
 });
 
 test("Fetch user by ID", async () => {
-  
   const response = await fetch(`http://localhost:5000/users/${userId}`);
   const responseData = await response.json();
   const status = responseData.status;
