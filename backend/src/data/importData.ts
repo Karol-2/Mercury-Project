@@ -1,3 +1,5 @@
+import { v4 as uuidv4 } from "uuid";
+
 import driver from "../driver/driver";
 import userData from "./users";
 
@@ -25,28 +27,41 @@ async function importInitialData() {
 
   const session = driver.session();
   try {
+    const userIds: string[] = []
+
+    // Create users
+    const createUserQuery = `
+      CREATE (u:User $user)
+    `;
+
     for (const user of userData) {
-      const friendIds = user.friend_ids.map((id) => Number(id));
+      const userId = uuidv4();
+      userIds.push(userId)
 
-      const createUserQuery = `
-        CREATE (u:User $user)
-        RETURN ID(u) AS userId
-      `;
-      const userResult = await session.run(createUserQuery, { user });
-      const userId = userResult.records[0].get("userId").toNumber();
+      const userClean: any = Object.assign({}, user)
+      delete userClean.friend_ids
+      delete userClean.chats
+      userClean.id = userId
 
-      for (const friendId of friendIds) {
-        const createRelationshipQuery = `
-          MATCH (u1:User) WHERE ID(u1) = $userId1
-          MATCH (u2:User) WHERE ID(u2) = $userId2
-          CREATE (u1)-[:IS_FRIENDS_WITH]->(u2)
-        `;
-        await session.run(createRelationshipQuery, {
-          userId1: userId,
-          userId2: friendId,
-        });
+      await session.run(createUserQuery, { user: userClean });
+    }
+
+    // Create relationships
+    const createRelationshipQuery = `
+      MATCH (u1:User {id: $userId})
+      MATCH (u2:User {id: $friendId})
+      CREATE (u1)-[:IS_FRIENDS_WITH]->(u2)
+    `;
+
+    for (const [userIndex, user] of userData.entries()) {
+      const userId = userIds[userIndex]
+
+      for (const friendIndex of user.friend_ids) {
+        const friendId = userIds[friendIndex]
+        await session.run(createRelationshipQuery, { userId, friendId });
       }
     }
+
     return "Initial data has been imported into database.";
   } catch (error) {
     return "Error importing data";
