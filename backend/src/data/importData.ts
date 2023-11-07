@@ -39,7 +39,7 @@ async function importInitialData() {
         const createRelationshipQuery = `
           MATCH (u1:User) WHERE ID(u1) = $userId1
           MATCH (u2:User) WHERE ID(u2) = $userId2
-          CREATE (u1)-[:FRIENDS]->(u2)
+          CREATE (u1)-[:IS_FRIENDS_WITH]->(u2)
         `;
         await session.run(createRelationshipQuery, {
           userId1: userId,
