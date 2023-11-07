@@ -73,3 +73,23 @@ test("Delete user by ID", async () => {
 
   expect(status).toBe("ok");
 });
+
+test("Get user's friends", async () => {
+  const usersResponse = await fetch("http://localhost:5000/users")
+  const usersResponseData = await usersResponse.json();
+  const usersStatus = usersResponseData.status
+
+  expect(usersStatus).toBe("ok")
+
+  const zuck = usersResponseData.users.find(
+    (user: any) => user.nick == "rEptiliAn69"
+  )
+  const zuckId = zuck.id
+
+  const response = await fetch(`http://localhost:5000/users/${zuckId}/friends`)
+  const responseData = await response.json();
+  const { status, friends } = responseData
+
+  expect(status).toBe("ok")
+  expect(friends).toHaveLength(2)
+})
