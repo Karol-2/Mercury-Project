@@ -1,12 +1,11 @@
-import { Router } from "express";
+import { Router, Request, Response } from "express";
 import User from "../models/User";
 import chatRouter from "./chatsRoute";
 import driver from "../driver/driver";
-import Response from "../models/Response";
 
 const usersRouter = Router();
 
-usersRouter.get("/", async (_req, res) => {
+usersRouter.get("/", async (_req: Request, res: Response) => {
     try {
         const session = driver.session();
         const usersRequest = await session.run(
@@ -24,7 +23,7 @@ usersRouter.get("/", async (_req, res) => {
     }
 });
 
-usersRouter.get("/:userId", async (req, res) => {
+usersRouter.get("/:userId", async (req: Request, res: Response) => {
     try {
         const session = driver.session();
         const userId = Number(req.params.userId);
@@ -46,7 +45,7 @@ usersRouter.get("/:userId", async (req, res) => {
     }
 });
 
-usersRouter.post("/", async (req, res) => {
+usersRouter.post("/", async (req: Request, res: Response) => {
     try {
         const userConstuctor = req.body;
         const {
@@ -89,7 +88,7 @@ usersRouter.post("/", async (req, res) => {
     }
 });
 
-usersRouter.put("/:userId", async (req, res) => {
+usersRouter.put("/:userId", async (req: Request, res: Response) => {
     try {
         const userPropertiesToUpdate = req.body;
         const {
@@ -125,7 +124,7 @@ usersRouter.put("/:userId", async (req, res) => {
     }
 });
 
-usersRouter.delete("/:userId", async (req, res) => {
+usersRouter.delete("/:userId", async (req: Request, res: Response) => {
     try {
         const session = driver.session();
         const userId = Number(req.params.userId);
