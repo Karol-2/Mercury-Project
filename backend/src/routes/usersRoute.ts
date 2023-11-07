@@ -150,7 +150,7 @@ usersRouter.delete("/:userId", async (req: Request, res: OkErrorResponse) => {
     }
 
     await session.run(
-      `MATCH (u:User {id: $id}) DETACH DELETE u`, { userId }
+      `MATCH (u:User {id: $userId}) DETACH DELETE u`, { userId }
     );
     await session.close();
 
