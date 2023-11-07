@@ -26,3 +26,8 @@ export interface UsersResponse {
   status: "ok",
   users: User[]
 }
+
+export interface FriendsResponse {
+  status: "ok",
+  friends: User[]
+}

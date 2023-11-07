@@ -4,7 +4,7 @@ import { v4 as uuidv4 } from "uuid"
 import chatRouter from "./chatsRoute";
 import driver from "../driver/driver";
 import {
-  CustomResponse, ErrorResponse, OkResponse, UserResponse, UsersResponse
+  CustomResponse, ErrorResponse, FriendsResponse, OkResponse, UserResponse, UsersResponse
 } from "../models/Response";
 
 const usersRouter = Router();
@@ -12,6 +12,7 @@ const usersRouter = Router();
 type UsersErrorResponse = CustomResponse<UsersResponse | ErrorResponse>
 type UserErrorResponse = CustomResponse<UserResponse | ErrorResponse>
 type OkErrorResponse = CustomResponse<OkResponse | ErrorResponse>
+type FriendsErrorResponse = CustomResponse<FriendsResponse | ErrorResponse>
 
 usersRouter.get("/", async (_req: Request, res: UsersErrorResponse) => {
   try {
@@ -47,6 +48,35 @@ usersRouter.get("/:userId", async (req: Request, res: UserErrorResponse) => {
     } else {
       return res.json({ status: "ok", user });
     }
+  } catch (err) {
+    console.log("Error:", err);
+    return res.status(404).json({ status: "error", errors: (err as object) });
+  }
+});
+
+usersRouter.get("/:userId/friends", async (req: Request, res: FriendsErrorResponse) => {
+  try {
+    const session = driver.session();
+    const userId = req.params.userId;
+    const userRequest = await session.run(
+      `MATCH (u:User {id: $userId}) RETURN u`, { userId }
+    );
+    const user = userRequest.records[0].get("u").properties
+
+    if (user.length == 0) {
+      await session.close()
+      const json = { status: "error", errors: { name: "NOT_FOUND" } } as const
+      return res.status(404).json(json)
+    }
+
+    const friendRequest = await session.run(
+      `MATCH (u:User {id: $userId})-[:IS_FRIENDS_WITH]-(f:User) RETURN f`,
+      { userId }
+    )
+    await session.close();
+
+    const friends = friendRequest.records.map(f => f.get("f").properties)
+    return res.json({ status: "ok", friends });
   } catch (err) {
     console.log("Error:", err);
     return res.status(404).json({ status: "error", errors: (err as object) });
