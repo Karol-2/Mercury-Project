@@ -1,10 +1,10 @@
 import { Link } from "react-router-dom";
+import { fetchData } from "../services/fetchData";
 
 function LoginBox() {
   const loginFunc = async () => {
-    const response = await fetch("http://localhost:5000/users/1");
-    const user = await response.json();
-    console.log("Login " + JSON.stringify(user));
+    const response = await fetchData("/users/1");
+    console.log("Login " + JSON.stringify(response));
   };
 
   return (
