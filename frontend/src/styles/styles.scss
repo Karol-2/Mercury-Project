@@ -107,6 +107,17 @@
     }
 }
 
+// navbar
+
+.nav-button{
+    transition: 0.25s ease-in-out;
+    padding-left: 5vh;
+    
+    &:hover{
+        background-color: #FF8001;
+        transform: scale(1.05);
+    }
+}
 
 
 
