@@ -95,6 +95,18 @@ test("Get user's friends", async () => {
 })
 
 test("Search users", async () => {
+  const usersNoResponse = await fetch("http://localhost:5000/users/search")
+  const usersNoResponseData = await usersNoResponse.json();
+  const usersNoStatus = usersNoResponseData.status
+
+  expect(usersNoStatus).toBe("error")
+
+  const usersEmptyResponse = await fetch("http://localhost:5000/users/search?q=")
+  const usersEmptyResponseData = await usersEmptyResponse.json();
+  const usersEmptyStatus = usersEmptyResponseData.status
+
+  expect(usersEmptyStatus).toBe("error")
+
   const usersResponse = await fetch("http://localhost:5000/users/search?q=zuckerberg")
   const usersResponseData = await usersResponse.json();
   const usersStatus = usersResponseData.status
