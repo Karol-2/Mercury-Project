@@ -40,6 +40,10 @@ usersRouter.get("/search", async (req: Request, res: UsersSearchErrorResponse) =
     return res.status(404).json({ status: "error", errors: { searchTerm: "not provided" } })
   }
 
+  if (searchTerm.length == 0) {
+    return res.status(404).json({ status: "error", errors: { searchTerm: "is empty" } })
+  }
+
   try {
     const session = driver.session();
     const wordVec = wordToVec(searchTerm)
