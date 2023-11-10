@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useLayoutEffect } from "react";
 import Footer from "../components/Footer";
 import Navbar from "../components/Navbar";
 import User from "../models/user.model";
+import { fetchData } from "../services/fetchData";
 
 const testUser: User = {
   nick: "boejiden",
@@ -20,13 +21,35 @@ function ProfilePage() {
   const [user, setUser] = useState<User>(testUser);
   const [isEditing, setIsEditing] = useState(false);
 
+  useLayoutEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const userData = await fetchData("/user/1","GET");
+        userData.status === "ok" ? setUser(userData.result): "";
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+      }
+    };
+
+    fetchUserData();
+  }, []);
+
   const handleEditClick = () => {
     setIsEditing(true);
   };
 
   const handleSaveClick = () => {
     setIsEditing(false);
-    // wysłać request
+    const sendData = async () => {
+      try {
+        const message = await fetchData("/user/1","PUT",{body: JSON.stringify(user) });
+        message.status === "ok" ? setUser(message.result): console.log("Error from the source: ", message.result );
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+      }
+    };
+
+    sendData();
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {

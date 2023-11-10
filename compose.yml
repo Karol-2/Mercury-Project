@@ -11,10 +11,12 @@ services:
     volumes:
       - ./db/data:/data
       - ./db/conf:/conf
-  # frontend:
-  #   build: ./frontend
-  #   ports:
-  #     - 5173:80
+
+  frontend:
+    build: ./frontend
+    ports:
+      - 5173:80
+      
   backend:
     build: ./backend
     ports:
