@@ -1,8 +1,9 @@
+import React, { useState } from "react";
 import Footer from "../components/Footer";
 import Navbar from "../components/Navbar";
 import User from "../models/user.model";
 
-const user: User = {
+const testUser: User = {
   nick: "boejiden",
   password: "sleepyjoe",
   first_name: "Joe",
@@ -16,25 +17,50 @@ const user: User = {
 };
 
 function ProfilePage() {
+  const [user, setUser] = useState<User>(testUser);
+  const [isEditing, setIsEditing] = useState(false);
+
+  const handleEditClick = () => {
+    setIsEditing(true);
+  };
+
+  const handleSaveClick = () => {
+    setIsEditing(false);
+    // wysłać request
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setUser((prevUser) => ({ ...prevUser, [name]: value }));
+  };
+
   return (
     <>
       <Navbar />
-      <section className="bg-my-darker min-h-screen">
-        <div>
-          <h1>Your profile</h1>
-          <hr></hr>
+      <section className="bg-my-darker min-h-screen flex justify-center ">
+        <div className=" bg-my-dark p-10 px-20 rounded-xl mx-50 my-20 lg:mx-72 text-lg">
+          <h1 className="text-3xl font-bold">Your profile</h1>
+          <hr className="text-my-orange"></hr>
           <div>
-            <p>Nick: {user.nick} </p>
-            <p>First Name: {user.first_name} </p>
-            <p>Last Name: {user.last_name} </p>
-            <p>Country: {user.country} </p>
-            <p>E-mail: {user.mail} </p>
-            <p>Password: {user.password} </p>
+          <img src={user.profile_picture} alt="Profile" className="my-5" />
+            <p>First Name: {isEditing ? <input type="text" name="first_name" value={user.first_name} onChange={handleChange} /> : user.first_name}</p>
+            <p>Last Name: {isEditing ? <input type="text" name="last_name" value={user.last_name} onChange={handleChange} /> : user.last_name}</p>
+            <p>Country: {isEditing ? <input type="text" name="country" value={user.country} onChange={handleChange} /> : user.country}</p>
+            <p>E-mail: {isEditing ? <input type="text" name="mail" value={user.mail} onChange={handleChange} /> : user.mail}</p>
+            <p>Password: {isEditing ? <input type="text" name="password" value={user.password} onChange={handleChange} /> : user.password}</p>
           </div>
-          <button>Edit</button>
-          <button>Remove account</button>
-          <img src={user.profile_picture}></img>
+          <div className="my-5">
+          {isEditing ? (
+            <button onClick={handleSaveClick} className="btn primary">Save</button>
+          ) : (
+            <button onClick={handleEditClick} className="btn primary">Edit</button>
+          )}
+          <button className="btn secondary">Remove account</button>
+          </div>
+         
+          
         </div>
+        
       </section>
       <Footer />
     </>
