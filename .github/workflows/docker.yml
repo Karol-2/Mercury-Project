@@ -16,3 +16,9 @@ jobs:
 
     - name: Compose the Docker-compose file
       run: docker-compose up
+
+    - name: Wait for 5 minutes
+      run: sleep 300
+
+    - name: Stop containers
+      run: docker-compose down
