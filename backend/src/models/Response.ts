@@ -10,7 +10,7 @@ export interface CustomResponse<J> extends Response {
 
 export interface ErrorResponse {
   status: "error",
-  errors: object
+  errors: Record<string, any> & { length?: never }
 }
 
 export interface OkResponse {
