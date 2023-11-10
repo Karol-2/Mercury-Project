@@ -161,7 +161,8 @@ usersRouter.put("/:userId", async (req: Request, res: OkErrorResponse) => {
 
     await session.run(
       `MATCH (u:User {id: $userId}) SET u=$user`,
-      { userId, user });
+      { userId, user }
+    );
     await session.close();
 
     return res.json({ status: "ok" });
