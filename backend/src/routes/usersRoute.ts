@@ -1,11 +1,14 @@
-import { Router, Request, Response } from "express";
+import { Router, Request } from "express";
 import { v4 as uuidv4 } from "uuid"
 
 import chatRouter from "./chatsRoute";
 import driver from "../driver/driver";
 import {
-  CustomResponse, ErrorResponse, FriendsResponse, OkResponse, UserResponse, UsersResponse, UsersSearchResponse
+  CustomResponse,
+  ErrorResponse, OkResponse,
+  UserResponse, UsersResponse, FriendsResponse, UsersSearchResponse
 } from "../models/Response";
+
 import wordToVec from "../../misc/wordToVec";
 import User from "../models/User";
 
@@ -178,7 +181,7 @@ usersRouter.delete("/:userId", async (req: Request, res: OkErrorResponse) => {
     );
     if (userExists.records.length === 0) {
       await session.close();
-      return res.status(404).json({ status: "error", errors: [{ name: "NOT_FOUND" }] });
+      return res.status(404).json({ status: "error", errors: { name: "NOT_FOUND" } });
     }
 
     await session.run(
