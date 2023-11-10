@@ -1,5 +1,6 @@
-import { Router, Request } from "express";
+import { Router, Request, Response } from "express";
 import { v4 as uuidv4 } from "uuid"
+import { Session } from "neo4j-driver";
 
 import chatRouter from "./chatsRoute";
 import driver from "../driver/driver";
@@ -13,6 +14,20 @@ import wordToVec from "../../misc/wordToVec";
 import User from "../models/User";
 
 const usersRouter = Router();
+
+async function userExists(session: Session, res: Response, userId: string): Promise<Response | User> {
+  const userExistsResult = await session.run(
+    `MATCH (u:User {id: $userId}) RETURN u`, { userId }
+  );
+
+  if (userExistsResult.records.length === 0) {
+    await session.close();
+    const json = { status: "error", errors: { id: "not found" } } as const
+    return res.status(404).json(json);
+  }
+
+  return userExistsResult.records[0].get("u").properties as User
+}
 
 type UsersErrorResponse = CustomResponse<UsersResponse | ErrorResponse>
 type UserErrorResponse = CustomResponse<UserResponse | ErrorResponse>
@@ -68,18 +83,12 @@ usersRouter.get("/:userId", async (req: Request, res: UserErrorResponse) => {
   try {
     const session = driver.session();
     const userId = req.params.userId;
-    const userRequest = await session.run(
-      `MATCH (u:User {id: $userId}) RETURN u`, { userId }
-    );
-    const user = userRequest.records[0].get("u").properties
-    await session.close();
 
-    if (user.length == 0) {
-      const json = { status: "error", errors: { name: "NOT_FOUND" } } as const
-      return res.status(404).json(json)
-    } else {
-      return res.json({ status: "ok", user });
-    }
+    const user = await userExists(session, res, userId)
+    await session.close();
+    if ("json" in user) return res;
+
+    return res.json({ status: "ok", user });
   } catch (err) {
     console.log("Error:", err);
     return res.status(404).json({ status: "error", errors: (err as object) });
@@ -90,15 +99,11 @@ usersRouter.get("/:userId/friends", async (req: Request, res: FriendsErrorRespon
   try {
     const session = driver.session();
     const userId = req.params.userId;
-    const userRequest = await session.run(
-      `MATCH (u:User {id: $userId}) RETURN u`, { userId }
-    );
-    const user = userRequest.records[0].get("u").properties
 
-    if (user.length == 0) {
+    const user = await userExists(session, res, userId)
+    if ("json" in user) {
       await session.close()
-      const json = { status: "error", errors: { name: "NOT_FOUND" } } as const
-      return res.status(404).json(json)
+      return res;
     }
 
     const friendRequest = await session.run(
@@ -148,18 +153,14 @@ usersRouter.put("/:userId", async (req: Request, res: OkErrorResponse) => {
 
     const session = driver.session();
     const userId = req.params.userId;
-    const userExistsResult = await session.run(
-      `MATCH (u:User {id: $userId}) RETURN u`, { userId }
-    );
-    if (userExistsResult.records.length === 0) {
-      await session.close();
-      const json = { status: "error", errors: { name: "NOT_FOUND" } } as const
-      return res.status(404).json(json);
+
+    const userProps = await userExists(session, res, userId)
+    if ("json" in userProps) {
+      session.close()
+      return res
     }
 
-    const userProps = userExistsResult.records[0].get("u").properties
     const user = { ...userProps, ...newUserProps }
-
     await session.run(
       `MATCH (u:User {id: $userId}) SET u=$user`,
       { userId, user }
@@ -178,13 +179,10 @@ usersRouter.delete("/:userId", async (req: Request, res: OkErrorResponse) => {
     const session = driver.session();
     const userId = req.params.userId;
 
-    const userExists = await session.run(
-      `MATCH (u:User {id: $userId}) RETURN u`, { userId }
-    );
-    if (userExists.records.length === 0) {
-      await session.close();
-      const json = { status: "error", errors: { name: "NOT_FOUND" } } as const
-      return res.status(404).json(json);
+    const user = await userExists(session, res, userId)
+    if ("json" in user) {
+      await session.close()
+      return res
     }
 
     await session.run(
