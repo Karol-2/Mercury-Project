@@ -94,21 +94,24 @@ test("Get user's friends", async () => {
   expect(friends).toHaveLength(2)
 })
 
+async function searchUsers(lastPart: string) {
+  const usersResponse = await fetch("http://localhost:5000/users/search" + lastPart)
+  const usersResponseData = await usersResponse.json();
+  return usersResponseData
+}
+
 test("Search users", async () => {
-  const usersNoResponse = await fetch("http://localhost:5000/users/search")
-  const usersNoResponseData = await usersNoResponse.json();
+  const usersNoResponseData = await searchUsers("");
   const usersNoStatus = usersNoResponseData.status
 
   expect(usersNoStatus).toBe("error")
 
-  const usersEmptyResponse = await fetch("http://localhost:5000/users/search?q=")
-  const usersEmptyResponseData = await usersEmptyResponse.json();
+  const usersEmptyResponseData = await searchUsers("?q=")
   const usersEmptyStatus = usersEmptyResponseData.status
 
   expect(usersEmptyStatus).toBe("error")
 
-  const usersResponse = await fetch("http://localhost:5000/users/search?q=zuckerberg")
-  const usersResponseData = await usersResponse.json();
+  const usersResponseData = await searchUsers("?q=zuckerberg")
   const usersStatus = usersResponseData.status
 
   expect(usersStatus).toBe("ok")
