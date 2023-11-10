@@ -93,3 +93,17 @@ test("Get user's friends", async () => {
   expect(status).toBe("ok")
   expect(friends).toHaveLength(2)
 })
+
+test("Search users", async () => {
+  const usersResponse = await fetch("http://localhost:5000/users/search?q=zuckerberg")
+  const usersResponseData = await usersResponse.json();
+  const usersStatus = usersResponseData.status
+
+  expect(usersStatus).toBe("ok")
+
+  const zuck = usersResponseData.users.find(
+    ([user, _score]: any) => user.nick == "rEptiliAn69"
+  )
+
+  expect(zuck).toBeDefined()
+})
