@@ -4,8 +4,10 @@ import { v4 as uuidv4 } from "uuid"
 import chatRouter from "./chatsRoute";
 import driver from "../driver/driver";
 import {
-  CustomResponse, ErrorResponse, FriendsResponse, OkResponse, UserResponse, UsersResponse
+  CustomResponse, ErrorResponse, FriendsResponse, OkResponse, UserResponse, UsersResponse, UsersSearchResponse
 } from "../models/Response";
+import wordToVec from "../../misc/wordToVec";
+import User from "../models/User";
 
 const usersRouter = Router();
 
@@ -13,6 +15,7 @@ type UsersErrorResponse = CustomResponse<UsersResponse | ErrorResponse>
 type UserErrorResponse = CustomResponse<UserResponse | ErrorResponse>
 type OkErrorResponse = CustomResponse<OkResponse | ErrorResponse>
 type FriendsErrorResponse = CustomResponse<FriendsResponse | ErrorResponse>
+type UsersSearchErrorResponse = CustomResponse<UsersSearchResponse | ErrorResponse>
 
 usersRouter.get("/", async (_req: Request, res: UsersErrorResponse) => {
   try {
@@ -31,6 +34,32 @@ usersRouter.get("/", async (_req: Request, res: UsersErrorResponse) => {
     return res.status(404).json({ status: "error", errors: (err as object) });
   }
 });
+
+usersRouter.get("/search", async (req: Request, res: UsersSearchErrorResponse) => {
+  const searchTerm = req.query.q
+  if (typeof (searchTerm) != "string") {
+    return res.status(404).json({ status: "error", errors: { searchTerm: "not provided" } })
+  }
+
+  try {
+    const session = driver.session();
+    const wordVec = wordToVec(searchTerm)
+
+    const userRequest = await session.run(
+      `CALL db.index.vector.queryNodes('user-names', 10, $wordVec)
+      YIELD node AS similarUser, score
+      RETURN similarUser, score`, { wordVec }
+    );
+    const users = userRequest.records.map((r) => {
+      return [r.get("similarUser").properties, Number(r.get("score"))] as [User, number]
+    })
+    await session.close();
+    return res.json({ status: "ok", users });
+  } catch (err) {
+    console.log("Error:", err);
+    return res.status(404).json({ status: "error", errors: (err as object) });
+  }
+})
 
 usersRouter.get("/:userId", async (req: Request, res: UserErrorResponse) => {
   try {

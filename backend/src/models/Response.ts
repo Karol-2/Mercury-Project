@@ -31,3 +31,8 @@ export interface FriendsResponse {
   status: "ok",
   friends: User[]
 }
+
+export interface UsersSearchResponse {
+  status: "ok",
+  users: [User, number][]
+}
