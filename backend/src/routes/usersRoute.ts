@@ -23,13 +23,9 @@ type UsersSearchErrorResponse = CustomResponse<UsersSearchResponse | ErrorRespon
 usersRouter.get("/", async (_req: Request, res: UsersErrorResponse) => {
   try {
     const session = driver.session();
-    const usersRequest = await session.run(
-      `MATCH (u:User) RETURN ID(u), u`
-    );
-    const users = usersRequest.records.map(user => ({
-      id: user.get(0).low,
-      ...user.get(1).properties
-    }));
+    const usersRequest = await session.run(`MATCH (u:User) RETURN u`);
+    const users = usersRequest.records.map((r) => r.get("u").properties);
+
     await session.close();
     return res.json({ status: "ok", users });
   } catch (err) {
