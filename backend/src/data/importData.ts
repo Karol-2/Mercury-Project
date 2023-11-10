@@ -2,6 +2,7 @@ import { v4 as uuidv4 } from "uuid";
 
 import driver from "../driver/driver";
 import userData from "./users";
+import wordToVec from "../../misc/wordToVec";
 
 async function isDatabaseEmpty() {
   const session = driver.session();
@@ -42,6 +43,7 @@ async function importInitialData() {
       delete userClean.friend_ids
       delete userClean.chats
       userClean.id = userId
+      userClean.name_embedding = wordToVec(userClean.first_name + userClean.last_name)
 
       await session.run(createUserQuery, { user: userClean });
     }
