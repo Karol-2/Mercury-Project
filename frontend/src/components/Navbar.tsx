@@ -11,11 +11,11 @@ function Navbar() {
           Mercury
         </span>
       </Link>
-      <div className="flex flex-col sm:flex-row font-semibold text-lg">
-        <button className="nav-button">Search</button>
-        <button className="nav-button">Messages</button>
-        <button className="nav-button">Profile</button>
-        <button className="nav-button">Logout</button>
+      <div className="flex flex-col sm:flex-row font-semibold text-lg content-center align-middle ">
+        <Link to={"/search"} className="transition duration-250 ease-in-out mr-5 hover:bg-my-orange transform hover:scale-105">Search</Link>
+        <Link to={"/messages"} className="transition duration-250 ease-in-out mr-5 hover:bg-my-orange transform hover:scale-105">Messages</Link>
+        <Link to={"/profile"} className="transition duration-250 ease-in-out mr-5 hover:bg-my-orange transform hover:scale-105">My Profile</Link>
+        <button className="transition duration-250 ease-in-out mr-5 hover:bg-my-orange transform hover:scale-105">Logout</button>
       </div>
     </nav>
   );

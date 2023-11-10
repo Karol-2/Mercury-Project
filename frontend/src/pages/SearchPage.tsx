@@ -1,14 +1,14 @@
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 
-function VideoCallPage() {
+function SearchPage() {
   return (
     <>
     <Navbar />
-    <section>VideoCall page</section>
+    <section>Search Page</section>
     <Footer />
     </>
   );
 }
 
-export default VideoCallPage;
+export default SearchPage;
