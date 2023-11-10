@@ -118,6 +118,9 @@ usersRouter.post("/", async (req: Request, res: UserErrorResponse) => {
     // TODO: verify user fields
 
     newUserProps.id = uuidv4()
+    newUserProps.name_embedding = wordToVec(
+      newUserProps.first_name + newUserProps.last_name
+    )
 
     const session = driver.session();
     const newUserResult = await session.run(
