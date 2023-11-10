@@ -153,7 +153,8 @@ usersRouter.put("/:userId", async (req: Request, res: OkErrorResponse) => {
     );
     if (userExistsResult.records.length === 0) {
       await session.close();
-      return res.status(404).json({ status: "error", errors: { name: "NOT_FOUND" } });
+      const json = { status: "error", errors: { name: "NOT_FOUND" } } as const
+      return res.status(404).json(json);
     }
 
     const userProps = userExistsResult.records[0].get("u").properties
@@ -182,7 +183,8 @@ usersRouter.delete("/:userId", async (req: Request, res: OkErrorResponse) => {
     );
     if (userExists.records.length === 0) {
       await session.close();
-      return res.status(404).json({ status: "error", errors: { name: "NOT_FOUND" } });
+      const json = { status: "error", errors: { name: "NOT_FOUND" } } as const
+      return res.status(404).json(json);
     }
 
     await session.run(
