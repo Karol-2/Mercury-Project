@@ -22,16 +22,15 @@ test("Create user", async () => {
   });
 
   const responseData = await response.json();
-  const data = responseData.result;
+  const user = responseData.user;
   const status = responseData.status;
 
   expect(status).toBe("ok");
 
-  userId = data[0].id;
+  userId = user.id;
 });
 
 test("Fetch user by ID", async () => {
-  
   const response = await fetch(`http://localhost:5000/users/${userId}`);
   const responseData = await response.json();
   const status = responseData.status;
@@ -74,3 +73,52 @@ test("Delete user by ID", async () => {
 
   expect(status).toBe("ok");
 });
+
+test("Get user's friends", async () => {
+  const usersResponse = await fetch("http://localhost:5000/users")
+  const usersResponseData = await usersResponse.json();
+  const usersStatus = usersResponseData.status
+
+  expect(usersStatus).toBe("ok")
+
+  const zuck = usersResponseData.users.find(
+    (user: any) => user.nick == "rEptiliAn69"
+  )
+  const zuckId = zuck.id
+
+  const response = await fetch(`http://localhost:5000/users/${zuckId}/friends`)
+  const responseData = await response.json();
+  const { status, friends } = responseData
+
+  expect(status).toBe("ok")
+  expect(friends).toHaveLength(2)
+})
+
+async function searchUsers(lastPart: string) {
+  const usersResponse = await fetch("http://localhost:5000/users/search" + lastPart)
+  const usersResponseData = await usersResponse.json();
+  return usersResponseData
+}
+
+test("Search users", async () => {
+  const usersNoResponseData = await searchUsers("");
+  const usersNoStatus = usersNoResponseData.status
+
+  expect(usersNoStatus).toBe("error")
+
+  const usersEmptyResponseData = await searchUsers("?q=")
+  const usersEmptyStatus = usersEmptyResponseData.status
+
+  expect(usersEmptyStatus).toBe("error")
+
+  const usersResponseData = await searchUsers("?q=zuckerberg")
+  const usersStatus = usersResponseData.status
+
+  expect(usersStatus).toBe("ok")
+
+  const zuck = usersResponseData.users.find(
+    ([user, _score]: any) => user.nick == "rEptiliAn69"
+  )
+
+  expect(zuck).toBeDefined()
+})
