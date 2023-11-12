@@ -1,4 +1,5 @@
 interface User {
+    id: number,
     nick: string,
     password: string,
     first_name: string,

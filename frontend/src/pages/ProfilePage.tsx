@@ -5,6 +5,7 @@ import User from "../models/user.model";
 import { fetchData } from "../services/fetchData";
 
 const testUser: User = {
+  id: 666,
   nick: "",
   password: "",
   first_name: "",
@@ -12,7 +13,7 @@ const testUser: User = {
   country: "",
   profile_picture:"",
   mail: "",
-  friend_ids: [2],
+  friend_ids: [],
   chats: [],
 };
 
@@ -23,7 +24,7 @@ function ProfilePage() {
   useLayoutEffect(() => {
     const fetchUserData = async () => {
       try {
-        const userData = await fetchData("/users/1","GET");
+        const userData = await fetchData(`/users/1`,"GET");
         userData.status === "ok" ? setUser(userData.result[0]): "";
       } catch (error) {
         console.error("Error fetching user data:", error);
@@ -37,21 +38,25 @@ function ProfilePage() {
     setIsEditing(true);
   };
 
-  // const handleDelete = () => {
-  //   try {
-  //     const userData = await fetchData("/users/1","GET");
-  //     userData.status === "ok" ? setUser(userData.result[0]): "";
-  //   } catch (error) {
-  //     console.error("Error fetching user data:", error);
-  //   }
-  // }
+  const handleDelete = () => {
+      const deleteUser = async () => {
+        try {
+          const resp = await fetchData(`/users/${user.id}`,"DELETE");
+          resp.status === "ok" ? setUser(resp.result[0]):  console.error("Error from the server", resp.errors);
+        } catch (error) {
+          console.error("Error while deleting user:", error);
+        }
+      };
+  
+      deleteUser();
+  }
 
   const handleSaveClick = () => {
     setIsEditing(false);
     const sendData = async () => {
       try {
-        const message = await fetchData("/user/1","PUT",{body: JSON.stringify(user) });
-        message.status === "ok" ? setUser(message.result): console.log("Error from the source: ", message.result );
+        const message = await fetchData(`/users/${user.id}`,"PUT",{body: JSON.stringify(user) });
+        message.status === "ok" ? console.log("deleted"): console.log("Error from the source: ", message.result );
       } catch (error) {
         console.error("Error fetching user data:", error);
       }
@@ -86,7 +91,7 @@ function ProfilePage() {
           ) : (
             <button onClick={handleEditClick} className="btn primary">Edit</button>
           )}
-          <button className="btn secondary">Remove account</button>
+          <button onClick={handleDelete} className="btn secondary">Remove account</button>
           </div>
          
           
@@ -99,4 +104,3 @@ function ProfilePage() {
 }
 
 export default ProfilePage;
-//TODO: Add an confirmation modal for the account removal
