@@ -3,7 +3,7 @@ import { fetchData } from "../services/fetchData";
 
 function LoginBox() {
   const loginFunc = async () => {
-    const response = await fetchData("/users/1");
+    const response = await fetchData("/users/1","GET");
     console.log("Login " + JSON.stringify(response));
   };
 

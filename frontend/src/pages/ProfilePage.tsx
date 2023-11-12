@@ -5,14 +5,13 @@ import User from "../models/user.model";
 import { fetchData } from "../services/fetchData";
 
 const testUser: User = {
-  nick: "boejiden",
-  password: "sleepyjoe",
-  first_name: "Joe",
-  last_name: "Biden",
-  country: "USA",
-  profile_picture:
-    "https://is1-ssl.mzstatic.com/image/thumb/Purple113/v4/ea/ec/36/eaec3686-c87d-1957-8d44-c6b8addda35a/pr_source.png/256x256bb.jpg",
-  mail: "joe.biden@gmail.com",
+  nick: "",
+  password: "",
+  first_name: "",
+  last_name: "",
+  country: "",
+  profile_picture:"",
+  mail: "",
   friend_ids: [2],
   chats: [],
 };
@@ -24,8 +23,8 @@ function ProfilePage() {
   useLayoutEffect(() => {
     const fetchUserData = async () => {
       try {
-        const userData = await fetchData("/user/1","GET");
-        userData.status === "ok" ? setUser(userData.result): "";
+        const userData = await fetchData("/users/1","GET");
+        userData.status === "ok" ? setUser(userData.result[0]): "";
       } catch (error) {
         console.error("Error fetching user data:", error);
       }
@@ -37,6 +36,15 @@ function ProfilePage() {
   const handleEditClick = () => {
     setIsEditing(true);
   };
+
+  // const handleDelete = () => {
+  //   try {
+  //     const userData = await fetchData("/users/1","GET");
+  //     userData.status === "ok" ? setUser(userData.result[0]): "";
+  //   } catch (error) {
+  //     console.error("Error fetching user data:", error);
+  //   }
+  // }
 
   const handleSaveClick = () => {
     setIsEditing(false);
@@ -91,3 +99,4 @@ function ProfilePage() {
 }
 
 export default ProfilePage;
+//TODO: Add an confirmation modal for the account removal
