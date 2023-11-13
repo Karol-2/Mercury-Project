@@ -64,6 +64,19 @@ async function importInitialData() {
       }
     }
 
+    // Add user search index
+    const searchIndexExistsQuery = `
+      SHOW INDEXES WHERE name="user-names"
+    `
+    const searchIndexCreateQuery = `
+      CALL db.index.vector.createNodeIndex('user-names', 'User', 'name_embedding', 64, 'cosine')
+      RETURN true
+    `
+    const indexExists = await session.run(searchIndexExistsQuery)
+    if (indexExists.records.length == 0) {
+      await session.run(searchIndexCreateQuery)
+    }
+
     return "Initial data has been imported into database.";
   } catch (error) {
     return "Error importing data";
