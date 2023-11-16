@@ -11,19 +11,21 @@ services:
     volumes:
       - ./db/data:/data
       - ./db/conf:/conf
-  frontend:
-    build: ./frontend
-    ports:
-      - 5173:80
-  backend:
-    build: ./backend
-    ports:
-      - 5000:5000
-    depends_on:
-      - db
-    command: sh -c "/wait && npm run prod"
-    environment:
-      - NEO4J_URI=neo4j://db:7687
-      - WAIT_HOSTS=db:7474
-      - WAIT_BEFORE_HOSTS=15
-      - WAIT_AFTER_HOSTS=3
+
+  # frontend:
+  #   build: ./frontend
+  #   ports:
+  #     - 5173:80
+      
+  # backend:
+  #   build: ./backend
+  #   ports:
+  #     - 5000:5000
+  #   depends_on:
+  #     - db
+  #   command: sh -c "/wait && npm run prod"
+  #   environment:
+  #     - NEO4J_URI=neo4j://db:7687
+  #     - WAIT_HOSTS=db:7474
+  #     - WAIT_BEFORE_HOSTS=15
+  #     - WAIT_AFTER_HOSTS=3
