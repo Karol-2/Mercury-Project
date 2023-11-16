@@ -11,14 +11,40 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
+    - uses: actions/checkout@v3
+    # - uses: isbang/compose-action@v1.5.1
+    #   with:
+    #     compose-file: "compose.yml"
+    #     services: |
+    #       db
+    #       frontend
+    #       backend
     
-    - name: Create .env file
-      run: touch db/credentials.env
+    # - name: Create .env file
+    #   run: touch db/credentials.env
 
-    - name: Add login passes to env file
-      run: echo "NEO4J_AUTH=neo4j/admin" >> db/credentials.env
+    # - name: Add login passes to env file
+    #   run: echo "NEO4J_AUTH=neo4j/admin123" >> db/credentials.env
 
-    - name: Compose the Docker-compose file
-      run: docker-compose up
+    - name: Build Docker compose
+      run: docker compose -f compose.yml build
+
+    - name: Run Docker compose
+      run: docker-compose -f compose.yml up -d
+
+    - name: List containers
+      run: sleep 2; docker ps
+  
+    - name: Wait for containers to start
+      run: |
+        sleep 15
+        docker run \
+          --rm \
+          --network mercury-project_default \
+          alpine/curl -o /dev/null --retry 3 --retry-connrefused backend:5000
+
+    - name: Test the backend
+      run: cd backend; npm i && npm run test run
+
+    - name: Shut down Docker compose
+      run: cd ..; docker-compose down
