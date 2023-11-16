@@ -2,7 +2,7 @@ import { v4 as uuidv4 } from "uuid";
 
 import driver from "../driver/driver";
 import userData from "./users";
-import wordToVec from "../../misc/wordToVec";
+import wordToVec from "../misc/wordToVec";
 
 async function isDatabaseEmpty() {
   const session = driver.session();
