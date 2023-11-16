@@ -6,116 +6,116 @@
 // buttons
 
 .btn {
-	text-align: center;
-	font-size: 1.5rem;
-	border-radius: 3rem;
-	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-	transition: 0.25s ease-in-out;
+  text-align: center;
+  font-size: 1.5rem;
+  border-radius: 3rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  transition: 0.25s ease-in-out;
 
-	&:hover {
-		transform: scale(1.05);
-	}
+  &:hover {
+    transform: scale(1.05);
+  }
 
-	&:active {
-		transform: translateY(5px);
-	}
+  &:active {
+    transform: translateY(5px);
+  }
 }
 
 .primary {
-	border: 3px solid darken($color: #ff8001, $amount: 10%);
-	background-color: #ff8001;
-	padding: 1.5rem 6rem;
+  border: 3px solid darken($color: #ff8001, $amount: 10%);
+  background-color: #ff8001;
+  padding: 1.5rem 6rem;
 }
 
 .secondary {
-	border: 3px solid darken($color: #3e0c70, $amount: 5%);
-	background-color: #3e0c70;
-	padding: 1.5rem 6rem;
+  border: 3px solid darken($color: #3e0c70, $amount: 5%);
+  background-color: #3e0c70;
+  padding: 1.5rem 6rem;
 }
 
 .small {
-	padding: 0.75rem 3rem;
+  padding: 0.75rem 3rem;
 }
 
 .clickable {
-	transition: 0.25s ease-in-out;
+  transition: 0.25s ease-in-out;
 
-	&:hover {
-		transform: scale(1.05);
-	}
+  &:hover {
+    transform: scale(1.05);
+  }
 }
 
 // forms
 
 .form-label {
-	font-weight: bold;
+  font-weight: bold;
 }
 
 .form-input {
-	border-radius: 0.5rem;
-	padding: 1rem;
-	border: solid 1px black;
-	width: 100%;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  border: solid 1px black;
+  width: 100%;
 }
 
 // animations
 
 .slide-in {
-	position: fixed;
-	top: 0;
-	left: 0;
-	width: 100%;
-	height: 100vh;
-	background: #121519;
-	transform-origin: bottom;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  background: #121519;
+  transform-origin: bottom;
 }
 
 .slide-out {
-	position: fixed;
-	top: 0;
-	left: 0;
-	width: 100%;
-	height: 100vh;
-	background: #121519;
-	transform-origin: top;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  background: #121519;
+  transform-origin: top;
 }
 
 .pulsate {
-	animation: pulse 10s 2s ease-in-out infinite;
-	// filter: drop-shadow(0 0 15px rgba(185, 43, 43, 0.8));
-	// filter: drop-shadow(5px 5px 10px rgba(120, 12, 91, 0.8));
-	filter: drop-shadow(-5px -5px 5px rgba(185, 43, 43, 0.8));
+  animation: pulse 10s 2s ease-in-out infinite;
+  // filter: drop-shadow(0 0 15px rgba(185, 43, 43, 0.8));
+  // filter: drop-shadow(5px 5px 10px rgba(120, 12, 91, 0.8));
+  filter: drop-shadow(-5px -5px 5px rgba(185, 43, 43, 0.8));
 }
 
 .fly-in-btm {
-	animation: fly-in-bottom 2s ease-in-out;
-	transition: 1s;
+  animation: fly-in-bottom 2s ease-in-out;
+  transition: 1s;
 }
 
 .fade-in {
-	animation: fade-in 0.5s 2s ease-in-out forwards;
-	opacity: 0;
+  animation: fade-in 0.5s 2s ease-in-out forwards;
+  opacity: 0;
 
-	&:after {
-		opacity: 100;
-	}
+  &:after {
+    opacity: 100;
+  }
 }
 
 // scrollbar
 
 html {
-	scroll-behavior: smooth;
+  scroll-behavior: smooth;
 }
 
 ::-webkit-scrollbar {
-	width: 12px;
+  width: 12px;
 }
 
 ::-webkit-scrollbar-thumb {
-	background-color: darken(#ff8001, 10%);
-	border-radius: 6px;
+  background-color: darken(#ff8001, 10%);
+  border-radius: 6px;
 }
 
 ::-webkit-scrollbar-track {
-	background-color: darken(#121519, 10%);
+  background-color: darken(#121519, 10%);
 }

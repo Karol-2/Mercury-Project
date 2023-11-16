@@ -1,30 +1,30 @@
 {
-	"name": "mercury-project",
-	"version": "1.0.0",
-	"description": "Projekt zespołowy - Zespół 6",
-	"scripts": {
-		"prettier:fix": "prettier --write .",
-		"prettier:check": "prettier --check ."
-	},
-	"author": {
-		"name": "Karol Krawczykiewicz",
-		"url": "https://github.com/Karol-2"
-	},
-	"contributors": [
-		{
-			"name": "Grzegorz Rogoziński",
-			"url": "https://github.com/gf-rog"
-		},
-		{
-			"name": "Jan Król",
-			"url": "https://github.com/JANKROL123"
-		},
-		{
-			"name": "Piotr Maszczak",
-			"url": "https://github.com/Piterson25"
-		}
-	],
-	"dependencies": {
-		"prettier": "^3.1.0"
-	}
+  "name": "mercury-project",
+  "version": "1.0.0",
+  "description": "Projekt zespołowy - Zespół 6",
+  "scripts": {
+    "prettier:fix": "prettier --write .",
+    "prettier:check": "prettier --check ."
+  },
+  "author": {
+    "name": "Karol Krawczykiewicz",
+    "url": "https://github.com/Karol-2"
+  },
+  "contributors": [
+    {
+      "name": "Grzegorz Rogoziński",
+      "url": "https://github.com/gf-rog"
+    },
+    {
+      "name": "Jan Król",
+      "url": "https://github.com/JANKROL123"
+    },
+    {
+      "name": "Piotr Maszczak",
+      "url": "https://github.com/Piterson25"
+    }
+  ],
+  "dependencies": {
+    "prettier": "^3.1.0"
+  }
 }

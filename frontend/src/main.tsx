@@ -17,18 +17,18 @@ const body = document.getElementsByTagName("body")[0]!;
 body.className = "bg-my-darker text-my-light";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
-	<AnimatePresence mode="wait">
-		<Router>
-			<Routes location={location} key={location.pathname}>
-				<Route path="/" element={<HomePage />} />
-				<Route path="/login" element={<LoginPage />} />
-				<Route path="/register" element={<RegisterPage />} />
-				<Route path="/profile" element={<ProfilePage />} />
-				<Route path="/admin" element={<AdminPage />} />
-				<Route path="/messages" element={<MessagingPage />} />
-				<Route path="/search" element={<SearchPage />} />
-				<Route path="/*" element={<PageNotFound />} />
-			</Routes>
-		</Router>
-	</AnimatePresence>,
+  <AnimatePresence mode="wait">
+    <Router>
+      <Routes location={location} key={location.pathname}>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
+        <Route path="/profile" element={<ProfilePage />} />
+        <Route path="/admin" element={<AdminPage />} />
+        <Route path="/messages" element={<MessagingPage />} />
+        <Route path="/search" element={<SearchPage />} />
+        <Route path="/*" element={<PageNotFound />} />
+      </Routes>
+    </Router>
+  </AnimatePresence>,
 );

@@ -5,34 +5,34 @@ import { Response } from "express";
 type Send<J, T = Response> = (body?: J) => T;
 
 export interface CustomResponse<J> extends Response {
-	json: Send<J, this>;
+  json: Send<J, this>;
 }
 
 export interface ErrorResponse {
-	status: "error";
-	errors: Record<string, any> & { length?: never };
+  status: "error";
+  errors: Record<string, any> & { length?: never };
 }
 
 export interface OkResponse {
-	status: "ok";
+  status: "ok";
 }
 
 export interface UserResponse {
-	status: "ok";
-	user: User;
+  status: "ok";
+  user: User;
 }
 
 export interface UsersResponse {
-	status: "ok";
-	users: User[];
+  status: "ok";
+  users: User[];
 }
 
 export interface FriendsResponse {
-	status: "ok";
-	friends: User[];
+  status: "ok";
+  friends: User[];
 }
 
 export interface UsersSearchResponse {
-	status: "ok";
-	users: [User, number][];
+  status: "ok";
+  users: [User, number][];
 }
