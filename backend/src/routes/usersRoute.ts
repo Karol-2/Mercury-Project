@@ -10,7 +10,7 @@ import {
   UserResponse, UsersResponse, FriendsResponse, UsersSearchResponse
 } from "../models/Response";
 
-import wordToVec from "../../misc/wordToVec";
+import wordToVec from "../misc/wordToVec";
 import User from "../models/User";
 
 const usersRouter = Router();
