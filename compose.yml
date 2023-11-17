@@ -12,11 +12,13 @@ services:
       - ./db/data:/data
       - ./db/conf:/conf
   frontend:
-    build: ./frontend
+    build:
+      context: ./frontend
     ports:
       - 5173:80
   backend:
-    build: ./backend
+    build:
+      context: ./backend
     ports:
       - 5000:5000
     depends_on:
