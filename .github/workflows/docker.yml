@@ -10,6 +10,9 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    permissions:
+      contents: write
+
     steps:
     - uses: actions/checkout@v3
     - uses: isbang/compose-action@v1.5.1
@@ -26,3 +29,12 @@ jobs:
 
     - name: Test the backend
       run: cd backend; npm i && npm run test run
+
+    - name: Format files
+      run: cd ..; npm i && npm run prettier:fix
+
+    - name: Commit changes
+      uses: stefanzweifel/git-auto-commit-action@v4
+      with:
+        commit_message: Apply formatting changes
+        branch: ${{ github.head_ref }}
