@@ -8,7 +8,7 @@ async function isDatabaseEmpty() {
   const session = driver.session();
   try {
     const result = await session.run(
-      "MATCH (u:User) RETURN count(u) as userCount"
+      "MATCH (u:User) RETURN count(u) as userCount",
     );
     const userCount = result.records[0].get("userCount").toNumber();
     return userCount === 0;
@@ -28,7 +28,7 @@ async function importInitialData() {
 
   const session = driver.session();
   try {
-    const userIds: string[] = []
+    const userIds: string[] = [];
 
     // Create users
     const createUserQuery = `
@@ -37,13 +37,15 @@ async function importInitialData() {
 
     for (const user of userData) {
       const userId = uuidv4();
-      userIds.push(userId)
+      userIds.push(userId);
 
-      const userClean: any = Object.assign({}, user)
-      delete userClean.friend_ids
-      delete userClean.chats
-      userClean.id = userId
-      userClean.name_embedding = wordToVec(userClean.first_name + userClean.last_name)
+      const userClean: any = Object.assign({}, user);
+      delete userClean.friend_ids;
+      delete userClean.chats;
+      userClean.id = userId;
+      userClean.name_embedding = wordToVec(
+        userClean.first_name + userClean.last_name,
+      );
 
       await session.run(createUserQuery, { user: userClean });
     }
@@ -56,25 +58,28 @@ async function importInitialData() {
     `;
 
     for (const [userIndex, user] of userData.entries()) {
-      const userId = userIds[userIndex]
+      const userId = userIds[userIndex];
 
       for (const friendIndex of user.friend_ids) {
-        const friendId = userIds[friendIndex]
-        await session.run(createRelationshipQuery, { userId, friendId });
+        const friendId = userIds[friendIndex];
+        await session.run(createRelationshipQuery, {
+          userId,
+          friendId,
+        });
       }
     }
 
     // Add user search index
     const searchIndexExistsQuery = `
       SHOW INDEXES WHERE name="user-names"
-    `
+    `;
     const searchIndexCreateQuery = `
       CALL db.index.vector.createNodeIndex('user-names', 'User', 'name_embedding', 64, 'cosine')
       RETURN true
-    `
-    const indexExists = await session.run(searchIndexExistsQuery)
+    `;
+    const indexExists = await session.run(searchIndexExistsQuery);
     if (indexExists.records.length == 0) {
-      await session.run(searchIndexCreateQuery)
+      await session.run(searchIndexCreateQuery);
     }
 
     return "Initial data has been imported into database.";

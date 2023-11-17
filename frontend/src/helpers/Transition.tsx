@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 
 type TransitionProps = {
-  children: React.ReactNode; 
+  children: React.ReactNode;
 };
 
 const Transition = ({ children }: TransitionProps) => {

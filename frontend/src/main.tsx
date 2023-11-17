@@ -30,5 +30,5 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
         <Route path="/*" element={<PageNotFound />} />
       </Routes>
     </Router>
-  </AnimatePresence>
+  </AnimatePresence>,
 );

@@ -4,9 +4,9 @@ import Footer from "../components/Footer";
 function AdminPage() {
   return (
     <>
-    <Navbar />
-    <section>Admin Page</section>
-    <Footer />
+      <Navbar />
+      <section>Admin Page</section>
+      <Footer />
     </>
   );
 }

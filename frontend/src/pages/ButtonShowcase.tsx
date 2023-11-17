@@ -1,5 +1,4 @@
-import Button from "../components/Button"
-
+import Button from "../components/Button";
 
 function ButtonShowcase() {
   return (
@@ -11,7 +10,7 @@ function ButtonShowcase() {
       <Button type="accept">accept</Button>
       <Button type="highlight">highlight</Button>
     </>
-  )
+  );
 }
 
-export default ButtonShowcase
+export default ButtonShowcase;

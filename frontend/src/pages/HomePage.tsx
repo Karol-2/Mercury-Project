@@ -6,18 +6,17 @@ import WelcomeMessage from "../layout/WelcomeMessage";
 import CallToAction from "../layout/CallToAction";
 import Technologies from "../layout/Technologies";
 
-function HomePage(){
-
+function HomePage() {
   return (
-      <main className="bg-my-darker min-h-screen" >
-        <WelcomeMessage />
-        <PhotoAndText />
-        <Reasons />
-        <Carousel />
-        <Technologies />
-        <CallToAction />
-        <Footer />
-      </main>
+    <main className="bg-my-darker min-h-screen">
+      <WelcomeMessage />
+      <PhotoAndText />
+      <Reasons />
+      <Carousel />
+      <Technologies />
+      <CallToAction />
+      <Footer />
+    </main>
   );
 }
 
