@@ -4,9 +4,9 @@ import Footer from "../components/Footer";
 function MessagingPage() {
   return (
     <>
-    <Navbar />
-    <section>Messaging page</section>
-    <Footer />
+      <Navbar />
+      <section>Messaging page</section>
+      <Footer />
     </>
   );
 }

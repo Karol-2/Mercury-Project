@@ -22,14 +22,8 @@ export default function Reasons() {
       >
         <div className="flex flex-col md:grid md:grid-cols-4 md:gap-x-50 justify-evenly mt-5">
           <ReasonCard icon={faShield} title="Privacy and Security" />
-          <ReasonCard
-            icon={faDesktop}
-            title="Cross-Platform Compatibility"
-          />
-          <ReasonCard
-            icon={faUsers}
-            title="User-Friendly Interface"
-          />
+          <ReasonCard icon={faDesktop} title="Cross-Platform Compatibility" />
+          <ReasonCard icon={faUsers} title="User-Friendly Interface" />
           <ReasonCard icon={faGlobe} title="Global Reach" />
         </div>
       </motion.div>

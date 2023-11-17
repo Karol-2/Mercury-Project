@@ -3,12 +3,15 @@ import { fetchData } from "../services/fetchData";
 
 function LoginBox() {
   const loginFunc = async () => {
-    const response = await fetchData("/users/1","GET");
+    const response = await fetchData("/users/1", "GET");
     console.log("Login " + JSON.stringify(response));
   };
 
   return (
-    <div className=" medium:w-[25vw] flex flex-col gap-2 bg-my-dark p-10 px-20 rounded-xl" id="login-box">
+    <div
+      className=" medium:w-[25vw] flex flex-col gap-2 bg-my-dark p-10 px-20 rounded-xl"
+      id="login-box"
+    >
       <div>Login:</div>
       <input
         type="text"

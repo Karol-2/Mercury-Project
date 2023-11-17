@@ -11,14 +11,14 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
-    
-    - name: Create .env file
-      run: touch db/credentials.env
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-    - name: Add login passes to env file
-      run: echo "NEO4J_AUTH=neo4j/admin" >> db/credentials.env
+      - name: Create .env file
+        run: touch db/credentials.env
 
-    - name: Compose the Docker-compose file
-      run: docker-compose up
+      - name: Add login passes to env file
+        run: echo "NEO4J_AUTH=neo4j/admin" >> db/credentials.env
+
+      - name: Compose the Docker-compose file
+        run: docker-compose up

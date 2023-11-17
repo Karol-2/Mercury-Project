@@ -31,9 +31,10 @@ function RegisterBox() {
   };
 
   return (
-    <div className=" medium:w-[25vw] flex flex-col gap-2 bg-my-dark p-10 px-20 rounded-xl" id="register-box">
-      
-
+    <div
+      className=" medium:w-[25vw] flex flex-col gap-2 bg-my-dark p-10 px-20 rounded-xl"
+      id="register-box"
+    >
       <div>First and last name:</div>
       <input
         type="text"
@@ -74,13 +75,13 @@ function RegisterBox() {
           placeholder="E-mail"
         />
 
-<div>Login:</div>
-      <input
-        type="text"
-        className="text-my-dark form-input"
-        onChange={updateFormUser("nick")}
-        placeholder="Login"
-      />
+        <div>Login:</div>
+        <input
+          type="text"
+          className="text-my-dark form-input"
+          onChange={updateFormUser("nick")}
+          placeholder="Login"
+        />
 
         <div>Password:</div>
         <input
@@ -95,10 +96,11 @@ function RegisterBox() {
         Register
       </button>
       <div className="text-center">
-      <p>Already have an account?</p>
-      <p className="font-bold"><Link to="/login">Login</Link></p>
-       
-       </div>
+        <p>Already have an account?</p>
+        <p className="font-bold">
+          <Link to="/login">Login</Link>
+        </p>
+      </div>
     </div>
   );
 }
