@@ -1,6 +1,7 @@
 import User from "./User";
 
 import { Response } from "express";
+import { Jwt } from "jsonwebtoken";
 
 type Send<J, T = Response> = (body?: J) => T;
 
@@ -35,4 +36,8 @@ export interface FriendsResponse {
 export interface UsersSearchResponse {
   status: "ok";
   users: [User, number][];
+}
+
+export interface JWTResponse extends OkResponse {
+  token: string
 }

@@ -12,10 +12,12 @@ import {
   UsersResponse,
   FriendsResponse,
   UsersSearchResponse,
+  JWTResponse,
 } from "../models/Response";
 
 import wordToVec from "../misc/wordToVec";
 import User from "../models/User";
+import { JWTRequest, authenticateToken, generateAccessToken } from "../misc/jwt";
 
 const usersRouter = Router();
 
@@ -59,6 +61,22 @@ usersRouter.get("/", async (_req: Request, res: UsersErrorResponse) => {
     return res.status(404).json({ status: "error", errors: err as object });
   }
 });
+
+usersRouter.get(
+  "/login",
+  async (req: Request, res: CustomResponse<JWTResponse>) => {
+    const token = generateAccessToken("123")
+    res.json({ status: "ok", token })
+  }
+)
+
+usersRouter.post(
+  "/protected",
+  authenticateToken,
+  async (req: JWTRequest, res: Response) => {
+    res.json({ status: "ok" })
+  }
+)
 
 usersRouter.get(
   "/search",
