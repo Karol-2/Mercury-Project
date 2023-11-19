@@ -17,6 +17,7 @@ import User from "../models/User";
 
 const usersRouter = Router();
 
+
 async function userExists(
   session: Session,
   res: Response,
