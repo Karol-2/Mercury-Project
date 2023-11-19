@@ -10,15 +10,34 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    permissions:
+      contents: write
+
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+    - uses: actions/checkout@v3
+      with:
+          ref: ${{ github.ref }}
 
-      - name: Create .env file
-        run: touch db/credentials.env
+    - uses: isbang/compose-action@v1.5.1
+      with:
+        compose-file: "compose.yml"
+    
+    - name: Wait for containers to start
+      run: |
+        sleep 18
+        docker run \
+          --rm \
+          --network mercury-project_default \
+          alpine/curl -o /dev/null --retry 3 --retry-connrefused backend:5000
 
-      - name: Add login passes to env file
-        run: echo "NEO4J_AUTH=neo4j/admin" >> db/credentials.env
+    - name: Test the backend
+      run: cd backend; npm i && npm run test run
 
-      - name: Compose the Docker-compose file
-        run: docker-compose up
+    - name: Format files
+      run: cd ..; npm i && npm run prettier:fix
+
+    - name: Commit changes
+      uses: stefanzweifel/git-auto-commit-action@v4
+      with:
+        commit_message: Apply formatting changes
+        branch: ${{ github.head_ref }}
