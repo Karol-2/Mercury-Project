@@ -4,6 +4,9 @@ import cors from "cors";
 import usersRouter from "./routes/usersRoute";
 import importInitialData from "./data/importData";
 
+const swaggerjsdoc = require("swagger-jsdoc")
+const swaggerui = require("swagger-ui-express")
+
 const app: Express = express();
 const port: number = 5000;
 
@@ -29,6 +32,28 @@ app.get("/", (_req: Request, res: Response) => {
 
 app.use(express.json());
 app.use("/users", usersRouter);
+
+const options = {
+  definition: {
+    openapi: "3.0.0",
+    info: {
+      title: "Mercury backend API",
+      version: "1.0.0",
+      description:
+        "This is an API application made with Express and documented with Swagger",
+    },
+    servers: [
+      {
+        url: "http://localhost:5000/",
+      },
+    ],
+  },
+  apis: ["./routes/*.ts"],
+}
+const spacs = swaggerjsdoc(options);
+app.use(
+  "/api-docs",swaggerui.serve, swaggerui.setup(spacs)
+)
 
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);

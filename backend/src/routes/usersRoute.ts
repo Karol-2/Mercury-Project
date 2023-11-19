@@ -5,14 +5,12 @@ import { Session } from "neo4j-driver";
 import chatRouter from "./chatsRoute";
 import driver from "../driver/driver";
 import {
-  CustomResponse,
-  ErrorResponse,
-  OkResponse,
-  UserResponse,
-  UsersResponse,
-  FriendsResponse,
-  UsersSearchResponse,
-} from "../models/Response";
+  UsersErrorResponse,
+  UsersSearchErrorResponse,
+  UserErrorResponse,
+  FriendsErrorResponse,
+  OkErrorResponse,
+} from "../models/ErrorTypes";
 
 import wordToVec from "../misc/wordToVec";
 import User from "../models/User";
@@ -38,13 +36,6 @@ async function userExists(
   return userExistsResult.records[0].get("u").properties as User;
 }
 
-type UsersErrorResponse = CustomResponse<UsersResponse | ErrorResponse>;
-type UserErrorResponse = CustomResponse<UserResponse | ErrorResponse>;
-type OkErrorResponse = CustomResponse<OkResponse | ErrorResponse>;
-type FriendsErrorResponse = CustomResponse<FriendsResponse | ErrorResponse>;
-type UsersSearchErrorResponse = CustomResponse<
-  UsersSearchResponse | ErrorResponse
->;
 
 usersRouter.get("/", async (_req: Request, res: UsersErrorResponse) => {
   try {
