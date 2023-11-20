@@ -1,10 +1,12 @@
 import servers from "./server";
 import driver from "./driver/driver";
 import CreateMeetingDto from "./dtos/createMeeting";
+import usersRouter from "./routes/usersRoute";
 import { sign, verify } from "jsonwebtoken";
 const {app} = servers;
 const linkSecret = "ijr2iq34rfeiadsfkjq3ew";
 
+app.use("/users", usersRouter);
 
 app.post("/meeting", async (req, res) => {
     try {
