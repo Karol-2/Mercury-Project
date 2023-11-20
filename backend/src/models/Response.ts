@@ -39,5 +39,9 @@ export interface UsersSearchResponse {
 }
 
 export interface JWTResponse extends OkResponse {
-  token: string
+  token: string;
+}
+
+export interface AuthResponse {
+  status: "unauthorized" | "forbidden";
 }
