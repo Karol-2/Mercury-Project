@@ -22,6 +22,7 @@ import {
   JWTRequest,
   authenticateToken,
   generateAccessToken,
+  generateRefreshToken,
 } from "../misc/jwt";
 
 const usersRouter = Router();
@@ -93,6 +94,13 @@ usersRouter.post("/login", async (req: Request, res: TokenErrorResponse) => {
     }
 
     const token = generateAccessToken(user.id);
+    const refreshToken = generateRefreshToken(user.id)
+
+    res.cookie("refreshToken", refreshToken, {
+      secure: true,
+      httpOnly: true,
+      maxAge: 1209600
+    })
     res.json({ status: "ok", token });
   } catch (err) {
     console.log("Error:", err);

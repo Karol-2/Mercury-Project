@@ -13,6 +13,12 @@ export function generateAccessToken(userId: string) {
   return jwt.sign({ userId }, process.env.TOKEN_SECRET!, { expiresIn: 900 });
 }
 
+export function generateRefreshToken(userId: string) {
+  return jwt.sign({ userId }, process.env.TOKEN_SECRET!, {
+    expiresIn: 1209600,
+  });
+}
+
 export async function authenticateToken(
   req: JWTRequest,
   res: CustomResponse<AuthResponse> | Response,
