@@ -1,5 +1,6 @@
 import express, { Express, Request, Response } from "express";
 import cors from "cors";
+import cookieParser from "cookie-parser";
 
 import usersRouter from "./routes/usersRoute";
 import importInitialData from "./data/importData";
@@ -20,6 +21,8 @@ app.use((req, res, next) => {
   res.header("Access-Control-Allow-Headers", "Content-Type");
   next();
 });
+
+app.use(cookieParser());
 
 importInitialData().then((res) => console.log(res));
 
