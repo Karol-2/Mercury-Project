@@ -7,6 +7,7 @@ import {
   JWTResponse,
   AuthResponse,
   ErrorResponse,
+  OkResponse,
 } from "../models/Response";
 
 import jwt, { JwtPayload } from "jsonwebtoken";
@@ -59,6 +60,17 @@ authRouter.post("/login", async (req: Request, res: TokenErrorResponse) => {
     return res.status(404).json({ status: "error", errors: err as object });
   }
 });
+
+authRouter.post(
+  "/logout",
+  async (_req: Request, res: CustomResponse<OkResponse>) => {
+    res.clearCookie("refreshToken", {
+      secure: true,
+      httpOnly: true,
+    });
+    res.json({ status: "ok" });
+  },
+);
 
 authRouter.post("/refresh", async (req: Request, res: TokenErrorResponse) => {
   const refreshToken = req.cookies.refreshToken;
