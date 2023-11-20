@@ -1,9 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
-import dotenv from "dotenv";
 import { AuthResponse, CustomResponse } from "../models/Response";
-
-dotenv.config();
 
 export interface JWTRequest extends Request {
   token?: jwt.Jwt;

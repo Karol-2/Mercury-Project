@@ -1,10 +1,13 @@
 import express, { Express, Request, Response } from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
+import dotenv from "dotenv";
 
 import usersRouter from "./routes/usersRoute";
 import importInitialData from "./data/importData";
 import authRouter from "./routes/authRoute";
+
+dotenv.config();
 
 const app: Express = express();
 const port: number = 5000;
