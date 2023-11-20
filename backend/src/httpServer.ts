@@ -1,12 +1,12 @@
 import servers from "./server";
 import driver from "./driver/driver";
 import CreateMeetingDto from "./dtos/createMeeting";
-import { sign } from "jsonwebtoken";
+import { sign, verify } from "jsonwebtoken";
 const {app} = servers;
 const linkSecret = "ijr2iq34rfeiadsfkjq3ew";
 
 
-app.post('/meeting', async (req, res)=>{
+app.post("/meeting", async (req, res) => {
     try {
         const {ownerId, guestId} = req.body as CreateMeetingDto;
         const session = driver.session();
@@ -31,10 +31,8 @@ app.post('/meeting', async (req, res)=>{
     }
 });
 
-app.post('/validate-link',(req, res)=>{
-    
-})
-
-app.get('/pro-link',(req, res)=>{
-    
-});
+app.post("/decode", (req, res) => {
+    const {token} = req.body as {token: string};
+    const decodedData = verify(token, linkSecret);
+    return res.json({decodedData});
+}); 
