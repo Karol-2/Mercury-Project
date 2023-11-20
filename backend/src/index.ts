@@ -4,6 +4,7 @@ import cookieParser from "cookie-parser";
 
 import usersRouter from "./routes/usersRoute";
 import importInitialData from "./data/importData";
+import authRouter from "./routes/authRoute";
 
 const app: Express = express();
 const port: number = 5000;
@@ -32,6 +33,7 @@ app.get("/", (_req: Request, res: Response) => {
 
 app.use(express.json());
 app.use("/users", usersRouter);
+app.use("/auth", authRouter);
 
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
