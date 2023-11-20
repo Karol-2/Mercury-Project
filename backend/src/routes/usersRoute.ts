@@ -13,11 +13,16 @@ import {
   FriendsResponse,
   UsersSearchResponse,
   JWTResponse,
+  AuthResponse,
 } from "../models/Response";
 
 import wordToVec from "../misc/wordToVec";
 import User from "../models/User";
-import { JWTRequest, authenticateToken, generateAccessToken } from "../misc/jwt";
+import {
+  JWTRequest,
+  authenticateToken,
+  generateAccessToken,
+} from "../misc/jwt";
 
 const usersRouter = Router();
 
@@ -47,6 +52,9 @@ type FriendsErrorResponse = CustomResponse<FriendsResponse | ErrorResponse>;
 type UsersSearchErrorResponse = CustomResponse<
   UsersSearchResponse | ErrorResponse
 >;
+type TokenErrorResponse = CustomResponse<
+  JWTResponse | AuthResponse | ErrorResponse
+>;
 
 usersRouter.get("/", async (_req: Request, res: UsersErrorResponse) => {
   try {
@@ -62,21 +70,43 @@ usersRouter.get("/", async (_req: Request, res: UsersErrorResponse) => {
   }
 });
 
-usersRouter.get(
-  "/login",
-  async (req: Request, res: CustomResponse<JWTResponse>) => {
-    const token = generateAccessToken("123")
-    res.json({ status: "ok", token })
+usersRouter.post("/login", async (req: Request, res: TokenErrorResponse) => {
+  const { mail, password } = req.body;
+
+  try {
+    const session = driver.session();
+
+    const userRequest = await session.run(
+      `MATCH (u:User {mail: $mail}) RETURN u`,
+      { mail },
+    );
+
+    if (userRequest.records.length == 0) {
+      return res.status(401).json({ status: "unauthorized" });
+    }
+
+    const user = userRequest.records[0].get("u").properties;
+    await session.close();
+
+    if (user.password != password) {
+      return res.status(401).json({ status: "unauthorized" });
+    }
+
+    const token = generateAccessToken(user.id);
+    res.json({ status: "ok", token });
+  } catch (err) {
+    console.log("Error:", err);
+    return res.status(404).json({ status: "error", errors: err as object });
   }
-)
+});
 
 usersRouter.post(
   "/protected",
   authenticateToken,
   async (req: JWTRequest, res: Response) => {
-    res.json({ status: "ok" })
-  }
-)
+    res.json({ status: "ok" });
+  },
+);
 
 usersRouter.get(
   "/search",
