@@ -37,7 +37,7 @@ app.post("/decode", (req, res) => {
     return res.json({decodedData});
 });
 
-app.get("/guest/:guestId", async (req, res) => {
+app.get("/guest-token/:guestId", async (req, res) => {
     try {
         const guestId = Number(req.params.guestId);
         const session = driver.session();
