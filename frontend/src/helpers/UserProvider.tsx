@@ -8,8 +8,10 @@ import React, {
 import { isExpired, decodeToken } from "react-jwt";
 import Cookies from "js-cookie";
 import { fetchData } from "../services/fetchData";
+import User from "../models/user.model";
 
 export interface UserContextValue {
+  user: User | null;
   userId: string | null;
   login: (mail: string, password: string) => Promise<void>;
 }
@@ -27,6 +29,7 @@ function useUser() {
 
 function UserProvider({ children }: { children: React.ReactNode }) {
   const [userId, setUserId] = useState<string | null>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [token, setToken] = useState<object | null>(null);
   const firstRefresh = useRef(true);
 
@@ -85,7 +88,11 @@ function UserProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (token) {
-      setUserId((token as any).userId);
+      const newUserId = (token as any).userId;
+      fetchData(`/users/${newUserId}`, "GET").then((response) => {
+        setUser(response.user as any);
+        setUserId(newUserId);
+      });
     }
   }, [token]);
 
@@ -95,7 +102,7 @@ function UserProvider({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <UserContext.Provider value={{ userId, login }}>
+    <UserContext.Provider value={{ userId, user, login }}>
       {children}
     </UserContext.Provider>
   );
