@@ -1,16 +1,27 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useUser } from "../helpers/UserProvider";
 
 function LoginBox() {
   const [login, setLogin] = useState("");
   const [password, setPassword] = useState("");
+  const [loginMsg, setLoginMsg] = useState("");
 
-  const { login: userLogin } = useUser() || { login: () => {} };
+  const { userId, login: userLogin } = useUser() || { login: () => {} };
 
   const loginFunc = async () => {
     userLogin(login, password);
   };
+
+  useEffect(() => {
+    if (userId === null) return;
+
+    if (userId === "") {
+      setLoginMsg("Bad credentials");
+    } else {
+      setLoginMsg("Logging in...");
+    }
+  }, [userId]);
 
   return (
     <div
@@ -41,6 +52,7 @@ function LoginBox() {
         <p className="font-bold">
           <Link to="/register">Create a new account</Link>
         </p>
+        <div className="text-red">{loginMsg}</div>
       </div>
     </div>
   );
