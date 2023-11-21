@@ -10,7 +10,7 @@ import Cookies from "js-cookie";
 import { fetchData } from "../services/fetchData";
 
 export interface UserContextValue {
-  userId: string;
+  userId: string | null;
   login: (mail: string, password: string) => Promise<void>;
 }
 
@@ -26,7 +26,7 @@ function useUser() {
 }
 
 function UserProvider({ children }: { children: React.ReactNode }) {
-  const [userId, setUserId] = useState("");
+  const [userId, setUserId] = useState<string | null>(null);
   const [token, setToken] = useState<object | null>(null);
   const firstRefresh = useRef(true);
 
@@ -74,7 +74,10 @@ function UserProvider({ children }: { children: React.ReactNode }) {
       }),
     });
 
-    if (response.status != "ok") return;
+    if (response.status != "ok") {
+      setUserId("");
+      return;
+    }
 
     sessionStorage.setItem("token", response.token);
     setToken(decodeToken(response.token));
