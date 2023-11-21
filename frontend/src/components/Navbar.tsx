@@ -1,7 +1,18 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import LogoSVG from "/logo.svg";
+import { fetchData } from "../services/fetchData";
 
 function Navbar() {
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    const data = await fetchData("/auth/logout", "POST");
+    if (data.status == "ok") {
+      sessionStorage.removeItem("token");
+      navigate("/");
+    }
+  };
+
   return (
     <nav className=" bg-my-dark py-2 flex flex-col sm:flex-row justify-between">
       <Link to="/" className="flex flex-row">
@@ -30,7 +41,10 @@ function Navbar() {
         >
           My Profile
         </Link>
-        <button className="transition duration-250 ease-in-out mr-5 hover:bg-my-orange transform hover:scale-105">
+        <button
+          className="transition duration-250 ease-in-out mr-5 hover:bg-my-orange transform hover:scale-105"
+          onClick={() => handleLogout()}
+        >
           Logout
         </button>
       </div>
