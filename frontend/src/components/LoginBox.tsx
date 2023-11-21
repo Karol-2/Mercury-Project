@@ -1,10 +1,15 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
-import { fetchData } from "../services/fetchData";
+import { useUser } from "../helpers/UserProvider";
 
 function LoginBox() {
+  const [login, setLogin] = useState("");
+  const [password, setPassword] = useState("");
+
+  const { login: userLogin } = useUser() || { login: () => {} };
+
   const loginFunc = async () => {
-    const response = await fetchData("/users/1", "GET");
-    console.log("Login " + JSON.stringify(response));
+    userLogin(login, password);
   };
 
   return (
@@ -17,6 +22,7 @@ function LoginBox() {
         type="text"
         className="text-my-dark form-input"
         placeholder="Login"
+        onChange={(e) => setLogin(e.target.value)}
       />
 
       <div>Password:</div>
@@ -24,6 +30,7 @@ function LoginBox() {
         type="password"
         className="text-my-dark form-input"
         placeholder="Password"
+        onChange={(e) => setPassword(e.target.value)}
       />
 
       <button className="btn small bg-my-orange" onClick={() => loginFunc()}>
