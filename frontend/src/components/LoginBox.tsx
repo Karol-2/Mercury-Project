@@ -1,8 +1,11 @@
+import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useUser } from "../helpers/UserProvider";
 
 function LoginBox() {
+  const navigate = useNavigate();
+
   const [login, setLogin] = useState("");
   const [password, setPassword] = useState("");
   const [loginMsg, setLoginMsg] = useState("");
@@ -19,6 +22,11 @@ function LoginBox() {
     if (userId === "") {
       setLoginMsg("Bad credentials");
     } else {
+      if (window.history.state && window.history.state.idx > 0) {
+        navigate(-1 as any, { replace: true });
+      } else {
+        navigate("/", { replace: true });
+      }
       setLoginMsg("Logging in...");
     }
   }, [userId]);
