@@ -15,6 +15,7 @@ export interface UserContextValue {
   user: User | null;
   setUser: React.Dispatch<React.SetStateAction<User | null>>;
   login: (mail: string, password: string) => Promise<void>;
+  logout: () => Promise<boolean>;
   updateUser: () => Promise<boolean>;
   deleteUser: () => Promise<boolean>;
 }
@@ -89,6 +90,20 @@ function UserProvider({ children }: { children: React.ReactNode }) {
     setToken(decodeToken(response.token));
   };
 
+  const logout = async () => {
+    if (!userId) return true;
+
+    const data = await fetchData("/auth/logout", "POST");
+    if (data.status == "ok") {
+      setUserId(null);
+      setUser(null);
+      sessionStorage.removeItem("token");
+      return true;
+    }
+
+    return false;
+  };
+
   const updateUser = async () => {
     if (!user) return false;
 
@@ -135,7 +150,7 @@ function UserProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <UserContext.Provider
-      value={{ userId, user, setUser, login, updateUser, deleteUser }}
+      value={{ userId, user, setUser, login, logout, updateUser, deleteUser }}
     >
       {children}
     </UserContext.Provider>

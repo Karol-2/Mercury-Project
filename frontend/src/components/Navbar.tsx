@@ -1,15 +1,18 @@
 import { Link, useNavigate } from "react-router-dom";
 import LogoSVG from "/logo.svg";
 import { fetchData } from "../services/fetchData";
+import { useUser } from "../helpers/UserProvider";
 
 function Navbar() {
   const navigate = useNavigate();
+  const { logout } = useUser();
 
   const handleLogout = async () => {
-    const data = await fetchData("/auth/logout", "POST");
-    if (data.status == "ok") {
-      sessionStorage.removeItem("token");
+    const logged_out = await logout();
+    if (logged_out) {
       navigate("/");
+    } else {
+      throw new Error("Couldn't log out");
     }
   };
 
