@@ -25,7 +25,7 @@ function LoginBox() {
       if (window.history.state && window.history.state.idx > 0) {
         navigate(-1 as any, { replace: true });
       } else {
-        navigate("/", { replace: true });
+        navigate("/messages", { replace: true });
       }
       setLoginMsg("Logging in...");
     }
