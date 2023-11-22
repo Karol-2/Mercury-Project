@@ -11,9 +11,12 @@ import { fetchData } from "../services/fetchData";
 import User from "../models/user.model";
 
 export interface UserContextValue {
-  user: User | null;
   userId: string | null;
+  user: User | null;
+  setUser: React.Dispatch<React.SetStateAction<User | null>>;
   login: (mail: string, password: string) => Promise<void>;
+  updateUser: () => Promise<boolean>;
+  deleteUser: () => Promise<boolean>;
 }
 
 const UserContext = createContext<UserContextValue | null>(null);
@@ -86,6 +89,35 @@ function UserProvider({ children }: { children: React.ReactNode }) {
     setToken(decodeToken(response.token));
   };
 
+  const updateUser = async () => {
+    if (!user) return false;
+
+    const response = await fetchData(`/users/${user.id}`, "PUT", {
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(user),
+    });
+
+    if (response.status === "ok") {
+      return true;
+    }
+
+    console.error("Error from the server", response.errors);
+    return false;
+  };
+
+  const deleteUser = async () => {
+    if (!user) return true;
+
+    const response = await fetchData(`/users/${user.id}`, "DELETE");
+    if (response.status === "ok") {
+      setUser(null);
+      return true;
+    }
+
+    console.error("Error from the server", response.errors);
+    return false;
+  };
+
   useEffect(() => {
     if (token) {
       const newUserId = (token as any).userId;
@@ -102,7 +134,9 @@ function UserProvider({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <UserContext.Provider value={{ userId, user, login }}>
+    <UserContext.Provider
+      value={{ userId, user, setUser, login, updateUser, deleteUser }}
+    >
       {children}
     </UserContext.Provider>
   );
