@@ -3,11 +3,6 @@ async function fetchData(endpoint: string, method: string, options = {}) {
 
   try {
     const response = await fetch(url + endpoint, { ...options, method });
-
-    if (!response.ok) {
-      throw new Error(`HTTP ERROR: ${response.status}`);
-    }
-
     const data = await response.json();
     return data;
   } catch (error) {
