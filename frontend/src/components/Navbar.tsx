@@ -1,6 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
 import LogoSVG from "/logo.svg";
-import { fetchData } from "../services/fetchData";
 import { useUser } from "../helpers/UserProvider";
 
 function Navbar() {

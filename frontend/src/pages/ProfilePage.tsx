@@ -1,10 +1,9 @@
-import React, { useState, useLayoutEffect, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 import Footer from "../components/Footer";
 import Navbar from "../components/Navbar";
 import User from "../models/user.model";
-import { fetchData } from "../services/fetchData";
 import { useUser } from "../helpers/UserProvider";
 import ProfilePageForm from "../components/ProfilePageForm";
 
