@@ -1,11 +1,35 @@
+import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { fetchData } from "../services/fetchData";
+import { useUser } from "../helpers/UserProvider";
 
 function LoginBox() {
+  const navigate = useNavigate();
+
+  const [login, setLogin] = useState("");
+  const [password, setPassword] = useState("");
+  const [loginMsg, setLoginMsg] = useState("");
+
+  const { userId, login: userLogin } = useUser() || { login: () => {} };
+
   const loginFunc = async () => {
-    const response = await fetchData("/users/1", "GET");
-    console.log("Login " + JSON.stringify(response));
+    userLogin(login, password);
   };
+
+  useEffect(() => {
+    if (userId === null) return;
+
+    if (userId === "") {
+      setLoginMsg("Bad credentials");
+    } else {
+      if (window.history.state && window.history.state.idx > 0) {
+        navigate(-1 as any, { replace: true });
+      } else {
+        navigate("/", { replace: true });
+      }
+      setLoginMsg("Logging in...");
+    }
+  }, [userId]);
 
   return (
     <div
@@ -17,6 +41,7 @@ function LoginBox() {
         type="text"
         className="text-my-dark form-input"
         placeholder="Login"
+        onChange={(e) => setLogin(e.target.value)}
       />
 
       <div>Password:</div>
@@ -24,6 +49,7 @@ function LoginBox() {
         type="password"
         className="text-my-dark form-input"
         placeholder="Password"
+        onChange={(e) => setPassword(e.target.value)}
       />
 
       <button className="btn small bg-my-orange" onClick={() => loginFunc()}>
@@ -34,6 +60,7 @@ function LoginBox() {
         <p className="font-bold">
           <Link to="/register">Create a new account</Link>
         </p>
+        <div className="text-red">{loginMsg}</div>
       </div>
     </div>
   );

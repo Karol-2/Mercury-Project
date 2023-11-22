@@ -1,8 +1,13 @@
 import express, { Express, Request, Response } from "express";
 import cors from "cors";
+import cookieParser from "cookie-parser";
+import dotenv from "dotenv";
 
 import usersRouter from "./routes/usersRoute";
 import importInitialData from "./data/importData";
+import authRouter from "./routes/authRoute";
+
+dotenv.config();
 
 const app: Express = express();
 const port: number = 5000;
@@ -20,6 +25,8 @@ app.use((req, res, next) => {
   next();
 });
 
+app.use(cookieParser());
+
 importInitialData().then((res) => console.log(res));
 
 app.get("/", (_req: Request, res: Response) => {
@@ -28,6 +35,7 @@ app.get("/", (_req: Request, res: Response) => {
 
 app.use(express.json());
 app.use("/users", usersRouter);
+app.use("/auth", authRouter);
 
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);

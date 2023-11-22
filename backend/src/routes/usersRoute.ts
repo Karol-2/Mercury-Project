@@ -16,6 +16,7 @@ import {
 
 import wordToVec from "../misc/wordToVec";
 import User from "../models/User";
+import { JWTRequest, authenticateToken } from "../misc/jwt";
 
 const usersRouter = Router();
 
@@ -59,6 +60,14 @@ usersRouter.get("/", async (_req: Request, res: UsersErrorResponse) => {
     return res.status(404).json({ status: "error", errors: err as object });
   }
 });
+
+usersRouter.post(
+  "/protected",
+  authenticateToken,
+  async (_req: JWTRequest, res: Response) => {
+    res.json({ status: "ok" });
+  },
+);
 
 usersRouter.get(
   "/search",
