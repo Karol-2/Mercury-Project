@@ -1,4 +1,6 @@
-import React, { useState, useLayoutEffect } from "react";
+import React, { useState, useLayoutEffect, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+
 import Footer from "../components/Footer";
 import Navbar from "../components/Navbar";
 import User from "../models/user.model";
@@ -7,7 +9,9 @@ import { useUser } from "../helpers/UserProvider";
 import ProfilePageForm from "../components/ProfilePageForm";
 
 function ProfilePage() {
-  const { user, setUser, updateUser, deleteUser } = useUser();
+  const navigate = useNavigate();
+
+  const { user, userId, setUser, updateUser, deleteUser } = useUser();
   const [isEditing, setIsEditing] = useState(false);
 
   const handleEditClick = () => {
@@ -26,6 +30,10 @@ function ProfilePage() {
     const { name, value } = e.target;
     setUser({ ...user, [name]: value } as User);
   };
+
+  useEffect(() => {
+    if (!userId) navigate("/login");
+  }, [userId]);
 
   return (
     <>
