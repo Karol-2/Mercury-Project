@@ -11,9 +11,9 @@ import { fetchData } from "../services/fetchData";
 import User from "../models/user.model";
 
 export interface UserContextValue {
-  userId: string | null;
-  user: User | null;
-  setUser: React.Dispatch<React.SetStateAction<User | null>>;
+  userId: string | null | undefined;
+  user: User | null | undefined;
+  setUser: React.Dispatch<React.SetStateAction<User | null | undefined>>;
   login: (mail: string, password: string) => Promise<void>;
   logout: () => Promise<boolean>;
   updateUser: () => Promise<boolean>;
@@ -32,8 +32,12 @@ function useUser() {
 }
 
 function UserProvider({ children }: { children: React.ReactNode }) {
-  const [userId, setUserId] = useState<string | null>(null);
-  const [user, setUser] = useState<User | null>(null);
+  // userId:
+  // undefined -> user state is loading
+  // null -> user not logged in
+  // string -> user logged in, userID correct
+  const [userId, setUserId] = useState<string | null | undefined>(undefined);
+  const [user, setUser] = useState<User | null | undefined>(null);
   const [token, setToken] = useState<object | null>(null);
   const firstRefresh = useRef(true);
 
@@ -69,7 +73,7 @@ function UserProvider({ children }: { children: React.ReactNode }) {
       }
     }
 
-    setUserId("");
+    setUserId(null);
   };
 
   const login = async (mail: string, password: string) => {
@@ -86,7 +90,7 @@ function UserProvider({ children }: { children: React.ReactNode }) {
     });
 
     if (response.status != "ok") {
-      setUserId("");
+      setUserId(null);
       return;
     }
 
@@ -129,6 +133,7 @@ function UserProvider({ children }: { children: React.ReactNode }) {
 
     const response = await fetchData(`/users/${user.id}`, "DELETE");
     if (response.status === "ok") {
+      setUserId(null);
       setUser(null);
       return true;
     }
@@ -141,14 +146,13 @@ function UserProvider({ children }: { children: React.ReactNode }) {
     if (token) {
       const newUserId = (token as any).userId;
       fetchData(`/users/${newUserId}`, "GET").then((response) => {
-        setUser(response.user as any);
         setUserId(newUserId);
+        setUser(response.user as any);
       });
     }
   }, [token]);
 
   if (firstRefresh.current) {
-    console.log("FIRST REFRESH");
     firstRefresh.current = false;
     getAccessToken();
   }

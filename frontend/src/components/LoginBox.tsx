@@ -17,9 +17,9 @@ function LoginBox() {
   };
 
   useEffect(() => {
-    if (userId === null) return;
+    if (userId === undefined) return;
 
-    if (userId === "") {
+    if (userId === null) {
       setLoginMsg("Bad credentials");
     } else {
       if (window.history.state && window.history.state.idx > 0) {
