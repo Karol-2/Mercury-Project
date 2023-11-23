@@ -1,22 +1,13 @@
-import { Router, Request, Response } from "express";
+import { Router, Request } from "express";
 
 import driver from "../driver/driver";
 import { generateAccessToken, generateRefreshToken } from "../misc/jwt";
-import {
-  CustomResponse,
-  JWTResponse,
-  AuthResponse,
-  ErrorResponse,
-  OkResponse,
-} from "../models/Response";
 
 import jwt, { JwtPayload } from "jsonwebtoken";
+import { TokenErrorResponse } from "../types/authResponse";
+import { CustomResponse, OkResponse } from "../models/Response";
 
 const authRouter = Router();
-
-type TokenErrorResponse = CustomResponse<
-  JWTResponse | AuthResponse | ErrorResponse
->;
 
 function generateTokens(res: TokenErrorResponse, userId: string) {
   const token = generateAccessToken(userId);
