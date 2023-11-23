@@ -31,7 +31,7 @@ function ProfilePage() {
   };
 
   useEffect(() => {
-    if (!userId) navigate("/login");
+    if (userId === "") navigate("/login");
   }, [userId]);
 
   return (

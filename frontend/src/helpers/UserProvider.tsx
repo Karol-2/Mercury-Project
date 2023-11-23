@@ -57,15 +57,19 @@ function UserProvider({ children }: { children: React.ReactNode }) {
 
     // Try to use refresh token from cookies
     const refreshTokenStr = Cookies.get("refreshToken");
-    if (!refreshTokenStr) return;
+    if (refreshTokenStr) {
+      const response = await fetchData("/auth/refresh", "POST", {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
 
-    const response = await fetchData("/auth/refresh", "POST", {
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+      if (trySetToken(response.token)) {
+        return;
+      }
+    }
 
-    trySetToken(response.token);
+    setUserId("");
   };
 
   const login = async (mail: string, password: string) => {
@@ -144,9 +148,14 @@ function UserProvider({ children }: { children: React.ReactNode }) {
   }, [token]);
 
   if (firstRefresh.current) {
+    console.log("FIRST REFRESH");
     firstRefresh.current = false;
     getAccessToken();
   }
+
+  useEffect(() => {
+    console.log(userId);
+  }, [userId]);
 
   return (
     <UserContext.Provider
