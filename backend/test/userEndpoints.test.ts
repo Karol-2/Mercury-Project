@@ -4,7 +4,6 @@ let userId: number;
 
 test("Create user", async () => {
   const userData = {
-    nick: "Tommy",
     password: "12345",
     first_name: "Tom",
     last_name: "Hanks",
@@ -40,7 +39,6 @@ test("Fetch user by ID", async () => {
 
 test("Update user by ID", async () => {
   const userUpdateData = {
-    nick: "Tommy",
     password: "54321",
     first_name: "Tommy",
     last_name: "Hanks",
@@ -82,7 +80,7 @@ test("Get user's friends", async () => {
   expect(usersStatus).toBe("ok");
 
   const zuck = usersResponseData.users.find(
-    (user: any) => user.nick == "rEptiliAn69",
+    (user: any) => user.mail == "goodboymark1@meta.com",
   );
   const zuckId = zuck.id;
 
@@ -119,7 +117,7 @@ test("Search users", async () => {
   expect(usersStatus).toBe("ok");
 
   const zuck = usersResponseData.users.find(
-    ([user, _score]: any) => user.nick == "rEptiliAn69",
+    ([user, _score]: any) => user.mail == "goodboymark1@meta.com",
   );
 
   expect(zuck).toBeDefined();

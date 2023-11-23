@@ -1,6 +1,5 @@
 const userData = [
   {
-    "nick": "boejiden",
     "password": "sleepyjoe",
     "first_name": "Joe",
     "last_name": "Biden",
@@ -12,7 +11,6 @@ const userData = [
     "chats": [],
   },
   {
-    "nick": "adamos",
     "password": "mysz888",
     "first_name": "Adam",
     "last_name": "Małysz",
@@ -24,7 +22,6 @@ const userData = [
     "chats": [],
   },
   {
-    "nick": "budyn1989",
     "password": "kaczorlove",
     "first_name": "Andrew",
     "last_name": "Duda",
@@ -36,7 +33,6 @@ const userData = [
     "chats": [],
   },
   {
-    "nick": "mentosdestroyer4",
     "password": "mmmcow",
     "first_name": "Kuba",
     "last_name": "Nowak",
@@ -48,7 +44,6 @@ const userData = [
     "chats": [],
   },
   {
-    "nick": "elonmusk",
     "password": "DogeToTheMOON",
     "first_name": "Elon",
     "last_name": "Musk",
@@ -60,7 +55,6 @@ const userData = [
     "chats": [],
   },
   {
-    "nick": "nowayno3",
     "password": "432525n",
     "first_name": "Olivia",
     "last_name": "Smith",
@@ -71,7 +65,6 @@ const userData = [
     "chats": [],
   },
   {
-    "nick": "rEptiliAn69",
     "password": "metaverse4ever",
     "first_name": "Mark",
     "last_name": "Zuckerberg",

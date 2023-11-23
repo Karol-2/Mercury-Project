@@ -36,11 +36,11 @@ function LoginBox() {
       className=" medium:w-[25vw] flex flex-col gap-2 bg-my-dark p-10 px-20 rounded-xl"
       id="login-box"
     >
-      <div>Login:</div>
+      <div>E-mail:</div>
       <input
         type="text"
         className="text-my-dark form-input"
-        placeholder="Login"
+        placeholder="E-mail"
         onChange={(e) => setLogin(e.target.value)}
       />
 

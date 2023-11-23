@@ -75,14 +75,6 @@ function RegisterBox() {
           placeholder="E-mail"
         />
 
-        <div>Login:</div>
-        <input
-          type="text"
-          className="text-my-dark form-input"
-          onChange={updateFormUser("nick")}
-          placeholder="Login"
-        />
-
         <div>Password:</div>
         <input
           type="password"
