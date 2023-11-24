@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 
 import Footer from "../components/Footer";
 import Navbar from "../components/Navbar";
-import User from "../models/user.model";
+import User from "../models/User";
 import { useUser } from "../helpers/UserProvider";
 import ProfilePageForm from "../components/ProfilePageForm";
 

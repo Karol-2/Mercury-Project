@@ -1,5 +1,5 @@
 import React from "react";
-import User from "../models/user.model";
+import User from "../models/User";
 
 export interface ProfilePageFormProps {
   user: User;
