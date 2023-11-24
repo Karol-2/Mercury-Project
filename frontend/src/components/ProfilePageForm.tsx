@@ -3,6 +3,7 @@ import User from "../models/User";
 
 export interface ProfilePageFormProps {
   user: User;
+  friends: User[];
   isEditing: boolean;
   handleEditClick: () => void;
   handleSaveClick: () => void;
@@ -19,7 +20,6 @@ function ProfilePageForm(props: ProfilePageFormProps) {
     handleChange,
     deleteUser,
   } = props;
-
   return (
     <section className="bg-my-darker min-h-screen flex justify-center ">
       <div className=" bg-my-dark p-10 px-20 rounded-xl mx-50 my-20 lg:mx-72 text-lg">
@@ -92,6 +92,13 @@ function ProfilePageForm(props: ProfilePageFormProps) {
               user.password || ""
             )}
           </p>
+          <ul>
+            Friends:{" "}
+            {props.friends.map(f => <li key={f.id}>
+              <h3>{f.first_name} {f.last_name}</h3>
+              <button onClick={() => console.log("meeting")}>launch meeting</button>
+            </li>)}
+          </ul>
         </div>
         <div className="my-5">
           {isEditing ? (
