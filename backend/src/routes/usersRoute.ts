@@ -2,7 +2,6 @@ import { Router, Request, Response } from "express";
 import { v4 as uuidv4 } from "uuid";
 import { Session } from "neo4j-driver";
 
-import chatRouter from "./chatsRoute";
 import driver from "../driver/driver";
 
 import wordToVec from "../misc/wordToVec";
@@ -220,7 +219,5 @@ usersRouter.delete("/:userId", async (req: Request, res: OkErrorResponse) => {
     return res.status(404).json({ status: "error", errors: err as object });
   }
 });
-
-usersRouter.use("/:userId/chats", chatRouter);
 
 export default usersRouter;
