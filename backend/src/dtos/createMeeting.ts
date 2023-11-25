@@ -1,4 +1,4 @@
 export default interface CreateMeetingDto {
-    ownerId: string;
-    guestId: string;
+  ownerId: string;
+  guestId: string;
 }

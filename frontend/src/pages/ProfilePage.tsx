@@ -38,9 +38,13 @@ function ProfilePage() {
 
   useEffect(() => {
     const fetchFriends = async () => {
-      const friendsResponse = await dataService.fetchData(`/users/${userId}/friends`,"GET",{});
+      const friendsResponse = await dataService.fetchData(
+        `/users/${userId}/friends`,
+        "GET",
+        {},
+      );
       setFriends(friendsResponse.friends);
-    }
+    };
     fetchFriends();
   }, []);
 

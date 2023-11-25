@@ -36,7 +36,10 @@ export async function authenticateToken(
   }
 }
 
-export async function decodeSocketData(handshakeData: string, linkSecret:string) {
+export async function decodeSocketData(
+  handshakeData: string,
+  linkSecret: string,
+) {
   try {
     const decodedData = jwt.verify(handshakeData, linkSecret);
     return decodedData;

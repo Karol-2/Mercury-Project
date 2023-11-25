@@ -94,10 +94,16 @@ function ProfilePageForm(props: ProfilePageFormProps) {
           </p>
           <ul>
             Friends:{" "}
-            {props.friends.map(f => <li key={f.id}>
-              <h3>{f.first_name} {f.last_name}</h3>
-              <button onClick={() => console.log("meeting")}>launch meeting</button>
-            </li>)}
+            {props.friends.map((f) => (
+              <li key={f.id}>
+                <h3>
+                  {f.first_name} {f.last_name}
+                </h3>
+                <button onClick={() => console.log("meeting")}>
+                  launch meeting
+                </button>
+              </li>
+            ))}
           </ul>
         </div>
         <div className="my-5">

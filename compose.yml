@@ -16,7 +16,7 @@ services:
     build: ./frontend
     ports:
       - 5173:80
-      
+
   backend:
     build: ./backend
     env_file:
