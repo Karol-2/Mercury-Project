@@ -1,5 +1,6 @@
 import { sign, verify } from "jsonwebtoken";
 import {v4} from "uuid";
+import dotenv from "dotenv";
 import servers from "./server";
 import driver from "./driver/driver";
 import usersRouter from "./routes/usersRoute";
@@ -8,7 +9,9 @@ import importInitialData from "./data/importData";
 import CreateMeetingDto from "./dtos/createMeeting";
 
 const {app} = servers;
-const linkSecret = "ijr2iq34rfeiadsfkjq3ew";
+
+dotenv.config();
+const linkSecret = process.env.LINK_SECRET;
 
 importInitialData().then((res) => console.log(res));
 
@@ -32,7 +35,7 @@ app.post("/meeting", async (req, res) => {
         if (newMeetingRequest.records.length === 0) {
             return res.status(404).json({ status: "error", errors: {message: "Cannot create new meeting"} });
         }
-        const token = sign({ownerId, guestId, meetingId}, linkSecret);
+        const token = sign({ownerId, guestId, meetingId}, linkSecret!);
         return res.json({token});      
     } catch (err) {
         console.log("Error:", err);
@@ -42,7 +45,7 @@ app.post("/meeting", async (req, res) => {
 
 app.post("/decode", (req, res) => {
     const {token} = req.body as {token: string};
-    const decodedData = verify(token, linkSecret);
+    const decodedData = verify(token, linkSecret!);
     return res.json({decodedData});
 });
 
@@ -58,7 +61,7 @@ app.get("/guest-token/:guestId", async (req, res) => {
             return res.status(404).json({ status: "error", errors: {message: "User does not exist"} });
         }
         const guest = guestRequest.records[0].get(0).properties;
-        const token = sign(guest, linkSecret);
+        const token = sign(guest, linkSecret!);
         return res.json({token});
     } catch (err) {
         console.log("Error:", err);
