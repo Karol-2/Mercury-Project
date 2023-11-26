@@ -14,30 +14,30 @@ jobs:
       contents: write
 
     steps:
-    - uses: actions/checkout@v3
-      with:
+      - uses: actions/checkout@v3
+        with:
           ref: ${{ github.ref }}
 
-    - uses: isbang/compose-action@v1.5.1
-      with:
-        compose-file: "compose.yml"
-    
-    - name: Wait for containers to start
-      run: |
-        sleep 18
-        docker run \
-          --rm \
-          --network mercury-project_default \
-          alpine/curl -o /dev/null --retry 3 --retry-connrefused backend:5000
+      - uses: isbang/compose-action@v1.5.1
+        with:
+          compose-file: "compose.yml"
 
-    - name: Test the backend
-      run: cd backend; npm i && npm run test run
+      - name: Wait for containers to start
+        run: |
+          sleep 18
+          docker run \
+            --rm \
+            --network mercury-project_default \
+            alpine/curl -o /dev/null --retry 3 --retry-connrefused backend:5000
 
-    - name: Format files
-      run: cd ..; npm i && npm run prettier:fix
+      - name: Test the backend
+        run: cd backend; npm i && npm run test run
 
-    - name: Commit changes
-      uses: stefanzweifel/git-auto-commit-action@v4
-      with:
-        commit_message: Apply formatting changes
-        branch: ${{ github.head_ref }}
+      - name: Format files
+        run: cd ..; npm i && npm run prettier:fix
+
+      - name: Commit changes
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: Apply formatting changes
+          branch: ${{ github.head_ref }}

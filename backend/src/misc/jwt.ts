@@ -35,3 +35,15 @@ export async function authenticateToken(
     return res.status(403).json({ status: "forbidden" });
   }
 }
+
+export async function decodeSocketData(
+  handshakeData: string,
+  linkSecret: string,
+) {
+  try {
+    const decodedData = jwt.verify(handshakeData, linkSecret);
+    return decodedData;
+  } catch (_e) {
+    return null;
+  }
+}

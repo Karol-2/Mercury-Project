@@ -7,8 +7,8 @@ import React, {
 } from "react";
 import { isExpired, decodeToken } from "react-jwt";
 import Cookies from "js-cookie";
-import { fetchData } from "../services/fetchData";
-import User from "../models/user.model";
+import dataService from "../services/data";
+import User from "../models/User";
 
 export interface UserContextValue {
   userId: string | null | undefined;
@@ -62,7 +62,7 @@ function UserProvider({ children }: { children: React.ReactNode }) {
     // Try to use refresh token from cookies
     const refreshTokenStr = Cookies.get("refreshToken");
     if (refreshTokenStr) {
-      const response = await fetchData("/auth/refresh", "POST", {
+      const response = await dataService.fetchData("/auth/refresh", "POST", {
         headers: {
           "Content-Type": "application/json",
         },
@@ -79,7 +79,7 @@ function UserProvider({ children }: { children: React.ReactNode }) {
   const login = async (mail: string, password: string) => {
     if (userId) return;
 
-    const response = await fetchData("/auth/login", "POST", {
+    const response = await dataService.fetchData("/auth/login", "POST", {
       headers: {
         "Content-Type": "application/json",
       },
@@ -101,7 +101,7 @@ function UserProvider({ children }: { children: React.ReactNode }) {
   const logout = async () => {
     if (!userId) return true;
 
-    const data = await fetchData("/auth/logout", "POST");
+    const data = await dataService.fetchData("/auth/logout", "POST");
     if (data.status == "ok") {
       setUserId(null);
       setUser(null);
@@ -115,7 +115,7 @@ function UserProvider({ children }: { children: React.ReactNode }) {
   const updateUser = async () => {
     if (!user) return false;
 
-    const response = await fetchData(`/users/${user.id}`, "PUT", {
+    const response = await dataService.fetchData(`/users/${user.id}`, "PUT", {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(user),
     });
@@ -131,7 +131,7 @@ function UserProvider({ children }: { children: React.ReactNode }) {
   const deleteUser = async () => {
     if (!user) return true;
 
-    const response = await fetchData(`/users/${user.id}`, "DELETE");
+    const response = await dataService.fetchData(`/users/${user.id}`, "DELETE");
     if (response.status === "ok") {
       setUserId(null);
       setUser(null);
@@ -145,7 +145,7 @@ function UserProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (token) {
       const newUserId = (token as any).userId;
-      fetchData(`/users/${newUserId}`, "GET").then((response) => {
+      dataService.fetchData(`/users/${newUserId}`, "GET").then((response) => {
         setUserId(newUserId);
         setUser(response.user as any);
       });

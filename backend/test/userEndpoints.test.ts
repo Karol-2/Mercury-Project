@@ -4,12 +4,12 @@ let userId: number;
 
 test("Create user", async () => {
   const userData = {
-    password: "12345",
     first_name: "Tom",
     last_name: "Hanks",
     country: "USA",
     profile_picture: "https://example.com/tommy.jpg",
     mail: "tom.hanks@example.com",
+    password: "12345",
   };
 
   const response = await fetch("http://localhost:5000/users", {
@@ -39,12 +39,12 @@ test("Fetch user by ID", async () => {
 
 test("Update user by ID", async () => {
   const userUpdateData = {
-    password: "54321",
     first_name: "Tommy",
     last_name: "Hanks",
     country: "Canada",
     profile_picture: "https://example.com/tommy.jpg",
     mail: "tommy.hanks@example.com",
+    password: "54321",
   };
 
   const response = await fetch(`http://localhost:5000/users/${userId}`, {
