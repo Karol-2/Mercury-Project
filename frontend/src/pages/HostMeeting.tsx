@@ -38,6 +38,27 @@ function HostMeeting() {
         }
         fetchMedia();
     }, []);
+    useEffect(() => {
+        const createOfferAsync = () => {
+            Object.keys(streams).forEach(async (s) => {
+                if (s !== "localStream") {
+                    try {
+                        const pc: RTCPeerConnection = streams[s].peerConnection;
+                        const offer = await pc.createOffer();
+                        pc.setLocalDescription(offer);
+                        const token = searchParams.get("token");
+                        const socket = socketConnection(token!);
+                        socket.emit("newOffer", {offer, meetingInfo});
+                    } catch (err) {
+                        console.log(err);
+                    }
+                }
+            });
+        }
+        if (callStatus.audio === "enabled" && callStatus.video === "enabled" && !callStatus.haveCreatedOffer) {
+            createOfferAsync();
+        }
+    }, [callStatus.audio, callStatus.video, callStatus.haveCreatedOffer]);
     const addIce = (iceC: RTCPeerConnectionIceEvent) => {
         const socket = socketConnection(searchParams.get("token")!);
         socket.emit("iceToServer", {
