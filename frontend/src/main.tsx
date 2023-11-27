@@ -10,6 +10,8 @@ import PageNotFound from "./pages/PageNotFound.tsx";
 import ProfilePage from "./pages/ProfilePage.tsx";
 import RegisterPage from "./pages/RegisterPage.tsx";
 import SearchPage from "./pages/SearchPage.tsx";
+import HostMeeting from "./pages/HostMeeting.tsx";
+import GuestMeeting from "./pages/GuestMeeting.tsx";
 import { store } from "./redux/store.ts";
 
 import { AnimatePresence } from "framer-motion";
@@ -32,6 +34,8 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
             <Route path="/admin" element={<AdminPage />} />
             <Route path="/messages" element={<MessagingPage />} />
             <Route path="/search" element={<SearchPage />} />
+            <Route path="/host-meeting" element={<HostMeeting />} />
+            <Route path="/guest-meeting" element={<GuestMeeting />} />
             <Route path="/*" element={<PageNotFound />} />
           </Routes>
         </Router>

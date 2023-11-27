@@ -5,6 +5,7 @@ export interface ProfilePageFormProps {
   user: User;
   friends: User[];
   isEditing: boolean;
+  launchMeeting: (ownerId: string, guestId: string) => void;
   handleEditClick: () => void;
   handleSaveClick: () => void;
   handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
@@ -15,10 +16,12 @@ function ProfilePageForm(props: ProfilePageFormProps) {
   const {
     user,
     isEditing,
+    friends,
     handleEditClick,
     handleSaveClick,
     handleChange,
     deleteUser,
+    launchMeeting
   } = props;
   return (
     <section className="bg-my-darker min-h-screen flex justify-center ">
@@ -94,12 +97,12 @@ function ProfilePageForm(props: ProfilePageFormProps) {
           </p>
           <ul>
             Friends:{" "}
-            {props.friends.map((f) => (
+            {friends.map((f) => (
               <li key={f.id}>
                 <h3>
                   {f.first_name} {f.last_name}
                 </h3>
-                <button onClick={() => console.log("meeting")}>
+                <button onClick={() => launchMeeting(String(user.id), String(f.id))}>
                   launch meeting
                 </button>
               </li>
