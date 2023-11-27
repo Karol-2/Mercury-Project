@@ -9,15 +9,17 @@ import addStream from "../redux/actions/addStream";
 import socketConnection from "../webSocket/socketConnection";
 import createPeerConnection from "../webRTC/createPeerConnection";
 import meetingService from "../services/meeting";
+import ownerSocketListeners from "../webSocket/ownerSocketListeners";
 function HostMeeting() {
     const dispatch = useDispatch();
     const callStatus = useSelector((state: RootState) => state.callStatus);
     const streams = useSelector((state: RootState) => state.streams);
-    const [searchParams, setSearchParams] = useSearchParams();
+    const [searchParams, _setSearchParams] = useSearchParams();
     const [meetingInfo, setMeetingInfo] = useState({});
     const smallFeedEl = useRef<HTMLVideoElement>(null);
     const largeFeedEl = useRef<HTMLVideoElement>(null);
     const uuidRef = useRef<any>(null);
+    const streamsRef = useRef<any>(null);
     useEffect(() => {
         const fetchMedia = async () => {
             const constraints = {
@@ -82,7 +84,20 @@ function HostMeeting() {
             uuidRef.current = response.meetingId;
         }
         fetchDecodedToken();
-    }, [])
+    }, []);
+    useEffect(() => {
+        const token = searchParams.get("token");
+        const socket = socketConnection(token!);
+        ownerSocketListeners(socket, dispatch, addIceCandidateToPc)
+    }, []);
+    const addIceCandidateToPc = (iceC: any) => {
+        Object.keys(streamsRef.current).forEach(s => {
+            if (s !== "localStream") {
+                const pc: RTCPeerConnection = streamsRef.current[s].peerConnection;
+                pc.addIceCandidate(iceC);
+            }
+        });
+    }
     const addIce = (iceC: RTCPeerConnectionIceEvent) => {
         const socket = socketConnection(searchParams.get("token")!);
         socket.emit("iceToServer", {
