@@ -1,6 +1,11 @@
-const getDevices = () => {
+interface Devices {
+    videoDevices: MediaDeviceInfo[];
+    audioInputDevices: MediaDeviceInfo[];
+    audioOutputDevices: MediaDeviceInfo[];
+}
+const getDevices = (): Promise<Devices> => {
     return new Promise(async (resolve, _reject) => {
-        const devices = await navigator.mediaDevices.enumerateDevices();
+        const devices: MediaDeviceInfo[] = await navigator.mediaDevices.enumerateDevices();
         const videoDevices = devices.filter(d => d.kind === "videoinput");
         const audioInputDevices = devices.filter(d => d.kind === "audioinput");
         const audioOutputDevices = devices.filter(d => d.kind === "audiooutput");
@@ -11,3 +16,4 @@ const getDevices = () => {
         });
     });
 }
+export default getDevices;
