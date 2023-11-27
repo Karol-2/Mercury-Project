@@ -60,6 +60,19 @@ function HostMeeting() {
             createOfferAsync();
         }
     }, [callStatus.audio, callStatus.video, callStatus.haveCreatedOffer]);
+    useEffect(() => {
+        const asyncAddAnswer = () => {
+            Object.keys(streams).forEach(async (s) => {
+                if (s !== "localStream") {
+                    const pc: RTCPeerConnection = streams[s].peerConnection;
+                    await pc.setRemoteDescription(callStatus.answer);
+                }
+            });
+        }
+        if (callStatus.answer) {
+            asyncAddAnswer();
+        }
+    }, [callStatus.answer]);
     const addIce = (iceC: RTCPeerConnectionIceEvent) => {
         const socket = socketConnection(searchParams.get("token")!);
         socket.emit("iceToServer", {
