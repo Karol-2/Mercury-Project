@@ -7,4 +7,7 @@ export default interface CallStatusState {
     shareScreen: boolean;
     haveMedia: boolean; 
     haveCreatedOffer: boolean;
+    answer?: any;
+    myRole?: string;
+    offer?: any;
 }
