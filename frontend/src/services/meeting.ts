@@ -19,6 +19,25 @@ class MeetingService {
       throw error;
     }
   }
+
+  async decodeMeetingData(token: string) {
+    const endpoint = this.url + "/decode";
+    try {
+      const response = await fetch(endpoint, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ token }),
+      });
+      const data = await response.json();
+      const { decodedData } = data;
+      return decodedData;
+    } catch (error) {
+      console.error("Error ocurred during fetch data:", error);
+      throw error;
+    }
+  }
 }
 
 export default new MeetingService();

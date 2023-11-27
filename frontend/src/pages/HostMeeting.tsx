@@ -8,6 +8,7 @@ import updateCallStatus from "../redux/actions/updateCallStatus";
 import addStream from "../redux/actions/addStream";
 import socketConnection from "../webSocket/socketConnection";
 import createPeerConnection from "../webRTC/createPeerConnection";
+import meetingService from "../services/meeting";
 function HostMeeting() {
     const dispatch = useDispatch();
     const callStatus = useSelector((state: RootState) => state.callStatus);
@@ -73,6 +74,15 @@ function HostMeeting() {
             asyncAddAnswer();
         }
     }, [callStatus.answer]);
+    useEffect(() => {
+        const token = searchParams.get("token");
+        const fetchDecodedToken = async () => {
+            const response = await meetingService.decodeMeetingData(token!);
+            setMeetingInfo(response);
+            uuidRef.current = response.meetingId;
+        }
+        fetchDecodedToken();
+    }, [])
     const addIce = (iceC: RTCPeerConnectionIceEvent) => {
         const socket = socketConnection(searchParams.get("token")!);
         socket.emit("iceToServer", {
