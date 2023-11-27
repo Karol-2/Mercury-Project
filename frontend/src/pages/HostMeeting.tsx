@@ -54,6 +54,7 @@ function HostMeeting() {
                     }
                 }
             });
+            dispatch(updateCallStatus("haveCreatedOffer", true));
         }
         if (callStatus.audio === "enabled" && callStatus.video === "enabled" && !callStatus.haveCreatedOffer) {
             createOfferAsync();
