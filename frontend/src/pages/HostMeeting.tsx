@@ -1,5 +1,6 @@
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
+import ActionButtons from "../components/ActionButtons";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../redux/store";
 import { useSearchParams } from "react-router-dom";
@@ -112,6 +113,7 @@ function HostMeeting() {
             <div>
                 <video id="large-feed" ref={largeFeedEl} autoPlay controls playsInline></video>
                 <video id="small-feed" ref={smallFeedEl} autoPlay controls playsInline></video>
+                <ActionButtons smallFeedEl={smallFeedEl} largeFeedEl={largeFeedEl} />
             </div>
             <Footer />
         </>
