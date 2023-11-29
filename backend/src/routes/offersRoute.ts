@@ -31,4 +31,27 @@ offersRouter.get(
     }
 );
 
+offersRouter.put(
+  "/:userId",
+  async (req, res) => {
+    try {
+      const newProps = req.body;
+      const {answer} = newProps;
+
+      const session = driver.session();
+      const userId = req.params.userId;
+  
+      await session.run(`MATCH (o:Offer)-[:DEDICATED]-(u:User {id: $userId}) SET o.answer=$answer`, {
+        userId,
+        answer
+      });
+  
+      return res.json({ status: "ok" });
+    } catch (err) {
+      console.log("Error:", err);
+      return res.status(404).json({ status: "error", errors: err as object });
+    }
+  }
+)
+
 export default offersRouter;
