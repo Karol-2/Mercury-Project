@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { FrontendUser } from "../models/user.model";
 
-const mailRegex = new RegExp("w+@w+[.]w+");
+const mailRegex = new RegExp("\\w+@\\w+[.]\\w+");
 
 type ErrorHandlers = Record<keyof FrontendUser, (value: string) => string>;
 const errorHandlers: ErrorHandlers = {
@@ -73,7 +73,7 @@ function RegisterBox() {
   );
 
   const error = (name: keyof FrontendUser) => (
-    <div className="pb-4 text-[#f88]">{errors[name] || "No errors"}</div>
+    <div className="pb-4 text-[#f88]">{errors[name]}</div>
   );
 
   const handleSubmit = (e: React.SyntheticEvent) => {
@@ -106,13 +106,15 @@ function RegisterBox() {
     >
       <div>First and last name:</div>
       {input("First name", "text", "first_name")}
-      {input("Last name", "text", "last_name")}
       {error("first_name")}
+      {input("Last name", "text", "last_name")}
       {error("last_name")}
 
       <div>
-        <span>Country:</span>
-        {input("Country", "text", "country")}
+        <div className="flex gap-2 items-center">
+          <div>Country:</div>
+          {input("Country", "text", "country")}
+        </div>
         {error("country")}
       </div>
 
@@ -120,7 +122,7 @@ function RegisterBox() {
       {input("", "file", "profile_picture")}
       {error("profile_picture")}
 
-      <div className="py-10">
+      <div className="py-5">
         <div>E-mail:</div>
         {input("E-mail", "text", "mail")}
         {error("mail")}
