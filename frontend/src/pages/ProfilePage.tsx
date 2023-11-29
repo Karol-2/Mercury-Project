@@ -46,9 +46,16 @@ function ProfilePage() {
     };
     fetchFriends();
   }, []);
-
+  useEffect(() => {
+    const fetchGuestToken = async () => {
+      const guestToken = await meetingService.getGuestToken(userId!);
+      sessionStorage.setItem("guestToken", guestToken);
+    }
+    fetchGuestToken();
+  }, []);
   const launchMeeting = async (ownerId: string, guestId: string) => {
     const token = await meetingService.createMeetingWithToken(ownerId, guestId);
+    sessionStorage.removeItem("guestToken");
     navigate(`/host-meeting?token=${token}`);
   }
   return (
