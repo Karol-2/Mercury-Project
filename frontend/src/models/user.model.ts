@@ -1,11 +1,14 @@
-interface User {
-  id: number;
+export interface FrontendUser {
   first_name: string;
   last_name: string;
   country: string;
   profile_picture: string;
   mail: string;
   password: string;
+}
+
+interface User extends FrontendUser {
+  id: number;
   friend_ids: number[];
   chats: number[];
 }
