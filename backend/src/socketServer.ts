@@ -7,11 +7,21 @@ const { io, app } = servers;
 dotenv.config();
 const linkSecret = process.env.LINK_SECRET;
 
-io.on("connection", (socket: Socket) => {
+io.on("connection", async (socket: Socket) => {
   const handshakeData = socket.handshake.auth.jwt;
   const decodedData = decodeSocketData(handshakeData, linkSecret!);
   if (!decodedData) {
     socket.disconnect();
     return;
+  }
+  const {guestId} = decodedData;
+  if (guestId) {
+    await fetch(`http://localhost:5000/users/${guestId}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ socketID: socket.id }),
+    });
   }
 });
