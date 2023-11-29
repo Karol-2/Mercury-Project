@@ -31,6 +31,25 @@ offersRouter.get(
     }
 );
 
+offersRouter.post(
+  "/",
+  async (req, res) => {
+    try {
+      const session = driver.session();
+      const newOfferProps = req.body;
+      const newOfferResult = await session.run(`CREATE (o:Offer $offer) RETURN o`, {
+        offer: newOfferProps,
+      });
+      const offer = newOfferResult.records[0].get(0).properties;
+      await session.close();
+      return res.json({ status: "ok", offer });
+    } catch (err) {
+      console.log("Error:", err);
+      return res.status(404).json({ status: "error", errors: err as object });
+    }
+  }
+);
+
 offersRouter.put(
   "/:userId",
   async (req, res) => {
