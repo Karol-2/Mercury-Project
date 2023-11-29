@@ -15,41 +15,38 @@ function Navbar() {
     }
   };
 
+  const navLinks = [
+    { to: "/search", text: "Search" },
+    { to: "/messages", text: "Messages" },
+    { to: "/profile", text: "My Profile" },
+  ];
+
   return (
     <nav className=" bg-my-dark py-2 flex flex-col sm:flex-row justify-between">
-      <Link to="/" className="flex flex-row">
+      <div className="flex flex-row">
         <img src={LogoSVG} alt="Mercury Logo" className=" h-20 w-20 pr-5 " />
         <span className=" self-center text-my-orange font-bold text-xl md:text-2xl">
           {" "}
           Mercury
         </span>
-      </Link>
-      <div className="flex flex-col sm:flex-row font-semibold text-lg content-center align-middle ">
-        <Link
-          to={"/search"}
-          className="transition duration-250 ease-in-out mr-5 hover:bg-my-orange transform hover:scale-105"
-        >
-          Search
-        </Link>
-        <Link
-          to={"/messages"}
-          className="transition duration-250 ease-in-out mr-5 hover:bg-my-orange transform hover:scale-105"
-        >
-          Messages
-        </Link>
-        <Link
-          to={"/profile"}
-          className="transition duration-250 ease-in-out mr-5 hover:bg-my-orange transform hover:scale-105"
-        >
-          My Profile
-        </Link>
-        <button
-          className="transition duration-250 ease-in-out mr-5 hover:bg-my-orange transform hover:scale-105"
-          onClick={() => handleLogout()}
-        >
-          Logout
-        </button>
       </div>
+      <div className=" self-center">
+  {navLinks.map((link) => (
+    <Link
+      key={link.to}
+      to={link.to}
+      className=" p-5 rounded-lg transition duration-250 ease-in-out mr-5 hover:bg-my-orange"
+    >
+      {link.text}
+    </Link>
+  ))}
+  <button
+    className="p-5 rounded-lg transition duration-250 ease-in-out mr-5 hover:bg-my-orange"
+    onClick={handleLogout}
+  >
+    Logout
+  </button>
+</div>
     </nav>
   );
 }
