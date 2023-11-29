@@ -3,4 +3,5 @@ export default interface DecodedData {
     guestId?: string;
     meetingId?: string;
     iat: number;
+    meetingOwner?: boolean;
 }

@@ -45,7 +45,8 @@ app.post("/meeting", async (req, res) => {
           errors: { message: "Cannot create new meeting" },
         });
     }
-    const token = sign({ ownerId, guestId, meetingId }, linkSecret!);
+    const meetingOwner = true;
+    const token = sign({ ownerId, guestId, meetingId, meetingOwner }, linkSecret!);
     return res.json({ token });
   } catch (err) {
     console.log("Error:", err);

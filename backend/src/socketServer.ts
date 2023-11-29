@@ -15,7 +15,7 @@ io.on("connection", async (socket: Socket) => {
     return;
   }
   const {guestId, ownerId} = decodedData;
-  if (guestId) {
+  if (!("meetingOwner" in decodedData)) {
     await fetch(`http://localhost:5000/users/${guestId}`, {
       method: "PUT",
       headers: {
@@ -28,6 +28,17 @@ io.on("connection", async (socket: Socket) => {
     const {meetingId} = meetingData;
     socket.emit("meetingData", {meetingId});
     const offersRequest = await fetch(`http://localhost:5000/offers/${guestId}`);
+    const offersData = await offersRequest.json();
+    offersData.offers.forEach((offer:any) => io.to(socket.id).emit("newOfferWaiting",offer));
+  } else {
+    await fetch(`http://localhost:5000/users/${ownerId}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ socketID: socket.id }),
+    });
+    const offersRequest = await fetch(`http://localhost:5000/offers/${ownerId}`);
     const offersData = await offersRequest.json();
     offersData.offers.forEach((offer:any) => io.to(socket.id).emit("newOfferWaiting",offer));
   }
