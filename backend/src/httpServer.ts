@@ -5,6 +5,7 @@ import servers from "./server";
 import driver from "./driver/driver";
 import usersRouter from "./routes/usersRoute";
 import authRouter from "./routes/authRoute";
+import offersRouter from "./routes/offersRoute";
 import importInitialData from "./data/importData";
 import CreateMeetingDto from "./dtos/createMeeting";
 
@@ -17,6 +18,7 @@ importInitialData().then((res) => console.log(res));
 
 app.use("/users", usersRouter);
 app.use("/auth", authRouter);
+app.use("/offers", offersRouter);
 
 app.post("/meeting", async (req, res) => {
   try {
