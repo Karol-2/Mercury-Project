@@ -7,7 +7,7 @@
   "author": "",
   "license": "ISC",
   "scripts": {
-    "start": "nodemon src/index.ts",
+    "start": "nodemon --exec ts-node src/index.ts",
     "test": "vitest",
     "coverage": "vitest --coverage",
     "build": "tsc",
@@ -22,7 +22,8 @@
     "jsonwebtoken": "^9.0.2",
     "neo4j-driver": "^5.13.0",
     "nodemon": "^3.0.1",
-    "socket.io": "^4.7.2"
+    "socket.io": "^4.7.2",
+    "ts-node": "^10.9.1"
   },
   "devDependencies": {
     "@types/cookie-parser": "^1.4.6",
