@@ -4,6 +4,7 @@ import { FrontendUser } from "../models/user.model";
 
 function RegisterBox() {
   const [user, setUser] = useState<Partial<FrontendUser>>({});
+  const [errors, setErrors] = useState<Partial<FrontendUser>>({});
 
   const registerFunc = async () => {
     const response = await fetch("http://localhost:5000/users", {
@@ -35,6 +36,10 @@ function RegisterBox() {
     />
   );
 
+  const error = (name: keyof FrontendUser) => (
+    <div className="pb-4 text-[#f88]">{errors[name] || "No errors"}</div>
+  );
+
   const handleSubmit = (e: React.SyntheticEvent) => {
     e.preventDefault();
     console.log(user);
@@ -49,21 +54,27 @@ function RegisterBox() {
       <div>First and last name:</div>
       {input("First name", "text", "first_name")}
       {input("Last name", "text", "last_name")}
+      {error("first_name")}
+      {error("last_name")}
 
       <div>
         <span>Country:</span>
         {input("Country", "text", "country")}
+        {error("country")}
       </div>
 
       <div>Profile picture:</div>
       {input("", "file", "profile_picture")}
+      {error("profile_picture")}
 
       <div className="py-10">
         <div>E-mail:</div>
         {input("E-mail", "text", "mail")}
+        {error("mail")}
 
         <div>Password:</div>
         {input("Password", "password", "password")}
+        {error("password")}
       </div>
 
       <button className="btn small bg-my-orange" type="submit">
