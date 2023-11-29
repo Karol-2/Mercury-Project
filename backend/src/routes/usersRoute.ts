@@ -17,7 +17,7 @@ import {
 
 const usersRouter = Router();
 
-async function userExists(
+export async function userExists(
   session: Session,
   res: Response,
   userId: string,

@@ -27,5 +27,8 @@ io.on("connection", async (socket: Socket) => {
     const meetingData = await meetingRequest.json();
     const {meetingId} = meetingData;
     socket.emit("meetingData", {meetingId});
+    const offersRequest = await fetch(`http://localhost:5000/offers/${guestId}`);
+    const offersData = await offersRequest.json();
+    offersData.offers.forEach((offer:any) => io.to(socket.id).emit("newOfferWaiting",offer));
   }
 });
