@@ -38,6 +38,19 @@ class MeetingService {
       throw error;
     }
   }
+
+  async getGuestToken(id: string) {
+    const endpoint = this.url + `/guest-token/${id}`;
+    try {
+      const response = await fetch(endpoint);
+      const data = await response.json();
+      const {token} = data;
+      return token;
+    } catch (error) {
+      console.error("Error ocurred during fetch data:", error);
+      throw error;
+    }
+  }
 }
 
 export default new MeetingService();
