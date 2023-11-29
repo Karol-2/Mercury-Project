@@ -35,6 +35,7 @@ function ProfilePageForm(props: ProfilePageFormProps) {
                 name="first_name"
                 value={user.first_name}
                 onChange={handleChange}
+                className=" text-my-dark"
               />
             ) : (
               user.first_name || ""
