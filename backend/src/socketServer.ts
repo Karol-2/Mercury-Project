@@ -14,7 +14,7 @@ io.on("connection", async (socket: Socket) => {
     socket.disconnect();
     return;
   }
-  const {guestId} = decodedData;
+  const {guestId, ownerId} = decodedData;
   if (guestId) {
     await fetch(`http://localhost:5000/users/${guestId}`, {
       method: "PUT",
@@ -23,5 +23,9 @@ io.on("connection", async (socket: Socket) => {
       },
       body: JSON.stringify({ socketID: socket.id }),
     });
+    const meetingRequest = await fetch(`http://localhost:5000/users/${guestId}/${ownerId}/meetings`);
+    const meetingData = await meetingRequest.json();
+    const {meetingId} = meetingData;
+    socket.emit("meetingData", {meetingId});
   }
 });
