@@ -144,6 +144,35 @@ usersRouter.get(
   },
 );
 
+usersRouter.get(
+  "/:user1Id/:user2Id/meetings",
+  async (req: Request, res) => {
+    try {
+      const session = driver.session();
+      const user1Id = req.params.user1Id;
+      const user2Id = req.params.user2Id;
+
+      const user1 = await userExists(session, res, user1Id);
+      const user2 = await userExists(session, res, user2Id);
+      if ("json" in user1 || "json" in user2) {
+        await session.close();
+        return res;
+      }
+
+      const meetingsRequest = await session.run(
+        `MATCH (u1:User {id: $user1Id})-[m:MEETING]-(u2:User {id: $user2Id}) RETURN m`,
+        { user1Id, user2Id },
+      );
+      await session.close();
+      const meetingId = meetingsRequest.records[0].get(0).properties.meetingId;
+      return res.json({ status: "ok", meetingId });
+    } catch (err) {
+      console.log("Error:", err);
+      return res.status(404).json({ status: "error", errors: err as object });
+    }
+  }
+)
+
 usersRouter.post("/", async (req: Request, res: UserErrorResponse) => {
   try {
     const newUserProps = req.body;
