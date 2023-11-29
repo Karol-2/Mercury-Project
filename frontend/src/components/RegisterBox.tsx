@@ -41,6 +41,7 @@ const errorHandlers: ErrorHandlers = {
 function RegisterBox() {
   const [user, setUser] = useState<Partial<FrontendUser>>({});
   const [errors, setErrors] = useState<Partial<FrontendUser>>({});
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
   const registerFunc = async () => {
     const response = await fetch("http://localhost:5000/users", {
@@ -52,6 +53,8 @@ function RegisterBox() {
     });
     const userJson = await response.json();
     console.log("Register " + JSON.stringify(userJson));
+
+    return response.ok;
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -76,8 +79,9 @@ function RegisterBox() {
     <div className="pb-4 text-[#f88]">{errors[name]}</div>
   );
 
-  const handleSubmit = (e: React.SyntheticEvent) => {
+  const handleSubmit = async (e: React.SyntheticEvent) => {
     e.preventDefault();
+    setIsSubmitting(true);
 
     const errors = Object.fromEntries(
       Object.entries(errorHandlers).map(([key, handler]) => {
@@ -92,17 +96,21 @@ function RegisterBox() {
     const noErrors = Object.values(errors).every((v) => v == "");
 
     if (noErrors) {
-      console.log(user);
+      const registered = await registerFunc();
+      console.log(registered);
+      setErrors({});
     } else {
       setErrors(errors);
     }
+
+    setIsSubmitting(false);
   };
 
   return (
     <form
       id="register-box"
       className="medium:w-[25vw] flex flex-col gap-2 bg-my-dark p-10 px-20 rounded-xl"
-      onSubmit={handleSubmit}
+      onSubmit={(e) => handleSubmit(e)}
     >
       <div>First and last name:</div>
       {input("First name", "text", "first_name")}
@@ -132,7 +140,11 @@ function RegisterBox() {
         {error("password")}
       </div>
 
-      <button className="btn small bg-my-orange" type="submit">
+      <button
+        disabled={isSubmitting}
+        className="btn small bg-my-orange disabled:bg-my-dark"
+        type="submit"
+      >
         Register
       </button>
       <div className="text-center">
