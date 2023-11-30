@@ -130,7 +130,7 @@ usersRouter.get(
       }
 
       const friendRequest = await session.run(
-        `MATCH (u:User {id: $userId})-[:IS_FRIENDS_WITH]-(f:User) RETURN f`,
+        `MATCH (u:User {id: $userId})-[:IS_FRIENDS_WITH]->(f:User)-[:IS_FRIENDS_WITH]->(u) RETURN DISTINCT f`,
         { userId },
       );
       await session.close();
