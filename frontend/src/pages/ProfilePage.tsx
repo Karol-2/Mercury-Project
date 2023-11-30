@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-
 import Footer from "../components/Footer";
 import Navbar from "../components/Navbar";
 import User from "../models/User";
@@ -46,17 +45,13 @@ function ProfilePage() {
     };
     fetchFriends();
   }, []);
-  useEffect(() => {
-    const fetchGuestToken = async () => {
-      const guestToken = await meetingService.getGuestToken(userId!);
-      sessionStorage.setItem("guestToken", guestToken);
-    }
-    fetchGuestToken();
-  }, []);
   const launchMeeting = async (ownerId: string, guestId: string) => {
     const token = await meetingService.createMeetingWithToken(ownerId, guestId);
-    sessionStorage.removeItem("guestToken");
     navigate(`/host-meeting?token=${token}`);
+  }
+  const viewMeetingDashboard = async () => {
+    const token = await meetingService.getGuestToken(userId!);
+    navigate(`/dashboard/?token=${token}`)
   }
   return (
     <>
@@ -71,6 +66,7 @@ function ProfilePage() {
           handleChange={handleChange}
           deleteUser={deleteUser}
           launchMeeting={launchMeeting}
+          viewMeetingDashboard={viewMeetingDashboard}
         />
       ) : (
         <div className="text-lg">Loading...</div>
