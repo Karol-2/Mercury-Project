@@ -35,13 +35,13 @@ function Navbar() {
     <Link
       key={link.to}
       to={link.to}
-      className=" p-5 rounded-lg transition duration-250 ease-in-out mr-5 hover:bg-my-orange"
+      className=" p-5 rounded-lg transition duration-250 ease-in-out mr-5 hover:bg-my-orange font-bold text-lg"
     >
       {link.text}
     </Link>
   ))}
   <button
-    className="p-5 rounded-lg transition duration-250 ease-in-out mr-5 hover:bg-my-orange"
+    className="p-5 rounded-lg transition duration-250 ease-in-out mr-5 hover:bg-my-orange font-bold text-lg"
     onClick={handleLogout}
   >
     Logout

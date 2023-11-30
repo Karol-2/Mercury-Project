@@ -34,12 +34,14 @@ function SearchPage() {
     }
     e.preventDefault();
     const response = await dataService.fetchData(`/users/search?q=${searchState}`,"GET")
-    setUsersFound(response.users)
+
+    const responseWithoutCurrUser = response.users.filter((respArr: [User,number])=> respArr[0].id !== user!.id)
+    setUsersFound(responseWithoutCurrUser)
+
     
   }
 
   const isFriend = (friendArr: string[], user: User): boolean => {
-    console.log(friendArr,user)
     return friendArr.reduce((prev: boolean, curr: string) => {
       return prev || curr === String(user.id);
     }, false);
