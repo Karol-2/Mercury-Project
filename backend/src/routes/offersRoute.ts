@@ -22,7 +22,7 @@ offersRouter.get(
             );
             await session.close();
       
-            const offers = offersRequest.records.map((o) => o.get("o").properties);
+            const offers = offersRequest.records;
             return res.json({ status: "ok", offers });
         } catch (err) {
             console.log("Error:", err);

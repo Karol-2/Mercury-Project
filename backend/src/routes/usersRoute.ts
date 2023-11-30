@@ -145,27 +145,30 @@ usersRouter.get(
 );
 
 usersRouter.get(
-  "/:user1Id/:user2Id/meetings",
+  "/meetings/:userId",
   async (req: Request, res) => {
     try {
       const session = driver.session();
-      const user1Id = req.params.user1Id;
-      const user2Id = req.params.user2Id;
+      const userId = req.params.userId;
 
-      const user1 = await userExists(session, res, user1Id);
-      const user2 = await userExists(session, res, user2Id);
-      if ("json" in user1 || "json" in user2) {
+      const user = await userExists(session, res, userId);
+      if ("json" in user) {
         await session.close();
         return res;
       }
 
       const meetingsRequest = await session.run(
-        `MATCH (u1:User {id: $user1Id})-[m:MEETING]-(u2:User {id: $user2Id}) RETURN m`,
-        { user1Id, user2Id },
+        `MATCH (u1:User {id: $userId})-[m:MEETING]-(u2:User) RETURN m`,
+        { userId },
       );
       await session.close();
-      const meetingId = meetingsRequest.records[0].get(0).properties.meetingId;
-      return res.json({ status: "ok", meetingId });
+      try {
+        const meetings = meetingsRequest.records.map(record => record.get(0).properties.meetingId);
+        return res.json({ status: "ok", meetings });
+      } catch (_err) {
+        return res.json({ status: "ok", meetings: [] });
+      }
+      
     } catch (err) {
       console.log("Error:", err);
       return res.status(404).json({ status: "error", errors: err as object });

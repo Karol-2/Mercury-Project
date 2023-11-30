@@ -15,7 +15,20 @@ io.on("connection", async (socket: Socket) => {
     socket.disconnect();
     return;
   }
-  console.log("Socket server started");
+  if ("ownerId" in decodedData) {
+    const {ownerId} = decodedData;
+    await axios.put(`http://localhost:5000/users/${ownerId}`, {socketID: socket.id});
+    const offer = await axios.get(`http://localhost:5000/offers/${ownerId}`);
+    if (offer.data.length > 0) {
+      //todo
+    }
+  } else {
+    const {id} = decodedData;
+    await axios.put(`http://localhost:5000/users/${id}`, {socketID: socket.id});
+    const meeting = await axios.get(`http://localhost:5000/users/meetings/${id}`);
+    socket.emit("meetingData", meeting.data.meetings);
+    // todo emit offers
+  }
   socket.on("newAnswer", async ({answer, ownerId}) => {
     console.log("newAnswer");
   });

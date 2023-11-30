@@ -46,6 +46,7 @@ function ProfilePage() {
     fetchFriends();
   }, []);
   const launchMeeting = async (ownerId: string, guestId: string) => {
+    console.log(ownerId, guestId);
     const token = await meetingService.createMeetingWithToken(ownerId, guestId);
     navigate(`/host-meeting?token=${token}`);
   }
