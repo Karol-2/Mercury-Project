@@ -129,8 +129,38 @@ usersRouter.get(
         return res;
       }
 
-      const friendRequest = await session.run(
+      const friendQuery = await session.run(
         `MATCH (u:User {id: $userId})-[:IS_FRIENDS_WITH]->(f:User)-[:IS_FRIENDS_WITH]->(u) RETURN DISTINCT f`,
+        { userId },
+      );
+      await session.close();
+
+      const friends = friendQuery.records.map((f) => f.get("f").properties);
+      return res.json({ status: "ok", friends });
+    } catch (err) {
+      console.log("Error:", err);
+      return res.status(404).json({ status: "error", errors: err as object });
+    }
+  },
+);
+
+usersRouter.get(
+  "/:userId/friend-requests",
+  async (req: Request, res: FriendsErrorResponse) => {
+    try {
+      const session = driver.session();
+      const userId = req.params.userId;
+
+      const user = await userExists(session, res, userId);
+      if ("json" in user) {
+        await session.close();
+        return res;
+      }
+
+      const friendRequest = await session.run(
+        `MATCH (u:User {id: $userId})<-[:IS_FRIENDS_WITH]-(f:User)
+        WHERE NOT (f)<-[:IS_FRIENDS_WITH]-(u)
+        RETURN DISTINCT f`,
         { userId },
       );
       await session.close();
