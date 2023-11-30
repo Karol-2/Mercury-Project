@@ -196,7 +196,37 @@ usersRouter.delete(
       await session.close();
 
       const friends = friendRequest.records.map((f) => f.get("f").properties);
-      return res.json({ status: "ok", friends }); //TODO: remove friends array - it's always empty
+      return res.json({ status: "ok", friends }); //TODO: remove friends array - it's always empty (change ErrorResponse?)
+    } catch (err) {
+      console.log("Error:", err);
+      return res.status(404).json({ status: "error", errors: err as object });
+    }
+  },
+);
+
+usersRouter.post(
+  "/:userId1/add/:userId2",
+  async (req: Request, res: FriendsErrorResponse) => {
+    try {
+      const session = driver.session();
+      const userId1 = req.params.userId1;
+      const userId2 = req.params.userId2;
+
+      const user = await userExists(session, res, userId1);
+      if ("json" in user) {
+        await session.close();
+        return res;
+      }
+
+      const friendRequest = await session.run(
+        `MATCH (a:User {id: $userId1}), (b:User {id: $userId2})
+        MERGE (a)-[:IS_FRIENDS_WITH]->(b)`,
+        { userId1, userId2},
+      );
+      await session.close();
+
+      const friends = friendRequest.records.map((f) => f.get("f").properties);
+      return res.json({ status: "ok", friends }); //TODO: remove friends array - it's always empty (change ErrorResponse?)
     } catch (err) {
       console.log("Error:", err);
       return res.status(404).json({ status: "error", errors: err as object });
