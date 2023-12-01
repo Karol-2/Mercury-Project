@@ -47,7 +47,7 @@ function ProfilePage() {
       setFriendsRequests(friendsRequestsResponse.friends);
     };
     fetchFriendRequests();
-  }, []);
+  }, [friendsRequests]);
 
   useEffect(() => {
     const fetchFriends = async () => {
@@ -59,7 +59,7 @@ function ProfilePage() {
       setFriends(friendsResponse.friends);
     };
     fetchFriends();
-  }, []);
+  }, [friends]);
 
   return (
     <>
