@@ -49,13 +49,13 @@ function FriendRequest(props: FriendRequestInterface) {
         <p> {props.user.country}</p>
         <div className="flex flex-row">
           <button
-            className={`btn small bg-my-orange text-xs`}
+            className={`btn small bg-my-purple text-xs`}
             onClick={handleAcceptRequest}
           >
             Accept
           </button>
           <button
-            className={`btn small bg-my-purple text-xs`}
+            className={`btn small bg-my-red text-xs`}
             onClick={handleDeclineRequest}
           >
             Decline

@@ -5,6 +5,8 @@ import { useEffect, useState } from "react";
 import FoundUser from "../components/FoundUser";
 import { useUser } from "../helpers/UserProvider";
 import User from "../models/User";
+import { faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 function SearchPage() {
   const [searchState, setSearchState] = useState("");
@@ -72,7 +74,10 @@ function SearchPage() {
               type="submit"
               className="btn small bg-my-purple ml-5 text-xs"
             >
-              Search
+              <div className="flex align-middle ">
+                <span>Search</span>
+                <FontAwesomeIcon icon={faMagnifyingGlass} className="ml-2" />
+              </div>
             </button>
           </form>
         </div>

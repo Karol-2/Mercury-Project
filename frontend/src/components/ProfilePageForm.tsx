@@ -1,6 +1,10 @@
 import React from "react";
 import User from "../models/User";
 import FriendRequest from "./FriendRequest";
+import dataService from "../services/data";
+import { faUserMinus } from "@fortawesome/free-solid-svg-icons";
+import { faVideo } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 export interface ProfilePageFormProps {
   user: User;
@@ -23,6 +27,22 @@ function ProfilePageForm(props: ProfilePageFormProps) {
     deleteUser,
     friendsRequests,
   } = props;
+
+  const handleDeclineRequest = async (
+    friend: User,
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+  ) => {
+    e.preventDefault();
+    await dataService.fetchData(
+      `/users/${props.user.id}/remove/${friend.id}`,
+      "DELETE",
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      },
+    );
+  };
 
   return (
     <section className="bg-my-darker min-h-screen flex justify-center ">
@@ -97,33 +117,51 @@ function ProfilePageForm(props: ProfilePageFormProps) {
               user.password || ""
             )}
           </p>
+          <div className="my-5">
+            {isEditing ? (
+              <button onClick={handleSaveClick} className="btn primary">
+                Save
+              </button>
+            ) : (
+              <button onClick={handleEditClick} className="btn primary">
+                Edit
+              </button>
+            )}
+            <button onClick={deleteUser} className="btn secondary">
+              Remove account
+            </button>
+          </div>
+          <h1 className="text-3xl font-bold">Friends:</h1>
+          <hr className="text-my-orange"></hr>
           <ul>
-            Friends:{" "}
-            {props.friends.map((f) => (
-              <li key={f.id}>
-                <h3>
-                  {f.first_name} {f.last_name}
-                </h3>
-                <button onClick={() => console.log("meeting")}>
-                  launch meeting
-                </button>
+            {props.friends.map((friend) => (
+              <li key={friend.id} className="flex flex-row mt-5">
+                <img
+                  src={friend.profile_picture}
+                  className="rounded-full w-20 h-20 border-my-orange border-2 object-cover"
+                />
+                <div className=" ml-5 flex flex-col justify-evenly">
+                  <p className="font-semibold text-2xl">
+                    {friend.first_name} {friend.last_name}
+                  </p>
+                  <div className="flex flex-row">
+                    <button
+                      className={`btn small bg-my-purple text-xs`}
+                      onClick={() => console.log("meeting")}
+                    >
+                      <FontAwesomeIcon icon={faVideo} />
+                    </button>
+                    <button
+                      className={`btn small bg-my-red text-xs`}
+                      onClick={(e) => handleDeclineRequest(friend, e)}
+                    >
+                      <FontAwesomeIcon icon={faUserMinus} />
+                    </button>
+                  </div>
+                </div>
               </li>
             ))}
           </ul>
-        </div>
-        <div className="my-5">
-          {isEditing ? (
-            <button onClick={handleSaveClick} className="btn primary">
-              Save
-            </button>
-          ) : (
-            <button onClick={handleEditClick} className="btn primary">
-              Edit
-            </button>
-          )}
-          <button onClick={deleteUser} className="btn secondary">
-            Remove account
-          </button>
         </div>
         <div>
           <h1 className="text-3xl font-bold">Friend requests:</h1>
@@ -138,7 +176,9 @@ function ProfilePageForm(props: ProfilePageFormProps) {
                 />
               ))
             ) : (
-              <p className="text-lg">There are currently no friend requests</p>
+              <p className="h1 text-lg">
+                There are currently no friend requests
+              </p>
             )}
           </div>
         </div>

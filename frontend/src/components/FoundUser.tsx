@@ -63,7 +63,13 @@ function FoundUser(props: FoundUserInterface) {
         </p>
         <p>{props.user.country}</p>
         <button
-          className={`btn small bg-my-purple text-xs`}
+          className={`btn small text-xs ${
+            requestSent
+              ? "bg-my-orange"
+              : props.isFriend
+                ? "bg-my-darker"
+                : "bg-my-purple"
+          }`}
           disabled={props.isFriend || requestSent}
           onClick={handleAddFriend}
         >
