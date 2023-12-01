@@ -29,6 +29,30 @@ test("Create user", async () => {
   userId = user.id;
 });
 
+test("Try to create user with existing mail", async () => {
+  const userData = {
+    first_name: "Tom",
+    last_name: "Hanks",
+    country: "USA",
+    profile_picture: "https://example.com/tommy.jpg",
+    mail: "tom.hanks@example.com",
+    password: "12345",
+  };
+
+  const response = await fetch("http://localhost:5000/users", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(userData),
+  });
+
+  const responseData = await response.json();
+  const status = responseData.status;
+
+  expect(status).toBe("error");
+})
+
 test("Fetch user by ID", async () => {
   const response = await fetch(`http://localhost:5000/users/${userId}`);
   const responseData = await response.json();

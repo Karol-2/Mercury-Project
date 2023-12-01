@@ -20,11 +20,15 @@ const usersRouter = Router();
 
 async function userExists(
   session: Session,
-  userId: string,
+  props: Partial<User>,
 ): Promise<User | null> {
+  const propsStr = Object.keys(props)
+    .map((k) => `${k}: $${k}`
+  ).join(", ")
+
   const userExistsResult = await session.run(
-    `MATCH (u:User {id: $userId}) RETURN u`,
-    { userId },
+    `MATCH (u:User {${propsStr}}) RETURN u`,
+    props,
   );
 
   if (userExistsResult.records.length === 0) {
@@ -108,7 +112,7 @@ usersRouter.get("/:userId", async (req: Request, res: UserErrorResponse) => {
     const userId = req.params.userId;
 
     const session = driver.session();
-    const user = await userExists(session, userId);
+    const user = await userExists(session, { id: userId });
     await session.close();
 
     if (!user) {
@@ -129,7 +133,7 @@ usersRouter.get(
       const userId = req.params.userId;
 
       const session = driver.session();
-      const user = await userExists(session, userId);
+      const user = await userExists(session, { id: userId });
 
       if (!user) {
         return userNotFoundRes(res);
@@ -155,12 +159,19 @@ usersRouter.post("/", async (req: Request, res: UserErrorResponse) => {
     const newUserProps = req.body;
     // TODO: verify user fields
 
+    const session = driver.session();
+    const existsUser = await userExists(session, { mail: newUserProps.mail });
+
+    if (existsUser) {
+      await session.close();
+      return res.status(400).json({ status: "error", errors: { id: "already exists" } });
+    }
+
     newUserProps.id = uuidv4();
     newUserProps.name_embedding = wordToVec(
       newUserProps.first_name + newUserProps.last_name,
     );
 
-    const session = driver.session();
     const newUserResult = await session.run(`CREATE (u:User $user) RETURN u`, {
       user: newUserProps,
     });
@@ -182,7 +193,7 @@ usersRouter.put("/:userId", async (req: Request, res: OkErrorResponse) => {
 
     // TODO: verify user fields
     const session = driver.session();
-    const user = await userExists(session, userId);
+    const user = await userExists(session, { id: userId });
 
     if (!user) {
       return userNotFoundRes(res);
@@ -207,7 +218,7 @@ usersRouter.delete("/:userId", async (req: Request, res: OkErrorResponse) => {
     const userId = req.params.userId;
 
     const session = driver.session();
-    const user = await userExists(session, userId);
+    const user = await userExists(session, { id: userId });
 
     if (!user) {
       return userNotFoundRes(res);
