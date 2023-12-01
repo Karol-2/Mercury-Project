@@ -14,6 +14,7 @@ function ProfilePage() {
   const { user, userId, setUser, updateUser, deleteUser } = useUser();
   const [isEditing, setIsEditing] = useState(false);
   const [friends, setFriends] = useState([]);
+  const [friendsRequests, setFriendsRequests] = useState([]);
 
   const handleEditClick = () => {
     setIsEditing(true);
@@ -35,6 +36,18 @@ function ProfilePage() {
   useEffect(() => {
     if (userId === null) navigate("/login");
   }, [userId]);
+
+  useEffect(() => {
+    const fetchFriendRequests = async () => {
+      const friendsRequestsResponse = await dataService.fetchData(
+        `/users/${userId}/friend-requests`,
+        "GET",
+        {},
+      );
+      setFriendsRequests(friendsRequestsResponse.friends);
+    };
+    fetchFriendRequests();
+  }, []);
 
   useEffect(() => {
     const fetchFriends = async () => {
@@ -60,6 +73,7 @@ function ProfilePage() {
           handleSaveClick={handleSaveClick}
           handleChange={handleChange}
           deleteUser={deleteUser}
+          friendsRequests={friendsRequests}
         />
       ) : (
         <div className="text-lg">Loading...</div>

@@ -1,5 +1,6 @@
 import React from "react";
 import User from "../models/User";
+import FriendRequest from "./FriendRequest";
 
 export interface ProfilePageFormProps {
   user: User;
@@ -9,6 +10,7 @@ export interface ProfilePageFormProps {
   handleSaveClick: () => void;
   handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   deleteUser: () => void;
+  friendsRequests: User[];
 }
 
 function ProfilePageForm(props: ProfilePageFormProps) {
@@ -19,7 +21,9 @@ function ProfilePageForm(props: ProfilePageFormProps) {
     handleSaveClick,
     handleChange,
     deleteUser,
+    friendsRequests,
   } = props;
+
   return (
     <section className="bg-my-darker min-h-screen flex justify-center ">
       <div className=" bg-my-dark p-10 px-20 rounded-xl mx-50 my-20 lg:mx-72 text-lg">
@@ -120,6 +124,23 @@ function ProfilePageForm(props: ProfilePageFormProps) {
           <button onClick={deleteUser} className="btn secondary">
             Remove account
           </button>
+        </div>
+        <div>
+          <h1 className="text-3xl font-bold">Friend requests:</h1>
+          <hr className="text-my-orange"></hr>
+          <div>
+            {friendsRequests && friendsRequests.length > 0 ? (
+              friendsRequests.map((friend, index) => (
+                <FriendRequest
+                  user={friend}
+                  key={String(index)}
+                  currentId={user.id}
+                />
+              ))
+            ) : (
+              <p className="text-lg">There are currently no friend requests</p>
+            )}
+          </div>
         </div>
       </div>
     </section>
