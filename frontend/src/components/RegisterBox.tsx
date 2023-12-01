@@ -42,8 +42,9 @@ function RegisterBox() {
   const [user, setUser] = useState<Partial<FrontendUser>>({});
   const [errors, setErrors] = useState<Partial<FrontendUser>>({});
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const [submitError, setSubmitError] = useState<string>("");
 
-  const registerFunc = async () => {
+  const registerFunc = async (): Promise<FrontendUser | number> => {
     const response = await fetch("http://localhost:5000/users", {
       method: "POST",
       headers: {
@@ -51,10 +52,15 @@ function RegisterBox() {
       },
       body: JSON.stringify(user),
     });
+
+    if (!response.ok) {
+      return response.status;
+    }
+
     const userJson = await response.json();
     console.log("Register " + JSON.stringify(userJson));
 
-    return response.ok;
+    return userJson.user;
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -82,6 +88,7 @@ function RegisterBox() {
   const handleSubmit = async (e: React.SyntheticEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
+    setSubmitError("");
 
     const errors = Object.fromEntries(
       Object.entries(errorHandlers).map(([key, handler]) => {
@@ -96,9 +103,22 @@ function RegisterBox() {
     const noErrors = Object.values(errors).every((v) => v == "");
 
     if (noErrors) {
-      const registered = await registerFunc();
-      console.log(registered);
-      setErrors({});
+      try {
+        const registered = await registerFunc();
+
+        if (typeof registered == "number") {
+          if (registered == 400) {
+            setSubmitError("User already exists");
+          } else {
+            setSubmitError("Unknown error");
+          }
+        }
+
+        console.log(registered);
+        setErrors({});
+      } catch (e) {
+        setSubmitError("Can't connect to the server");
+      }
     } else {
       setErrors(errors);
     }
@@ -140,6 +160,7 @@ function RegisterBox() {
         {error("password")}
       </div>
 
+      <div className="pb-4 text-[#f88]">{submitError}</div>
       <button
         disabled={isSubmitting}
         className="btn small bg-my-orange disabled:bg-my-dark"
