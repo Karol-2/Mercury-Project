@@ -119,6 +119,7 @@ function ProfilePageForm(props: ProfilePageFormProps) {
                 name="last_name"
                 value={user.last_name}
                 onChange={handleChange}
+                className=" text-my-dark"
               />
             ) : (
               user.last_name || ""
@@ -132,6 +133,7 @@ function ProfilePageForm(props: ProfilePageFormProps) {
                 name="country"
                 value={user.country}
                 onChange={handleChange}
+                className=" text-my-dark"
               />
             ) : (
               user.country || ""
@@ -145,6 +147,7 @@ function ProfilePageForm(props: ProfilePageFormProps) {
                 name="mail"
                 value={user.mail}
                 onChange={handleChange}
+                className=" text-my-dark"
               />
             ) : (
               user.mail || ""
@@ -158,6 +161,7 @@ function ProfilePageForm(props: ProfilePageFormProps) {
                 name="password"
                 value={user.password}
                 onChange={handleChange}
+                className=" text-my-dark"
               />
             ) : (
               user.password || ""
@@ -217,7 +221,7 @@ function ProfilePageForm(props: ProfilePageFormProps) {
           </ul>
         </div>
         <div>
-          <h1 className="text-3xl font-bold">Friend requests:</h1>
+          <h1 className="text-3xl font-bold mt-5">Friend requests:</h1>
           <hr className="text-my-orange"></hr>
           <div>
             {friendsRequests && friendsRequests.length > 0 ? (
