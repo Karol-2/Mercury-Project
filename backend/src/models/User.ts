@@ -1,6 +1,7 @@
 import Chat from "./Chat";
 
 export default interface User {
+  id: string;
   first_name: string;
   last_name: string;
   country: string;
