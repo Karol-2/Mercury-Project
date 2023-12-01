@@ -5,6 +5,7 @@ import dataService from "../services/data";
 import { faUserMinus } from "@fortawesome/free-solid-svg-icons";
 import { faVideo } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import Modal from "./Modal";
 
 export interface ProfilePageFormProps {
   user: User;
@@ -20,6 +21,9 @@ function ProfilePageForm(props: ProfilePageFormProps) {
   const [friends, setFriends] = useState([]);
   const [friendsRequests,setFriendsRequests] = useState([]);
   const [refresh,setRefresh] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  
+
   
   const {
     user,
@@ -169,9 +173,14 @@ function ProfilePageForm(props: ProfilePageFormProps) {
                 Edit
               </button>
             )}
-            <button onClick={deleteUser} className="btn secondary">
+            <button onClick={()=>setShowDeleteModal(true)} className="btn secondary">
               Remove account
             </button>
+             {/* modals section */}
+             {showDeleteModal &&(
+                        <Modal text={`Are you sure that you want to delete you account?`}
+                        handleYes={deleteUser} handleNo={()=>setShowDeleteModal(false)}></Modal>
+                      )}
           </div>
           <h1 className="text-3xl font-bold">Friends:</h1>
           <hr className="text-my-orange"></hr>
@@ -195,10 +204,11 @@ function ProfilePageForm(props: ProfilePageFormProps) {
                     </button>
                     <button
                       className={`btn small bg-my-red text-xs`}
-                      onClick={(e) => handleDeclineRequest(friend, e)}
+                      onClick={() => handleDeclineRequest(friend)}
                     >
                       <FontAwesomeIcon icon={faUserMinus} />
                     </button>
+                 
                   </div>
                 </div>
               </li>
@@ -214,7 +224,6 @@ function ProfilePageForm(props: ProfilePageFormProps) {
               friendsRequests.map((friend, index) => (
                 <FriendRequest
                   user={friend}
-                  friend={user!}
                   key={String(index)}
                   handleAcceptRequest={handleAcceptRequest}
                   handleDeclineRequest={handleDeclineRequest}
@@ -228,6 +237,8 @@ function ProfilePageForm(props: ProfilePageFormProps) {
           </div>
         </div>
       </div>
+      
+      
     </section>
   );
 }
