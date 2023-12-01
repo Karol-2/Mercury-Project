@@ -70,8 +70,9 @@ function ProfilePageForm(props: ProfilePageFormProps) {
   };
 
   const handleAcceptRequest = async (currentId: string) => {
+
     await dataService.fetchData(
-      `/users/${currentId}/add/${user.id}`,
+      `/users/${user.id}/add/${currentId}`,
       "POST",
       {
         headers: {
@@ -91,6 +92,7 @@ function ProfilePageForm(props: ProfilePageFormProps) {
         <hr className="text-my-orange"></hr>
         <div>
           <img src={user.profile_picture} alt="Profile" className="my-5" />
+          <p>{user.id}</p>
           <p>
             First Name:{" "}
             {isEditing ? (
