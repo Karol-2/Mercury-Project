@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import User from "../models/User";
 import FriendRequest from "./FriendRequest";
 import dataService from "../services/data";
@@ -8,16 +8,19 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 export interface ProfilePageFormProps {
   user: User;
-  friends: User[];
   isEditing: boolean;
   handleEditClick: () => void;
   handleSaveClick: () => void;
   handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   deleteUser: () => void;
-  friendsRequests: User[];
 }
 
 function ProfilePageForm(props: ProfilePageFormProps) {
+
+  const [friends, setFriends] = useState([]);
+  const [friendsRequests,setFriendsRequests] = useState([]);
+  const [refresh,setRefresh] = useState(false);
+  
   const {
     user,
     isEditing,
@@ -25,24 +28,61 @@ function ProfilePageForm(props: ProfilePageFormProps) {
     handleSaveClick,
     handleChange,
     deleteUser,
-    friendsRequests,
   } = props;
 
-  const handleDeclineRequest = async (
-    friend: User,
-    e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
-  ) => {
-    e.preventDefault();
+  useEffect(() => {
+    const fetchFriendRequests = async () => {
+      const friendsRequestsResponse = await dataService.fetchData(
+        `/users/${user!.id}/friend-requests`,
+        "GET",
+        {},
+      );
+      setFriendsRequests(friendsRequestsResponse.friends);
+    };
+    fetchFriendRequests();
+  }, [refresh]);
+
+  useEffect(() => {
+    const fetchFriends = async () => {
+      const friendsResponse = await dataService.fetchData(
+        `/users/${user.id}/friends`,
+        "GET",
+        {},
+      );
+      setFriends(friendsResponse.friends);
+    };
+    fetchFriends();
+  }, [refresh]);
+
+
+
+  const handleDeclineRequest = async (friend: User,) => {
+    
+    await dataService
+      .fetchData(`/users/${user.id}/remove/${friend.id}`, "DELETE", {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+  
+    setRefresh(() => !refresh);
+    
+  };
+
+  const handleAcceptRequest = async (currentId: string) => {
     await dataService.fetchData(
-      `/users/${props.user.id}/remove/${friend.id}`,
-      "DELETE",
+      `/users/${currentId}/add/${user.id}`,
+      "POST",
       {
         headers: {
           "Content-Type": "application/json",
         },
       },
     );
+
+    setRefresh(() => !refresh);
   };
+
 
   return (
     <section className="bg-my-darker min-h-screen flex justify-center ">
@@ -134,7 +174,7 @@ function ProfilePageForm(props: ProfilePageFormProps) {
           <h1 className="text-3xl font-bold">Friends:</h1>
           <hr className="text-my-orange"></hr>
           <ul>
-            {props.friends.map((friend) => (
+            {friends.map((friend: User) => (
               <li key={friend.id} className="flex flex-row mt-5">
                 <img
                   src={friend.profile_picture}
@@ -161,6 +201,7 @@ function ProfilePageForm(props: ProfilePageFormProps) {
                 </div>
               </li>
             ))}
+            
           </ul>
         </div>
         <div>
@@ -171,13 +212,15 @@ function ProfilePageForm(props: ProfilePageFormProps) {
               friendsRequests.map((friend, index) => (
                 <FriendRequest
                   user={friend}
+                  friend={user!}
                   key={String(index)}
-                  currentId={user.id}
+                  handleAcceptRequest={handleAcceptRequest}
+                  handleDeclineRequest={handleDeclineRequest}
                 />
               ))
             ) : (
               <p className="h1 text-lg">
-                There are currently no friend requests
+                There are currently no friend requests.
               </p>
             )}
           </div>

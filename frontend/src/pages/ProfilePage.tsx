@@ -6,15 +6,12 @@ import Navbar from "../components/Navbar";
 import User from "../models/User";
 import { useUser } from "../helpers/UserProvider";
 import ProfilePageForm from "../components/ProfilePageForm";
-import dataService from "../services/data";
 
 function ProfilePage() {
   const navigate = useNavigate();
 
   const { user, userId, setUser, updateUser, deleteUser } = useUser();
   const [isEditing, setIsEditing] = useState(false);
-  const [friends, setFriends] = useState([]);
-  const [friendsRequests, setFriendsRequests] = useState([]);
 
   const handleEditClick = () => {
     setIsEditing(true);
@@ -37,29 +34,7 @@ function ProfilePage() {
     if (userId === null) navigate("/login");
   }, [userId]);
 
-  useEffect(() => {
-    const fetchFriendRequests = async () => {
-      const friendsRequestsResponse = await dataService.fetchData(
-        `/users/${userId}/friend-requests`,
-        "GET",
-        {},
-      );
-      setFriendsRequests(friendsRequestsResponse.friends);
-    };
-    fetchFriendRequests();
-  }, [friendsRequests]);
-
-  useEffect(() => {
-    const fetchFriends = async () => {
-      const friendsResponse = await dataService.fetchData(
-        `/users/${userId}/friends`,
-        "GET",
-        {},
-      );
-      setFriends(friendsResponse.friends);
-    };
-    fetchFriends();
-  }, [friends]);
+ 
 
   return (
     <>
@@ -67,13 +42,11 @@ function ProfilePage() {
       {user ? (
         <ProfilePageForm
           user={user}
-          friends={friends}
           isEditing={isEditing}
           handleEditClick={handleEditClick}
           handleSaveClick={handleSaveClick}
           handleChange={handleChange}
           deleteUser={deleteUser}
-          friendsRequests={friendsRequests}
         />
       ) : (
         <div className="text-lg">Loading...</div>
