@@ -44,7 +44,7 @@ class MeetingService {
     try {
       const response = await fetch(endpoint);
       const data = await response.json();
-      const {token} = data;
+      const { token } = data;
       return token;
     } catch (error) {
       console.error("Error ocurred during fetch data:", error);

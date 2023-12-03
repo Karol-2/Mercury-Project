@@ -1,3 +1,3 @@
 export default interface StreamsState {
-    [key: string]: any
+  [key: string]: any;
 }

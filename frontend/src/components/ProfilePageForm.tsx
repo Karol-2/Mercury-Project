@@ -108,10 +108,16 @@ function ProfilePageForm(props: ProfilePageFormProps) {
           <button onClick={deleteUser} className="btn secondary">
             Remove account
           </button>
-          <button onClick={() => navigate("/host-meeting")} className="btn secondary">
+          <button
+            onClick={() => navigate("/host-meeting")}
+            className="btn secondary"
+          >
             Join meeting as an owner
           </button>
-          <button onClick={() => navigate("/guest-meeting")} className="btn secondary">
+          <button
+            onClick={() => navigate("/guest-meeting")}
+            className="btn secondary"
+          >
             Join meeting as guest
           </button>
         </div>

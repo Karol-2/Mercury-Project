@@ -7,22 +7,25 @@ import addStream from "../redux/actions/addStream";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../redux/store";
 interface VideoCallPageProps {
-  userType: 'guest' | 'owner';
-};
+  userType: "guest" | "owner";
+}
 
-function VideoCallPage({userType}: VideoCallPageProps) {
+function VideoCallPage({ userType }: VideoCallPageProps) {
   const dispatch = useDispatch();
   const localVideo = useRef<HTMLVideoElement>(null);
   const remoteVideo = useRef<HTMLVideoElement>(null);
   const [streamSetup, setStreamSetup] = useState(false);
-  const streamSelector = useSelector((state: RootState) => state.streams)
+  const streamSelector = useSelector((state: RootState) => state.streams);
   console.log("remoteVideo: ", remoteVideo.current?.srcObject);
-  
+
   useEffect(() => {
     let stream: MediaStream;
 
     (async () => {
-      stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: true });
+      stream = await navigator.mediaDevices.getUserMedia({
+        audio: true,
+        video: true,
+      });
       localVideo.current!.srcObject = stream;
       dispatch(addStream("localStream", stream));
       setStreamSetup(true);
@@ -39,61 +42,59 @@ function VideoCallPage({userType}: VideoCallPageProps) {
     const socket = socketConnection(token!);
     let peerConnection: RTCPeerConnection;
     let candidates: RTCIceCandidateInit[] = [];
-    
+
     const stream: MediaStream = streamSelector.localStream.stream;
 
     // let the server know someone joined
-    socket.on('connect', () => {
+    socket.on("connect", () => {
       socket.emit(userType);
     });
 
-    socket.on('offer', async (id, message) => {
-      console.log('got remote offer');
+    socket.on("offer", async (id, message) => {
+      console.log("got remote offer");
       peerConnection = new RTCPeerConnection(stunServers);
       await peerConnection.setRemoteDescription(message);
 
-      stream.getTracks().forEach((track) => peerConnection.addTrack(track, stream));
-        
+      stream
+        .getTracks()
+        .forEach((track) => peerConnection.addTrack(track, stream));
+
       peerConnection.ontrack = (event) => {
         // got track from other user
         console.log("Possible streams: ", event.streams);
         remoteVideo.current!.srcObject = event.streams[0];
-        console.log('got track');
+        console.log("got track");
         dispatch(addStream("remoteStream", event.streams[0]));
       };
-      
-    
 
-      peerConnection.addEventListener('icecandidate', (event) => {
+      peerConnection.addEventListener("icecandidate", (event) => {
         ("listener: icecandidate");
         // geneated ice candidate, sending to other person
         if (event.candidate) {
-          socket.emit('candidate', id, event.candidate);
+          socket.emit("candidate", id, event.candidate);
           console.log("sending candidate", event.candidate);
         }
       });
 
-      peerConnection.createAnswer({})
+      peerConnection
+        .createAnswer({})
         .then((sdp) => peerConnection.setLocalDescription(sdp))
         .then(() => {
-          socket.emit('answer',
-            id,
-            peerConnection.localDescription,
-          );
-          console.log('sending answer');
+          socket.emit("answer", id, peerConnection.localDescription);
+          console.log("sending answer");
         })
-        .catch(e => console.error(e));
-      
+        .catch((e) => console.error(e));
+
       for (const candidate of candidates) {
         peerConnection
           .addIceCandidate(new RTCIceCandidate(candidate))
           .catch((e) => console.error(e));
-        console.log('added stored remote candidate') 
+        console.log("added stored remote candidate");
       }
       candidates = [];
     });
 
-    socket.on('candidate', (_, message) => {
+    socket.on("candidate", (_, message) => {
       if (!peerConnection.remoteDescription) {
         candidates.push(message); // remember candidate for later
         console.log("storing remote canidate");
@@ -101,28 +102,30 @@ function VideoCallPage({userType}: VideoCallPageProps) {
         peerConnection
           .addIceCandidate(new RTCIceCandidate(message))
           .catch((e) => console.error(e));
-        console.log('got remote candidate') 
+        console.log("got remote candidate");
       }
     });
 
-    socket.on('owner', () => {
-      socket.emit('guest');
+    socket.on("owner", () => {
+      socket.emit("guest");
     });
 
-    socket.on('guest', async (id: string) => {
-      console.log('got guest');
+    socket.on("guest", async (id: string) => {
+      console.log("got guest");
       peerConnection = new RTCPeerConnection(stunServers);
-      
-      peerConnection.addEventListener('icecandidate', (event) => {
+
+      peerConnection.addEventListener("icecandidate", (event) => {
         console.log("listener: icecandidate");
         // geneated ice candidate, sending to other person
         if (event.candidate) {
-          socket.emit('candidate', id, event.candidate);
+          socket.emit("candidate", id, event.candidate);
           console.log("sending candidate", event.candidate);
         }
       });
 
-      stream.getTracks().forEach((track) => peerConnection.addTrack(track, stream));
+      stream
+        .getTracks()
+        .forEach((track) => peerConnection.addTrack(track, stream));
 
       peerConnection.ontrack = (event) => {
         // got track from other user
@@ -135,39 +138,51 @@ function VideoCallPage({userType}: VideoCallPageProps) {
       peerConnection.onnegotiationneeded = () => {
         console.log("on negotiated");
         peerConnection
-        .createOffer()
-        .then((sdp) => peerConnection.setLocalDescription(sdp))
-        .then(() => {
-          socket.emit('offer', id, peerConnection.localDescription);
-        });
+          .createOffer()
+          .then((sdp) => peerConnection.setLocalDescription(sdp))
+          .then(() => {
+            socket.emit("offer", id, peerConnection.localDescription);
+          });
       };
 
       peerConnection
         .createOffer()
         .then((sdp) => peerConnection.setLocalDescription(sdp))
         .then(() => {
-          socket.emit('offer', id, peerConnection.localDescription);
-          console.log('sent offer');
+          socket.emit("offer", id, peerConnection.localDescription);
+          console.log("sent offer");
         });
     });
 
-    socket.on('answer', (_, message) => {
+    socket.on("answer", (_, message) => {
       peerConnection.setRemoteDescription(message);
-      console.log("got remote answer")
+      console.log("got remote answer");
     });
 
     // @ts-ignore
-    socket.on('userDisconnected', (_) => {
+    socket.on("userDisconnected", (_) => {
       peerConnection.close();
     });
-  }, [streamSetup])
+  }, [streamSetup]);
 
   return (
     <>
       <Navbar />
       <div>
-        <video id="large-feed" ref={remoteVideo} autoPlay controls playsInline></video>
-        <video id="small-feed" ref={localVideo} autoPlay controls playsInline></video>
+        <video
+          id="large-feed"
+          ref={remoteVideo}
+          autoPlay
+          controls
+          playsInline
+        ></video>
+        <video
+          id="small-feed"
+          ref={localVideo}
+          autoPlay
+          controls
+          playsInline
+        ></video>
       </div>
       <Footer />
     </>

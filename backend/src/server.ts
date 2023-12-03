@@ -43,9 +43,12 @@ interface ClientToServerEvents {
   candidate: (id: string, message: any) => void;
 }
 
-const io = new SocketServer<ClientToServerEvents, ServerToClientEvents>(expressServer, {
-  cors: { origin: ["http://localhost:5173"] },
-});
+const io = new SocketServer<ClientToServerEvents, ServerToClientEvents>(
+  expressServer,
+  {
+    cors: { origin: ["http://localhost:5173"] },
+  },
+);
 
 expressServer.listen(port, () =>
   console.log(`HTTP server running on port ${port}`),
