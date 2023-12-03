@@ -3,7 +3,6 @@ import Footer from "../components/Footer";
 import { useEffect, useRef, useState } from "react";
 import socketConnection from "../webSocket/socketConnection";
 import stunServers from "../webRTC/stunServers";
-import ActionButtons from "../components/ActionButtons";
 import addStream from "../redux/actions/addStream";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../redux/store";
@@ -169,7 +168,6 @@ function VideoCallPage({userType}: VideoCallPageProps) {
       <div>
         <video id="large-feed" ref={remoteVideo} autoPlay controls playsInline></video>
         <video id="small-feed" ref={localVideo} autoPlay controls playsInline></video>
-        <ActionButtons smallFeedEl={localVideo} largeFeedEl={remoteVideo} />
       </div>
       <Footer />
     </>
