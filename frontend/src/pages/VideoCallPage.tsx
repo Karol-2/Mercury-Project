@@ -17,6 +17,8 @@ function VideoCallPage({userType}: VideoCallPageProps) {
   const remoteVideo = useRef<HTMLVideoElement>(null);
   const [streamSetup, setStreamSetup] = useState(false);
   const streamSelector = useSelector((state: RootState) => state.streams)
+  console.log("remoteVideo: ", remoteVideo.current?.srcObject);
+  
   useEffect(() => {
     let stream: MediaStream;
 
@@ -55,6 +57,7 @@ function VideoCallPage({userType}: VideoCallPageProps) {
         
       peerConnection.ontrack = (event) => {
         // got track from other user
+        console.log("Possible streams: ", event.streams);
         remoteVideo.current!.srcObject = event.streams[0];
         console.log('got track');
         dispatch(addStream("remoteStream", event.streams[0]));
@@ -63,6 +66,7 @@ function VideoCallPage({userType}: VideoCallPageProps) {
     
 
       peerConnection.addEventListener('icecandidate', (event) => {
+        ("listener: icecandidate");
         // geneated ice candidate, sending to other person
         if (event.candidate) {
           socket.emit('candidate', id, event.candidate);
@@ -111,6 +115,7 @@ function VideoCallPage({userType}: VideoCallPageProps) {
       peerConnection = new RTCPeerConnection(stunServers);
       
       peerConnection.addEventListener('icecandidate', (event) => {
+        console.log("listener: icecandidate");
         // geneated ice candidate, sending to other person
         if (event.candidate) {
           socket.emit('candidate', id, event.candidate);
@@ -122,12 +127,14 @@ function VideoCallPage({userType}: VideoCallPageProps) {
 
       peerConnection.ontrack = (event) => {
         // got track from other user
+        console.log("Possible streams: ", event.streams);
         remoteVideo.current!.srcObject = event.streams[0];
         dispatch(addStream("remoteStream", event.streams[0]));
         console.log("got track, i am host");
       };
 
       peerConnection.onnegotiationneeded = () => {
+        console.log("on negotiated");
         peerConnection
         .createOffer()
         .then((sdp) => peerConnection.setLocalDescription(sdp))

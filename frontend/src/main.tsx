@@ -1,7 +1,6 @@
 import ReactDOM from "react-dom/client";
 import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
 import { Provider } from "react-redux";
-import MeetingDashboard from "./pages/MeetingDashboard.tsx";
 import AdminPage from "./pages/AdminPage.tsx";
 import HomePage from "./pages/HomePage.tsx";
 import LoginPage from "./pages/LoginPage.tsx";
@@ -36,7 +35,6 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
             <Route path="/search" element={<SearchPage />} />
             <Route path="/host-meeting" element={<HostMeeting />} />
             <Route path="/guest-meeting" element={<GuestMeeting />} />
-            <Route path="/dashboard" element={<MeetingDashboard />} />
             <Route path="/*" element={<PageNotFound />} />
           </Routes>
         </Router>

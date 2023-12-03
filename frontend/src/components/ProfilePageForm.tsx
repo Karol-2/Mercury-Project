@@ -6,12 +6,10 @@ export interface ProfilePageFormProps {
   user: User;
   friends: User[];
   isEditing: boolean;
-  launchMeeting: (ownerId: string, guestId: string) => void;
   handleEditClick: () => void;
   handleSaveClick: () => void;
   handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   deleteUser: () => void;
-  viewMeetingDashboard: () => void;
 }
 
 function ProfilePageForm(props: ProfilePageFormProps) {
@@ -19,13 +17,10 @@ function ProfilePageForm(props: ProfilePageFormProps) {
   const {
     user,
     isEditing,
-    friends,
     handleEditClick,
     handleSaveClick,
     handleChange,
     deleteUser,
-    launchMeeting,
-    viewMeetingDashboard
   } = props;
   return (
     <section className="bg-my-darker min-h-screen flex justify-center ">
@@ -99,19 +94,6 @@ function ProfilePageForm(props: ProfilePageFormProps) {
               user.password || ""
             )}
           </p>
-          <ul>
-            Friends:{" "}
-            {friends.map((f) => (
-              <li key={f.id}>
-                <h3>
-                  {f.first_name} {f.last_name}
-                </h3>
-                <button onClick={() => launchMeeting(String(user.id), String(f.id))}>
-                  launch meeting
-                </button>
-              </li>
-            ))}
-          </ul>
         </div>
         <div className="my-5">
           {isEditing ? (
@@ -126,8 +108,11 @@ function ProfilePageForm(props: ProfilePageFormProps) {
           <button onClick={deleteUser} className="btn secondary">
             Remove account
           </button>
-          <button onClick={() => viewMeetingDashboard()} className="btn secondary">
-            View meeting dashboard
+          <button onClick={() => navigate("/host-meeting")} className="btn secondary">
+            Join meeting as an owner
+          </button>
+          <button onClick={() => navigate("/guest-meeting")} className="btn secondary">
+            Join meeting as guest
           </button>
         </div>
       </div>

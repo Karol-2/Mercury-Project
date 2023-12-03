@@ -6,7 +6,6 @@ import User from "../models/User";
 import { useUser } from "../helpers/UserProvider";
 import ProfilePageForm from "../components/ProfilePageForm";
 import dataService from "../services/data";
-import meetingService from "../services/meeting";
 function ProfilePage() {
   const navigate = useNavigate();
   const { user, userId, setUser, updateUser, deleteUser } = useUser();
@@ -45,15 +44,6 @@ function ProfilePage() {
     };
     fetchFriends();
   }, []);
-  const launchMeeting = async (ownerId: string, guestId: string) => {
-    console.log(ownerId, guestId);
-    const token = await meetingService.createMeetingWithToken(ownerId, guestId);
-    navigate(`/host-meeting?token=${token}`);
-  }
-  const viewMeetingDashboard = async () => {
-    const token = await meetingService.getGuestToken(userId!);
-    navigate(`/dashboard/?token=${token}`)
-  }
   return (
     <>
       <Navbar />
@@ -66,8 +56,6 @@ function ProfilePage() {
           handleSaveClick={handleSaveClick}
           handleChange={handleChange}
           deleteUser={deleteUser}
-          launchMeeting={launchMeeting}
-          viewMeetingDashboard={viewMeetingDashboard}
         />
       ) : (
         <div className="text-lg">Loading...</div>
