@@ -5,7 +5,6 @@ import servers from "./server";
 import driver from "./driver/driver";
 import usersRouter from "./routes/usersRoute";
 import authRouter from "./routes/authRoute";
-import offersRouter from "./routes/offersRoute";
 import importInitialData from "./data/importData";
 import CreateMeetingDto from "./dtos/createMeeting";
 
