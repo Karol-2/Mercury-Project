@@ -2,7 +2,6 @@ import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import { useEffect, useRef, useState } from "react";
 import socketConnection from "../webSocket/socketConnection";
-import { useSearchParams } from "react-router-dom";
 import stunServers from "../webRTC/stunServers";
 import ActionButtons from "../components/ActionButtons";
 import addStream from "../redux/actions/addStream";
@@ -14,7 +13,6 @@ interface VideoCallPageProps {
 
 function VideoCallPage({userType}: VideoCallPageProps) {
   const dispatch = useDispatch();
-  const [searchParams] = useSearchParams();
   const localVideo = useRef<HTMLVideoElement>(null);
   const remoteVideo = useRef<HTMLVideoElement>(null);
   const [streamSetup, setStreamSetup] = useState(false);
@@ -62,16 +60,6 @@ function VideoCallPage({userType}: VideoCallPageProps) {
         dispatch(addStream("remoteStream", event.streams[0]));
       };
       
-      // https://stackoverflow.com/questions/72467928/webrtc-peerconnection-ontrack-listener-doesnt-trigger
-      // peerConnection.onnegotiationneeded = () => {
-      //   console.log('negotiation needed');
-      //   peerConnection
-      //   .createOffer()
-      //   .then((sdp) => peerConnection.setLocalDescription(sdp))
-      //   .then(() => {
-      //     socket.emit('offer', id, peerConnection.localDescription);
-      //   });
-      // }
     
 
       peerConnection.addEventListener('icecandidate', (event) => {
@@ -173,7 +161,7 @@ function VideoCallPage({userType}: VideoCallPageProps) {
       <Navbar />
       <div>
         <video id="large-feed" ref={remoteVideo} autoPlay controls playsInline></video>
-        <video id="small-feed" ref={localVideo} style={{outline: "red solid 10px"}} autoPlay controls playsInline></video>
+        <video id="small-feed" ref={localVideo} autoPlay controls playsInline></video>
         <ActionButtons smallFeedEl={localVideo} largeFeedEl={remoteVideo} />
       </div>
       <Footer />
