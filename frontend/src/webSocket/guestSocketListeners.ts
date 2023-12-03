@@ -3,14 +3,14 @@ import updateCallStatus from "../redux/actions/updateCallStatus";
 
 const guestDashboardSocketListeners = (socket: Socket, setMeetingInfo: any, dispatch: any) => {
     
-    socket.on("meetingData", meetingData => {
+    socket.on("meetingInfo", meetingInfo => {
         console.log("meetingData");
-        setMeetingInfo(meetingData);
+        setMeetingInfo(meetingInfo);
     });
 
     socket.on("newOfferWaiting", offerData => {
         console.log("newOfferWaiting");
-        dispatch(updateCallStatus("offer", offerData.offer));
+        dispatch(updateCallStatus("offer", offerData.sdp));
         dispatch(updateCallStatus("myRole", "answerer"));
     });
 }

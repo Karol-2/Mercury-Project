@@ -4,5 +4,4 @@ export default interface DecodedData {
     meetingId?: string;
     id?: string;
     iat: number;
-    meetingOwner?: boolean;
 }

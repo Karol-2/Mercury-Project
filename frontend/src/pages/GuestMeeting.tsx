@@ -1,6 +1,6 @@
+import VideoCallPage from "./VideoCallPage";
+
 function GuestMeeting() {
-    return (
-        <div>Guest meeting</div>
-    )
+    return <VideoCallPage userType="guest"/>
 }
 export default GuestMeeting;
