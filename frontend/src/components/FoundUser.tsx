@@ -2,14 +2,14 @@ import { useState, useEffect } from "react";
 import User from "../models/User";
 import dataService from "../services/data";
 
-interface FoundUserInterface {
+interface FoundUserProps {
   user: User;
   key: string;
   currentId: string | null | undefined;
   isFriend: boolean;
 }
 
-function FoundUser(props: FoundUserInterface) {
+function FoundUser(props: FoundUserProps) {
   const [requestSent, setRequestSent] = useState(false);
 
   useEffect(() => {

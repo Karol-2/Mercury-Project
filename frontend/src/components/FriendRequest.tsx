@@ -2,17 +2,16 @@ import { useState } from "react";
 import User from "../models/User";
 import Modal from "./Modal";
 
-interface FriendRequestInterface {
+interface FriendRequestProps {
   user: User;
   key: string;
-  handleAcceptRequest: (currentId: string)=> void,
-  handleDeclineRequest: (friend: User)=> void,
-
+  handleAcceptRequest: (currentId: string) => void;
+  handleDeclineRequest: (friend: User) => void;
 }
 
-function FriendRequest(props: FriendRequestInterface) {
-  const {user,handleAcceptRequest,handleDeclineRequest} = props;
-  const [showDeclineModal,setShowDeclineModal] = useState(false);
+function FriendRequest(props: FriendRequestProps) {
+  const { user, handleAcceptRequest, handleDeclineRequest } = props;
+  const [showDeclineModal, setShowDeclineModal] = useState(false);
 
   return (
     <div className="flex flex-row bg-my-dark p-5 rounded-lg mt-5">
@@ -28,22 +27,25 @@ function FriendRequest(props: FriendRequestInterface) {
         <div className="flex flex-row">
           <button
             className={`btn small bg-my-purple text-xs`}
-            onClick={()=> handleAcceptRequest(String(user.id))}
+            onClick={() => handleAcceptRequest(String(user.id))}
           >
             Accept
           </button>
           <button
             className={`btn small bg-my-red text-xs`}
-            onClick={()=>setShowDeclineModal(true)}
+            onClick={() => setShowDeclineModal(true)}
           >
             Decline
           </button>
         </div>
       </div>
-       {/* modals section */}
-       {showDeclineModal &&(
-        <Modal text={`Are you sure that you want to decline to ${user.first_name} ${user.last_name}?`}
-        handleYes={()=>handleDeclineRequest(user)} handleNo={()=>setShowDeclineModal(false)}></Modal>
+      {/* modals section */}
+      {showDeclineModal && (
+        <Modal
+          text={`Are you sure that you want to decline to ${user.first_name} ${user.last_name}?`}
+          handleYes={() => handleDeclineRequest(user)}
+          handleNo={() => setShowDeclineModal(false)}
+        ></Modal>
       )}
     </div>
   );
