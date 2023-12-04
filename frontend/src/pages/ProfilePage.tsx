@@ -1,16 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-
 import Footer from "../components/Footer";
 import Navbar from "../components/Navbar";
 import User from "../models/User";
 import { useUser } from "../helpers/UserProvider";
 import ProfilePageForm from "../components/ProfilePageForm";
 import dataService from "../services/data";
-
 function ProfilePage() {
   const navigate = useNavigate();
-
   const { user, userId, setUser, updateUser, deleteUser } = useUser();
   const [isEditing, setIsEditing] = useState(false);
   const [friends, setFriends] = useState([]);
@@ -47,11 +44,10 @@ function ProfilePage() {
     };
     fetchFriends();
   }, []);
-
   return (
     <>
       <Navbar />
-      {user ? (
+      {user && friends ? (
         <ProfilePageForm
           user={user}
           friends={friends}

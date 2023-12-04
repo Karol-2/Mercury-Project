@@ -29,19 +29,17 @@ app.post("/meeting", async (req, res) => {
             MATCH (u2:User) WHERE u2.id=$guestId
             MATCH (u1)-[:IS_FRIENDS_WITH]-(u2)
             WHERE NOT (u1)-[:MEETING]-(u2)
-            CREATE (u1)-[m:MEETING {meetingId: $meetingId}]->(u2)
+            CREATE (u1)-[m:MEETING {waiting: false, meetingId: $meetingId}]->(u2)
             RETURN m
         `,
       { ownerId, guestId, meetingId },
     );
     await session.close();
     if (newMeetingRequest.records.length === 0) {
-      return res
-        .status(404)
-        .json({
-          status: "error",
-          errors: { message: "Cannot create new meeting" },
-        });
+      return res.status(404).json({
+        status: "error",
+        errors: { message: "Cannot create new meeting" },
+      });
     }
     const token = sign({ ownerId, guestId, meetingId }, linkSecret!);
     return res.json({ token });

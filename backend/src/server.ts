@@ -25,9 +25,30 @@ app.use(cookieParser());
 app.use(express.json());
 
 const expressServer = createServer(app);
-const io = new SocketServer(expressServer, {
-  cors: { origin: ["http://localhost:5173"] },
-});
+
+interface ServerToClientEvents {
+  guest: () => void;
+  owner: (id: string) => void;
+  userDisconnected: (id: string) => void;
+  offer: (id: string, message: any) => void;
+  answer: (id: string, message: any) => void;
+  candidate: (id: string, message: any) => void;
+}
+
+interface ClientToServerEvents {
+  guest: (secret: string) => void;
+  owner: () => void;
+  offer: (id: string, message: any) => void;
+  answer: (id: string, message: any) => void;
+  candidate: (id: string, message: any) => void;
+}
+
+const io = new SocketServer<ClientToServerEvents, ServerToClientEvents>(
+  expressServer,
+  {
+    cors: { origin: ["http://localhost:5173"] },
+  },
+);
 
 expressServer.listen(port, () =>
   console.log(`HTTP server running on port ${port}`),

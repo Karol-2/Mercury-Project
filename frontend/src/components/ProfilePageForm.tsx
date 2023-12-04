@@ -1,5 +1,6 @@
 import React from "react";
 import User from "../models/User";
+import { useNavigate } from "react-router-dom";
 
 export interface ProfilePageFormProps {
   user: User;
@@ -12,6 +13,7 @@ export interface ProfilePageFormProps {
 }
 
 function ProfilePageForm(props: ProfilePageFormProps) {
+  const navigate = useNavigate();
   const {
     user,
     isEditing,
@@ -92,19 +94,6 @@ function ProfilePageForm(props: ProfilePageFormProps) {
               user.password || ""
             )}
           </p>
-          <ul>
-            Friends:{" "}
-            {props.friends.map((f) => (
-              <li key={f.id}>
-                <h3>
-                  {f.first_name} {f.last_name}
-                </h3>
-                <button onClick={() => console.log("meeting")}>
-                  launch meeting
-                </button>
-              </li>
-            ))}
-          </ul>
         </div>
         <div className="my-5">
           {isEditing ? (
@@ -118,6 +107,18 @@ function ProfilePageForm(props: ProfilePageFormProps) {
           )}
           <button onClick={deleteUser} className="btn secondary">
             Remove account
+          </button>
+          <button
+            onClick={() => navigate("/host-meeting")}
+            className="btn secondary"
+          >
+            Join meeting as an owner
+          </button>
+          <button
+            onClick={() => navigate("/guest-meeting")}
+            className="btn secondary"
+          >
+            Join meeting as guest
           </button>
         </div>
       </div>
