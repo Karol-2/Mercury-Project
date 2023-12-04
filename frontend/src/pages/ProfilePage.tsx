@@ -34,8 +34,6 @@ function ProfilePage() {
     if (userId === null) navigate("/login");
   }, [userId]);
 
- 
-
   return (
     <>
       <Navbar />

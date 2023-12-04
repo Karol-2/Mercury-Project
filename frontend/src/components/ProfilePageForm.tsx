@@ -17,14 +17,11 @@ export interface ProfilePageFormProps {
 }
 
 function ProfilePageForm(props: ProfilePageFormProps) {
-
   const [friends, setFriends] = useState([]);
-  const [friendsRequests,setFriendsRequests] = useState([]);
-  const [refresh,setRefresh] = useState(false);
+  const [friendsRequests, setFriendsRequests] = useState([]);
+  const [refresh, setRefresh] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  
 
-  
   const {
     user,
     isEditing,
@@ -58,26 +55,10 @@ function ProfilePageForm(props: ProfilePageFormProps) {
     fetchFriends();
   }, [refresh]);
 
-
-
-  const handleDeclineRequest = async (friend: User,) => {
-    
-    await dataService
-      .fetchData(`/users/${user.id}/remove/${friend.id}`, "DELETE", {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-  
-    setRefresh(() => !refresh);
-    
-  };
-
-  const handleAcceptRequest = async (currentId: string) => {
-
+  const handleDeclineRequest = async (friend: User) => {
     await dataService.fetchData(
-      `/users/${user.id}/add/${currentId}`,
-      "POST",
+      `/users/${user.id}/remove/${friend.id}`,
+      "DELETE",
       {
         headers: {
           "Content-Type": "application/json",
@@ -88,6 +69,15 @@ function ProfilePageForm(props: ProfilePageFormProps) {
     setRefresh(() => !refresh);
   };
 
+  const handleAcceptRequest = async (currentId: string) => {
+    await dataService.fetchData(`/users/${user.id}/add/${currentId}`, "POST", {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    setRefresh(() => !refresh);
+  };
 
   return (
     <section className="bg-my-darker min-h-screen flex justify-center ">
@@ -177,14 +167,20 @@ function ProfilePageForm(props: ProfilePageFormProps) {
                 Edit
               </button>
             )}
-            <button onClick={()=>setShowDeleteModal(true)} className="btn secondary">
+            <button
+              onClick={() => setShowDeleteModal(true)}
+              className="btn secondary"
+            >
               Remove account
             </button>
-             {/* modals section */}
-             {showDeleteModal &&(
-                        <Modal text={`Are you sure that you want to delete you account?`}
-                        handleYes={deleteUser} handleNo={()=>setShowDeleteModal(false)}></Modal>
-                      )}
+            {/* modals section */}
+            {showDeleteModal && (
+              <Modal
+                text={`Are you sure that you want to delete you account?`}
+                handleYes={deleteUser}
+                handleNo={() => setShowDeleteModal(false)}
+              ></Modal>
+            )}
           </div>
           <h1 className="text-3xl font-bold">Friends:</h1>
           <hr className="text-my-orange"></hr>
@@ -212,12 +208,10 @@ function ProfilePageForm(props: ProfilePageFormProps) {
                     >
                       <FontAwesomeIcon icon={faUserMinus} />
                     </button>
-                 
                   </div>
                 </div>
               </li>
             ))}
-            
           </ul>
         </div>
         <div>
@@ -241,8 +235,6 @@ function ProfilePageForm(props: ProfilePageFormProps) {
           </div>
         </div>
       </div>
-      
-      
     </section>
   );
 }

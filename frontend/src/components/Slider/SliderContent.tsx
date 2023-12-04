@@ -16,7 +16,11 @@ const SliderContent = (props: ISlider) => {
   }
   return (
     <article className={position} key={props.photoThumb}>
-      <img className="slider-photo" src={props.photoThumb} alt={`app interface ${props.index}`} />
+      <img
+        className="slider-photo"
+        src={props.photoThumb}
+        alt={`app interface ${props.index}`}
+      />
     </article>
   );
 };
