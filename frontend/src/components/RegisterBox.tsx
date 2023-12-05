@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { FrontendUser } from "../models/user.model";
 
 const mailRegex = new RegExp("\\w+@\\w+[.]\\w+");
@@ -39,6 +39,8 @@ const errorHandlers: ErrorHandlers = {
 };
 
 function RegisterBox() {
+  const navigate = useNavigate();
+  
   const [user, setUser] = useState<Partial<FrontendUser>>({});
   const [errors, setErrors] = useState<Partial<FrontendUser>>({});
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
@@ -116,6 +118,7 @@ function RegisterBox() {
 
         console.log(registered);
         setErrors({});
+        navigate("/login")
       } catch (e) {
         setSubmitError("Can't connect to the server");
       }
