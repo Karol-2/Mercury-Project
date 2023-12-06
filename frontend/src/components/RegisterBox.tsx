@@ -1,52 +1,53 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import * as z from "zod";
+
 import { FrontendUser } from "../models/user.model";
 
-const mailRegex = new RegExp("\\w+@\\w+[.]\\w+");
-
-type ErrorHandlers = Record<keyof FrontendUser, (value: string) => string>;
-const errorHandlers: ErrorHandlers = {
-  first_name: (v) => {
-    if (v.length < 2) {
-      return "First name should be at least two characters long";
-    }
-    return "";
-  },
-  last_name: (v) => {
-    if (v.length < 2) {
-      return "Last name should be at least two characters long";
-    }
-    return "";
-  },
-  country: (_v) => {
-    return "";
-  },
-  profile_picture: (_v) => {
-    return "";
-  },
-  mail: (v) => {
-    if (!mailRegex.test(v)) {
-      return "Incorrect mail format";
-    }
-    return "";
-  },
-  password: (v) => {
-    if (v.length < 8) {
-      return "Password should be at least eight characters long";
-    }
-    return "";
-  },
-};
+const userSchema: z.ZodType<Partial<FrontendUser>> = z.object({
+  first_name: (
+    z.string()
+      .min(2, "First name should be at least two characters long")
+  ),
+  last_name: (
+    z.string()
+      .min(2, "Last name should be at least two characters long")
+  ),
+  country: (
+    z.string()
+      .length(2, "Country code should be 2 characters long")
+  ),
+  profile_picture: (
+    z.any()
+      .refine((obj) => obj.length > 0, "Profile picture not provided")
+      .transform((obj) => (obj as FileList)[0].name)
+  ),
+  mail: z.string().email(),
+  password: (
+    z.string()
+      .min(8, "Password should be at least eight characters long")
+  )
+})
 
 function RegisterBox() {
   const navigate = useNavigate();
+  const {register, handleSubmit, formState: {errors, isSubmitting}} = useForm<FrontendUser>({
+    resolver: zodResolver(userSchema)
+  })
   
-  const [user, setUser] = useState<Partial<FrontendUser>>({});
-  const [errors, setErrors] = useState<Partial<FrontendUser>>({});
-  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [submitError, setSubmitError] = useState<string>("");
 
-  const registerFunc = async (): Promise<FrontendUser | number> => {
+  const errorProps = {
+    className: "pb-4 text-[#f88]"    
+  }
+
+  const inputProps = {
+    className: "text-my-dark form-input"
+  }
+
+  const registerUser = async (user: FrontendUser): Promise<FrontendUser> => {
     const response = await fetch("http://localhost:5000/users", {
       method: "POST",
       headers: {
@@ -56,7 +57,7 @@ function RegisterBox() {
     });
 
     if (!response.ok) {
-      return response.status;
+      throw response;
     }
 
     const userJson = await response.json();
@@ -65,112 +66,68 @@ function RegisterBox() {
     return userJson.user;
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setUser({ ...user, [e.target.name]: e.target.value });
-  };
+  const submit = async (user: FrontendUser) => {
+    try {
+      const registered = await registerUser(user);
 
-  const input = (
-    placeholder: string,
-    type: string,
-    name: keyof FrontendUser,
-  ) => (
-    <input
-      className="text-my-dark form-input"
-      type={type}
-      name={name}
-      onChange={handleChange}
-      placeholder={placeholder}
-    />
-  );
-
-  const error = (name: keyof FrontendUser) => (
-    <div className="pb-4 text-[#f88]">{errors[name]}</div>
-  );
-
-  const handleSubmit = async (e: React.SyntheticEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-    setSubmitError("");
-
-    const errors = Object.fromEntries(
-      Object.entries(errorHandlers).map(([key, handler]) => {
-        const formValue = user[key as keyof FrontendUser];
-        if (!formValue) {
-          return [key, "Required"];
-        }
-
-        return [key, handler(formValue)];
-      }),
-    );
-    const noErrors = Object.values(errors).every((v) => v == "");
-
-    if (noErrors) {
-      try {
-        const registered = await registerFunc();
-
-        if (typeof registered == "number") {
-          if (registered == 400) {
-            setSubmitError("User already exists");
-          } else {
-            setSubmitError("Unknown error");
-          }
-        }
-
-        console.log(registered);
-        setErrors({});
-        navigate("/login")
-      } catch (e) {
+      console.log(registered);
+      navigate("/login")
+    } catch (e) {
+      if (e instanceof Error) {
         setSubmitError("Can't connect to the server");
+        throw e
       }
-    } else {
-      setErrors(errors);
+
+      if ((e as Response).status == 400) {
+        setSubmitError("User already exists");
+      } else {
+        setSubmitError("Unknown error");
+      }
     }
-
-    setIsSubmitting(false);
-  };
-
+  }
+  
   return (
     <form
       id="register-box"
       className="medium:w-[25vw] flex flex-col gap-2 bg-my-dark p-10 px-20 rounded-xl"
-      onSubmit={(e) => handleSubmit(e)}
+      onSubmit={handleSubmit(submit)}
     >
       <div>First and last name:</div>
-      {input("First name", "text", "first_name")}
-      {error("first_name")}
-      {input("Last name", "text", "last_name")}
-      {error("last_name")}
-
+      <input {...inputProps} {...register("first_name")} placeholder="First name" />
+      <div {...errorProps}>{errors.first_name?.message}</div>
+      <input {...inputProps} {...register("last_name")} placeholder="Last name" />
+      <div {...errorProps}>{errors.last_name?.message}</div>
       <div>
         <div className="flex gap-2 items-center">
           <div>Country:</div>
-          {input("Country", "text", "country")}
+          <input {...inputProps} {...register("country")} placeholder="Country" />
         </div>
-        {error("country")}
+        <div {...errorProps}>{errors.country?.message}</div>
       </div>
 
       <div>Profile picture:</div>
-      {input("", "file", "profile_picture")}
-      {error("profile_picture")}
+      <input {...inputProps} {...register("profile_picture")} type="file" />
+      <div {...errorProps}>{errors.profile_picture?.message}</div>
 
       <div className="py-5">
         <div>E-mail:</div>
-        {input("E-mail", "text", "mail")}
-        {error("mail")}
+        <input {...inputProps} {...register("mail")} placeholder="E-mail" />
+        <div {...errorProps}>{errors.mail?.message}</div>
 
         <div>Password:</div>
-        {input("Password", "password", "password")}
-        {error("password")}
+        <input {...inputProps} {...register("password")} type="password" placeholder="Password" />
+        <div {...errorProps}>{errors.password?.message}</div>
       </div>
 
       <div className="pb-4 text-[#f88]">{submitError}</div>
-      <button
+
+      <input
         disabled={isSubmitting}
-        className="btn small bg-my-orange disabled:bg-my-dark"
         type="submit"
-      >
-        Register
-      </button>
+        className="btn small bg-my-orange disabled:bg-my-dark"
+        value="Register"
+      />
+
       <div className="text-center">
         <p>Already have an account?</p>
         <p className="font-bold">
