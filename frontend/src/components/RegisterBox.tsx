@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 
-import { FrontendUser } from "../models/user.model";
+import { FrontendUser } from "../models/User";
 
 const userSchema: z.ZodType<Partial<FrontendUser>> = z.object({
   first_name: z
