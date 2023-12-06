@@ -104,7 +104,7 @@ test("Get user's friends", async () => {
   expect(usersStatus).toBe("ok");
 
   const zuck = usersResponseData.users.find(
-    (user: any) => user.mail == "goodboymark1@meta.com",
+    (user: any) => user.mail == "reptilian@meta.com",
   );
   const zuckId = zuck.id;
 
@@ -141,7 +141,7 @@ test("Search users", async () => {
   expect(usersStatus).toBe("ok");
 
   const zuck = usersResponseData.users.find(
-    ([user, _score]: any) => user.mail == "goodboymark1@meta.com",
+    ([user, _score]: any) => user.mail == "reptilian@meta.com",
   );
 
   expect(zuck).toBeDefined();

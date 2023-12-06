@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 import { AuthResponse, CustomResponse } from "../models/Response";
+import DecodedData from "../models/DecodedData";
 
 export interface JWTRequest extends Request {
   token?: jwt.Jwt;
@@ -33,5 +34,17 @@ export async function authenticateToken(
     next();
   } catch (e) {
     return res.status(403).json({ status: "forbidden" });
+  }
+}
+
+export function decodeSocketData(
+  handshakeData: string,
+  linkSecret: string,
+): DecodedData | null {
+  try {
+    const decodedData = jwt.verify(handshakeData, linkSecret);
+    return decodedData as DecodedData;
+  } catch (_e) {
+    return null;
   }
 }

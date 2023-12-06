@@ -1,8 +1,10 @@
 import React from "react";
-import User from "../models/user.model";
+import User from "../models/User";
+import { useNavigate } from "react-router-dom";
 
 export interface ProfilePageFormProps {
   user: User;
+  friends: User[];
   isEditing: boolean;
   handleEditClick: () => void;
   handleSaveClick: () => void;
@@ -11,6 +13,7 @@ export interface ProfilePageFormProps {
 }
 
 function ProfilePageForm(props: ProfilePageFormProps) {
+  const navigate = useNavigate();
   const {
     user,
     isEditing,
@@ -19,7 +22,6 @@ function ProfilePageForm(props: ProfilePageFormProps) {
     handleChange,
     deleteUser,
   } = props;
-
   return (
     <section className="bg-my-darker min-h-screen flex justify-center ">
       <div className=" bg-my-dark p-10 px-20 rounded-xl mx-50 my-20 lg:mx-72 text-lg">
@@ -105,6 +107,18 @@ function ProfilePageForm(props: ProfilePageFormProps) {
           )}
           <button onClick={deleteUser} className="btn secondary">
             Remove account
+          </button>
+          <button
+            onClick={() => navigate("/host-meeting")}
+            className="btn secondary"
+          >
+            Join meeting as an owner
+          </button>
+          <button
+            onClick={() => navigate("/guest-meeting")}
+            className="btn secondary"
+          >
+            Join meeting as guest
           </button>
         </div>
       </div>
