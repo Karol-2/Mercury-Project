@@ -21,7 +21,8 @@
     "react-hook-form": "^7.48.2",
     "react-jwt": "^1.2.0",
     "react-router-dom": "^6.17.0",
-    "sass": "^1.69.2"
+    "sass": "^1.69.2",
+    "zod": "^3.22.4"
   },
   "devDependencies": {
     "@types/js-cookie": "^3.0.6",
