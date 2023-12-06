@@ -158,8 +158,8 @@ usersRouter.get("/meetings/:userId", async (req: Request, res) => {
     const session = driver.session();
     const userId = req.params.userId;
 
-    const user = await userExists(session, res, userId);
-    if ("json" in user) {
+    const user = await userExists(session, { id: userId });
+    if (!user) {
       await session.close();
       return res;
     }
