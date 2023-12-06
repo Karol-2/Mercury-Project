@@ -51,7 +51,7 @@ test("Try to create user with existing mail", async () => {
   const status = responseData.status;
 
   expect(status).toBe("error");
-})
+});
 
 test("Fetch user by ID", async () => {
   const response = await fetch(`http://localhost:5000/users/${userId}`);

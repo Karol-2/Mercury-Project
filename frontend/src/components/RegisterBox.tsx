@@ -1,51 +1,48 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 
 import { FrontendUser } from "../models/user.model";
 
 const userSchema: z.ZodType<Partial<FrontendUser>> = z.object({
-  first_name: (
-    z.string()
-      .min(2, "First name should be at least two characters long")
-  ),
-  last_name: (
-    z.string()
-      .min(2, "Last name should be at least two characters long")
-  ),
-  country: (
-    z.string()
-      .length(2, "Country code should be 2 characters long")
-  ),
-  profile_picture: (
-    z.any()
-      .refine((obj) => obj.length > 0, "Profile picture not provided")
-      .transform((obj) => (obj as FileList)[0].name)
-  ),
+  first_name: z
+    .string()
+    .min(2, "First name should be at least two characters long"),
+  last_name: z
+    .string()
+    .min(2, "Last name should be at least two characters long"),
+  country: z.string().length(2, "Country code should be 2 characters long"),
+  profile_picture: z
+    .any()
+    .refine((obj) => obj.length > 0, "Profile picture not provided")
+    .transform((obj) => (obj as FileList)[0].name),
   mail: z.string().email(),
-  password: (
-    z.string()
-      .min(8, "Password should be at least eight characters long")
-  )
-})
+  password: z
+    .string()
+    .min(8, "Password should be at least eight characters long"),
+});
 
 function RegisterBox() {
   const navigate = useNavigate();
-  const {register, handleSubmit, formState: {errors, isSubmitting}} = useForm<FrontendUser>({
-    resolver: zodResolver(userSchema)
-  })
-  
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<FrontendUser>({
+    resolver: zodResolver(userSchema),
+  });
+
   const [submitError, setSubmitError] = useState<string>("");
 
   const errorProps = {
-    className: "pb-4 text-[#f88]"    
-  }
+    className: "pb-4 text-[#f88]",
+  };
 
   const inputProps = {
-    className: "text-my-dark form-input"
-  }
+    className: "text-my-dark form-input",
+  };
 
   const registerUser = async (user: FrontendUser): Promise<FrontendUser> => {
     const response = await fetch("http://localhost:5000/users", {
@@ -71,11 +68,11 @@ function RegisterBox() {
       const registered = await registerUser(user);
 
       console.log(registered);
-      navigate("/login")
+      navigate("/login");
     } catch (e) {
       if (e instanceof Error) {
         setSubmitError("Can't connect to the server");
-        throw e
+        throw e;
       }
 
       if ((e as Response).status == 400) {
@@ -84,8 +81,8 @@ function RegisterBox() {
         setSubmitError("Unknown error");
       }
     }
-  }
-  
+  };
+
   return (
     <form
       id="register-box"
@@ -93,14 +90,26 @@ function RegisterBox() {
       onSubmit={handleSubmit(submit)}
     >
       <div>First and last name:</div>
-      <input {...inputProps} {...register("first_name")} placeholder="First name" />
+      <input
+        {...inputProps}
+        {...register("first_name")}
+        placeholder="First name"
+      />
       <div {...errorProps}>{errors.first_name?.message}</div>
-      <input {...inputProps} {...register("last_name")} placeholder="Last name" />
+      <input
+        {...inputProps}
+        {...register("last_name")}
+        placeholder="Last name"
+      />
       <div {...errorProps}>{errors.last_name?.message}</div>
       <div>
         <div className="flex gap-2 items-center">
           <div>Country:</div>
-          <input {...inputProps} {...register("country")} placeholder="Country" />
+          <input
+            {...inputProps}
+            {...register("country")}
+            placeholder="Country"
+          />
         </div>
         <div {...errorProps}>{errors.country?.message}</div>
       </div>
@@ -115,7 +124,12 @@ function RegisterBox() {
         <div {...errorProps}>{errors.mail?.message}</div>
 
         <div>Password:</div>
-        <input {...inputProps} {...register("password")} type="password" placeholder="Password" />
+        <input
+          {...inputProps}
+          {...register("password")}
+          type="password"
+          placeholder="Password"
+        />
         <div {...errorProps}>{errors.password?.message}</div>
       </div>
 

@@ -23,8 +23,8 @@ async function userExists(
   props: Partial<User>,
 ): Promise<User | null> {
   const propsStr = Object.keys(props)
-    .map((k) => `${k}: $${k}`
-  ).join(", ")
+    .map((k) => `${k}: $${k}`)
+    .join(", ");
 
   const userExistsResult = await session.run(
     `MATCH (u:User {${propsStr}}) RETURN u`,
@@ -164,7 +164,9 @@ usersRouter.post("/", async (req: Request, res: UserErrorResponse) => {
 
     if (existsUser) {
       await session.close();
-      return res.status(400).json({ status: "error", errors: { id: "already exists" } });
+      return res
+        .status(400)
+        .json({ status: "error", errors: { id: "already exists" } });
     }
 
     newUserProps.id = uuidv4();
