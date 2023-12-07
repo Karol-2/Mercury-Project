@@ -13,7 +13,10 @@ const userSchema: z.ZodType<Partial<FrontendUser>> = z.object({
   last_name: z
     .string()
     .min(2, "Last name should be at least two characters long"),
-  country: z.string().length(2, "Country code should be 2 characters long"),
+  country: z
+    .string()
+    .length(2, "Country code should be 2 characters long")
+    .toUpperCase(),
   profile_picture: z
     .any()
     .refine((obj) => obj.length > 0, "Profile picture not provided")
@@ -42,6 +45,17 @@ function RegisterBox() {
 
   const inputProps = {
     className: "text-my-dark form-input",
+  };
+
+  const countryOptions = {
+    onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
+      const input = e.target;
+      const start = input.selectionStart;
+      const end = input.selectionEnd;
+
+      input.value = e.target.value.toUpperCase();
+      input.setSelectionRange(start, end);
+    },
   };
 
   const registerUser = async (user: FrontendUser): Promise<FrontendUser> => {
@@ -107,7 +121,7 @@ function RegisterBox() {
           <div>Country:</div>
           <input
             {...inputProps}
-            {...register("country")}
+            {...register("country", countryOptions)}
             placeholder="Country"
           />
         </div>
