@@ -62,6 +62,7 @@ usersRouter.get(
   "/search",
   async (req: Request, res: UsersSearchErrorResponse) => {
     const searchTerm = req.query.q;
+    console.log(`aaaa ${searchTerm}`);
     if (typeof searchTerm != "string") {
       return res.status(404).json({
         status: "error",
@@ -199,9 +200,14 @@ usersRouter.post("/", async (req: Request, res: UserErrorResponse) => {
     // TODO: verify user fields
 
     newUserProps.id = uuidv4();
-    newUserProps.name_embedding = wordToVec(
-      newUserProps.first_name + newUserProps.last_name,
-    );
+
+    const firstNameEmbedding = wordToVec(newUserProps.first_name);
+    const lastNameEmbedding = wordToVec(newUserProps.last_name);
+
+    newUserProps.name_embedding = firstNameEmbedding.map((e1, i) => {
+      const e2 = lastNameEmbedding[i];
+      return (e1 + e2) / 2;
+    });
 
     const session = driver.session();
     const newUserResult = await session.run(`CREATE (u:User $user) RETURN u`, {
