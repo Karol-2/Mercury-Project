@@ -129,7 +129,12 @@ function RegisterBox() {
       </div>
 
       <div>Profile picture:</div>
-      <input {...inputProps} {...register("profile_picture")} type="file" />
+      <input
+        {...inputProps}
+        {...register("profile_picture")}
+        type="file"
+        accept="image/*"
+      />
       <div {...errorProps}>{errors.profile_picture?.message}</div>
 
       <div className="py-5">
