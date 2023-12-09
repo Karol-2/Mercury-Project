@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Socket } from "socket.io-client";
 import socketConnection from "../webSocket/socketConnection";
+import createPeerConnection from "../webRTC/createPeerConnection";
 function VideoCallPage() {
   const { user, userId } = useUser();
   const navigate = useNavigate();
@@ -28,7 +29,8 @@ function VideoCallPage() {
 
   async function prepareWebRTC() {
     const socket = socketConnection();
-
+    const peerConnection = createPeerConnection(remoteStream, negotiate, socket);
+    
   }
 
   async function negotiate(peerConnection: RTCPeerConnection, socket: Socket) {
