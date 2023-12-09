@@ -74,7 +74,7 @@ friendshipRouter.get(
         }
   
         const friendRequests = await session.run(
-          `MATCH (u:User {id: $userId})<-[:SEND_INVITE_TO]-(f:User)
+          `MATCH (u:User {id: $userId})<-[:SENT_INVITE_TO]-(f:User)
           WITH f ORDER BY f.last_name, f.first_name
           RETURN DISTINCT f`,
           { userId },
@@ -112,7 +112,7 @@ friendshipRouter.get(
         );
         
         await session.run(
-          `MATCH (a:User {id: $userId1})-[r:SEND_INVITE_TO]-(b:User {id: $userId2})
+          `MATCH (a:User {id: $userId1})-[r:SENT_INVITE_TO]-(b:User {id: $userId2})
           DELETE r`,
           { userId1, userId2 },
         );
@@ -142,7 +142,7 @@ friendshipRouter.get(
   
         const friendRequest = await session.run(
           `MATCH (a:User {id: $userId1}), (b:User {id: $userId2})
-          MERGE (a)-[:SEND_INVITE_TO]->(b)`,
+          MERGE (a)-[:SENT_INVITE_TO]->(b)`,
           { userId1, userId2 },
         );
         await session.close();
@@ -170,9 +170,9 @@ friendshipRouter.get(
           return res;
         }
   
-         // Delete every SEND_INVITE_TO between 2 users
+         // Delete every SENT_INVITE_TO between 2 users
          await session.run(
-          `MATCH (a:User {id: $userId1})-[r:SEND_INVITE_TO]-(b:User {id: $userId2})
+          `MATCH (a:User {id: $userId1})-[r:SENT_INVITE_TO]-(b:User {id: $userId2})
           DELETE r`,
           { userId1, userId2 },
         );
