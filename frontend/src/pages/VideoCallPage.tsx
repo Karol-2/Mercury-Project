@@ -36,9 +36,9 @@ function VideoCallPage() {
     });
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: true });
-      for (const track of stream.getTracks()) {
+      stream.getTracks().forEach(track => {
         peerConnection.addTrack(track, stream);
-      }
+      });
       localStream.current!.srcObject = stream;
     } catch (err) {
       console.error(err);
