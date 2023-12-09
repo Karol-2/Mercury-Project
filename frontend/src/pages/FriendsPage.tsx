@@ -80,8 +80,9 @@ function FriendsPage() {
   return (
     <>
       <Navbar />
-      <section>
-        <div>
+      <div className="mx-50 my-20 lg:mx-56" id="wrapper">
+      <section className="grid grid-cols-1 lg:grid-cols-2 gap-8 ">
+        <div id="friends" className=" bg-my-dark p-10 rounded-xl">
           <h1 className="text-3xl font-bold">Friends:</h1>
           <hr className="text-my-orange"></hr>
           <ul>
@@ -115,9 +116,11 @@ function FriendsPage() {
           </ul>
         </div>
 
-        <div>
-          <h1 className="text-3xl font-bold mt-5">Friend requests:</h1>
-          <hr className="text-my-orange"></hr>
+        <div id="friend-requests" className="">
+          <div className="p-10 rounded-xl bg-my-dark">
+            <h1 className="text-3xl font-bold">Friend requests:</h1>
+            <hr className="text-my-orange"></hr>
+          </div>
           <div>
             {friendsRequests && friendsRequests.length > 0 ? (
               friendsRequests.map((friend, index) => (
@@ -136,6 +139,7 @@ function FriendsPage() {
           </div>
         </div>
       </section>
+      </div>
       <Footer />
     </>
   );
