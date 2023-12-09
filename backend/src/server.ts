@@ -4,6 +4,8 @@ import cors from "cors";
 import { Server as SocketServer } from "socket.io";
 import { createServer } from "http";
 import cookieParser from "cookie-parser";
+import ServerToClientEvents from "./events/ServerToClientEvents";
+import ClientToServerEvents from "./events/ClientToServerEvents";
 
 dotenv.config();
 
@@ -26,7 +28,7 @@ app.use(express.json());
 
 const expressServer = createServer(app);
 
-const io = new SocketServer(
+const io = new SocketServer<ClientToServerEvents, ServerToClientEvents>(
   expressServer,
   {
     cors: { origin: ["http://localhost:5173"] },
