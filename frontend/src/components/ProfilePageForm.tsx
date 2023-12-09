@@ -23,7 +23,6 @@ function ProfilePageForm(props: ProfilePageFormProps) {
     deleteUser,
   } = props;
 
-
   return (
     <section className="bg-my-darker min-h-screen flex justify-center ">
       <div className=" bg-my-dark p-10 px-20 rounded-xl mx-50 my-20 lg:mx-72 text-lg">
@@ -127,9 +126,7 @@ function ProfilePageForm(props: ProfilePageFormProps) {
               ></Modal>
             )}
           </div>
-          
         </div>
-        
       </div>
     </section>
   );
