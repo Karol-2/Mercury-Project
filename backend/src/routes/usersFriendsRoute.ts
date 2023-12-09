@@ -44,7 +44,9 @@ friendshipRouter.get(
         }
   
         const friendQuery = await session.run(
-          `MATCH (u:User {id: $userId})-[:IS_FRIENDS_WITH]->(f:User)-[:IS_FRIENDS_WITH]->(u) RETURN DISTINCT f`,
+          `MATCH (u:User {id: $userId})-[:IS_FRIENDS_WITH]->(f:User)-[:IS_FRIENDS_WITH]->(u)
+          WITH f ORDER BY f.last_name, f.first_name
+          RETURN DISTINCT f`,
           { userId },
         );
         await session.close();
@@ -73,6 +75,7 @@ friendshipRouter.get(
   
         const friendRequests = await session.run(
           `MATCH (u:User {id: $userId})<-[:SEND_INVITE_TO]-(f:User)
+          WITH f ORDER BY f.last_name, f.first_name
           RETURN DISTINCT f`,
           { userId },
         );
