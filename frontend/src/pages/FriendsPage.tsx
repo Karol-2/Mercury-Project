@@ -6,7 +6,7 @@ import { faUserMinus } from "@fortawesome/free-solid-svg-icons";
 import { faVideo } from "@fortawesome/free-solid-svg-icons";
 import dataService from "../services/data";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-// import Modal from "../components/Modal";
+import Modal from "../components/Modal";
 import User from "../models/User";
 import { useUser } from "../helpers/UserProvider";
 
@@ -14,7 +14,8 @@ function FriendsPage() {
   const [friends, setFriends] = useState([]);
   const [friendsRequests, setFriendsRequests] = useState([]);
   const [refresh, setRefresh] = useState(false);
-  // const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [friendToDelete, setFriendToDelete] = useState<User | null>(null);
 
   const { user } = useUser();
 
@@ -105,13 +106,21 @@ function FriendsPage() {
                     </button>
                     <button
                       className={`btn small bg-my-red text-xs`}
-                      onClick={() => handleDeclineRequest(friend)}
+                      onClick={() => {setShowDeleteModal(true); setFriendToDelete(friend)}}
                     >
                       <FontAwesomeIcon icon={faUserMinus} />
                     </button>
                   </div>
+                  {showDeleteModal && friendToDelete && (
+                      <Modal
+                        text={`Are you sure that you want remove ${friendToDelete.first_name} ${friendToDelete.last_name} from your friends ?`}
+                        handleYes={() => {handleDeclineRequest(friendToDelete); setFriendToDelete(null)}}
+                        handleNo={() => setShowDeleteModal(false)}
+                      ></Modal>
+                    )}
                 </div>
               </li>
+      
             ))}
           </ul>
         </div>
