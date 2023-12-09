@@ -16,6 +16,7 @@ function ProfilePageForm(props: ProfilePageFormProps) {
   const navigate = useNavigate();
   const {
     user,
+    friends,
     isEditing,
     handleEditClick,
     handleSaveClick,
@@ -96,6 +97,20 @@ function ProfilePageForm(props: ProfilePageFormProps) {
           </p>
         </div>
         <div className="my-5">
+          <h2 className="text-4xl font-extrabold dark:text-white">Friends</h2>
+          <ul className="list-disc">
+            {friends.map(friend => <li className="my-1" key={friend.id}>
+              {`${friend.first_name} ${friend.last_name}`}
+              <button 
+                className="mx-2 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 border border-blue-700 rounded"
+                onClick={() => navigate("/meeting")}
+              >
+                Meeting
+              </button>
+            </li>)}
+          </ul>
+        </div>
+        <div className="my-5">
           {isEditing ? (
             <button onClick={handleSaveClick} className="btn primary">
               Save
@@ -107,18 +122,6 @@ function ProfilePageForm(props: ProfilePageFormProps) {
           )}
           <button onClick={deleteUser} className="btn secondary">
             Remove account
-          </button>
-          <button
-            onClick={() => navigate("/host-meeting")}
-            className="btn secondary"
-          >
-            Join meeting as an owner
-          </button>
-          <button
-            onClick={() => navigate("/guest-meeting")}
-            className="btn secondary"
-          >
-            Join meeting as guest
           </button>
         </div>
       </div>
