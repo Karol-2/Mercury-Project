@@ -70,7 +70,7 @@ function ProfilePageForm(props: ProfilePageFormProps) {
   };
 
   const handleAcceptRequest = async (currentId: string) => {
-    await dataService.fetchData(`/users/${user.id}/add/${currentId}`, "POST", {
+    await dataService.fetchData(`/users/${user.id}/accept/${currentId}`, "POST", {
       headers: {
         "Content-Type": "application/json",
       },
