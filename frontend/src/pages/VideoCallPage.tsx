@@ -12,7 +12,7 @@ function VideoCallPage() {
   const localStream = useRef<HTMLVideoElement>(null);
   const remoteStream = useRef<HTMLVideoElement>(null);
   const [makingOffer, setMakingOffer] = useState(false);
-  
+
   useEffect(() => {
     if (userId === null) navigate("/login");
   }, [userId]);
@@ -31,12 +31,15 @@ function VideoCallPage() {
     const socket = socketConnection();
     const peerConnection = new RTCPeerConnection(stunServers);
     let polite = false;
-    socket.on('first', () => {
+    socket.on("first", () => {
       polite = true;
     });
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: true });
-      stream.getTracks().forEach(track => {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        audio: true,
+        video: true,
+      });
+      stream.getTracks().forEach((track) => {
         peerConnection.addTrack(track, stream);
       });
       localStream.current!.srcObject = stream;
@@ -57,8 +60,7 @@ function VideoCallPage() {
     peerConnection.oniceconnectionstatechange = () => {
       if (peerConnection.iceConnectionState === "failed") {
         peerConnection.restartIce();
-      }
-      else if(peerConnection.iceConnectionState == 'disconnected') {
+      } else if (peerConnection.iceConnectionState == "disconnected") {
         remoteStream.current!.srcObject = null;
       }
     };
@@ -68,28 +70,28 @@ function VideoCallPage() {
     };
 
     let ignoreOffer = false;
-    socket.on('description', async (description) => {
-        const offerCollision =
-                description.type === "offer" &&
-                (makingOffer || peerConnection.signalingState !== "stable");
+    socket.on("description", async (description) => {
+      const offerCollision =
+        description.type === "offer" &&
+        (makingOffer || peerConnection.signalingState !== "stable");
 
-        ignoreOffer = !polite && offerCollision;
-        if (ignoreOffer) {
-          return;
-        }
-        await peerConnection.setRemoteDescription(description);
-        if (description.type === "offer") {
-          await peerConnection.setLocalDescription();
-          socket.emit('description', peerConnection.localDescription!)
-        }
-      });
-      socket.on('iceCandidate', async (candidate) => {
-        try {
-          await peerConnection.addIceCandidate(candidate);
-        } catch (err) {
-          console.error(err);
-        }
-      });
+      ignoreOffer = !polite && offerCollision;
+      if (ignoreOffer) {
+        return;
+      }
+      await peerConnection.setRemoteDescription(description);
+      if (description.type === "offer") {
+        await peerConnection.setLocalDescription();
+        socket.emit("description", peerConnection.localDescription!);
+      }
+    });
+    socket.on("iceCandidate", async (candidate) => {
+      try {
+        await peerConnection.addIceCandidate(candidate);
+      } catch (err) {
+        console.error(err);
+      }
+    });
   }
 
   async function negotiate(peerConnection: RTCPeerConnection, socket: Socket) {
@@ -111,7 +113,7 @@ function VideoCallPage() {
         <video
           id="large-feed"
           ref={localStream}
-          className="rounded-lg flex-1" 
+          className="rounded-lg flex-1"
           autoPlay
           controls
           playsInline
@@ -119,7 +121,7 @@ function VideoCallPage() {
         <video
           id="small-feed"
           ref={remoteStream}
-          className="rounded-lg flex-1" 
+          className="rounded-lg flex-1"
           autoPlay
           controls
           playsInline

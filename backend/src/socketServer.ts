@@ -7,9 +7,9 @@ dotenv.config();
 
 io.on("connection", (socket: Socket) => {
   console.log("Socket server started");
-  
+
   socket.on("iceCandidate", (candidate) => {
-    socket.broadcast.emit("iceCandidate", candidate)
+    socket.broadcast.emit("iceCandidate", candidate);
   });
 
   socket.on("description", (description) => {
@@ -21,5 +21,4 @@ io.on("connection", (socket: Socket) => {
       socket.emit("first");
     }
   });
-
 });

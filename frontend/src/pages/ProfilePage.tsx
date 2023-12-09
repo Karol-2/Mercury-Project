@@ -42,7 +42,7 @@ function ProfilePage() {
     const fetchFriends = async () => {
       const friendsResponse = await dataService.fetchData(
         `/users/${userId}/friends`,
-        "GET"
+        "GET",
       );
       setFriends(friendsResponse.friends);
     };
@@ -52,7 +52,7 @@ function ProfilePage() {
   return (
     <>
       <Navbar />
-      {(user && friends) ? (
+      {user && friends ? (
         <ProfilePageForm
           user={user}
           friends={friends}
