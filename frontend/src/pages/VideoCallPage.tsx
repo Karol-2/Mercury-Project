@@ -4,12 +4,14 @@ import { useUser } from "../helpers/UserProvider";
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Socket } from "socket.io-client";
+import socketConnection from "../webSocket/socketConnection";
 function VideoCallPage() {
   const { user, userId } = useUser();
   const navigate = useNavigate();
   const localStream = useRef<HTMLVideoElement>(null);
   const remoteStream = useRef<HTMLVideoElement>(null);
   const [makingOffer, setMakingOffer] = useState(false);
+  const [polite, setPolite] = useState(false);
   useEffect(() => {
     if (userId === null) navigate("/login");
   }, [userId]);
@@ -25,6 +27,7 @@ function VideoCallPage() {
   }, []);
 
   async function prepareWebRTC() {
+    const socket = socketConnection();
 
   }
 

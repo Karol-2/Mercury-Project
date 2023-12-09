@@ -1,30 +1,28 @@
+import { Socket } from "socket.io-client";
 import stunServers from "./stunServers";
-import PeerConfig from "../models/PeerConfig";
 
-type IceEventFunction = (e: RTCPeerConnectionIceEvent) => void;
-
-const createPeerConnection = (
-  addIce: IceEventFunction,
-): Promise<PeerConfig> => {
-  return new Promise(async (resolve, _reject) => {
+const createPeerConnection = (remoteVideo: any, negotiate:any, socket: Socket): Promise<RTCPeerConnection> => {
+  return new Promise((resolve, _reject) => {
     const peerConnection = new RTCPeerConnection(stunServers);
-    const remoteStream = new MediaStream();
-    peerConnection.addEventListener("signalingstatechange", (_e) => {});
-    peerConnection.addEventListener("icecandidate", (e) => {
-      if (e.candidate) {
-        addIce(e);
+    peerConnection.ontrack = ({track, streams}) => {
+      track.onunmute = () => {
+        remoteVideo.current!.srcObject = streams[0];
       }
-    });
-    peerConnection.addEventListener("track", (e) => {
-      e.streams[0].getTracks().forEach((track) => {
-        remoteStream.addTrack(track);
-      });
-    });
-    resolve({
-      peerConnection,
-      remoteStream,
-    });
+    }
+    peerConnection.onnegotiationneeded = async () => {
+      negotiate(peerConnection, socket)
+    }
+    peerConnection.oniceconnectionstatechange = () => {
+      if (peerConnection.iceConnectionState === "failed") {
+        peerConnection.restartIce();
+      } else if (peerConnection.iceConnectionState === "disconnected") {
+        remoteVideo.current!.srcObject = null;
+      }
+    }
+    peerConnection.onicecandidate = ({candidate}) => {
+      socket.emit("iceCandidate", candidate);
+    }
+    resolve(peerConnection);
   });
-};
-
+}
 export default createPeerConnection;
