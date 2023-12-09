@@ -6,7 +6,6 @@ import importInitialData from "./data/importData";
 const { app } = servers;
 
 dotenv.config();
-const linkSecret = process.env.LINK_SECRET;
 
 importInitialData().then((res) => console.log(res));
 
