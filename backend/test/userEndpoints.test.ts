@@ -135,6 +135,11 @@ test("Search users", async () => {
 
   expect(usersEmptyStatus).toBe("error");
 
+  const usersIncorrectResponseData = await searchUsers("?q=🐈");
+  const usersIncorrectStatus = usersIncorrectResponseData.status;
+
+  expect(usersIncorrectStatus).toBe("error");
+
   const usersResponseData = await searchUsers("?q=zuckerberg");
   const usersStatus = usersResponseData.status;
 

@@ -1,3 +1,5 @@
+import unidecode from "unidecode";
+
 const kb = [
   2, 15, 9, 7, 5, 10, 13, 16, 18, 19, 22, 25, 21, 20, 23, 24, 0, 6, 4, 11, 17,
   14, 1, 8, 12, 3,
@@ -61,7 +63,13 @@ function cosineSimilarity(a: number[], b: number[]): number {
 }
 
 function wordToVec(word: string) {
-  const wordFilter = keepLetters(word.toLowerCase());
+  const wordNormalized = unidecode(word);
+  const wordFilter = keepLetters(wordNormalized.toLowerCase());
+
+  if (wordFilter.length == 0) {
+    return [];
+  }
+
   const vecOrder = wordVecInterp(wordFilter, 32);
   const vecSort = wordVecInterp(sortLetters(wordFilter), 32);
 

@@ -14,6 +14,10 @@ import {
 } from "../types/userResponse";
 import usersFriendsRoute from "./usersFriendsRoute";
 
+import removeKeys from "../misc/removeKeys";
+
+const filterUser = (user: User) => removeKeys({ ...user }, ["name_embedding"]);
+
 const usersRouter = Router();
 
 usersRouter.use("/", usersFriendsRoute);
@@ -35,7 +39,8 @@ export async function userExists(
     return null;
   }
 
-  return userExistsResult.records[0].get("u").properties as User;
+  const user = userExistsResult.records[0].get("u").properties as User;
+  return filterUser(user);
 }
 
 function userNotFoundRes(res: Response) {
@@ -47,7 +52,9 @@ usersRouter.get("/", async (_req: Request, res: UsersErrorResponse) => {
   try {
     const session = driver.session();
     const usersRequest = await session.run(`MATCH (u:User) RETURN u`);
-    const users = usersRequest.records.map((r) => r.get("u").properties);
+    const users = usersRequest.records.map((r) =>
+      filterUser(r.get("u").properties),
+    );
 
     await session.close();
     return res.json({ status: "ok", users });
@@ -69,6 +76,7 @@ usersRouter.get(
   "/search",
   async (req: Request, res: UsersSearchErrorResponse) => {
     const searchTerm = req.query.q;
+
     if (typeof searchTerm != "string") {
       return res.status(404).json({
         status: "error",
@@ -86,6 +94,12 @@ usersRouter.get(
       const session = driver.session();
       const wordVec = wordToVec(searchTerm);
 
+      if (wordVec.length == 0) {
+        return res
+          .status(400)
+          .json({ status: "error", errors: { searchTerm: "incorrect" } });
+      }
+
       const userRequest = await session.run(
         `CALL db.index.vector.queryNodes('user-names', 10, $wordVec)
       YIELD node AS similarUser, score
@@ -93,10 +107,10 @@ usersRouter.get(
         { wordVec },
       );
       const users = userRequest.records.map((r) => {
-        return [r.get("similarUser").properties, Number(r.get("score"))] as [
-          User,
-          number,
-        ];
+        return [
+          filterUser(r.get("similarUser").properties),
+          Number(r.get("score")),
+        ] as [User, number];
       });
       await session.close();
       return res.json({ status: "ok", users });
@@ -145,7 +159,9 @@ usersRouter.get(
       );
       await session.close();
 
-      const friends = friendRequest.records.map((f) => f.get("f").properties);
+      const friends = friendRequest.records.map((f) =>
+        filterUser(f.get("f").properties),
+      );
       return res.json({ status: "ok", friends });
     } catch (err) {
       console.log("Error:", err);
@@ -219,15 +235,34 @@ usersRouter.post("/", async (req: Request, res: UserErrorResponse) => {
     }
 
     newUserProps.id = uuidv4();
-    newUserProps.name_embedding = wordToVec(
-      newUserProps.first_name + newUserProps.last_name,
-    );
+
+    const firstNameEmbedding = wordToVec(newUserProps.first_name);
+    const lastNameEmbedding = wordToVec(newUserProps.last_name);
+
+    const errors: Record<string, string> = {};
+
+    if (firstNameEmbedding.length == 0) {
+      errors["first_name"] = "incorrect";
+    }
+
+    if (lastNameEmbedding.length == 0) {
+      errors["last_name"] = "incorrect";
+    }
+
+    for (const _ in errors) {
+      return res.status(400).json({ status: "error", errors });
+    }
+
+    newUserProps.name_embedding = firstNameEmbedding.map((e1, i) => {
+      const e2 = lastNameEmbedding[i];
+      return (e1 + e2) / 2;
+    });
 
     const newUserResult = await session.run(`CREATE (u:User $user) RETURN u`, {
       user: newUserProps,
     });
 
-    const user = newUserResult.records[0].get("u").properties;
+    const user = filterUser(newUserResult.records[0].get("u").properties);
     await session.close();
 
     return res.json({ status: "ok", user });
