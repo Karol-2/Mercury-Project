@@ -6,6 +6,7 @@ import User from "../models/User";
 import { useUser } from "../helpers/UserProvider";
 import ProfilePageForm from "../components/ProfilePageForm";
 import dataService from "../services/data";
+
 function ProfilePage() {
   const navigate = useNavigate();
   const { user, userId, setUser, updateUser, deleteUser } = useUser();
@@ -31,23 +32,23 @@ function ProfilePage() {
 
   useEffect(() => {
     if (userId === null) navigate("/login");
-  }, [userId]);
 
-  useEffect(() => {
     const fetchFriends = async () => {
       const friendsResponse = await dataService.fetchData(
         `/users/${userId}/friends`,
-        "GET",
-        {},
+        "GET"
       );
       setFriends(friendsResponse.friends);
     };
+
     fetchFriends();
-  }, []);
+  }, [userId]);
+
+
   return (
     <>
       <Navbar />
-      {user && friends ? (
+      {(user && friends) ? (
         <ProfilePageForm
           user={user}
           friends={friends}
