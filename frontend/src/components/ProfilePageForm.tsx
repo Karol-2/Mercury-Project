@@ -1,9 +1,11 @@
 import React, { useState } from "react";
 import User from "../models/User";
 import Modal from "./Modal";
+import { useNavigate } from "react-router-dom";
 
 export interface ProfilePageFormProps {
   user: User;
+  friends: User[];
   isEditing: boolean;
   handleEditClick: () => void;
   handleSaveClick: () => void;
@@ -12,6 +14,7 @@ export interface ProfilePageFormProps {
 }
 
 function ProfilePageForm(props: ProfilePageFormProps) {
+  const navigate = useNavigate();
   const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   const {
@@ -101,31 +104,39 @@ function ProfilePageForm(props: ProfilePageFormProps) {
               user.password || ""
             )}
           </p>
-          <div className="my-5">
-            {isEditing ? (
-              <button onClick={handleSaveClick} className="btn primary">
-                Save
-              </button>
-            ) : (
-              <button onClick={handleEditClick} className="btn primary">
-                Edit
-              </button>
-            )}
-            <button
-              onClick={() => setShowDeleteModal(true)}
-              className="btn secondary"
-            >
-              Remove account
+        </div>
+        <div className="my-5">
+          {isEditing ? (
+            <button onClick={handleSaveClick} className="btn primary">
+              Save
             </button>
-            {/* modals section */}
-            {showDeleteModal && (
-              <Modal
-                text={`Are you sure that you want to delete you account?`}
-                handleYes={deleteUser}
-                handleNo={() => setShowDeleteModal(false)}
-              ></Modal>
-            )}
-          </div>
+          ) : (
+            <button onClick={handleEditClick} className="btn primary">
+              Edit
+            </button>
+          )}
+          <button onClick={deleteUser} className="btn secondary">
+            Remove account
+          </button>
+          <button
+            onClick={() => navigate("/host-meeting")}
+            className="btn secondary"
+          >
+            Join meeting as an owner
+          </button>
+          <button
+            onClick={() => navigate("/guest-meeting")}
+            className="btn secondary"
+          >
+            Join meeting as guest
+          </button>
+          {showDeleteModal && (
+            <Modal
+              text={`Are you sure that you want to delete you account?`}
+              handleYes={deleteUser}
+              handleNo={() => setShowDeleteModal(false)}
+            ></Modal>
+          )}
         </div>
       </div>
     </section>

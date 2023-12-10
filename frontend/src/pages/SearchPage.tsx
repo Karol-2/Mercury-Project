@@ -38,6 +38,7 @@ function SearchPage() {
       return;
     }
     e.preventDefault();
+    console.log(searchState)
     const response = await dataService.fetchData(
       `/users/search?q=${searchState}`,
       "GET",

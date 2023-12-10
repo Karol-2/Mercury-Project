@@ -6,6 +6,7 @@ import wordToVec from "../misc/wordToVec";
 import User from "../models/User";
 import { JWTRequest, authenticateToken } from "../misc/jwt";
 import {
+  FriendsErrorResponse,
   OkErrorResponse,
   UserErrorResponse,
   UsersErrorResponse,
@@ -17,7 +18,7 @@ const usersRouter = Router();
 
 usersRouter.use("/", usersFriendsRoute);
 
-async function userExists(
+export async function userExists(
   session: Session,
   res: Response,
   userId: string,
@@ -110,6 +111,83 @@ usersRouter.get("/:userId", async (req: Request, res: UserErrorResponse) => {
     if ("json" in user) return res;
 
     return res.json({ status: "ok", user });
+  } catch (err) {
+    console.log("Error:", err);
+    return res.status(404).json({ status: "error", errors: err as object });
+  }
+});
+
+usersRouter.get(
+  "/:userId/friends",
+  async (req: Request, res: FriendsErrorResponse) => {
+    try {
+      const session = driver.session();
+      const userId = req.params.userId;
+
+      const user = await userExists(session, res, userId);
+      if ("json" in user) {
+        await session.close();
+        return res;
+      }
+
+      const friendRequest = await session.run(
+        `MATCH (u:User {id: $userId})-[:IS_FRIENDS_WITH]-(f:User) RETURN f`,
+        { userId },
+      );
+      await session.close();
+
+      const friends = friendRequest.records.map((f) => f.get("f").properties);
+      return res.json({ status: "ok", friends });
+    } catch (err) {
+      console.log("Error:", err);
+      return res.status(404).json({ status: "error", errors: err as object });
+    }
+  },
+);
+
+usersRouter.get("/meetings/:userId", async (req: Request, res) => {
+  try {
+    const session = driver.session();
+    const userId = req.params.userId;
+
+    const user = await userExists(session, res, userId);
+    if ("json" in user) {
+      await session.close();
+      return res;
+    }
+
+    const meetingsRequest = await session.run(
+      `MATCH (u1:User {id: $userId})-[m:MEETING]-(u2:User) RETURN m, u2`,
+      { userId },
+    );
+    await session.close();
+    try {
+      const meetings = meetingsRequest.records.map((meeting) => {
+        const { meetingId, waiting } = meeting.get(0).properties;
+        const { id, first_name, last_name } = meeting.get(1).properties;
+        return { meetingId, id, first_name, last_name, waiting };
+      });
+      return res.json({ status: "ok", meetings });
+    } catch (_err) {
+      return res.json({ status: "ok", meetings: [] });
+    }
+  } catch (err) {
+    console.log("Error:", err);
+    return res.status(404).json({ status: "error", errors: err as object });
+  }
+});
+
+usersRouter.put("/meetings/:meetingId", async (req: Request, res) => {
+  try {
+    const session = driver.session();
+    const meetingId = req.params.meetingId;
+
+    await session.run(
+      `MATCH (u1:User)-[m:MEETING]-(u2:User) WHERE m.meetingId=$meetingId SET m.waiting = true`,
+      { meetingId },
+    );
+    await session.close();
+    return res.json({ status: "ok" });
   } catch (err) {
     console.log("Error:", err);
     return res.status(404).json({ status: "error", errors: err as object });
