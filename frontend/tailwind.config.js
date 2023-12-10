@@ -16,6 +16,7 @@ export default {
     colors: {
       "my-orange": "#FF8001",
       "my-purple": "#3E0C70",
+      "my-red": "#CA1A1A",
       "my-cancel": "#FF7976",
       "my-accept": "#10D019",
       "my-dark": "#21262D",

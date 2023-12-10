@@ -55,6 +55,7 @@ async function importInitialData() {
       MATCH (u1:User {id: $userId})
       MATCH (u2:User {id: $friendId})
       CREATE (u1)-[:IS_FRIENDS_WITH]->(u2)
+      CREATE (u2)-[:IS_FRIENDS_WITH]->(u1)
     `;
 
     for (const [userIndex, user] of userData.entries()) {
