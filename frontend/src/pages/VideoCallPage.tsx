@@ -1,184 +1,127 @@
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
+import { useUser } from "../helpers/UserProvider";
 import { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { Socket } from "socket.io-client";
 import socketConnection from "../webSocket/socketConnection";
-import stunServers from "../webRTC/stunServers";
-import addStream from "../redux/actions/addStream";
-import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "../redux/store";
-interface VideoCallPageProps {
-  userType: "guest" | "owner";
-}
-
-function VideoCallPage({ userType }: VideoCallPageProps) {
-  const dispatch = useDispatch();
-  const localVideo = useRef<HTMLVideoElement>(null);
-  const remoteVideo = useRef<HTMLVideoElement>(null);
-  const [streamSetup, setStreamSetup] = useState(false);
-  const streamSelector = useSelector((state: RootState) => state.streams);
-  console.log("remoteVideo: ", remoteVideo.current?.srcObject);
+import stunServers from "../stun/stunServers";
+function VideoCallPage() {
+  const { user, userId } = useUser();
+  const navigate = useNavigate();
+  const localStream = useRef<HTMLVideoElement>(null);
+  const remoteStream = useRef<HTMLVideoElement>(null);
+  const [makingOffer, setMakingOffer] = useState(false);
 
   useEffect(() => {
-    let stream: MediaStream;
+    if (userId === null) navigate("/login");
+  }, [userId]);
 
-    (async () => {
-      stream = await navigator.mediaDevices.getUserMedia({
+  useEffect(() => {
+    if (user === undefined) {
+      return;
+    }
+  }, [user]);
+
+  useEffect(() => {
+    prepareWebRTC();
+  }, []);
+
+  async function prepareWebRTC() {
+    const socket = socketConnection();
+    const peerConnection = new RTCPeerConnection(stunServers);
+    let polite = false;
+    socket.on("first", () => {
+      polite = true;
+    });
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
         audio: true,
         video: true,
       });
-      localVideo.current!.srcObject = stream;
-      dispatch(addStream("localStream", stream));
-      setStreamSetup(true);
-    })();
+      stream.getTracks().forEach((track) => {
+        peerConnection.addTrack(track, stream);
+      });
+      localStream.current!.srcObject = stream;
+    } catch (err) {
+      console.error(err);
+    }
 
-    return () => {
-      stream.getTracks().forEach((track) => track.stop());
+    peerConnection.ontrack = ({ track, streams }) => {
+      track.onunmute = () => {
+        remoteStream.current!.srcObject = streams[0];
+      };
     };
-  }, []);
 
-  useEffect(() => {
-    if (!streamSetup) return;
-    const token = "some-token";
-    const socket = socketConnection(token!);
-    let peerConnection: RTCPeerConnection;
-    let candidates: RTCIceCandidateInit[] = [];
+    peerConnection.onnegotiationneeded = async () => {
+      negotiate(peerConnection, socket);
+    };
 
-    const stream: MediaStream = streamSelector.localStream.stream;
-
-    // let the server know someone joined
-    socket.on("connect", () => {
-      socket.emit(userType);
-    });
-
-    socket.on("offer", async (id, message) => {
-      console.log("got remote offer");
-      peerConnection = new RTCPeerConnection(stunServers);
-      await peerConnection.setRemoteDescription(message);
-
-      stream
-        .getTracks()
-        .forEach((track) => peerConnection.addTrack(track, stream));
-
-      peerConnection.ontrack = (event) => {
-        // got track from other user
-        console.log("Possible streams: ", event.streams);
-        remoteVideo.current!.srcObject = event.streams[0];
-        console.log("got track");
-        dispatch(addStream("remoteStream", event.streams[0]));
-      };
-
-      peerConnection.addEventListener("icecandidate", (event) => {
-        ("listener: icecandidate");
-        // geneated ice candidate, sending to other person
-        if (event.candidate) {
-          socket.emit("candidate", id, event.candidate);
-          console.log("sending candidate", event.candidate);
-        }
-      });
-
-      peerConnection
-        .createAnswer({})
-        .then((sdp) => peerConnection.setLocalDescription(sdp))
-        .then(() => {
-          socket.emit("answer", id, peerConnection.localDescription);
-          console.log("sending answer");
-        })
-        .catch((e) => console.error(e));
-
-      for (const candidate of candidates) {
-        peerConnection
-          .addIceCandidate(new RTCIceCandidate(candidate))
-          .catch((e) => console.error(e));
-        console.log("added stored remote candidate");
+    peerConnection.oniceconnectionstatechange = () => {
+      if (peerConnection.iceConnectionState === "failed") {
+        peerConnection.restartIce();
+      } else if (peerConnection.iceConnectionState == "disconnected") {
+        remoteStream.current!.srcObject = null;
       }
-      candidates = [];
-    });
+    };
 
-    socket.on("candidate", (_, message) => {
-      if (!peerConnection.remoteDescription) {
-        candidates.push(message); // remember candidate for later
-        console.log("storing remote canidate");
-      } else {
-        peerConnection
-          .addIceCandidate(new RTCIceCandidate(message))
-          .catch((e) => console.error(e));
-        console.log("got remote candidate");
+    peerConnection.onicecandidate = ({ candidate }) => {
+      socket.emit("iceCandidate", candidate!);
+    };
+
+    let ignoreOffer = false;
+    socket.on("description", async (description) => {
+      const offerCollision =
+        description.type === "offer" &&
+        (makingOffer || peerConnection.signalingState !== "stable");
+
+      ignoreOffer = !polite && offerCollision;
+      if (ignoreOffer) {
+        return;
+      }
+      await peerConnection.setRemoteDescription(description);
+      if (description.type === "offer") {
+        await peerConnection.setLocalDescription();
+        socket.emit("description", peerConnection.localDescription!);
       }
     });
-
-    socket.on("owner", () => {
-      socket.emit("guest");
+    socket.on("iceCandidate", async (candidate) => {
+      try {
+        await peerConnection.addIceCandidate(candidate);
+      } catch (err) {
+        console.error(err);
+      }
     });
+  }
 
-    socket.on("guest", async (id: string) => {
-      console.log("got guest");
-      peerConnection = new RTCPeerConnection(stunServers);
-
-      peerConnection.addEventListener("icecandidate", (event) => {
-        console.log("listener: icecandidate");
-        // geneated ice candidate, sending to other person
-        if (event.candidate) {
-          socket.emit("candidate", id, event.candidate);
-          console.log("sending candidate", event.candidate);
-        }
-      });
-
-      stream
-        .getTracks()
-        .forEach((track) => peerConnection.addTrack(track, stream));
-
-      peerConnection.ontrack = (event) => {
-        // got track from other user
-        console.log("Possible streams: ", event.streams);
-        remoteVideo.current!.srcObject = event.streams[0];
-        dispatch(addStream("remoteStream", event.streams[0]));
-        console.log("got track, i am host");
-      };
-
-      peerConnection.onnegotiationneeded = () => {
-        console.log("on negotiated");
-        peerConnection
-          .createOffer()
-          .then((sdp) => peerConnection.setLocalDescription(sdp))
-          .then(() => {
-            socket.emit("offer", id, peerConnection.localDescription);
-          });
-      };
-
-      peerConnection
-        .createOffer()
-        .then((sdp) => peerConnection.setLocalDescription(sdp))
-        .then(() => {
-          socket.emit("offer", id, peerConnection.localDescription);
-          console.log("sent offer");
-        });
-    });
-
-    socket.on("answer", (_, message) => {
-      peerConnection.setRemoteDescription(message);
-      console.log("got remote answer");
-    });
-
-    // @ts-ignore
-    socket.on("userDisconnected", (_) => {
-      peerConnection.close();
-    });
-  }, [streamSetup]);
+  async function negotiate(peerConnection: RTCPeerConnection, socket: Socket) {
+    try {
+      setMakingOffer(true);
+      await peerConnection.setLocalDescription();
+      socket.emit("description", peerConnection.localDescription);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setMakingOffer(false);
+    }
+  }
 
   return (
     <>
       <Navbar />
-      <div>
+      <div className="flex gap-5 p-10">
         <video
           id="large-feed"
-          ref={remoteVideo}
+          ref={localStream}
+          className="rounded-lg flex-1"
           autoPlay
           controls
           playsInline
         ></video>
         <video
           id="small-feed"
-          ref={localVideo}
+          ref={remoteStream}
+          className="rounded-lg flex-1"
           autoPlay
           controls
           playsInline

@@ -4,6 +4,8 @@ import cors from "cors";
 import { Server as SocketServer } from "socket.io";
 import { createServer } from "http";
 import cookieParser from "cookie-parser";
+import ServerToClientEvents from "./events/ServerToClientEvents";
+import ClientToServerEvents from "./events/ClientToServerEvents";
 
 dotenv.config();
 
@@ -25,23 +27,6 @@ app.use(cookieParser());
 app.use(express.json());
 
 const expressServer = createServer(app);
-
-interface ServerToClientEvents {
-  guest: () => void;
-  owner: (id: string) => void;
-  userDisconnected: (id: string) => void;
-  offer: (id: string, message: any) => void;
-  answer: (id: string, message: any) => void;
-  candidate: (id: string, message: any) => void;
-}
-
-interface ClientToServerEvents {
-  guest: (secret: string) => void;
-  owner: () => void;
-  offer: (id: string, message: any) => void;
-  answer: (id: string, message: any) => void;
-  candidate: (id: string, message: any) => void;
-}
 
 const io = new SocketServer<ClientToServerEvents, ServerToClientEvents>(
   expressServer,
