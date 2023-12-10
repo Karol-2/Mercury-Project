@@ -12,6 +12,7 @@ import VideoCallPage from "./pages/VideoCallPage.tsx";
 import { AnimatePresence } from "framer-motion";
 import "./styles/styles.scss";
 import UserProvider from "./helpers/UserProvider.tsx";
+import FriendsPage from "./pages/FriendsPage.tsx";
 
 const body = document.getElementsByTagName("body")[0]!;
 body.className = "bg-my-darker text-my-light";
@@ -27,6 +28,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/admin" element={<AdminPage />} />
           <Route path="/messages" element={<MessagingPage />} />
+          <Route path="/friends" element={<FriendsPage />} />
           <Route path="/search" element={<SearchPage />} />
           <Route path="/meeting" element={<VideoCallPage />} />
           <Route path="/*" element={<PageNotFound />} />

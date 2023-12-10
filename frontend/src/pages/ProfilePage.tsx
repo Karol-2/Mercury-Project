@@ -32,12 +32,6 @@ function ProfilePage() {
 
   useEffect(() => {
     if (userId === null) navigate("/login");
-  }, [userId]);
-
-  useEffect(() => {
-    if (user === undefined) {
-      return;
-    }
 
     const fetchFriends = async () => {
       const friendsResponse = await dataService.fetchData(
@@ -46,8 +40,9 @@ function ProfilePage() {
       );
       setFriends(friendsResponse.friends);
     };
+
     fetchFriends();
-  }, [user]);
+  }, [userId]);
 
   return (
     <>

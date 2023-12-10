@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useState } from "react";
 import User from "../models/User";
+import Modal from "./Modal";
 import { useNavigate } from "react-router-dom";
 
 export interface ProfilePageFormProps {
@@ -14,6 +15,8 @@ export interface ProfilePageFormProps {
 
 function ProfilePageForm(props: ProfilePageFormProps) {
   const navigate = useNavigate();
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+
   const {
     user,
     friends,
@@ -23,6 +26,7 @@ function ProfilePageForm(props: ProfilePageFormProps) {
     handleChange,
     deleteUser,
   } = props;
+
   return (
     <section className="bg-my-darker min-h-screen flex justify-center ">
       <div className=" bg-my-dark p-10 px-20 rounded-xl mx-50 my-20 lg:mx-72 text-lg">
@@ -30,6 +34,7 @@ function ProfilePageForm(props: ProfilePageFormProps) {
         <hr className="text-my-orange"></hr>
         <div>
           <img src={user.profile_picture} alt="Profile" className="my-5" />
+          <p>{user.id}</p>
           <p>
             First Name:{" "}
             {isEditing ? (
@@ -38,6 +43,7 @@ function ProfilePageForm(props: ProfilePageFormProps) {
                 name="first_name"
                 value={user.first_name}
                 onChange={handleChange}
+                className=" text-my-dark"
               />
             ) : (
               user.first_name || ""
@@ -51,6 +57,7 @@ function ProfilePageForm(props: ProfilePageFormProps) {
                 name="last_name"
                 value={user.last_name}
                 onChange={handleChange}
+                className=" text-my-dark"
               />
             ) : (
               user.last_name || ""
@@ -64,6 +71,7 @@ function ProfilePageForm(props: ProfilePageFormProps) {
                 name="country"
                 value={user.country}
                 onChange={handleChange}
+                className=" text-my-dark"
               />
             ) : (
               user.country || ""
@@ -77,6 +85,7 @@ function ProfilePageForm(props: ProfilePageFormProps) {
                 name="mail"
                 value={user.mail}
                 onChange={handleChange}
+                className=" text-my-dark"
               />
             ) : (
               user.mail || ""
@@ -90,6 +99,7 @@ function ProfilePageForm(props: ProfilePageFormProps) {
                 name="password"
                 value={user.password}
                 onChange={handleChange}
+                className=" text-my-dark"
               />
             ) : (
               user.password || ""
@@ -125,6 +135,25 @@ function ProfilePageForm(props: ProfilePageFormProps) {
           <button onClick={deleteUser} className="btn secondary">
             Remove account
           </button>
+          <button
+            onClick={() => navigate("/host-meeting")}
+            className="btn secondary"
+          >
+            Join meeting as an owner
+          </button>
+          <button
+            onClick={() => navigate("/guest-meeting")}
+            className="btn secondary"
+          >
+            Join meeting as guest
+          </button>
+          {showDeleteModal && (
+            <Modal
+              text={`Are you sure that you want to delete you account?`}
+              handleYes={deleteUser}
+              handleNo={() => setShowDeleteModal(false)}
+            ></Modal>
+          )}
         </div>
       </div>
     </section>

@@ -1,9 +1,7 @@
 import { Router, Request, Response } from "express";
 import { v4 as uuidv4 } from "uuid";
 import { Session } from "neo4j-driver";
-
 import driver from "../driver/driver";
-
 import wordToVec from "../misc/wordToVec";
 import User from "../models/User";
 import { JWTRequest, authenticateToken } from "../misc/jwt";
@@ -14,8 +12,11 @@ import {
   UsersErrorResponse,
   UsersSearchErrorResponse,
 } from "../types/userResponse";
+import usersFriendsRoute from "./usersFriendsRoute";
 
 const usersRouter = Router();
+
+usersRouter.use("/", usersFriendsRoute);
 
 export async function userExists(
   session: Session,
