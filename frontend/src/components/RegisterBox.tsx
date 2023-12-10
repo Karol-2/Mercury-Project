@@ -1,24 +1,68 @@
-import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+
+import { FrontendUser } from "../models/User";
+
+const userSchema: z.ZodType<Partial<FrontendUser>> = z.object({
+  first_name: z
+    .string()
+    .min(2, "First name should be at least two characters long"),
+  last_name: z
+    .string()
+    .min(2, "Last name should be at least two characters long"),
+  country: z
+    .string()
+    .length(2, "Country code should be 2 characters long")
+    .toUpperCase(),
+  profile_picture: z
+    .any()
+    .refine((obj) => obj.length > 0, "Profile picture not provided")
+    .refine(
+      (obj) => (obj as FileList)[0].size <= 5 * 1024 * 1024,
+      "File is too big (>5 MB)",
+    )
+    .transform((obj) => (obj as FileList)[0].name),
+  mail: z.string().email(),
+  password: z
+    .string()
+    .min(8, "Password should be at least eight characters long"),
+});
 
 function RegisterBox() {
-  const [user, setUser] = useState({});
-  useEffect(() => {
-    console.log(user);
-  }, [user]);
+  const navigate = useNavigate();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<FrontendUser>({
+    resolver: zodResolver(userSchema),
+  });
 
-  const updateFormUser = (key: string) => {
-    const changeKey = updateUser(key);
-    return (e: React.ChangeEvent<HTMLInputElement>) =>
-      changeKey(e.target.value);
+  const [submitError, setSubmitError] = useState<string>("");
+
+  const errorProps = {
+    className: "pb-4 text-[#f88]",
   };
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const updateUser = (key: string) => (value: any) => {
-    setUser({ ...user, [key]: value });
+  const inputProps = {
+    className: "text-my-dark form-input",
   };
 
-  const registerFunc = async () => {
+  const countryOptions = {
+    onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
+      const input = e.target;
+      const start = input.selectionStart;
+      const end = input.selectionEnd;
+
+      input.value = e.target.value.toUpperCase();
+      input.setSelectionRange(start, end);
+    },
+  };
+
+  const registerUser = async (user: FrontendUser): Promise<FrontendUser> => {
     const response = await fetch("http://localhost:5000/users", {
       method: "POST",
       headers: {
@@ -26,74 +70,108 @@ function RegisterBox() {
       },
       body: JSON.stringify(user),
     });
+
+    if (!response.ok) {
+      throw response;
+    }
+
     const userJson = await response.json();
     console.log("Register " + JSON.stringify(userJson));
+
+    return userJson.user;
+  };
+
+  const submit = async (user: FrontendUser) => {
+    try {
+      const registered = await registerUser(user);
+
+      console.log(registered);
+      navigate("/login");
+    } catch (e) {
+      if (e instanceof Error) {
+        setSubmitError("Can't connect to the server");
+        throw e;
+      }
+
+      if ((e as Response).status == 400) {
+        setSubmitError("User already exists");
+      } else {
+        setSubmitError("Unknown error");
+      }
+    }
   };
 
   return (
-    <div
-      className=" medium:w-[25vw] flex flex-col gap-2 bg-my-dark p-10 px-20 rounded-xl"
+    <form
       id="register-box"
+      className="medium:w-[25vw] flex flex-col gap-2 bg-my-dark p-10 px-20 rounded-xl"
+      onSubmit={handleSubmit(submit)}
     >
       <div>First and last name:</div>
       <input
-        type="text"
-        className="text-my-dark form-input"
-        onChange={updateFormUser("first_name")}
+        {...inputProps}
+        {...register("first_name")}
         placeholder="First name"
       />
+      <div {...errorProps}>{errors.first_name?.message}</div>
       <input
-        type="text"
-        className="text-my-dark form-input"
-        onChange={updateFormUser("last_name")}
+        {...inputProps}
+        {...register("last_name")}
         placeholder="Last name"
       />
-
+      <div {...errorProps}>{errors.last_name?.message}</div>
       <div>
-        <span>Country:</span>
-        <input
-          type="text"
-          className="text-my-dark form-input"
-          onChange={updateFormUser("country")}
-          placeholder="Country"
-        />
+        <div className="flex gap-2 items-center">
+          <div>Country:</div>
+          <input
+            {...inputProps}
+            {...register("country", countryOptions)}
+            placeholder="Country"
+          />
+        </div>
+        <div {...errorProps}>{errors.country?.message}</div>
       </div>
 
       <div>Profile picture:</div>
       <input
+        {...inputProps}
+        {...register("profile_picture")}
         type="file"
-        className="text-my-dark form-input"
-        onChange={updateFormUser("profile_picture")}
+        accept="image/*"
       />
+      <div {...errorProps}>{errors.profile_picture?.message}</div>
 
-      <div className=" py-10">
+      <div className="py-5">
         <div>E-mail:</div>
-        <input
-          type="text"
-          className="text-my-dark form-input"
-          onChange={updateFormUser("mail")}
-          placeholder="E-mail"
-        />
+        <input {...inputProps} {...register("mail")} placeholder="E-mail" />
+        <div {...errorProps}>{errors.mail?.message}</div>
 
         <div>Password:</div>
         <input
+          {...inputProps}
+          {...register("password")}
           type="password"
-          className="text-my-dark form-input"
-          onChange={updateFormUser("mail")}
           placeholder="Password"
         />
+        <div {...errorProps}>{errors.password?.message}</div>
       </div>
 
-      <button className="btn small bg-my-orange" onClick={() => registerFunc()}>
-        Register
-      </button>
+      <div className="pb-4 text-[#f88]">{submitError}</div>
+
+      <input
+        disabled={isSubmitting}
+        type="submit"
+        className="btn small bg-my-orange disabled:bg-my-dark"
+        value="Register"
+      />
+
       <div className="text-center">
         <p>Already have an account?</p>
         <p className="font-bold">
           <Link to="/login">Login</Link>
         </p>
       </div>
-    </div>
+    </form>
   );
 }
 

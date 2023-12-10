@@ -20,21 +20,27 @@ usersRouter.use("/", usersFriendsRoute);
 
 export async function userExists(
   session: Session,
-  res: Response,
-  userId: string,
-): Promise<Response | User> {
+  props: Partial<User>,
+): Promise<User | null> {
+  const propsStr = Object.keys(props)
+    .map((k) => `${k}: $${k}`)
+    .join(", ");
+
   const userExistsResult = await session.run(
-    `MATCH (u:User {id: $userId}) RETURN u`,
-    { userId },
+    `MATCH (u:User {${propsStr}}) RETURN u`,
+    props,
   );
 
   if (userExistsResult.records.length === 0) {
-    await session.close();
-    const json = { status: "error", errors: { id: "not found" } } as const;
-    return res.status(404).json(json);
+    return null;
   }
 
   return userExistsResult.records[0].get("u").properties as User;
+}
+
+function userNotFoundRes(res: Response) {
+  const json = { status: "error", errors: { id: "not found" } } as const;
+  return res.status(404).json(json);
 }
 
 usersRouter.get("/", async (_req: Request, res: UsersErrorResponse) => {
@@ -103,12 +109,15 @@ usersRouter.get(
 
 usersRouter.get("/:userId", async (req: Request, res: UserErrorResponse) => {
   try {
-    const session = driver.session();
     const userId = req.params.userId;
 
-    const user = await userExists(session, res, userId);
+    const session = driver.session();
+    const user = await userExists(session, { id: userId });
     await session.close();
-    if ("json" in user) return res;
+
+    if (!user) {
+      return userNotFoundRes(res);
+    }
 
     return res.json({ status: "ok", user });
   } catch (err) {
@@ -121,13 +130,13 @@ usersRouter.get(
   "/:userId/friends",
   async (req: Request, res: FriendsErrorResponse) => {
     try {
-      const session = driver.session();
       const userId = req.params.userId;
 
-      const user = await userExists(session, res, userId);
-      if ("json" in user) {
-        await session.close();
-        return res;
+      const session = driver.session();
+      const user = await userExists(session, { id: userId });
+
+      if (!user) {
+        return userNotFoundRes(res);
       }
 
       const friendRequest = await session.run(
@@ -150,8 +159,8 @@ usersRouter.get("/meetings/:userId", async (req: Request, res) => {
     const session = driver.session();
     const userId = req.params.userId;
 
-    const user = await userExists(session, res, userId);
-    if ("json" in user) {
+    const user = await userExists(session, { id: userId });
+    if (!user) {
       await session.close();
       return res;
     }
@@ -199,12 +208,21 @@ usersRouter.post("/", async (req: Request, res: UserErrorResponse) => {
     const newUserProps = req.body;
     // TODO: verify user fields
 
+    const session = driver.session();
+    const existsUser = await userExists(session, { mail: newUserProps.mail });
+
+    if (existsUser) {
+      await session.close();
+      return res
+        .status(400)
+        .json({ status: "error", errors: { id: "already exists" } });
+    }
+
     newUserProps.id = uuidv4();
     newUserProps.name_embedding = wordToVec(
       newUserProps.first_name + newUserProps.last_name,
     );
 
-    const session = driver.session();
     const newUserResult = await session.run(`CREATE (u:User $user) RETURN u`, {
       user: newUserProps,
     });
@@ -221,22 +239,21 @@ usersRouter.post("/", async (req: Request, res: UserErrorResponse) => {
 
 usersRouter.put("/:userId", async (req: Request, res: OkErrorResponse) => {
   try {
-    const newUserProps = req.body;
-    // TODO: verify user fields
-
-    const session = driver.session();
     const userId = req.params.userId;
+    const newUserProps = req.body;
 
-    const userProps = await userExists(session, res, userId);
-    if ("json" in userProps) {
-      session.close();
-      return res;
+    // TODO: verify user fields
+    const session = driver.session();
+    const user = await userExists(session, { id: userId });
+
+    if (!user) {
+      return userNotFoundRes(res);
     }
 
-    const user = { ...userProps, ...newUserProps };
+    const newUser = { ...user, ...newUserProps };
     await session.run(`MATCH (u:User {id: $userId}) SET u=$user`, {
       userId,
-      user,
+      user: newUser,
     });
     await session.close();
 
@@ -249,13 +266,13 @@ usersRouter.put("/:userId", async (req: Request, res: OkErrorResponse) => {
 
 usersRouter.delete("/:userId", async (req: Request, res: OkErrorResponse) => {
   try {
-    const session = driver.session();
     const userId = req.params.userId;
 
-    const user = await userExists(session, res, userId);
-    if ("json" in user) {
-      await session.close();
-      return res;
+    const session = driver.session();
+    const user = await userExists(session, { id: userId });
+
+    if (!user) {
+      return userNotFoundRes(res);
     }
 
     await session.run(`MATCH (u:User {id: $userId}) DETACH DELETE u`, {
