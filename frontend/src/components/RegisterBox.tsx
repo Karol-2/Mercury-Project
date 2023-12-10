@@ -21,7 +21,7 @@ const userSchema: z.ZodType<Partial<FrontendUser>> = z.object({
     .any()
     .refine((obj) => obj.length > 0, "Profile picture not provided")
     .refine(
-      (obj) => (obj as FileList)[0].size <= 5 * 1024 * 1024,
+      (obj) => obj.length > 0 && (obj as FileList)[0].size <= 5 * 1024 * 1024,
       "File is too big (>5 MB)",
     )
     .transform((obj) => (obj as FileList)[0].name),
