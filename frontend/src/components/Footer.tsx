@@ -43,10 +43,16 @@ export default function Footer() {
 
           <div className="flex flex-col">
             <button onClick={scrollToTop} className=" text-my-darker clickable">
-              <FontAwesomeIcon icon={faArrowCircleUp} className=" text-7xl self-end" />{" "}
+              <FontAwesomeIcon
+                icon={faArrowCircleUp}
+                className=" text-7xl self-end"
+              />{" "}
             </button>
 
-            <p className=" font-thin mt-20"> &#169; 2023 Mercury. All Rights Reserved.</p>
+            <p className=" font-thin mt-20">
+              {" "}
+              &#169; 2023 Mercury. All Rights Reserved.
+            </p>
           </div>
         </div>
       </section>

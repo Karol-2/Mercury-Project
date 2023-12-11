@@ -1,19 +1,43 @@
+import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { useUser } from "../helpers/UserProvider";
 
 function LoginBox() {
+  const navigate = useNavigate();
+
+  const [login, setLogin] = useState("");
+  const [password, setPassword] = useState("");
+  const [loginMsg, setLoginMsg] = useState("");
+
+  const { userId, login: userLogin } = useUser() || { login: () => {} };
+
   const loginFunc = async () => {
-    const response = await fetch("http://localhost:5000/users/1");
-    const user = await response.json();
-    console.log("Login " + JSON.stringify(user));
+    userLogin(login, password);
   };
 
+  useEffect(() => {
+    if (userId === undefined) return;
+
+    if (userId === null) {
+      setLoginMsg("Bad credentials");
+    } else {
+      navigate("/messages", { replace: true });
+      setLoginMsg("Logging in...");
+    }
+  }, [userId]);
+
   return (
-    <div className=" w-80 flex flex-col gap-2 bg-my-dark p-10 m-10 rounded-xl">
-      <div>Login:</div>
+    <div
+      className=" medium:w-[25vw] flex flex-col gap-2 bg-my-dark p-10 px-20 rounded-xl"
+      id="login-box"
+    >
+      <div>E-mail:</div>
       <input
         type="text"
         className="text-my-dark form-input"
-        placeholder="Login"
+        placeholder="E-mail"
+        onChange={(e) => setLogin(e.target.value)}
       />
 
       <div>Password:</div>
@@ -21,9 +45,10 @@ function LoginBox() {
         type="password"
         className="text-my-dark form-input"
         placeholder="Password"
+        onChange={(e) => setPassword(e.target.value)}
       />
 
-      <button className="btn bg-my-orange" onClick={() => loginFunc()}>
+      <button className="btn small bg-my-orange" onClick={() => loginFunc()}>
         Login
       </button>
       <div className="text-center">
@@ -31,6 +56,7 @@ function LoginBox() {
         <p className="font-bold">
           <Link to="/register">Create a new account</Link>
         </p>
+        <div className="text-red">{loginMsg}</div>
       </div>
     </div>
   );

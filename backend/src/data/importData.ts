@@ -1,13 +1,14 @@
-import { readFileSync } from "fs";
-import driver from "../driver/driver";
+import { v4 as uuidv4 } from "uuid";
 
-const jsonFilePath = "data/users.json";
+import driver from "../driver/driver";
+import userData from "./users";
+import wordToVec from "../misc/wordToVec";
 
 async function isDatabaseEmpty() {
   const session = driver.session();
   try {
     const result = await session.run(
-      "MATCH (u:User) RETURN count(u) as userCount"
+      "MATCH (u:User) RETURN count(u) as userCount",
     );
     const userCount = result.records[0].get("userCount").toNumber();
     return userCount === 0;
@@ -22,32 +23,69 @@ async function isDatabaseEmpty() {
 async function importInitialData() {
   const isEmpty = await isDatabaseEmpty();
   if (!isEmpty) {
-    return;
+    return "Database is not empty";
   }
 
   const session = driver.session();
   try {
-    const jsonData = JSON.parse(readFileSync(jsonFilePath, "utf-8"));
-    for (const user of jsonData) {
-      const query = `
-        CREATE (u:User {
-          id: $id,
-          nick: $nick,
-          first_name: $first_name,
-          last_name: $last_name,
-          country: $country,
-          profile_picture: $profile_picture,
-          mail: $mail,
-          friend_ids: $friend_ids,
-          chats: $chats
-        })
-        RETURN u.id AS userId
-      `;
-      await session.run(query, user);
+    const userIds: string[] = [];
+
+    // Create users
+    const createUserQuery = `
+      CREATE (u:User $user)
+    `;
+
+    for (const user of userData) {
+      const userId = uuidv4();
+      userIds.push(userId);
+
+      const userClean: any = Object.assign({}, user);
+      delete userClean.friend_ids;
+      delete userClean.chats;
+      userClean.id = userId;
+      userClean.name_embedding = wordToVec(
+        userClean.first_name + userClean.last_name,
+      );
+
+      await session.run(createUserQuery, { user: userClean });
     }
-    console.log("Initial data has been imported into database.");
+
+    // Create relationships
+    const createRelationshipQuery = `
+      MATCH (u1:User {id: $userId})
+      MATCH (u2:User {id: $friendId})
+      CREATE (u1)-[:IS_FRIENDS_WITH]->(u2)
+      CREATE (u2)-[:IS_FRIENDS_WITH]->(u1)
+    `;
+
+    for (const [userIndex, user] of userData.entries()) {
+      const userId = userIds[userIndex];
+
+      for (const friendIndex of user.friend_ids) {
+        const friendId = userIds[friendIndex];
+        await session.run(createRelationshipQuery, {
+          userId,
+          friendId,
+        });
+      }
+    }
+
+    // Add user search index
+    const searchIndexExistsQuery = `
+      SHOW INDEXES WHERE name="user-names"
+    `;
+    const searchIndexCreateQuery = `
+      CALL db.index.vector.createNodeIndex('user-names', 'User', 'name_embedding', 64, 'cosine')
+      RETURN true
+    `;
+    const indexExists = await session.run(searchIndexExistsQuery);
+    if (indexExists.records.length == 0) {
+      await session.run(searchIndexCreateQuery);
+    }
+
+    return "Initial data has been imported into database.";
   } catch (error) {
-    console.error("Error importing data:", error);
+    return "Error importing data";
   } finally {
     session.close();
   }

@@ -1,5 +1,3 @@
-import React from "react";
-
 interface ISlider {
   photoThumb: string;
   photoIndex: number;
@@ -17,8 +15,12 @@ const SliderContent = (props: ISlider) => {
     position = "lastSlide";
   }
   return (
-    <article className={position}>
-      <img src={props.photoThumb} alt={`app interface ${props.index}`} />
+    <article className={position} key={props.photoThumb}>
+      <img
+        className="slider-photo"
+        src={props.photoThumb}
+        alt={`app interface ${props.index}`}
+      />
     </article>
   );
 };

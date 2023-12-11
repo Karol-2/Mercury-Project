@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import {
   faArrowCircleLeft,
   faArrowCircleRight,
@@ -17,7 +17,7 @@ function Slider() {
   ];
 
   useEffect(() => {
-    const lastIndex = photoBase.length -1;
+    const lastIndex = photoBase.length - 1;
     if (index < 0) {
       setIndex(lastIndex);
     }
@@ -35,7 +35,7 @@ function Slider() {
 
   return (
     <section className="section">
-      <div className="section-center">
+      <div className="section-center w-auto md:w-[20vw]">
         {photoBase.slice(0, 5).map((photo, photoIndex) => {
           return (
             <SliderContent
