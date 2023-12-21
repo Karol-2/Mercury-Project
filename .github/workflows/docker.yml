@@ -33,8 +33,6 @@ jobs:
       - name: Test the backend
         run: cd backend; npm i && npm run test run
 
-      - name: Test the frontend
-        run: cd frontend; npm i && npm run dev
 
       # - name: Format files
       #   run: cd ..; npm i && npm run prettier:fix
