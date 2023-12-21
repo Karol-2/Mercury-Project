@@ -33,11 +33,14 @@ jobs:
       - name: Test the backend
         run: cd backend; npm i && npm run test run
 
-      - name: Format files
-        run: cd ..; npm i && npm run prettier:fix
+      - name: Test the frontend
+        run: cd frontend; npm i && npm run dev
 
-      - name: Commit changes
-        uses: stefanzweifel/git-auto-commit-action@v4
-        with:
-          commit_message: Apply formatting changes
-          branch: ${{ github.head_ref }}
+      # - name: Format files
+      #   run: cd ..; npm i && npm run prettier:fix
+
+      # - name: Commit changes
+      #   uses: stefanzweifel/git-auto-commit-action@v4
+      #   with:
+      #     commit_message: Apply formatting changes
+      #     branch: ${{ github.head_ref }}
