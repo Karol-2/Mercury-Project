@@ -21,6 +21,7 @@ function FriendsPage() {
   const [friendToDelete, setFriendToDelete] = useState<User | null>(null);
 
   const { user } = useUser();
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (user === null) navigate("/login");
@@ -122,7 +123,7 @@ function FriendsPage() {
                       </button>
                       <button
                         className={`btn small bg-my-green text-xs`}
-                        onClick={() => console.log("chat")}
+                        onClick={() => navigate(`/messages/${friend.id}`)}
                       >
                         <FontAwesomeIcon icon={faCommentAlt} />
                       </button>

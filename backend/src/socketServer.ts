@@ -16,6 +16,10 @@ io.on("connection", (socket: Socket) => {
     socket.broadcast.emit("description", description);
   });
 
+  socket.on("message", (message) => {
+    socket.broadcast.emit("message", message);
+  });
+
   socket.rooms.forEach((room) => {
     if (io.sockets.adapter.rooms.get(room)?.size === 1) {
       socket.emit("first");

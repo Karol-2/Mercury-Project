@@ -1,10 +1,22 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Message, { MessageProps } from "./Message";
 import User from "../models/User";
+import socketConnection from "../webSocket/socketConnection";
 
 function ChatBox() {
   const [messages, setMessages] = useState<MessageProps[]>([]);
   const enterPressed = useRef<boolean>(false);
+  const socket = socketConnection();
+
+  useEffect(() => {
+    socket.on("message", (message: MessageProps) => {
+      console.log("received msg: ", message);
+      setMessages([...messages, message]);
+    });
+  }, []);
+  useEffect(() => {
+    console.log(messages);
+  }, [messages]);
 
   const handleKeyPress = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key != "Enter") return;
@@ -30,7 +42,7 @@ function ChatBox() {
   const sendMessage = (author: User, content: string) => {
     const message: MessageProps = { type: "sent", author, content };
     setMessages([...messages, message]);
-    console.log("SEND MESSAGE:", message);
+    socket.emit("message", message);
   };
 
   const receiveMessage = (message: MessageProps) => {
