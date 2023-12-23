@@ -4,6 +4,7 @@ import Footer from "../components/Footer";
 import FriendRequest from "../components/FriendRequest";
 import { faUserMinus } from "@fortawesome/free-solid-svg-icons";
 import { faVideo } from "@fortawesome/free-solid-svg-icons";
+import { faCommentAlt } from "@fortawesome/free-solid-svg-icons";
 import dataService from "../services/data";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Modal from "../components/Modal";
@@ -118,6 +119,12 @@ function FriendsPage() {
                         }}
                       >
                         <FontAwesomeIcon icon={faUserMinus} />
+                      </button>
+                      <button
+                        className={`btn small bg-my-green text-xs`}
+                        onClick={() => console.log("chat")}
+                      >
+                        <FontAwesomeIcon icon={faCommentAlt} />
                       </button>
                     </div>
                     {showDeleteModal && friendToDelete && (
