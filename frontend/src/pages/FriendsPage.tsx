@@ -10,6 +10,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Modal from "../components/Modal";
 import User from "../models/User";
 import { useUser } from "../helpers/UserProvider";
+import { useNavigate } from "react-router-dom";
 
 function FriendsPage() {
   const [friends, setFriends] = useState([]);
@@ -19,6 +20,7 @@ function FriendsPage() {
   const [friendToDelete, setFriendToDelete] = useState<User | null>(null);
 
   const { user } = useUser();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchFriendRequests = async () => {
@@ -116,7 +118,7 @@ function FriendsPage() {
                       </button>
                       <button
                         className={`btn small bg-my-green text-xs`}
-                        onClick={() => console.log("chat")}
+                        onClick={() => navigate(`/messages/${friend.id}`)}
                       >
                         <FontAwesomeIcon icon={faCommentAlt} />
                       </button>

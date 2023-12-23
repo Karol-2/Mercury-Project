@@ -22,7 +22,7 @@ function LoginBox() {
     if (userId === null) {
       setLoginMsg("Bad credentials");
     } else {
-      navigate("/messages", { replace: true });
+      navigate("/profile", { replace: true });
       setLoginMsg("Logging in...");
     }
   }, [userId]);

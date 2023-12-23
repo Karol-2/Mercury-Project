@@ -27,7 +27,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/admin" element={<AdminPage />} />
-          <Route path="/messages" element={<MessagingPage />} />
+          <Route path="/messages/:friendId" element={<MessagingPage />} />
           <Route path="/friends" element={<FriendsPage />} />
           <Route path="/search" element={<SearchPage />} />
           <Route path="/meeting" element={<VideoCallPage />} />
