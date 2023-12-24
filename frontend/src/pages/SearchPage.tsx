@@ -33,11 +33,13 @@ function SearchPage() {
     fetchFriends();
   }, [user]);
 
-  const handleSearch = async (e: { preventDefault: () => void }) => {
+  const handleSearch = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
     if (searchState.trim() === "") {
       return;
     }
-    e.preventDefault();
+
     console.log(searchState);
     const response = await dataService.fetchData(
       `/users/search?q=${searchState}`,
@@ -62,7 +64,7 @@ function SearchPage() {
       <section className=" min-h-screen mx-50 lg:mx-72 ">
         <div>
           <form
-            className="flex flex-row max-w-3xl w-full mt-5"
+            className="flex flex-row gap-5 max-w-3xl w-full mt-5"
             onSubmit={handleSearch}
           >
             <input
@@ -73,11 +75,11 @@ function SearchPage() {
             ></input>
             <button
               type="submit"
-              className="btn small bg-my-purple ml-5 text-xs"
+              className="btn bg-my-purple text-xs px-7 py-5"
             >
-              <div className="flex align-middle ">
+              <div className="flex gap-3 items-center">
                 <span>Search</span>
-                <FontAwesomeIcon icon={faMagnifyingGlass} className="ml-2" />
+                <FontAwesomeIcon icon={faMagnifyingGlass} />
               </div>
             </button>
           </form>
