@@ -30,7 +30,7 @@ export default function Footer() {
             </figure>
             <figure className=" flex flex-row font-medium text-my-darker clickable">
               <FontAwesomeIcon icon={faTwitter} className=" text-3xl" />{" "}
-              <p>@MercuryAppl</p>
+              <p>@MercuryApp</p>
             </figure>
             <a
               className=" flex flex-row font-medium text-my-darker clickable"
