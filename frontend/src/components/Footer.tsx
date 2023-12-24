@@ -8,7 +8,7 @@ import { faArrowCircleUp } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 export default function Footer() {
-  const scrollToTop = (): void => {
+  const scrollToTop = (_e: React.MouseEvent<HTMLButtonElement>) => {
     window.scrollTo({
       top: 0,
       behavior: "smooth",
