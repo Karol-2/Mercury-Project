@@ -7,16 +7,9 @@ function ChatBox() {
   const [messages, setMessages] = useState<MessageProps[]>([]);
   const enterPressed = useRef<boolean>(false);
   const socket = socketConnection();
-
-  useEffect(() => {
-    socket.on("message", (message: MessageProps) => {
-      console.log("received msg: ", message);
-      setMessages([...messages, message]);
-    });
-  }, []);
-  useEffect(() => {
-    console.log(messages);
-  }, [messages]);
+  socket.on("message", (message: MessageProps) => {
+    setMessages([...messages, message]);
+  });
 
   const handleKeyPress = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key != "Enter") return;
