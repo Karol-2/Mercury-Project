@@ -26,18 +26,18 @@ export default function Footer() {
             </div>
             <div className="flex flex-row font-medium text-my-darker clickable">
               <FontAwesomeIcon icon={faFacebook} className=" text-3xl" />
-              <span>MercuryApp</span>
+              <span className="self-center">MercuryApp</span>
             </div>
             <div className="flex flex-row font-medium text-my-darker clickable">
               <FontAwesomeIcon icon={faTwitter} className="text-3xl" />
-              <span>@MercuryApp</span>
+              <span className="self-center">@MercuryApp</span>
             </div>
             <a
               className="flex flex-row font-medium text-my-darker clickable"
               href="https://github.com/Karol-2/Mercury-Project"
             >
               <FontAwesomeIcon icon={faGithub} className="text-3xl" />
-              <span>Mercury Project</span>
+              <span className="self-center">Mercury Project</span>
             </a>
           </figure>
 
