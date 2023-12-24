@@ -8,12 +8,13 @@ import User from "../models/User";
 import { faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useNavigate } from "react-router-dom";
+import editDistance from "../misc/editDistance";
 
 function SearchPage() {
   const navigate = useNavigate();
 
   const [searchState, setSearchState] = useState("");
-  const [usersFound, setUsersFound] = useState([]);
+  const [usersFound, setUsersFound] = useState<[[User, number]]>();
   const [usersFriends, setUsersFriends] = useState([]);
 
   const { user, userId } = useUser();
@@ -47,7 +48,6 @@ function SearchPage() {
       return;
     }
 
-    console.log(searchState);
     const response = await dataService.fetchData(
       `/users/search?q=${searchState}`,
       "GET",
@@ -56,13 +56,34 @@ function SearchPage() {
     const responseWithoutCurrUser = response.users.filter(
       (respArr: [User, number]) => respArr[0].id !== user!.id,
     );
-    setUsersFound(responseWithoutCurrUser);
+
+    const usersSorted = sortUsersByDistance(
+      searchState,
+      responseWithoutCurrUser,
+    );
+
+    setUsersFound(usersSorted);
   };
 
   const isFriend = (friendArr: string[], user: User): boolean => {
     return friendArr.reduce((prev: boolean, curr: string) => {
       return prev || curr === String(user.id);
     }, false);
+  };
+
+  const sortUsersByDistance = (searchTerm: string, users: [[User, number]]) => {
+    const userScores = users.map((respArr: [User, number]) => {
+      const user = respArr[0];
+      const score = editDistance(user.first_name + user.last_name, searchTerm);
+      return [user, score];
+    });
+
+    return userScores.sort((a: any, b: any) => {
+      const [_userA, scoreA] = a;
+      const [_userB, scoreB] = b;
+
+      return scoreA - scoreB;
+    });
   };
 
   return (
