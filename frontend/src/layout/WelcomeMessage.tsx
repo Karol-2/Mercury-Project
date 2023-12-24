@@ -46,7 +46,7 @@ export default function WelcomeMessage() {
               >
                 <Link to="/login">
                   <button
-                    className="btn primary m-5 fade-in "
+                    className="btn primary w-64 m-5 fade-in"
                     id="login-button"
                   >
                     Login
@@ -54,7 +54,7 @@ export default function WelcomeMessage() {
                 </Link>
                 <Link to="/register">
                   <button
-                    className="btn secondary m-5 text-my-light fade-in"
+                    className="btn secondary w-64 m-5 text-my-light fade-in"
                     id="register-button"
                     onClick={scrollToTop}
                   >
