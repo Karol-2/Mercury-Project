@@ -39,6 +39,7 @@ function Slider() {
         {photoBase.slice(0, 5).map((photo, photoIndex) => {
           return (
             <SliderContent
+              key={photoIndex}
               photoThumb={photo}
               photoIndex={photoIndex}
               index={index}
