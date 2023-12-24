@@ -9,31 +9,31 @@ export default function WelcomeMessage() {
   return (
     <div className="relative overflow-hidden" id="background">
       <div
-        className=" h-full absolute top-1/2 md:top-[30%] md:left-1/4 lg:left-1/4 lg:right-1/4 select-none"
+        className="h-full absolute top-1/3 left-0 flex items-center select-none"
         id="logo"
       >
         <img
           src={LogoSVG}
           alt="Mercury Logo"
-          className=" min-h-screen min-w-screen opacity-90 pulsate fly-in-btm"
+          className="w-screen h-screen opacity-90 pulsate fly-in-btm"
         />
       </div>
 
       <section className="wrapper z-50">
         <div className=" bg-my-dark text-my-light p-10 min-h-screen">
           <div className="flex flex-col mb-10 " id="page-content">
-            <div className=" text-center select-none" id="header-text">
+            <div className="text-center select-none" id="header-text">
               <p
-                className="font-bold text-7xl md:text-9xl text-my-orange"
+                className="font-bold text-7xl md:text-9xl text-my-orange uppercase"
                 id="header-name"
               >
-                MERCURY
+                Mercury
               </p>
               <p
                 className=" text-my-light font-semibold uppercase"
                 id="header-slogan"
               >
-                Modern Communication platform For More Modern Times
+                Modern Communication Platform for More Modern Times
               </p>
             </div>
             <div
