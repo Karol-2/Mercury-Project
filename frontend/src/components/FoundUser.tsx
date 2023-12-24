@@ -78,7 +78,7 @@ function FoundUser(props: FoundUserProps) {
         </p>
         <p>{user.country}</p>
         <button
-          className={`btn small text-xs ${buttonColor}`}
+          className={`btn small text-xs w-52 ${buttonColor}`}
           disabled={isFriend || requestSent}
           onClick={handleAddFriend}
         >
