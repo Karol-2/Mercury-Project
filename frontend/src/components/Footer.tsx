@@ -15,30 +15,31 @@ export default function Footer() {
     });
   };
 
-  const socialStyle = "flex flex-row gap-1 font-medium text-my-darker clickable"
+  const socialStyle =
+    "flex flex-row gap-1 h-8 font-medium text-my-darker clickable";
 
   return (
     <footer className="bg-my-orange mt-5 text-my-light p-10 flex flex-row">
       <section className="min-w-full">
         <div className="mx-50 lg:mx-72 flex flex-row justify-around">
-          <figure className="flex flex-col content-evenly gap-3">
+          <figure className="flex flex-col content-evenly gap-2">
             <div className={socialStyle}>
-              <FontAwesomeIcon icon={faYoutube} className="text-3xl" />
+              <FontAwesomeIcon icon={faYoutube} className="w-8 text-3xl" />
               <span className="self-center">Mercury App Channel</span>
             </div>
             <div className={socialStyle}>
-              <FontAwesomeIcon icon={faFacebook} className="text-3xl" />
+              <FontAwesomeIcon icon={faFacebook} className="w-8 text-3xl" />
               <span className="self-center">MercuryApp</span>
             </div>
             <div className={socialStyle}>
-              <FontAwesomeIcon icon={faTwitter} className="text-3xl" />
+              <FontAwesomeIcon icon={faTwitter} className="w-8 text-3xl" />
               <span className="self-center">@MercuryApp</span>
             </div>
             <a
               className={socialStyle}
               href="https://github.com/Karol-2/Mercury-Project"
             >
-              <FontAwesomeIcon icon={faGithub} className="text-3xl" />
+              <FontAwesomeIcon icon={faGithub} className="w-8 text-3xl" />
               <span className="self-center">Mercury Project</span>
             </a>
           </figure>
