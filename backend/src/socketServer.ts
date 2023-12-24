@@ -17,7 +17,7 @@ io.on("connection", (socket: Socket) => {
   });
 
   socket.on("message", (message) => {
-    socket.broadcast.emit("message", message);
+    socket.broadcast.emit("message", {...message, type: "received"});
   });
 
   socket.rooms.forEach((room) => {

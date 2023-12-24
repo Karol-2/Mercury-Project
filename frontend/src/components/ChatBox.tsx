@@ -2,8 +2,10 @@ import React, { useEffect, useRef, useState } from "react";
 import Message, { MessageProps } from "./Message";
 import User from "../models/User";
 import socketConnection from "../webSocket/socketConnection";
-
-function ChatBox() {
+interface ChatBoxProps {
+  user: User
+}
+function ChatBox({user}: ChatBoxProps) {
   const [messages, setMessages] = useState<MessageProps[]>([]);
   const enterPressed = useRef<boolean>(false);
   const socket = socketConnection();
@@ -21,7 +23,7 @@ function ChatBox() {
       const text = e.currentTarget.value.trim();
       if (!text) return;
 
-      sendMessage({} as User, text);
+      sendMessage(user, text);
       e.currentTarget.value = "";
     }
   };
@@ -33,6 +35,7 @@ function ChatBox() {
   };
 
   const sendMessage = (author: User, content: string) => {
+    console.log("SEND: ", author);
     const message: MessageProps = { type: "sent", author, content };
     setMessages([...messages, message]);
     socket.emit("message", message);
@@ -43,8 +46,8 @@ function ChatBox() {
   };
 
   return (
-    <div className="w-96">
-      <div className="flex flex-col">
+    <div className="w-full p-2">
+      <div className="w-full px-5 flex flex-col justify-between">
         {messages.map((e, i) => (
           <Message key={i} {...e} />
         ))}
