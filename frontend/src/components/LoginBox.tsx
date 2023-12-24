@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { useUser } from "../helpers/UserProvider";
 
@@ -11,6 +11,7 @@ function LoginBox() {
   const [loginMsg, setLoginMsg] = useState("");
 
   const { userId, login: userLogin } = useUser() || { login: () => {} };
+  const firstVisit = useRef<boolean>(true);
 
   const loginFunc = async () => {
     userLogin(login, password);
@@ -20,6 +21,11 @@ function LoginBox() {
     if (userId === undefined) return;
 
     if (userId === null) {
+      if (firstVisit.current) {
+        firstVisit.current = false;
+        return;
+      }
+
       setLoginMsg("Bad credentials");
     } else {
       navigate("/messages", { replace: true });
