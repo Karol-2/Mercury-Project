@@ -54,7 +54,7 @@ function LoginBox() {
         onChange={(e) => setPassword(e.target.value)}
       />
 
-      <button className="btn small bg-my-orange" onClick={() => loginFunc()}>
+      <button className="btn small my-4 bg-my-orange" onClick={() => loginFunc()}>
         Login
       </button>
       <div className="text-center">
