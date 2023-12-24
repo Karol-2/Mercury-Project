@@ -83,7 +83,7 @@ function SearchPage() {
       const [_userB, scoreB] = b;
 
       return scoreA - scoreB;
-    });
+    }) as [[User, number]];
   };
 
   return (
