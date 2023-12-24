@@ -7,8 +7,11 @@ import { useUser } from "../helpers/UserProvider";
 import User from "../models/User";
 import { faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useNavigate } from "react-router-dom";
 
 function SearchPage() {
+  const navigate = useNavigate();
+
   const [searchState, setSearchState] = useState("");
   const [usersFound, setUsersFound] = useState([]);
   const [usersFriends, setUsersFriends] = useState([]);
@@ -16,6 +19,8 @@ function SearchPage() {
   const { user, userId } = useUser();
 
   useEffect(() => {
+    if (userId === null) navigate("/login");
+
     const fetchFriends = async () => {
       const friendsResponse = await dataService.fetchData(
         `/users/${userId}/friends`,
@@ -35,6 +40,8 @@ function SearchPage() {
 
   const handleSearch = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+    if (userId === null) navigate("/login");
 
     if (searchState.trim() === "") {
       return;

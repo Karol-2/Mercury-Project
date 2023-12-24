@@ -9,8 +9,10 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Modal from "../components/Modal";
 import User from "../models/User";
 import { useUser } from "../helpers/UserProvider";
+import { useNavigate } from "react-router-dom";
 
 function FriendsPage() {
+  const navigate = useNavigate();
   const [friends, setFriends] = useState([]);
   const [friendsRequests, setFriendsRequests] = useState([]);
   const [refresh, setRefresh] = useState(false);
@@ -18,6 +20,10 @@ function FriendsPage() {
   const [friendToDelete, setFriendToDelete] = useState<User | null>(null);
 
   const { user } = useUser();
+
+  useEffect(() => {
+    if (user === null) navigate("/login");
+  }, [user]);
 
   useEffect(() => {
     const fetchFriendRequests = async () => {
