@@ -13,7 +13,7 @@ function MessagingPage() {
   return (
     <>
       <Navbar />
-      <ChatBox />
+      <ChatBox user={user} />
       <Footer />
     </>
   );
