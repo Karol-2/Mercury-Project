@@ -11,6 +11,7 @@ interface FoundUserProps {
 
 function FoundUser(props: FoundUserProps) {
   const [requestSent, setRequestSent] = useState(false);
+  const { user, isFriend } = props;
 
   useEffect(() => {
     const fetchData = async () => {
@@ -51,33 +52,37 @@ function FoundUser(props: FoundUserProps) {
     }
   };
 
+  let buttonColor = "";
+  let buttonText = "";
+
+  if (requestSent) {
+    buttonColor = "bg-my-orange";
+    buttonText = "Request sent";
+  } else if (isFriend) {
+    buttonColor = "bg-my-darker";
+    buttonText = "You are already friends!";
+  } else {
+    buttonColor = "bg-my-purple";
+    buttonText = "Add friend";
+  }
+
   return (
     <div className="flex flex-row bg-my-dark p-5 rounded-lg mt-5">
       <img
-        src={props.user.profile_picture}
+        src={user.profile_picture}
         className="rounded-full w-40 h-40 border-my-orange border-4 object-cover"
       />
       <div className="ml-5 flex flex-col justify-evenly">
         <p className="font-semibold text-3xl">
-          {props.user.first_name + " " + props.user.last_name}
+          {user.first_name + " " + user.last_name}
         </p>
-        <p>{props.user.country}</p>
+        <p>{user.country}</p>
         <button
-          className={`btn small text-xs ${
-            requestSent
-              ? "bg-my-orange"
-              : props.isFriend
-                ? "bg-my-darker"
-                : "bg-my-purple"
-          }`}
-          disabled={props.isFriend || requestSent}
+          className={`btn small text-xs ${buttonColor}`}
+          disabled={isFriend || requestSent}
           onClick={handleAddFriend}
         >
-          {requestSent
-            ? "Request Sent"
-            : props.isFriend
-              ? "You are already friends!"
-              : "Add Friend"}
+          {buttonText}
         </button>
       </div>
     </div>
