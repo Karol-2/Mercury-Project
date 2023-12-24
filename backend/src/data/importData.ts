@@ -1,6 +1,8 @@
 import { v4 as uuidv4 } from "uuid";
 
 import driver from "../driver/driver";
+import bcrypt from "bcrypt";
+
 import userData from "./users";
 import wordToVec from "../misc/wordToVec";
 
@@ -42,10 +44,14 @@ async function importInitialData() {
       const userClean: any = Object.assign({}, user);
       delete userClean.friend_ids;
       delete userClean.chats;
+
       userClean.id = userId;
       userClean.name_embedding = wordToVec(
         userClean.first_name + userClean.last_name,
       );
+      const { password } = userClean;
+      const passwordHashed = await bcrypt.hash(password, 10);
+      userClean.password = passwordHashed;
 
       await session.run(createUserQuery, { user: userClean });
     }
