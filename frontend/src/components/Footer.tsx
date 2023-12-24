@@ -22,22 +22,22 @@ export default function Footer() {
           <figure className="flex flex-col content-evenly gap-3">
             <div className="flex flex-row font-medium text-my-darker clickable">
               <FontAwesomeIcon icon={faYoutube} className="text-3xl" />
-              <p className="self-center">Mercury App Channel</p>
+              <span className="self-center">Mercury App Channel</span>
             </div>
-            <figure className="flex flex-row font-medium text-my-darker clickable">
-              <FontAwesomeIcon icon={faFacebook} className="text-3xl" />
-              <p>MercuryApp</p>
-            </figure>
-            <figure className="flex flex-row font-medium text-my-darker clickable">
+            <div className="flex flex-row font-medium text-my-darker clickable">
+              <FontAwesomeIcon icon={faFacebook} className=" text-3xl" />
+              <span>MercuryApp</span>
+            </div>
+            <div className="flex flex-row font-medium text-my-darker clickable">
               <FontAwesomeIcon icon={faTwitter} className="text-3xl" />
-              <p>@MercuryApp</p>
-            </figure>
+              <span>@MercuryApp</span>
+            </div>
             <a
               className="flex flex-row font-medium text-my-darker clickable"
               href="https://github.com/Karol-2/Mercury-Project"
             >
               <FontAwesomeIcon icon={faGithub} className="text-3xl" />
-              <p>Mercury Project</p>
+              <span>Mercury Project</span>
             </a>
           </figure>
 
