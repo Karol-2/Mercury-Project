@@ -46,18 +46,19 @@ function ChatBox({user}: ChatBoxProps) {
   };
 
   return (
-    <div className="w-full p-2">
-      <div className="w-full px-5 flex flex-col justify-between">
+    <div className="flex flex-col justify-end w-full p-2 h-[90vh]">
+      <div className="w-full px-5 flex flex-col justify-between overflow-y-scroll">
         {messages.map((e, i) => (
           <Message key={i} {...e} />
         ))}
       </div>
       <textarea
-        className="text-my-dark form-input"
+        className="w-3/6 text-3xl bg-my-dark form-input"
         rows={4}
         cols={30}
         onKeyDown={handleKeyPress}
         onKeyUp={handleKeyRelease}
+        placeholder="Type message here ..."
       ></textarea>
     </div>
   );
