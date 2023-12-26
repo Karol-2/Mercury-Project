@@ -5,7 +5,6 @@ import { useUser } from "../helpers/UserProvider";
 
 function LoginBox() {
   const navigate = useNavigate();
-
   const [login, setLogin] = useState("");
   const [password, setPassword] = useState("");
   const [loginMsg, setLoginMsg] = useState("");

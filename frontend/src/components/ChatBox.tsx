@@ -1,7 +1,9 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import Message, { MessageProps } from "./Message";
 import User from "../models/User";
-import socketConnection from "../webSocket/socketConnection";
+import { useSelector } from "react-redux";
+import { RootState } from "../redux/store";
+import { Socket } from "socket.io-client";
 interface ChatBoxProps {
   user: User,
   friendId: string;
@@ -9,7 +11,7 @@ interface ChatBoxProps {
 function ChatBox({user, friendId}: ChatBoxProps) {
   const [messages, setMessages] = useState<MessageProps[]>([]);
   const enterPressed = useRef<boolean>(false);
-  const socket = socketConnection();
+  const socket: Socket = useSelector((state: RootState) => state.socket);
   socket.on("message", (message: MessageProps) => {
     setMessages([...messages, message]);
   });
