@@ -3,9 +3,10 @@ import Message, { MessageProps } from "./Message";
 import User from "../models/User";
 import socketConnection from "../webSocket/socketConnection";
 interface ChatBoxProps {
-  user: User
+  user: User,
+  friendId: string;
 }
-function ChatBox({user}: ChatBoxProps) {
+function ChatBox({user, friendId}: ChatBoxProps) {
   const [messages, setMessages] = useState<MessageProps[]>([]);
   const enterPressed = useRef<boolean>(false);
   const socket = socketConnection();
@@ -35,8 +36,7 @@ function ChatBox({user}: ChatBoxProps) {
   };
 
   const sendMessage = (author: User, content: string) => {
-    console.log("SEND: ", author);
-    const message: MessageProps = { type: "sent", author, content };
+    const message: MessageProps = { type: "sent", author, content, receiverId: friendId};
     setMessages([...messages, message]);
     socket.emit("message", message);
   };
