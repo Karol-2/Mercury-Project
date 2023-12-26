@@ -1,12 +1,15 @@
 import servers from "./server";
 import dotenv from "dotenv";
 import { Socket } from "socket.io";
+import setSocketId from "./misc/setSocketId";
 const { io } = servers;
 
 dotenv.config();
 
-io.on("connection", (socket: Socket) => {
-  console.log("Socket server started");
+io.on("connection", async (socket: Socket) => {
+  const userId = socket.handshake.auth.userId;
+  await setSocketId(socket.id, userId);
+  console.log("Socket server started ");
 
   socket.on("iceCandidate", (candidate) => {
     socket.broadcast.emit("iceCandidate", candidate);
