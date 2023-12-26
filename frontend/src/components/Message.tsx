@@ -3,6 +3,7 @@ import User from "../models/User";
 export interface MessageProps {
   type: "sent" | "received" | "info";
   author: User;
+  receiverId?: string;
   content: string;
 }
 

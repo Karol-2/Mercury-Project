@@ -1,7 +1,7 @@
 import servers from "./server";
 import dotenv from "dotenv";
 import { Socket } from "socket.io";
-import setSocketId from "./misc/setSocketId";
+import {setSocketId, getSocketId} from "./misc/socketId";
 const { io } = servers;
 
 dotenv.config();
@@ -19,8 +19,11 @@ io.on("connection", async (socket: Socket) => {
     socket.broadcast.emit("description", description);
   });
 
-  socket.on("message", (message) => {
-    socket.broadcast.emit("message", {...message, type: "received"});
+  socket.on("message", async (message) => {
+    const {receiverId} = message; 
+    const socketId = await getSocketId(receiverId);
+    delete message.receiverId;
+    socket.to(socketId).emit("message", {...message, type: "received"});
   });
 
   socket.rooms.forEach((room) => {
