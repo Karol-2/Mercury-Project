@@ -13,27 +13,31 @@ import { AnimatePresence } from "framer-motion";
 import "./styles/styles.scss";
 import UserProvider from "./helpers/UserProvider.tsx";
 import FriendsPage from "./pages/FriendsPage.tsx";
+import { Provider } from "react-redux";
+import { store } from "./redux/store.ts";
 
 const body = document.getElementsByTagName("body")[0]!;
 body.className = "bg-my-darker text-my-light";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
-  <AnimatePresence mode="wait">
-    <UserProvider>
-      <Router>
-        <Routes location={location} key={location.pathname}>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/register" element={<RegisterPage />} />
-          <Route path="/profile" element={<ProfilePage />} />
-          <Route path="/admin" element={<AdminPage />} />
-          <Route path="/messages/:friendId" element={<MessagingPage />} />
-          <Route path="/friends" element={<FriendsPage />} />
-          <Route path="/search" element={<SearchPage />} />
-          <Route path="/meeting" element={<VideoCallPage />} />
-          <Route path="/*" element={<PageNotFound />} />
-        </Routes>
-      </Router>
-    </UserProvider>
-  </AnimatePresence>,
+  <Provider store={store}>
+    <AnimatePresence mode="wait">
+      <UserProvider>
+        <Router>
+          <Routes location={location} key={location.pathname}>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/register" element={<RegisterPage />} />
+            <Route path="/profile" element={<ProfilePage />} />
+            <Route path="/admin" element={<AdminPage />} />
+            <Route path="/messages/:friendId" element={<MessagingPage />} />
+            <Route path="/friends" element={<FriendsPage />} />
+            <Route path="/search" element={<SearchPage />} />
+            <Route path="/meeting" element={<VideoCallPage />} />
+            <Route path="/*" element={<PageNotFound />} />
+          </Routes>
+        </Router>
+      </UserProvider>
+    </AnimatePresence>
+  </Provider>,
 );
