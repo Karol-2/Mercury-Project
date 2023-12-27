@@ -7,15 +7,21 @@ import { useUser } from "../helpers/UserProvider";
 import User from "../models/User";
 import { faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useNavigate } from "react-router-dom";
+import editDistance from "../misc/editDistance";
 
 function SearchPage() {
+  const navigate = useNavigate();
+
   const [searchState, setSearchState] = useState("");
-  const [usersFound, setUsersFound] = useState([]);
+  const [usersFound, setUsersFound] = useState<[[User, number]]>();
   const [usersFriends, setUsersFriends] = useState([]);
 
   const { user, userId } = useUser();
 
   useEffect(() => {
+    if (userId === null) navigate("/login");
+
     const fetchFriends = async () => {
       const friendsResponse = await dataService.fetchData(
         `/users/${userId}/friends`,
@@ -33,12 +39,15 @@ function SearchPage() {
     fetchFriends();
   }, [user]);
 
-  const handleSearch = async (e: { preventDefault: () => void }) => {
+  const handleSearch = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    if (userId === null) navigate("/login");
+
     if (searchState.trim() === "") {
       return;
     }
-    e.preventDefault();
-    console.log(searchState);
+
     const response = await dataService.fetchData(
       `/users/search?q=${searchState}`,
       "GET",
@@ -47,7 +56,13 @@ function SearchPage() {
     const responseWithoutCurrUser = response.users.filter(
       (respArr: [User, number]) => respArr[0].id !== user!.id,
     );
-    setUsersFound(responseWithoutCurrUser);
+
+    const usersSorted = sortUsersByDistance(
+      searchState,
+      responseWithoutCurrUser,
+    );
+
+    setUsersFound(usersSorted);
   };
 
   const isFriend = (friendArr: string[], user: User): boolean => {
@@ -56,13 +71,28 @@ function SearchPage() {
     }, false);
   };
 
+  const sortUsersByDistance = (searchTerm: string, users: [[User, number]]) => {
+    const userScores = users.map((respArr: [User, number]) => {
+      const user = respArr[0];
+      const score = editDistance(user.first_name + user.last_name, searchTerm);
+      return [user, score];
+    });
+
+    return userScores.sort((a: any, b: any) => {
+      const [_userA, scoreA] = a;
+      const [_userB, scoreB] = b;
+
+      return scoreA - scoreB;
+    }) as [[User, number]];
+  };
+
   return (
     <>
       <Navbar />
       <section className=" min-h-screen mx-50 lg:mx-72 ">
         <div>
           <form
-            className="flex flex-row max-w-3xl w-full mt-5"
+            className="flex flex-row gap-5 max-w-3xl w-full mt-5"
             onSubmit={handleSearch}
           >
             <input
@@ -73,11 +103,11 @@ function SearchPage() {
             ></input>
             <button
               type="submit"
-              className="btn small bg-my-purple ml-5 text-xs"
+              className="btn bg-my-purple text-xs px-7 py-5"
             >
-              <div className="flex align-middle ">
+              <div className="flex gap-3 items-center">
                 <span>Search</span>
-                <FontAwesomeIcon icon={faMagnifyingGlass} className="ml-2" />
+                <FontAwesomeIcon icon={faMagnifyingGlass} />
               </div>
             </button>
           </form>

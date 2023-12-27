@@ -24,13 +24,15 @@
 .primary {
   border: 3px solid darken($color: #ff8001, $amount: 10%);
   background-color: #ff8001;
-  padding: 1.5rem 6rem;
+  padding-top: 1.5rem;
+  padding-bottom: 1.5rem;
 }
 
 .secondary {
   border: 3px solid darken($color: #3e0c70, $amount: 5%);
   background-color: #3e0c70;
-  padding: 1.5rem 6rem;
+  padding-top: 1.5rem;
+  padding-bottom: 1.5rem;
 }
 
 .small {

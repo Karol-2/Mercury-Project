@@ -2,6 +2,7 @@ import { Router, Request, Response } from "express";
 import { v4 as uuidv4 } from "uuid";
 import { Session } from "neo4j-driver";
 import driver from "../driver/driver";
+import bcrypt from "bcrypt";
 import wordToVec from "../misc/wordToVec";
 import User from "../models/User";
 import { JWTRequest, authenticateToken } from "../misc/jwt";
@@ -257,6 +258,10 @@ usersRouter.post("/", async (req: Request, res: UserErrorResponse) => {
       const e2 = lastNameEmbedding[i];
       return (e1 + e2) / 2;
     });
+
+    const { password } = newUserProps;
+    const passwordHashed = await bcrypt.hash(password, 10);
+    newUserProps.password = passwordHashed;
 
     const newUserResult = await session.run(`CREATE (u:User $user) RETURN u`, {
       user: newUserProps,

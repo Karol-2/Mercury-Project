@@ -9,7 +9,7 @@ export default function CallToAction() {
   return (
     <section className="flex flex-col">
       <div className="mx-50 lg:mx-96 py-40">
-        <h1 className="text-center font-bold text-5xl">Let`s work together!</h1>
+        <h1 className="text-center font-bold text-5xl">Let's work together!</h1>
         <motion.div
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}

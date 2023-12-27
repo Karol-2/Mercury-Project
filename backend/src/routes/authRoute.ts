@@ -1,5 +1,7 @@
 import { Router, Request } from "express";
 
+import bcrypt from "bcrypt";
+
 import driver from "../driver/driver";
 import { generateAccessToken, generateRefreshToken } from "../misc/jwt";
 
@@ -40,7 +42,8 @@ authRouter.post("/login", async (req: Request, res: TokenErrorResponse) => {
     const user = userRequest.records[0].get("u").properties;
     await session.close();
 
-    if (user.password != password) {
+    const passwordCorrect = await bcrypt.compare(password, user.password);
+    if (!passwordCorrect) {
       return res.status(401).json({ status: "unauthorized" });
     }
 
