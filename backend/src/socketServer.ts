@@ -22,7 +22,6 @@ io.on("connection", async (socket: Socket) => {
   socket.on("message", async (message) => {
     const { receiverId } = message;
     const socketId = await getSocketId(receiverId);
-    delete message.receiverId;
     socket.to(socketId).emit("message", { ...message, type: "received" });
   });
 
