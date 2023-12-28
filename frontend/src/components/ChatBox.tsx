@@ -44,6 +44,7 @@ function ChatBox({ user, friendId }: ChatBoxProps) {
       author_image: author.profile_picture,
       content,
       receiverId: friendId,
+      created_date: new Date()
     };
     setMessages([...messages, message]);
     socket.emit("message", message);
