@@ -8,8 +8,9 @@ import dataService from "../services/data";
 interface ChatBoxProps {
   user: User;
   friendId: string;
+  friend_profile_picture: string;
 }
-function ChatBox({ user, friendId }: ChatBoxProps) {
+function ChatBox({ user, friendId, friend_profile_picture }: ChatBoxProps) {
   const [messages, setMessages] = useState<MessageProps[]>([]);
   const enterPressed = useRef<boolean>(false);
   const socket: Socket = useSelector((state: RootState) => state.socket);
@@ -29,7 +30,7 @@ function ChatBox({ user, friendId }: ChatBoxProps) {
           ...message, 
           author_image: message.type === "sent" 
                         ? user.profile_picture 
-                        : ""
+                        : friend_profile_picture
         }
       })
       setMessages(messageArr);

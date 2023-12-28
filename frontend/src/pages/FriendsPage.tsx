@@ -11,6 +11,8 @@ import Modal from "../components/Modal";
 import User from "../models/User";
 import { useUser } from "../helpers/UserProvider";
 import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import setUserFriends from "../redux/actions/setUserFriends";
 
 function FriendsPage() {
   const navigate = useNavigate();
@@ -22,6 +24,7 @@ function FriendsPage() {
 
   const { user } = useUser();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   useEffect(() => {
     if (user === null) navigate("/login");
@@ -50,6 +53,7 @@ function FriendsPage() {
           {},
         );
         setFriends(friendsResponse.friends);
+        dispatch(setUserFriends(friendsResponse.friends));
       }
     };
     fetchFriends();
@@ -68,6 +72,7 @@ function FriendsPage() {
       );
 
       setRefresh(() => !refresh);
+
     }
   };
 

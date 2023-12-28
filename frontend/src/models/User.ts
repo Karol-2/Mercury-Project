@@ -8,7 +8,7 @@ export interface FrontendUser {
 }
 
 interface User extends FrontendUser {
-  id: number;
+  id: string;
   friend_ids: number[];
   chats: number[];
 }

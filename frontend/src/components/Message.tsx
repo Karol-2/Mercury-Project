@@ -1,7 +1,7 @@
 export interface MessageProps {
   type: "sent" | "received" | "info";
   author_image: string;
-  authorId: number;
+  authorId: string;
   receiverId?: string;
   content: string;
   created_date: Date;
