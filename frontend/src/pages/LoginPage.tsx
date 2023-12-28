@@ -11,7 +11,7 @@ function LoginPage() {
   const dispatch = useDispatch();
   useEffect(() => {
     console.log("LoginPage:", user);
-    const {userId} = user;
+    const { userId } = user;
     if (userId !== null) {
       dispatch(createSocketConnection(userId!));
     }

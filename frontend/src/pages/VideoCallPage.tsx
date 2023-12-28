@@ -29,7 +29,7 @@ function VideoCallPage() {
     prepareWebRTC();
   }, []);
 
-  async function prepareWebRTC() {    
+  async function prepareWebRTC() {
     const peerConnection = new RTCPeerConnection(stunServers);
     let polite = false;
     socket.on("first", () => {
