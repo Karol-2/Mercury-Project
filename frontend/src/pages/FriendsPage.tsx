@@ -67,7 +67,6 @@ function FriendsPage() {
       );
 
       setRefresh(() => !refresh);
-
     }
   };
 

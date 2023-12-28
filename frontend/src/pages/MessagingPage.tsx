@@ -10,7 +10,7 @@ import User from "../models/User";
 function MessagingPage() {
   const friends = useSelector((state: RootState) => state.friends);
   const { friendId } = useParams();
-  const friend = friends.find((f:User) => f.id === friendId);
+  const friend = friends.find((f: User) => f.id === friendId);
   const { user } = useUser();
   if (!user || !friendId) {
     return <PageNotFound />;
@@ -18,10 +18,10 @@ function MessagingPage() {
   return (
     <>
       <Navbar />
-      <ChatBox 
-        user={user} 
-        friendId={friendId} 
-        friend_profile_picture={friend.profile_picture} 
+      <ChatBox
+        user={user}
+        friendId={friendId}
+        friend_profile_picture={friend.profile_picture}
       />
       <Footer />
     </>
