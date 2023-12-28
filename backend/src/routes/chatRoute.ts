@@ -18,15 +18,4 @@ chatRouter.get("/:user1Id/:user2Id", async (req, res) => {
     }
 });
 
-chatRouter.post("/", async (req, res) => {
-    try {
-        const newChat = req.body as Chat;
-        await ChatModel.create(newChat);
-        return res.json({status: "ok"});
-    } catch (err) {
-        console.log("Error:", err);
-        return res.status(404).json({ status: "error", errors: err as object });
-    }
-});
-
 export default chatRouter;
