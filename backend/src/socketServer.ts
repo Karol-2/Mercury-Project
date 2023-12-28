@@ -2,6 +2,7 @@ import servers from "./server";
 import dotenv from "dotenv";
 import { Socket } from "socket.io";
 import { setSocketId, getSocketId } from "./misc/socketId";
+import addMessageToDb from "./misc/addMessageToDb";
 const { io } = servers;
 
 dotenv.config();
@@ -22,6 +23,7 @@ io.on("connection", async (socket: Socket) => {
   socket.on("message", async (message) => {
     const { receiverId } = message;
     const socketId = await getSocketId(receiverId);
+    await addMessageToDb(message);
     socket.to(socketId).emit("message", { ...message, type: "received" });
   });
 
