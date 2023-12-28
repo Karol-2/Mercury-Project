@@ -23,7 +23,7 @@ export default {
       "my-darker": "#121519",
       "my-light": "#EDE9E9",
       "my-lighter": "#F4F4F4",
-      "my-green": "#3E4F13"
+      "my-green": "#3E4F13",
     },
     extend: {},
   },

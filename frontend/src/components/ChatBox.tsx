@@ -5,10 +5,10 @@ import { useSelector } from "react-redux";
 import { RootState } from "../redux/store";
 import { Socket } from "socket.io-client";
 interface ChatBoxProps {
-  user: User,
+  user: User;
   friendId: string;
 }
-function ChatBox({user, friendId}: ChatBoxProps) {
+function ChatBox({ user, friendId }: ChatBoxProps) {
   const [messages, setMessages] = useState<MessageProps[]>([]);
   const enterPressed = useRef<boolean>(false);
   const socket: Socket = useSelector((state: RootState) => state.socket);
@@ -38,7 +38,12 @@ function ChatBox({user, friendId}: ChatBoxProps) {
   };
 
   const sendMessage = (author: User, content: string) => {
-    const message: MessageProps = { type: "sent", author, content, receiverId: friendId};
+    const message: MessageProps = {
+      type: "sent",
+      author,
+      content,
+      receiverId: friendId,
+    };
     setMessages([...messages, message]);
     socket.emit("message", message);
   };

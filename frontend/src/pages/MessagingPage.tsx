@@ -5,10 +5,10 @@ import { useUser } from "../helpers/UserProvider";
 import { useParams } from "react-router-dom";
 import PageNotFound from "./PageNotFound";
 function MessagingPage() {
-  const {friendId} = useParams();
-  const {user, userId} = useUser();
+  const { friendId } = useParams();
+  const { user, userId } = useUser();
   if (!user || !friendId) {
-    return <PageNotFound />
+    return <PageNotFound />;
   }
   return (
     <>
