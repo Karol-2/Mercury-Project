@@ -4,6 +4,7 @@ export interface MessageProps {
   authorId: number;
   receiverId?: string;
   content: string;
+  created_date: Date;
 }
 
 function Message(props: MessageProps) {
