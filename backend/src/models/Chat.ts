@@ -1,5 +1,3 @@
-import Message from "./Message";
-
 export default interface Chat {
   authorId: string;
   receiverId: string;
