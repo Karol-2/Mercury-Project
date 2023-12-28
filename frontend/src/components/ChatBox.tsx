@@ -19,20 +19,23 @@ function ChatBox({ user, friendId, friend_profile_picture }: ChatBoxProps) {
   });
 
   useEffect(() => {
-    async function fetchMessages() {  
+    async function fetchMessages() {
       const messageResponse = await dataService.fetchData(
-        `/chat/${user.id}/${friendId}`, 
+        `/chat/${user.id}/${friendId}`,
         "GET",
-        {}
+        {},
       );
-      const messageArr = messageResponse.messages.map((message: MessageProps) => {
-        return {
-          ...message, 
-          author_image: message.type === "sent" 
-                        ? user.profile_picture 
-                        : friend_profile_picture
-        }
-      })
+      const messageArr = messageResponse.messages.map(
+        (message: MessageProps) => {
+          return {
+            ...message,
+            author_image:
+              message.type === "sent"
+                ? user.profile_picture
+                : friend_profile_picture,
+          };
+        },
+      );
       setMessages(messageArr);
     }
     fetchMessages();
@@ -66,7 +69,7 @@ function ChatBox({ user, friendId, friend_profile_picture }: ChatBoxProps) {
       author_image: author.profile_picture,
       content,
       receiverId: friendId,
-      created_date: new Date()
+      created_date: new Date(),
     };
     setMessages([...messages, message]);
     socket.emit("message", message);

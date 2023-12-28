@@ -4,7 +4,7 @@ import friendsReducer from "./reducers/friendsReducer";
 
 const rootReducer = combineReducers({
   socket: socketConnectionReducer,
-  friends: friendsReducer
+  friends: friendsReducer,
 });
 
 export const store = createStore(rootReducer);
