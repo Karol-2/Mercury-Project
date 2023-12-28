@@ -6,7 +6,7 @@ import { useParams } from "react-router-dom";
 import PageNotFound from "./PageNotFound";
 function MessagingPage() {
   const { friendId } = useParams();
-  const { user, userId } = useUser();
+  const { user } = useUser();
   if (!user || !friendId) {
     return <PageNotFound />;
   }

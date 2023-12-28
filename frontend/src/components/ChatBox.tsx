@@ -48,10 +48,6 @@ function ChatBox({ user, friendId }: ChatBoxProps) {
     socket.emit("message", message);
   };
 
-  const receiveMessage = (message: MessageProps) => {
-    console.log("RECEIVE MESSAGE:", message);
-  };
-
   return (
     <div className="flex flex-col justify-end w-full p-2 h-[90vh]">
       <div className="w-full px-5 flex flex-col justify-between overflow-y-scroll">
