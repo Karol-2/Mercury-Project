@@ -1,9 +1,10 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Message, { MessageProps } from "./Message";
 import User from "../models/User";
 import { useSelector } from "react-redux";
 import { RootState } from "../redux/store";
 import { Socket } from "socket.io-client";
+import dataService from "../services/data";
 interface ChatBoxProps {
   user: User;
   friendId: string;
@@ -15,6 +16,26 @@ function ChatBox({ user, friendId }: ChatBoxProps) {
   socket.on("message", (message: MessageProps) => {
     setMessages([...messages, message]);
   });
+
+  useEffect(() => {
+    async function fetchMessages() {  
+      const messageResponse = await dataService.fetchData(
+        `/chat/${user.id}/${friendId}`, 
+        "GET",
+        {}
+      );
+      const messageArr = messageResponse.messages.map((message: MessageProps) => {
+        return {
+          ...message, 
+          author_image: message.type === "sent" 
+                        ? user.profile_picture 
+                        : ""
+        }
+      })
+      setMessages(messageArr);
+    }
+    fetchMessages();
+  }, []);
 
   const handleKeyPress = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key != "Enter") return;
