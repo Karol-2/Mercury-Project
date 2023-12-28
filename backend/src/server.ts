@@ -36,14 +36,13 @@ const io = new SocketServer<ClientToServerEvents, ServerToClientEvents>(
   },
 );
 
-
-
 (async () => {
   try {
     await connect("mongodb://localhost:27017/chats");
-    expressServer.listen(port, () =>
-      console.log(`HTTP server running on port ${port}`),
-    ) ;
+    expressServer.listen(port, () => {
+      console.log("Chat database started");
+      console.log(`HTTP server running on port ${port}`)
+    });
   } catch (err) {
     console.error(err);
   }
