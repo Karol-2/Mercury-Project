@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 import cors from "cors";
 import { Server as SocketServer } from "socket.io";
 import { createServer } from "http";
+import { connect } from "mongoose";
 import cookieParser from "cookie-parser";
 import ServerToClientEvents from "./events/ServerToClientEvents";
 import ClientToServerEvents from "./events/ClientToServerEvents";
@@ -35,8 +36,17 @@ const io = new SocketServer<ClientToServerEvents, ServerToClientEvents>(
   },
 );
 
-expressServer.listen(port, () =>
-  console.log(`HTTP server running on port ${port}`),
-);
+
+
+(async () => {
+  try {
+    await connect("mongodb://localhost:27017/chats");
+    expressServer.listen(port, () =>
+      console.log(`HTTP server running on port ${port}`),
+    ) ;
+  } catch (err) {
+    console.error(err);
+  }
+})();
 
 export default { expressServer, io, app };
