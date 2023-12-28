@@ -40,7 +40,8 @@ function ChatBox({ user, friendId }: ChatBoxProps) {
   const sendMessage = (author: User, content: string) => {
     const message: MessageProps = {
       type: "sent",
-      author,
+      authorId: author.id,
+      author_image: author.profile_picture,
       content,
       receiverId: friendId,
     };
