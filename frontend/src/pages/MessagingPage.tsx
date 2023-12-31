@@ -1,10 +1,12 @@
+import { useParams } from "react-router-dom";
+import { useSelector } from "react-redux";
+
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import ChatBox from "../components/ChatBox";
 import { useUser } from "../helpers/UserProvider";
-import { useParams } from "react-router-dom";
 import PageNotFound from "./PageNotFound";
-import { useSelector } from "react-redux";
+
 import { RootState } from "../redux/store";
 import User from "../models/User";
 function MessagingPage() {

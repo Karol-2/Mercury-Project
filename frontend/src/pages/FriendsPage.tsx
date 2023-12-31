@@ -1,18 +1,20 @@
 import { useEffect, useState } from "react";
-import Navbar from "../components/Navbar";
-import Footer from "../components/Footer";
-import FriendRequest from "../components/FriendRequest";
+import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { useUser } from "../helpers/UserProvider";
+
 import { faUserMinus } from "@fortawesome/free-solid-svg-icons";
 import { faVideo } from "@fortawesome/free-solid-svg-icons";
 import { faCommentAlt } from "@fortawesome/free-solid-svg-icons";
-import dataService from "../services/data";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+
+import Footer from "../components/Footer";
+import FriendRequest from "../components/FriendRequest";
 import Modal from "../components/Modal";
+import Navbar from "../components/Navbar";
 import User from "../models/User";
-import { useUser } from "../helpers/UserProvider";
-import { useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
 import setUserFriends from "../redux/actions/setUserFriends";
+import dataService from "../services/data";
 
 function FriendsPage() {
   const navigate = useNavigate();

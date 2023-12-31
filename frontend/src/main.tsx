@@ -1,19 +1,22 @@
 import ReactDOM from "react-dom/client";
 import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
-import AdminPage from "./pages/AdminPage.tsx";
+import { Provider } from "react-redux";
+import { AnimatePresence } from "framer-motion";
+
 import HomePage from "./pages/HomePage.tsx";
 import LoginPage from "./pages/LoginPage.tsx";
-import MessagingPage from "./pages/MessagingPage.tsx";
-import PageNotFound from "./pages/PageNotFound.tsx";
-import ProfilePage from "./pages/ProfilePage.tsx";
 import RegisterPage from "./pages/RegisterPage.tsx";
+import ProfilePage from "./pages/ProfilePage.tsx";
+import AdminPage from "./pages/AdminPage.tsx";
+import MessagingPage from "./pages/MessagingPage.tsx";
+import FriendsPage from "./pages/FriendsPage.tsx";
 import SearchPage from "./pages/SearchPage.tsx";
 import VideoCallPage from "./pages/VideoCallPage.tsx";
-import { AnimatePresence } from "framer-motion";
+import PageNotFound from "./pages/PageNotFound.tsx";
+
 import "./styles/styles.scss";
+
 import UserProvider from "./helpers/UserProvider.tsx";
-import FriendsPage from "./pages/FriendsPage.tsx";
-import { Provider } from "react-redux";
 import { store } from "./redux/store.ts";
 
 const body = document.getElementsByTagName("body")[0]!;

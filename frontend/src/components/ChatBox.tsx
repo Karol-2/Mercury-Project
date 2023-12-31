@@ -1,9 +1,11 @@
 import React, { useEffect, useRef, useState } from "react";
-import Message, { MessageProps } from "./Message";
-import User from "../models/User";
 import { useSelector } from "react-redux";
-import { RootState } from "../redux/store";
+
 import { Socket } from "socket.io-client";
+
+import User from "../models/User";
+import Message, { MessageProps } from "./Message";
+import { RootState } from "../redux/store";
 import dataService from "../services/data";
 interface ChatBoxProps {
   user: User;
