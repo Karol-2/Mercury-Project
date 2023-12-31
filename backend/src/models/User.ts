@@ -10,4 +10,5 @@ export default interface User {
   password: string;
   friend_ids?: number[];
   chats?: Chat[];
+  socketId?: string;
 }

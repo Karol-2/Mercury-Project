@@ -12,6 +12,9 @@ function VideoCallPage() {
   const localStream = useRef<HTMLVideoElement>(null);
   const remoteStream = useRef<HTMLVideoElement>(null);
   const [makingOffer, setMakingOffer] = useState(false);
+  //const socket: Socket = useSelector((state: RootState) => state.socket);
+  //console.log(socket)
+  const socket = socketConnection();
 
   useEffect(() => {
     if (userId === null) navigate("/login");
@@ -28,12 +31,14 @@ function VideoCallPage() {
   }, []);
 
   async function prepareWebRTC() {
-    const socket = socketConnection();
     const peerConnection = new RTCPeerConnection(stunServers);
     let polite = false;
+
     socket.on("first", () => {
+      console.log("SOCKET: first");
       polite = true;
     });
+
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
         audio: true,
@@ -71,6 +76,7 @@ function VideoCallPage() {
 
     let ignoreOffer = false;
     socket.on("description", async (description) => {
+      console.log("SOCKET: description");
       const offerCollision =
         description.type === "offer" &&
         (makingOffer || peerConnection.signalingState !== "stable");
@@ -85,7 +91,9 @@ function VideoCallPage() {
         socket.emit("description", peerConnection.localDescription!);
       }
     });
+
     socket.on("iceCandidate", async (candidate) => {
+      console.log("SOCKET: iceCandidate");
       try {
         await peerConnection.addIceCandidate(candidate);
       } catch (err) {

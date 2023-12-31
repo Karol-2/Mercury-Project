@@ -5,7 +5,6 @@ import { useUser } from "../helpers/UserProvider";
 
 function LoginBox() {
   const navigate = useNavigate();
-
   const [login, setLogin] = useState("");
   const [password, setPassword] = useState("");
   const [loginMsg, setLoginMsg] = useState("");
@@ -28,7 +27,7 @@ function LoginBox() {
 
       setLoginMsg("Bad credentials");
     } else {
-      navigate("/messages", { replace: true });
+      navigate("/profile", { replace: true });
       setLoginMsg("Logging in...");
     }
   }, [userId]);
@@ -54,7 +53,10 @@ function LoginBox() {
         onChange={(e) => setPassword(e.target.value)}
       />
 
-      <button className="btn small my-4 bg-my-orange" onClick={() => loginFunc()}>
+      <button
+        className="btn small my-4 bg-my-orange"
+        onClick={() => loginFunc()}
+      >
         Login
       </button>
       <div className="text-center">

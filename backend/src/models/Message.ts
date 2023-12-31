@@ -1,10 +1,8 @@
-import Reaction from "./Reaction";
+import User from "./User";
 
 export default interface Message {
-  id: string;
-  date: Date;
-  from_id: string;
-  to_id: string;
+  type: "sent" | "received" | "info";
+  author: User;
+  receiverId?: string;
   content: string;
-  reactions: Reaction[];
 }

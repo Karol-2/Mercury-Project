@@ -1,8 +1,6 @@
-import Message from "./Message";
-
 export default interface Chat {
-  id: string;
-  owner_id: string;
-  users_ids: string[];
-  messages: Message[];
+  authorId: string;
+  receiverId: string;
+  content: string;
+  created_date: Date;
 }
