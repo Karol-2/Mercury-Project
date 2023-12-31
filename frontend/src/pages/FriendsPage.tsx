@@ -23,7 +23,6 @@ function FriendsPage() {
   const [friendToDelete, setFriendToDelete] = useState<User | null>(null);
 
   const { user } = useUser();
-  const navigate = useNavigate();
   const dispatch = useDispatch();
 
   useEffect(() => {
