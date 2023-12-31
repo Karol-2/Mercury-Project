@@ -9,6 +9,7 @@ import createSocketConnection from "../redux/actions/createSocketConnection";
 function LoginPage() {
   const user = useUser();
   const dispatch = useDispatch();
+
   useEffect(() => {
     console.log("LoginPage:", user);
     const { userId } = user;
@@ -26,7 +27,6 @@ function LoginPage() {
       <div className="flex justify-center">
         <LoginBox />
       </div>
-
       <Footer />
     </div>
   );

@@ -15,6 +15,7 @@ function VideoCallPage() {
   //const socket: Socket = useSelector((state: RootState) => state.socket);
   //console.log(socket)
   const socket = socketConnection();
+
   useEffect(() => {
     if (userId === null) navigate("/login");
   }, [userId]);
@@ -32,10 +33,12 @@ function VideoCallPage() {
   async function prepareWebRTC() {
     const peerConnection = new RTCPeerConnection(stunServers);
     let polite = false;
+
     socket.on("first", () => {
       console.log("SOCKET: first");
       polite = true;
     });
+
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
         audio: true,
@@ -88,6 +91,7 @@ function VideoCallPage() {
         socket.emit("description", peerConnection.localDescription!);
       }
     });
+
     socket.on("iceCandidate", async (candidate) => {
       console.log("SOCKET: iceCandidate");
       try {

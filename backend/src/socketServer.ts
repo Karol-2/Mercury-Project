@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 import { Socket } from "socket.io";
 import { setSocketId, getSocketId } from "./misc/socketId";
 import addMessageToDb from "./misc/addMessageToDb";
+
 const { io } = servers;
 
 dotenv.config();

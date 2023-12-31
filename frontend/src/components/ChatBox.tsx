@@ -7,11 +7,13 @@ import User from "../models/User";
 import Message, { MessageProps } from "./Message";
 import { RootState } from "../redux/store";
 import dataService from "../services/data";
+
 interface ChatBoxProps {
   user: User;
   friendId: string;
   friend_profile_picture: string;
 }
+
 function ChatBox({ user, friendId, friend_profile_picture }: ChatBoxProps) {
   const [messages, setMessages] = useState<MessageProps[]>([]);
   const enterPressed = useRef<boolean>(false);
@@ -40,6 +42,7 @@ function ChatBox({ user, friendId, friend_profile_picture }: ChatBoxProps) {
       );
       setMessages(messageArr);
     }
+
     fetchMessages();
   }, []);
 

@@ -1,5 +1,6 @@
 import { model, Schema } from "mongoose";
 import Chat from "../models/Chat";
+
 const chatSchema = new Schema<Chat>({
   authorId: { type: String, required: true },
   receiverId: { type: String, required: true },

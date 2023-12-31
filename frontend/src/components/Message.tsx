@@ -9,6 +9,7 @@ export interface MessageProps {
 
 function Message(props: MessageProps) {
   const { type, author_image, content } = props;
+
   let align = "";
   let flexDirection = "";
   let rounded = "";
@@ -25,6 +26,7 @@ function Message(props: MessageProps) {
     rounded = "rounded-br-3xl rounded-tr-3xl rounded-tl-xl";
     bgColor = "bg-my-orange";
   }
+
   return (
     <div className={`${align} flex ${flexDirection} justify-center gap-5 mb-4`}>
       <div
