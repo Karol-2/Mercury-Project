@@ -16,14 +16,15 @@ import setUserFriends from "../redux/actions/setUserFriends";
 
 function FriendsPage() {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const { user } = useUser();
+
   const [friends, setFriends] = useState([]);
   const [friendsRequests, setFriendsRequests] = useState([]);
   const [refresh, setRefresh] = useState(false);
+
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [friendToDelete, setFriendToDelete] = useState<User | null>(null);
-
-  const { user } = useUser();
-  const dispatch = useDispatch();
 
   useEffect(() => {
     if (user === null) navigate("/login");
