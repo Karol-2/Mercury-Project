@@ -12,7 +12,7 @@ services:
       - ./db/data:/data
       - ./db/conf:/conf
   chats:
-    image: mongo:latest
+    image: mongo:4.4.26
     ports:
       - 27017:27017
   frontend:
