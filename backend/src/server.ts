@@ -38,7 +38,9 @@ const io = new SocketServer<ClientToServerEvents, ServerToClientEvents>(
 
 (async () => {
   try {
-    await connect("mongodb://localhost:27017/chats");
+    const uri = process.env.MONGODB_URI || "mongodb://localhost:27017";
+    await connect(`${uri}/chats`);
+
     expressServer.listen(port, () => {
       console.log("Chat database started");
       console.log(`HTTP server running on port ${port}`);
