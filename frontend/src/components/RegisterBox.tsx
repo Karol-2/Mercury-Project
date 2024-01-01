@@ -2,37 +2,8 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
-
+import { userSchema } from "../models/RegisterUserSchema";
 import { FrontendUser } from "../models/User";
-
-const userSchema: z.ZodType<Partial<FrontendUser>> = z.object({
-  first_name: z
-    .string()
-    .min(2, "First name should be at least two characters long"),
-  last_name: z
-    .string()
-    .min(2, "Last name should be at least two characters long"),
-  country: z
-    .string()
-    .length(2, "Country code should be 2 characters long")
-    .toUpperCase(),
-    profile_picture: z
-    .any()
-    .refine((obj) => (!obj ? "Profile picture is required" : ""))
-    .refine((obj) => obj && obj.length > 0, "Profile picture not provided")
-    .transform((obj) => {
-      if (obj && obj.length > 0 && (obj as FileList)[0].size <= 5 * 1024 * 1024) {
-        return (obj as FileList)[0].name;
-      } else {
-        throw new Error("File is too big (>5 MB)");
-      }
-    }),
-  mail: z.string().email(),
-  password: z
-    .string()
-    .min(8, "Password should be at least eight characters long"),
-});
 
 function RegisterBox() {
   const navigate = useNavigate();
@@ -46,6 +17,7 @@ function RegisterBox() {
 
   const [submitError, setSubmitError] = useState<string>("");
   const [profilePictureBase64, setProfilePictureBase64] = useState<string>("");
+  const [pictureFile, setPictureFile] = useState<File>()
 
   const errorProps = {
     className: "pb-4 text-[#f88]",
@@ -85,14 +57,19 @@ function RegisterBox() {
     return userJson.user;
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
+  const encodePicture = (file: File) => {
+    const reader = new FileReader();
       reader.onloadend = () => {
         setProfilePictureBase64(reader.result as string);
       };
       reader.readAsDataURL(file);
+  }
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setPictureFile(file)
+      encodePicture(file)
     }
   };
 
@@ -100,6 +77,7 @@ function RegisterBox() {
     try {
       user.profile_picture = profilePictureBase64;
       // console.log(user)
+      
       const registered = await registerUser(user);
 
       console.log(registered);
@@ -124,13 +102,14 @@ function RegisterBox() {
       className="medium:w-[25vw] flex flex-col gap-2 bg-my-dark p-10 px-20 rounded-xl"
       onSubmit={handleSubmit(submit)}
     >
-      <div>First and last name:</div>
+      <div>First name:</div>
       <input
         {...inputProps}
         {...register("first_name")}
         placeholder="First name"
       />
       <div {...errorProps}>{errors.first_name?.message}</div>
+      <div>Last Name:</div>
       <input
         {...inputProps}
         {...register("last_name")}
@@ -156,7 +135,7 @@ function RegisterBox() {
         accept="image/*"
         onChange={handleFileChange}
       />
-      <p></p>
+      <p> {pictureFile?.name}</p>
       <div {...errorProps}>{errors.profile_picture?.message}</div>
 
       <div className="py-5">
