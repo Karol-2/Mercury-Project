@@ -17,14 +17,17 @@ const userSchema: z.ZodType<Partial<FrontendUser>> = z.object({
     .string()
     .length(2, "Country code should be 2 characters long")
     .toUpperCase(),
-  profile_picture: z
+    profile_picture: z
     .any()
-    .refine((obj) => obj.length > 0, "Profile picture not provided")
-    .refine(
-      (obj) => obj.length > 0 && (obj as FileList)[0].size <= 5 * 1024 * 1024,
-      "File is too big (>5 MB)",
-    )
-    .transform((obj) => (obj as FileList)[0].name),
+    .refine((obj) => (!obj ? "Profile picture is required" : ""))
+    .refine((obj) => obj && obj.length > 0, "Profile picture not provided")
+    .transform((obj) => {
+      if (obj && obj.length > 0 && (obj as FileList)[0].size <= 5 * 1024 * 1024) {
+        return (obj as FileList)[0].name;
+      } else {
+        throw new Error("File is too big (>5 MB)");
+      }
+    }),
   mail: z.string().email(),
   password: z
     .string()
@@ -42,6 +45,7 @@ function RegisterBox() {
   });
 
   const [submitError, setSubmitError] = useState<string>("");
+  const [profilePictureBase64, setProfilePictureBase64] = useState<string>("");
 
   const errorProps = {
     className: "pb-4 text-[#f88]",
@@ -81,8 +85,21 @@ function RegisterBox() {
     return userJson.user;
   };
 
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setProfilePictureBase64(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   const submit = async (user: FrontendUser) => {
     try {
+      user.profile_picture = profilePictureBase64;
+      // console.log(user)
       const registered = await registerUser(user);
 
       console.log(registered);
@@ -135,10 +152,11 @@ function RegisterBox() {
       <div>Profile picture:</div>
       <input
         {...inputProps}
-        {...register("profile_picture")}
         type="file"
         accept="image/*"
+        onChange={handleFileChange}
       />
+      <p></p>
       <div {...errorProps}>{errors.profile_picture?.message}</div>
 
       <div className="py-5">
