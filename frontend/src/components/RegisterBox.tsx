@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { userSchema } from "../models/RegisterUserSchema";
 import { FrontendUser } from "../models/User";
-import userPlaceholder from "../assets/user-placeholder.jpg";
+import * as userPlaceholder from "../assets/user-placeholder.jpg";
 
 function RegisterBox() {
   const navigate = useNavigate();
@@ -86,7 +86,7 @@ function RegisterBox() {
 
   const fetchDefaultPhoto = async () => {
     try {
-      const response = await fetch(userPlaceholder);
+      const response = await fetch(userPlaceholder.default);
       if (response.ok) {
         const blob = await response.blob();
         const myFile = createFileFromBlob(
@@ -164,12 +164,30 @@ function RegisterBox() {
       </div>
 
       <div>Profile picture:</div>
-      <input
-        {...inputProps}
-        type="file"
-        accept="image/*"
-        onChange={handleFileChange}
-      />
+      <div className="flex items-center justify-center space-x-4 rounded-xl">
+        <label
+          htmlFor="upload-button"
+          className="relative cursor-pointer bg-gray-200 rounded-xl py-2 px-4 border border-gray-300"
+        >
+          <span>Choose a file</span>
+          <input
+            id="upload-button"
+            {...inputProps}
+            type="file"
+            accept="image/*"
+            onChange={handleFileChange}
+            className="opacity-0 absolute top-0 left-0 w-full h-full cursor-pointer"
+          />
+        </label>
+        {profilePictureBase64 && (
+          <img
+            src={profilePictureBase64}
+            alt="Profile"
+            className="w-20 h-20 object-cover border border-gray-300 rounded-xl"
+          />
+        )}
+      </div>
+
       <p> {pictureFile?.name}</p>
       <div {...errorProps}>{errors.profile_picture?.message}</div>
 
