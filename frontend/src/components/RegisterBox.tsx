@@ -4,6 +4,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { userSchema } from "../models/RegisterUserSchema";
 import { FrontendUser } from "../models/User";
+import userPlaceholder from "../assets/user-placeholder.jpg";
 
 function RegisterBox() {
   const navigate = useNavigate();
@@ -17,7 +18,7 @@ function RegisterBox() {
 
   const [submitError, setSubmitError] = useState<string>("");
   const [profilePictureBase64, setProfilePictureBase64] = useState<string>("");
-  const [pictureFile, setPictureFile] = useState<File>()
+  const [pictureFile, setPictureFile] = useState<File>();
 
   const errorProps = {
     className: "pb-4 text-[#f88]",
@@ -59,25 +60,59 @@ function RegisterBox() {
 
   const encodePicture = (file: File) => {
     const reader = new FileReader();
-      reader.onloadend = () => {
-        setProfilePictureBase64(reader.result as string);
-      };
-      reader.readAsDataURL(file);
-  }
+    reader.onloadend = () => {
+      setProfilePictureBase64(reader.result as string);
+      console.log(profilePictureBase64);
+    };
+    reader.readAsDataURL(file);
+  };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      setPictureFile(file)
-      encodePicture(file)
+      setPictureFile(file);
+      encodePicture(file);
+    }
+  };
+
+  const createFileFromBlob = (
+    blob: Blob,
+    fileName: string,
+    fileType: string,
+  ): File => {
+    const file = new File([blob], fileName, { type: fileType });
+    return file;
+  };
+
+  const fetchDefaultPhoto = async () => {
+    try {
+      const response = await fetch(userPlaceholder);
+      if (response.ok) {
+        const blob = await response.blob();
+        const myFile = createFileFromBlob(
+          blob,
+          "user-placeholder.jpg",
+          "image/jpeg",
+        );
+        setPictureFile(myFile);
+        encodePicture(myFile);
+        console.log(myFile);
+      } else {
+        throw new Error("Failed to fetch image");
+      }
+    } catch (error) {
+      console.error("Error fetching image:", error);
     }
   };
 
   const submit = async (user: FrontendUser) => {
     try {
+      if (!pictureFile) {
+        await fetchDefaultPhoto();
+      }
+
       user.profile_picture = profilePictureBase64;
-      // console.log(user)
-      
+
       const registered = await registerUser(user);
 
       console.log(registered);
