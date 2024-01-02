@@ -58,13 +58,18 @@ function RegisterBox() {
     return userJson.user;
   };
 
-  const encodePicture = (file: File) => {
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setProfilePictureBase64(reader.result as string);
-      console.log(profilePictureBase64);
-    };
-    reader.readAsDataURL(file);
+  const encodePicture = async (file: File): Promise<string> => {
+    return new Promise<string>((resolve) => {
+      console.log("EncodePicture");
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const base64 = reader.result as string;
+        setProfilePictureBase64(base64);
+        console.log("Base64: " + profilePictureBase64);
+        resolve(base64);
+      };
+      reader.readAsDataURL(file);
+    });
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -84,7 +89,7 @@ function RegisterBox() {
     return file;
   };
 
-  const fetchDefaultPhoto = async () => {
+  const fetchDefaultPhoto = async (): Promise<File | undefined> => {
     try {
       const response = await fetch(userPlaceholder.default);
       if (response.ok) {
@@ -95,8 +100,9 @@ function RegisterBox() {
           "image/jpeg",
         );
         setPictureFile(myFile);
-        encodePicture(myFile);
+        await encodePicture(myFile);
         console.log(myFile);
+        return myFile;
       } else {
         throw new Error("Failed to fetch image");
       }
@@ -108,10 +114,14 @@ function RegisterBox() {
   const submit = async (user: FrontendUser) => {
     try {
       if (!pictureFile) {
-        await fetchDefaultPhoto();
+        const defaultFile = await fetchDefaultPhoto();
+        if (defaultFile) {
+          const base64 = await encodePicture(defaultFile);
+          user.profile_picture = base64;
+        }
+      } else {
+        user.profile_picture = profilePictureBase64;
       }
-
-      user.profile_picture = profilePictureBase64;
 
       const registered = await registerUser(user);
 
