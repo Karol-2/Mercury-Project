@@ -60,7 +60,6 @@ function RegisterBox() {
 
   const encodePicture = async (file: File): Promise<string> => {
     return new Promise<string>((resolve) => {
-  
       const reader = new FileReader();
       reader.onloadend = () => {
         const base64 = reader.result as string;
@@ -106,7 +105,7 @@ function RegisterBox() {
         throw new Error("Failed to fetch image");
       }
     } catch (error) {
-      throw new Error("Error fetching image: "+ error)
+      throw new Error("Error fetching image: " + error);
     }
   };
 
@@ -187,9 +186,8 @@ function RegisterBox() {
             onChange={handleFileChange}
             className="opacity-0 absolute top-0 left-0 w-full h-full cursor-pointer"
           />
-          
         </label>
-       
+
         {profilePictureBase64 && (
           <>
             <img
@@ -197,7 +195,12 @@ function RegisterBox() {
               alt="Profile"
               className="w-20 h-20 object-cover border border-gray-300 rounded-xl"
             />
-            <button className="btn secondary" onClick={()=>setProfilePictureBase64("")}>Clear</button>  
+            <button
+              className="btn secondary"
+              onClick={() => setProfilePictureBase64("")}
+            >
+              Clear
+            </button>
           </>
         )}
       </div>

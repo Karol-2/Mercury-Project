@@ -119,7 +119,7 @@ function ProfilePageForm(props: ProfilePageFormProps) {
           <button onClick={deleteUser} className="btn secondary">
             Remove account
           </button>
-         
+
           {showDeleteModal && (
             <Modal
               text={`Are you sure that you want to delete you account?`}
@@ -144,7 +144,6 @@ function ProfilePageForm(props: ProfilePageFormProps) {
             ))}
           </ul>
         </div>
-        
       </div>
     </section>
   );
