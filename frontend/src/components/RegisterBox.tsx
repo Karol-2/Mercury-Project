@@ -60,12 +60,11 @@ function RegisterBox() {
 
   const encodePicture = async (file: File): Promise<string> => {
     return new Promise<string>((resolve) => {
-      console.log("EncodePicture");
+  
       const reader = new FileReader();
       reader.onloadend = () => {
         const base64 = reader.result as string;
         setProfilePictureBase64(base64);
-        console.log("Base64: " + profilePictureBase64);
         resolve(base64);
       };
       reader.readAsDataURL(file);
@@ -101,13 +100,13 @@ function RegisterBox() {
         );
         setPictureFile(myFile);
         await encodePicture(myFile);
-        console.log(myFile);
+        // console.log(myFile);
         return myFile;
       } else {
         throw new Error("Failed to fetch image");
       }
     } catch (error) {
-      console.error("Error fetching image:", error);
+      throw new Error("Error fetching image: "+ error)
     }
   };
 
@@ -163,11 +162,11 @@ function RegisterBox() {
       <div {...errorProps}>{errors.last_name?.message}</div>
       <div>
         <div className="flex gap-2 items-center">
-          <div>Country:</div>
+          <div>Country Code:</div>
           <input
             {...inputProps}
             {...register("country", countryOptions)}
-            placeholder="Country"
+            placeholder="XX"
           />
         </div>
         <div {...errorProps}>{errors.country?.message}</div>
@@ -179,7 +178,7 @@ function RegisterBox() {
           htmlFor="upload-button"
           className="relative cursor-pointer bg-gray-200 rounded-xl py-2 px-4 border border-gray-300"
         >
-          <span>Choose a file</span>
+          <span className="cursor-pointer">Choose a file</span>
           <input
             id="upload-button"
             {...inputProps}
@@ -188,17 +187,22 @@ function RegisterBox() {
             onChange={handleFileChange}
             className="opacity-0 absolute top-0 left-0 w-full h-full cursor-pointer"
           />
+          
         </label>
+       
         {profilePictureBase64 && (
-          <img
-            src={profilePictureBase64}
-            alt="Profile"
-            className="w-20 h-20 object-cover border border-gray-300 rounded-xl"
-          />
+          <>
+            <img
+              src={profilePictureBase64}
+              alt="Profile"
+              className="w-20 h-20 object-cover border border-gray-300 rounded-xl"
+            />
+            <button className="btn secondary" onClick={()=>setProfilePictureBase64("")}>Clear</button>  
+          </>
         )}
       </div>
 
-      <p> {pictureFile?.name}</p>
+      <p className=" text-center"> {pictureFile?.name}</p>
       <div {...errorProps}>{errors.profile_picture?.message}</div>
 
       <div className="py-5">
