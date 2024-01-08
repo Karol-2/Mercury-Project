@@ -6,15 +6,13 @@ import { useNavigate } from "react-router-dom";
 import { Socket } from "socket.io-client";
 import socketConnection from "../webSocket/socketConnection";
 import stunServers from "../stun/stunServers";
+
 function VideoCallPage() {
-  const { user, userId } = useUser();
+  const { user, socket, userId } = useUser();
   const navigate = useNavigate();
   const localStream = useRef<HTMLVideoElement>(null);
   const remoteStream = useRef<HTMLVideoElement>(null);
   const [makingOffer, setMakingOffer] = useState(false);
-  //const socket: Socket = useSelector((state: RootState) => state.socket);
-  //console.log(socket)
-  const socket = socketConnection();
 
   useEffect(() => {
     if (userId === null) navigate("/login");
@@ -27,10 +25,12 @@ function VideoCallPage() {
   }, [user]);
 
   useEffect(() => {
-    prepareWebRTC();
+    if (socket) {
+      prepareWebRTC(socket);
+    }
   }, []);
 
-  async function prepareWebRTC() {
+  async function prepareWebRTC(socket: Socket) {
     const peerConnection = new RTCPeerConnection(stunServers);
     let polite = false;
 
