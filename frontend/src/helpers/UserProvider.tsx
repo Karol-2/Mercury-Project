@@ -9,10 +9,14 @@ import { isExpired, decodeToken } from "react-jwt";
 import Cookies from "js-cookie";
 import dataService from "../services/data";
 import User from "../models/User";
+import { useDispatch } from "react-redux";
+import createSocketConnection from "../redux/actions/createSocketConnection";
+import { Socket, io } from "socket.io-client";
 
 export interface UserContextValue {
   userId: string | null | undefined;
   user: User | null | undefined;
+  socket: Socket | null;
   setUser: React.Dispatch<React.SetStateAction<User | null | undefined>>;
   login: (mail: string, password: string) => Promise<void>;
   logout: () => Promise<boolean>;
@@ -39,6 +43,17 @@ function UserProvider({ children }: { children: React.ReactNode }) {
   const [userId, setUserId] = useState<string | null | undefined>(undefined);
   const [user, setUser] = useState<User | null | undefined>(null);
   const [token, setToken] = useState<object | null>(null);
+  const [socket, setSocket] = useState<Socket | null>(null);
+
+  useEffect(() => {
+    if (!user){
+      setSocket(null)
+      return
+    }
+    if (socket && socket.connected) return;
+    setSocket(io("http://localhost:5000", { auth: { userId } }));
+  }, [user])
+
   const firstRefresh = useRef(true);
 
   const trySetToken = (tokenStr: string | null): boolean => {
@@ -163,7 +178,7 @@ function UserProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <UserContext.Provider
-      value={{ userId, user, setUser, login, logout, updateUser, deleteUser }}
+      value={{ userId, user, setUser, socket, login, logout, updateUser, deleteUser }}
     >
       {children}
     </UserContext.Provider>
