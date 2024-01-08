@@ -2,34 +2,9 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
-
+import { userSchema } from "../models/RegisterUserSchema";
 import { FrontendUser } from "../models/User";
-
-const userSchema: z.ZodType<Partial<FrontendUser>> = z.object({
-  first_name: z
-    .string()
-    .min(2, "First name should be at least two characters long"),
-  last_name: z
-    .string()
-    .min(2, "Last name should be at least two characters long"),
-  country: z
-    .string()
-    .length(2, "Country code should be 2 characters long")
-    .toUpperCase(),
-  profile_picture: z
-    .any()
-    .refine((obj) => obj.length > 0, "Profile picture not provided")
-    .refine(
-      (obj) => obj.length > 0 && (obj as FileList)[0].size <= 5 * 1024 * 1024,
-      "File is too big (>5 MB)",
-    )
-    .transform((obj) => (obj as FileList)[0].name),
-  mail: z.string().email(),
-  password: z
-    .string()
-    .min(8, "Password should be at least eight characters long"),
-});
+import * as userPlaceholder from "../assets/user-placeholder.jpg";
 
 function RegisterBox() {
   const navigate = useNavigate();
@@ -42,6 +17,8 @@ function RegisterBox() {
   });
 
   const [submitError, setSubmitError] = useState<string>("");
+  const [profilePictureBase64, setProfilePictureBase64] = useState<string>("");
+  const [pictureFile, setPictureFile] = useState<File>();
 
   const errorProps = {
     className: "pb-4 text-[#f88]",
@@ -81,8 +58,69 @@ function RegisterBox() {
     return userJson.user;
   };
 
+  const encodePicture = async (file: File): Promise<string> => {
+    return new Promise<string>((resolve) => {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const base64 = reader.result as string;
+        setProfilePictureBase64(base64);
+        resolve(base64);
+      };
+      reader.readAsDataURL(file);
+    });
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setPictureFile(file);
+      encodePicture(file);
+    }
+  };
+
+  const createFileFromBlob = (
+    blob: Blob,
+    fileName: string,
+    fileType: string,
+  ): File => {
+    const file = new File([blob], fileName, { type: fileType });
+    return file;
+  };
+
+  const fetchDefaultPhoto = async (): Promise<File | undefined> => {
+    try {
+      const response = await fetch(userPlaceholder.default);
+      if (response.ok) {
+        const blob = await response.blob();
+        const myFile = createFileFromBlob(
+          blob,
+          "user-placeholder.jpg",
+          "image/jpeg",
+        );
+        setPictureFile(myFile);
+        await encodePicture(myFile);
+        // console.log(myFile);
+        return myFile;
+      } else {
+        throw new Error("Failed to fetch image");
+      }
+    } catch (error) {
+      throw new Error("Error fetching image: " + error);
+    }
+  };
+
   const submit = async (user: FrontendUser) => {
     try {
+      if (!pictureFile) {
+        const defaultFile = await fetchDefaultPhoto();
+        if (defaultFile) {
+          const base64 = await encodePicture(defaultFile);
+          user.profile_picture = base64;
+        }
+      } else {
+        user.profile_picture = profilePictureBase64;
+      }
+
       const registered = await registerUser(user);
 
       console.log(registered);
@@ -107,13 +145,14 @@ function RegisterBox() {
       className="medium:w-[25vw] flex flex-col gap-2 bg-my-dark p-10 px-20 rounded-xl"
       onSubmit={handleSubmit(submit)}
     >
-      <div>First and last name:</div>
+      <div>First name:</div>
       <input
         {...inputProps}
         {...register("first_name")}
         placeholder="First name"
       />
       <div {...errorProps}>{errors.first_name?.message}</div>
+      <div>Last Name:</div>
       <input
         {...inputProps}
         {...register("last_name")}
@@ -122,23 +161,51 @@ function RegisterBox() {
       <div {...errorProps}>{errors.last_name?.message}</div>
       <div>
         <div className="flex gap-2 items-center">
-          <div>Country:</div>
+          <div>Country Code:</div>
           <input
             {...inputProps}
             {...register("country", countryOptions)}
-            placeholder="Country"
+            placeholder="XX"
           />
         </div>
         <div {...errorProps}>{errors.country?.message}</div>
       </div>
 
       <div>Profile picture:</div>
-      <input
-        {...inputProps}
-        {...register("profile_picture")}
-        type="file"
-        accept="image/*"
-      />
+      <div className="flex items-center justify-center space-x-4 rounded-xl">
+        <label
+          htmlFor="upload-button"
+          className="relative cursor-pointer bg-gray-200 rounded-xl py-2 px-4 border border-gray-300"
+        >
+          <span className="cursor-pointer">Choose a file</span>
+          <input
+            id="upload-button"
+            {...inputProps}
+            type="file"
+            accept="image/*"
+            onChange={handleFileChange}
+            className="opacity-0 absolute top-0 left-0 w-full h-full cursor-pointer"
+          />
+        </label>
+
+        {profilePictureBase64 && (
+          <>
+            <img
+              src={profilePictureBase64}
+              alt="Profile"
+              className="w-20 h-20 object-cover border border-gray-300 rounded-xl"
+            />
+            <button
+              className="btn secondary"
+              onClick={() => setProfilePictureBase64("")}
+            >
+              Clear
+            </button>
+          </>
+        )}
+      </div>
+
+      <p className=" text-center"> {pictureFile?.name}</p>
       <div {...errorProps}>{errors.profile_picture?.message}</div>
 
       <div className="py-5">
