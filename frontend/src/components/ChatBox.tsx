@@ -4,9 +4,12 @@ import { useSelector } from "react-redux";
 import { Socket } from "socket.io-client";
 
 import User from "../models/User";
+import notificationSoundUrl from "../misc/notification.mp3";
 import Message, { MessageProps } from "./Message";
 import { RootState } from "../redux/store";
 import dataService from "../services/data";
+
+const notificationSound = new Audio(notificationSoundUrl);
 
 interface ChatBoxProps {
   user: User;
@@ -18,9 +21,32 @@ function ChatBox({ user, friendId, friend_profile_picture }: ChatBoxProps) {
   const [messages, setMessages] = useState<MessageProps[]>([]);
   const enterPressed = useRef<boolean>(false);
   const socket: Socket = useSelector((state: RootState) => state.socket);
+  const [notificationPlaying, setNotificationPlaying] =
+    useState<boolean>(false);
+
   socket.on("message", (message: MessageProps) => {
+    setNotificationPlaying(true);
     setMessages([...messages, message]);
   });
+
+  useEffect(() => {
+    if (notificationPlaying) {
+      notificationSound.addEventListener("canplay", () =>
+        notificationSound.play(),
+      );
+    }
+  }, [notificationPlaying]);
+
+  useEffect(() => {
+    notificationSound.addEventListener("ended", () =>
+      setNotificationPlaying(false),
+    );
+    return () => {
+      notificationSound.removeEventListener("ended", () =>
+        setNotificationPlaying(false),
+      );
+    };
+  }, []);
 
   useEffect(() => {
     async function fetchMessages() {
