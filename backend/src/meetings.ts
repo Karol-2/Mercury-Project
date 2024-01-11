@@ -49,8 +49,8 @@ export async function joinMeeting(
 export async function endMeeting(session: Session, userId: string) {
   await session.run(
     `
-    MATCH (u:User { id: $userId })-[:IS_IN_MEETING]->(m:Meeting)
-    DELETE m
+    MATCH (u:User { id: $userId })-[r:IS_IN_MEETING]->(m:Meeting)
+    DELETE r, m
     `,
     { userId },
   );
