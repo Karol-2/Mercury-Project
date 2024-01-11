@@ -144,6 +144,27 @@ function ProfilePageForm(props: ProfilePageFormProps) {
             ))}
           </ul>
         </div>
+        <div className="my-5">
+          {isEditing ? (
+            <button onClick={handleSaveClick} className="btn primary">
+              Save
+            </button>
+          ) : (
+            <button onClick={handleEditClick} className="btn primary">
+              Edit
+            </button>
+          )}
+          <button onClick={deleteUser} className="btn secondary">
+            Remove account
+          </button>
+          {showDeleteModal && (
+            <Modal
+              text={`Are you sure that you want to delete you account?`}
+              handleYes={deleteUser}
+              handleNo={() => setShowDeleteModal(false)}
+            ></Modal>
+          )}
+        </div>
       </div>
     </section>
   );
