@@ -17,11 +17,14 @@ export interface UserContextValue {
   userId: string | null | undefined;
   user: User | null | undefined;
   socket: Socket | null;
+  meetingId: string;
   setUser: React.Dispatch<React.SetStateAction<User | null | undefined>>;
   login: (mail: string, password: string) => Promise<void>;
   logout: () => Promise<boolean>;
   updateUser: () => Promise<boolean>;
   deleteUser: () => Promise<boolean>;
+  createMeeting: () => Promise<string>;
+  joinMeeting: () => boolean;
 }
 
 const UserContext = createContext<UserContextValue | null>(null);
@@ -44,15 +47,16 @@ function UserProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null | undefined>(null);
   const [token, setToken] = useState<object | null>(null);
   const [socket, setSocket] = useState<Socket | null>(null);
+  const [meetingId, setMeetingId] = useState<string>("");
 
   useEffect(() => {
-    if (!user){
-      setSocket(null)
-      return
+    if (!user) {
+      setSocket(null);
+      return;
     }
     if (socket && socket.connected) return;
     setSocket(io("http://localhost:5000", { auth: { userId } }));
-  }, [user])
+  }, [user]);
 
   const firstRefresh = useRef(true);
 
@@ -157,6 +161,25 @@ function UserProvider({ children }: { children: React.ReactNode }) {
     return false;
   };
 
+  const createMeeting = async () => {
+    if (!socket) return;
+
+    const waitForMeeting = new Promise<string | void>((resolve) => {
+      socket.once("createdMeeting", (meeting) => {
+        const meetingId = (meeting?.id || "") as string;
+        setMeetingId(meetingId);
+        return resolve(meetingId);
+      });
+    });
+
+    socket.emit("createMeeting");
+
+    const meetingId = await waitForMeeting;
+    return meetingId;
+  };
+
+  const joinMeeting = async () => {};
+
   useEffect(() => {
     if (token) {
       const newUserId = (token as any).userId;
@@ -178,7 +201,19 @@ function UserProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <UserContext.Provider
-      value={{ userId, user, setUser, socket, login, logout, updateUser, deleteUser }}
+      value={{
+        userId,
+        user,
+        setUser,
+        socket,
+        meetingId,
+        login,
+        logout,
+        updateUser,
+        deleteUser,
+        createMeeting,
+        joinMeeting,
+      }}
     >
       {children}
     </UserContext.Provider>
