@@ -46,11 +46,14 @@ export async function joinMeeting(
   return createResult.records[0]?.get("m").properties;
 }
 
-export async function endMeeting(session: Session, userId: string) {
+export async function leaveMeeting(session: Session, userId: string) {
   await session.run(
     `
-    MATCH (u:User { id: $userId })-[r:IS_IN_MEETING]->(m:Meeting)
-    DELETE r, m
+    MATCH (:User { id: $userId })-[r:IS_IN_MEETING]->(m:Meeting)
+    DELETE r
+    WITH m
+    MATCH (m) WHERE NOT ()-[]->(m)
+    DELETE m
     `,
     { userId },
   );

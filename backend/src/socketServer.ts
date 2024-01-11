@@ -7,7 +7,7 @@ import { isFriend } from "./users";
 import driver from "./driver/driver";
 import {
   createMeeting,
-  endMeeting,
+  leaveMeeting,
   isInMeeting,
   joinMeeting,
 } from "./meetings";
@@ -70,7 +70,7 @@ io.on("connection", async (socket: Socket) => {
 
   socket.on("disconnect", async (_reason) => {
     const session = driver.session();
-    await endMeeting(session, userId);
+    await leaveMeeting(session, userId);
     session.close();
   });
 
