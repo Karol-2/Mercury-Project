@@ -4,11 +4,10 @@ import { useUser } from "../helpers/UserProvider";
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Socket } from "socket.io-client";
-import socketConnection from "../webSocket/socketConnection";
 import stunServers from "../stun/stunServers";
 
 function VideoCallPage() {
-  const { user, socket, userId } = useUser();
+  const { user, socket, userId, meetingId } = useUser();
   const navigate = useNavigate();
   const localStream = useRef<HTMLVideoElement>(null);
   const remoteStream = useRef<HTMLVideoElement>(null);
@@ -19,10 +18,10 @@ function VideoCallPage() {
   }, [userId]);
 
   useEffect(() => {
-    if (user === undefined) {
-      return;
+    if (!meetingId) {
+      navigate("/");
     }
-  }, [user]);
+  }, [meetingId]);
 
   useEffect(() => {
     if (socket) {
