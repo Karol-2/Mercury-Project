@@ -45,3 +45,13 @@ export async function joinMeeting(
 
   return createResult.records[0]?.get("m").properties;
 }
+
+export async function endMeeting(session: Session, userId: string) {
+  await session.run(
+    `
+    MATCH (u:User { id: $userId })-[:IS_IN_MEETING]->(m:Meeting)
+    DELETE m
+    `,
+    { userId },
+  );
+}
