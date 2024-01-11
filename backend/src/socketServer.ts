@@ -39,12 +39,13 @@ io.on("connection", async (socket: Socket) => {
   socket.on("joinMeeting", async (friendId: string) => {
     const session = driver.session();
     const canJoin = await isFriend(session, userId, friendId);
+    let meeting = null;
 
     if (canJoin) {
-      const meeting = await joinMeeting(session, userId, friendId);
-      socket.emit(meeting);
+      meeting = await joinMeeting(session, userId, friendId);
     }
 
+    socket.emit("joinedMeeting", meeting);
     session.close();
   });
 
