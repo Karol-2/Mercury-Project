@@ -19,12 +19,15 @@ io.on("connection", async (socket: Socket) => {
   socket.on("createMeeting", async () => {
     const session = driver.session()
     const inMeeting = await isInMeeting(session, userId)
+    let meeting = null
+    console.log("check")
 
     if (!inMeeting) {
-      const meeting = await createMeeting(session, userId)
-      socket.emit(meeting)
+      console.log("create")
+      meeting = await createMeeting(session, userId)
     }
 
+    socket.emit("createdMeeting", meeting)
     session.close()
   })
 
