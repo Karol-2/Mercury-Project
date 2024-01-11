@@ -10,6 +10,7 @@ export interface ProfilePageFormProps {
   handleEditClick: () => void;
   handleSaveClick: () => void;
   handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  createMeeting: () => void;
   deleteUser: () => void;
 }
 
@@ -24,6 +25,7 @@ function ProfilePageForm(props: ProfilePageFormProps) {
     handleEditClick,
     handleSaveClick,
     handleChange,
+    createMeeting,
     deleteUser,
   } = props;
 
@@ -154,6 +156,9 @@ function ProfilePageForm(props: ProfilePageFormProps) {
               Edit
             </button>
           )}
+          <button onClick={createMeeting} className="btn secondary">
+            Create a meeting
+          </button>
           <button onClick={deleteUser} className="btn secondary">
             Remove account
           </button>

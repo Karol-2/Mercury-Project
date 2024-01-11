@@ -30,6 +30,10 @@ function ProfilePage() {
     setUser({ ...user, [name]: value } as User);
   };
 
+  const createMeeting = () => {
+    console.log("Create a meeting");
+  };
+
   useEffect(() => {
     if (userId === null) navigate("/login");
 
@@ -55,6 +59,7 @@ function ProfilePage() {
           handleEditClick={handleEditClick}
           handleSaveClick={handleSaveClick}
           handleChange={handleChange}
+          createMeeting={createMeeting}
           deleteUser={deleteUser}
         />
       ) : (
