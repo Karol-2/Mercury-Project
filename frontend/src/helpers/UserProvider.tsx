@@ -23,8 +23,8 @@ export interface UserContextValue {
   logout: () => Promise<boolean>;
   updateUser: () => Promise<boolean>;
   deleteUser: () => Promise<boolean>;
-  createMeeting: () => Promise<string>;
-  joinMeeting: () => boolean;
+  createMeeting: () => Promise<string | void>;
+  joinMeeting: (friendId: string) => Promise<string | void>;
 }
 
 const UserContext = createContext<UserContextValue | null>(null);
@@ -178,7 +178,22 @@ function UserProvider({ children }: { children: React.ReactNode }) {
     return meetingId;
   };
 
-  const joinMeeting = async () => {};
+  const joinMeeting = async (friendId: string) => {
+    if (!socket) return;
+
+    const waitForMeeting = new Promise<string | void>((resolve) => {
+      socket.once("joinedMeeting", (meeting) => {
+        const meetingId = (meeting?.id || "") as string;
+        setMeetingId(meetingId);
+        return resolve(meetingId);
+      });
+    });
+
+    socket.emit("joinMeeting", [friendId]);
+
+    const meetingId = await waitForMeeting;
+    return meetingId;
+  };
 
   useEffect(() => {
     if (token) {

@@ -11,6 +11,7 @@ export interface ProfilePageFormProps {
   handleSaveClick: () => void;
   handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   createMeeting: () => void;
+  joinMeeting: (friendId: string) => void;
   deleteUser: () => void;
 }
 
@@ -26,6 +27,7 @@ function ProfilePageForm(props: ProfilePageFormProps) {
     handleSaveClick,
     handleChange,
     createMeeting,
+    joinMeeting,
     deleteUser,
   } = props;
 
@@ -138,7 +140,7 @@ function ProfilePageForm(props: ProfilePageFormProps) {
                 {`${friend.first_name} ${friend.last_name}`}
                 <button
                   className="mx-2 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 border border-blue-700 rounded"
-                  onClick={() => navigate("/meeting")}
+                  onClick={() => joinMeeting(friend.id)}
                 >
                   Meeting
                 </button>

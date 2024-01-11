@@ -9,8 +9,16 @@ import dataService from "../services/data";
 
 function ProfilePage() {
   const navigate = useNavigate();
-  const { user, userId, setUser, updateUser, deleteUser, createMeeting } =
-    useUser();
+  const {
+    user,
+    userId,
+    setUser,
+    meetingId,
+    updateUser,
+    deleteUser,
+    createMeeting,
+    joinMeeting,
+  } = useUser();
   const [isEditing, setIsEditing] = useState(false);
   const [friends, setFriends] = useState([]);
 
@@ -31,12 +39,11 @@ function ProfilePage() {
     setUser({ ...user, [name]: value } as User);
   };
 
-  const createMeetingRedirect = async () => {
-    const meetingId = await createMeeting();
+  useEffect(() => {
     if (meetingId) {
       navigate("/meeting");
     }
-  };
+  }, [meetingId]);
 
   useEffect(() => {
     if (userId === null) navigate("/login");
@@ -63,7 +70,8 @@ function ProfilePage() {
           handleEditClick={handleEditClick}
           handleSaveClick={handleSaveClick}
           handleChange={handleChange}
-          createMeeting={createMeetingRedirect}
+          createMeeting={createMeeting}
+          joinMeeting={joinMeeting}
           deleteUser={deleteUser}
         />
       ) : (
