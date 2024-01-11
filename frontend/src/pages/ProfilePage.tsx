@@ -9,7 +9,7 @@ import dataService from "../services/data";
 
 function ProfilePage() {
   const navigate = useNavigate();
-  const { user, userId, setUser, updateUser, deleteUser } = useUser();
+  const { user, userId, setUser, socket, updateUser, deleteUser } = useUser();
   const [isEditing, setIsEditing] = useState(false);
   const [friends, setFriends] = useState([]);
 
@@ -31,7 +31,14 @@ function ProfilePage() {
   };
 
   const createMeeting = () => {
-    console.log("Create a meeting");
+    if (!socket) return;
+
+    socket.once("createdMeeting", (meeting) => {
+      if (!meeting) return;
+      navigate("/meeting");
+    });
+
+    socket.emit("createMeeting");
   };
 
   useEffect(() => {
