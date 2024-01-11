@@ -3,6 +3,9 @@ import dotenv from "dotenv";
 import { Socket } from "socket.io";
 import { setSocketId, getSocketId } from "./misc/socketId";
 import addMessageToDb from "./misc/addMessageToDb";
+import { isFriend } from "./users";
+import driver from "./driver/driver";
+import { createMeeting, isInMeeting, joinMeeting } from "./meetings";
 
 const { io } = servers;
 
@@ -11,7 +14,31 @@ dotenv.config();
 io.on("connection", async (socket: Socket) => {
   const userId = socket.handshake.auth.userId;
   await setSocketId(socket.id, userId);
-  console.log("Socket server started ");
+  console.log("Client connected");
+
+  socket.on("createMeeting", async () => {
+    const session = driver.session()
+    const inMeeting = await isInMeeting(session, userId)
+
+    if (!inMeeting) {
+      const meeting = await createMeeting(session, userId)
+      socket.emit(meeting)
+    }
+
+    session.close()
+  })
+
+  socket.on("joinMeeting", async (friendId: string) => {
+    const session = driver.session()
+    const canJoin = await isFriend(session, userId, friendId)
+
+    if (canJoin) {
+      const meeting = await joinMeeting(session, userId, friendId) 
+      socket.emit(meeting)
+    }
+
+    session.close()
+  });
 
   socket.on("iceCandidate", (candidate) => {
     socket.broadcast.emit("iceCandidate", candidate);
