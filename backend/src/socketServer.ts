@@ -36,13 +36,17 @@ io.on("connection", async (socket: Socket) => {
     session.close();
   });
 
-  socket.on("joinMeeting", async (friendId: string) => {
+  socket.on("joinMeeting", async (message) => {
+    const [friendId] = message;
     const session = driver.session();
     const canJoin = await isFriend(session, userId, friendId);
     let meeting = null;
 
     if (canJoin) {
       meeting = await joinMeeting(session, userId, friendId);
+      console.log("Join meeting:", userId, "joined meeting of", friendId);
+    } else {
+      console.log("Join meeting:", userId, "is not a friend of", friendId);
     }
 
     socket.emit("joinedMeeting", meeting);
