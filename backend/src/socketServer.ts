@@ -112,5 +112,6 @@ io.on("connection", async (socket: Socket) => {
     await leaveMeeting(session, userId);
     session.close();
     setMeeting(null);
+    console.log("Client disconnected");
   });
 });
