@@ -113,10 +113,4 @@ io.on("connection", async (socket: Socket) => {
     session.close();
     setMeeting(null);
   });
-
-  socket.rooms.forEach((room) => {
-    if (io.sockets.adapter.rooms.get(room)?.size === 1) {
-      socket.emit("first");
-    }
-  });
 });
