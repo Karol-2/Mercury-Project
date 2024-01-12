@@ -1,5 +1,6 @@
 import { Session } from "neo4j-driver";
 import { v4 as uuidv4 } from "uuid";
+import Meeting from "./models/Meeting";
 
 export async function isInMeeting(session: Session, userId: string) {
   const result = await session.run(
@@ -8,7 +9,7 @@ export async function isInMeeting(session: Session, userId: string) {
   );
 
   if (result.records.length > 0) {
-    return result.records[0].get("m");
+    return result.records[0].get("m").properties as Meeting;
   }
 
   return null;
@@ -25,7 +26,7 @@ export async function createMeeting(session: Session, userId: string) {
     { userId, meetingId },
   );
 
-  return createResult.records[0].get("m").properties;
+  return createResult.records[0].get("m").properties as Meeting;
 }
 
 export async function joinMeeting(
@@ -43,7 +44,7 @@ export async function joinMeeting(
     { userId, friendId },
   );
 
-  return createResult.records[0]?.get("m").properties;
+  return createResult.records[0]?.get("m").properties as Meeting;
 }
 
 export async function leaveMeeting(session: Session, userId: string) {

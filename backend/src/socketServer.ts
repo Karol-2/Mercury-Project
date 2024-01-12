@@ -11,6 +11,7 @@ import {
   isInMeeting,
   joinMeeting,
 } from "./meetings";
+import Meeting from "./models/Meeting";
 
 const { io } = servers;
 
@@ -18,13 +19,14 @@ dotenv.config();
 
 io.on("connection", async (socket: Socket) => {
   const userId = socket.handshake.auth.userId;
+  let meeting: Meeting | null = null;
+
   await setSocketId(socket.id, userId);
   console.log("Client connected");
 
   socket.on("createMeeting", async () => {
     const session = driver.session();
     const inMeeting = await isInMeeting(session, userId);
-    let meeting = null;
 
     if (!inMeeting) {
       meeting = await createMeeting(session, userId);
@@ -43,7 +45,6 @@ io.on("connection", async (socket: Socket) => {
     const [friendId] = message;
     const session = driver.session();
     const canJoin = await isFriend(session, userId, friendId);
-    let meeting = null;
 
     if (canJoin) {
       meeting = await joinMeeting(session, userId, friendId);
