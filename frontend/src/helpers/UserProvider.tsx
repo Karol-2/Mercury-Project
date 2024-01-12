@@ -12,12 +12,13 @@ import User from "../models/User";
 import { useDispatch } from "react-redux";
 import createSocketConnection from "../redux/actions/createSocketConnection";
 import { Socket, io } from "socket.io-client";
+import Meeting from "../models/Meeting";
 
 export interface UserContextValue {
   userId: string | null | undefined;
   user: User | null | undefined;
   socket: Socket | null;
-  meetingId: string;
+  meeting: Meeting | null;
   setUser: React.Dispatch<React.SetStateAction<User | null | undefined>>;
   login: (mail: string, password: string) => Promise<void>;
   logout: () => Promise<boolean>;
@@ -47,7 +48,7 @@ function UserProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null | undefined>(null);
   const [token, setToken] = useState<object | null>(null);
   const [socket, setSocket] = useState<Socket | null>(null);
-  const [meetingId, setMeetingId] = useState<string>("");
+  const [meeting, setMeeting] = useState<Meeting | null>(null);
 
   useEffect(() => {
     if (!user) {
@@ -164,10 +165,9 @@ function UserProvider({ children }: { children: React.ReactNode }) {
   const createMeeting = async () => {
     if (!socket) return;
 
-    const waitForMeeting = new Promise<string | void>((resolve) => {
+    const waitForMeeting = new Promise<string>((resolve) => {
       socket.once("createdMeeting", (meeting) => {
         const meetingId = (meeting?.id || "") as string;
-        setMeetingId(meetingId);
         return resolve(meetingId);
       });
     });
@@ -175,16 +175,16 @@ function UserProvider({ children }: { children: React.ReactNode }) {
     socket.emit("createMeeting");
 
     const meetingId = await waitForMeeting;
+    setMeeting({id: meetingId, state: "created"});
     return meetingId;
   };
 
   const joinMeeting = async (friendId: string) => {
     if (!socket) return;
 
-    const waitForMeeting = new Promise<string | void>((resolve) => {
+    const waitForMeeting = new Promise<string>((resolve) => {
       socket.once("joinedMeeting", (meeting) => {
         const meetingId = (meeting?.id || "") as string;
-        setMeetingId(meetingId);
         return resolve(meetingId);
       });
     });
@@ -192,6 +192,7 @@ function UserProvider({ children }: { children: React.ReactNode }) {
     socket.emit("joinMeeting", [friendId]);
 
     const meetingId = await waitForMeeting;
+    setMeeting({id: meetingId, state: "joined"});
     return meetingId;
   };
 
@@ -221,7 +222,7 @@ function UserProvider({ children }: { children: React.ReactNode }) {
         user,
         setUser,
         socket,
-        meetingId,
+        meeting,
         login,
         logout,
         updateUser,
