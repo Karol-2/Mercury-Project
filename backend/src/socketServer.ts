@@ -87,11 +87,17 @@ io.on("connection", async (socket: Socket) => {
   });
 
   socket.on("iceCandidate", (candidate) => {
-    socket.broadcast.emit("iceCandidate", candidate);
+    const meetingRoom = getMeetingRoom();
+    if (meetingRoom) {
+      socket.to(meetingRoom).emit("iceCandidate", candidate);
+    }
   });
 
   socket.on("description", (description) => {
-    socket.broadcast.emit("description", description);
+    const meetingRoom = getMeetingRoom();
+    if (meetingRoom) {
+      socket.to(meetingRoom).emit("description", description);
+    }
   });
 
   socket.on("message", async (message) => {
