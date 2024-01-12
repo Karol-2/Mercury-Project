@@ -17,10 +17,27 @@ const { io } = servers;
 
 dotenv.config();
 
+const meetings: Record<string, Meeting> = {};
+
 io.on("connection", async (socket: Socket) => {
   const userId = socket.handshake.auth.userId;
-  let meeting: Meeting | null = null;
-  let meetingRoom: string = "";
+
+  const getMeeting = () => meetings[socket.id];
+  const getMeetingRoom = () => `meeting:${meetings[socket.id].id}`;
+
+  const setMeeting = (newMeeting: Meeting | null) => {
+    const meeting = meetings[socket.id];
+
+    if (!meeting && newMeeting) {
+      meetings[socket.id] = newMeeting;
+      const meetingRoom = getMeetingRoom();
+      socket.join(meetingRoom);
+    } else if (meeting && !newMeeting) {
+      const meetingRoom = getMeetingRoom();
+      socket.leave(meetingRoom);
+      delete meetings[socket.id];
+    }
+  };
 
   await setSocketId(socket.id, userId);
   console.log("Client connected");
@@ -30,18 +47,17 @@ io.on("connection", async (socket: Socket) => {
     const inMeeting = await isInMeeting(session, userId);
 
     if (!inMeeting) {
-      meeting = await createMeeting(session, userId);
-      meetingRoom = `meeting:${meeting.id}`;
+      const meeting = await createMeeting(session, userId);
+      setMeeting(meeting);
       console.log(`Create meeting: ${userId} created meeting ${meeting.id}`);
     } else {
-      meeting = null;
-      meetingRoom = "";
+      setMeeting(null);
       console.log(
         `Create meeting: ${userId} can't create meeting - already created`,
       );
     }
 
-    socket.emit("createdMeeting", meeting);
+    socket.emit("createdMeeting", getMeeting());
     session.close();
   });
 
@@ -51,13 +67,13 @@ io.on("connection", async (socket: Socket) => {
     const canJoin = await isFriend(session, userId, friendId);
 
     if (canJoin) {
-      meeting = await joinMeeting(session, userId, friendId);
+      const meeting = await joinMeeting(session, userId, friendId);
 
       if (meeting) {
-        meetingRoom = `meeting:${meeting.id}`;
+        setMeeting(meeting);
         console.log(`Join meeting: ${userId} joined meeting of ${friendId}`);
       } else {
-        meetingRoom = "";
+        setMeeting(null);
         console.log(
           `Join meeting: ${userId} can't join meeting of ${friendId} - meeting not created`,
         );
@@ -66,7 +82,7 @@ io.on("connection", async (socket: Socket) => {
       console.log(`Join meeting: ${userId} is not a friend of ${friendId}`);
     }
 
-    socket.emit("joinedMeeting", meeting);
+    socket.emit("joinedMeeting", getMeeting());
     session.close();
   });
 
@@ -89,6 +105,7 @@ io.on("connection", async (socket: Socket) => {
     const session = driver.session();
     await leaveMeeting(session, userId);
     session.close();
+    setMeeting(null);
   });
 
   socket.rooms.forEach((room) => {
