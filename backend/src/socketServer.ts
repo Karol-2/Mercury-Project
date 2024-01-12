@@ -44,9 +44,15 @@ io.on("connection", async (socket: Socket) => {
 
     if (canJoin) {
       meeting = await joinMeeting(session, userId, friendId);
-      console.log("Join meeting:", userId, "joined meeting of", friendId);
+      if (meeting) {
+        console.log(`Join meeting: ${userId} joined meeting of ${friendId}`);
+      } else {
+        console.log(
+          `Join meeting: ${userId} can't join meeting of ${friendId} - meeting not created`,
+        );
+      }
     } else {
-      console.log("Join meeting:", userId, "is not a friend of", friendId);
+      console.log(`Join meeting: ${userId} is not a friend of ${friendId}`);
     }
 
     socket.emit("joinedMeeting", meeting);
