@@ -41,7 +41,7 @@ function ProfilePage() {
   };
 
   useEffect(() => {
-    if (meeting) {
+    if (meeting?.id) {
       navigate("/meeting");
     }
   }, [meeting]);
