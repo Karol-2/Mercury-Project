@@ -20,6 +20,7 @@ dotenv.config();
 io.on("connection", async (socket: Socket) => {
   const userId = socket.handshake.auth.userId;
   let meeting: Meeting | null = null;
+  let meetingRoom: string = "";
 
   await setSocketId(socket.id, userId);
   console.log("Client connected");
@@ -30,8 +31,11 @@ io.on("connection", async (socket: Socket) => {
 
     if (!inMeeting) {
       meeting = await createMeeting(session, userId);
+      meetingRoom = `meeting:${meeting.id}`;
       console.log(`Create meeting: ${userId} created meeting ${meeting.id}`);
     } else {
+      meeting = null;
+      meetingRoom = "";
       console.log(
         `Create meeting: ${userId} can't create meeting - already created`,
       );
@@ -48,9 +52,12 @@ io.on("connection", async (socket: Socket) => {
 
     if (canJoin) {
       meeting = await joinMeeting(session, userId, friendId);
+
       if (meeting) {
+        meetingRoom = `meeting:${meeting.id}`;
         console.log(`Join meeting: ${userId} joined meeting of ${friendId}`);
       } else {
+        meetingRoom = "";
         console.log(
           `Join meeting: ${userId} can't join meeting of ${friendId} - meeting not created`,
         );
