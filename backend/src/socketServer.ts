@@ -25,11 +25,14 @@ io.on("connection", async (socket: Socket) => {
     const session = driver.session();
     const inMeeting = await isInMeeting(session, userId);
     let meeting = null;
-    console.log("check");
 
     if (!inMeeting) {
-      console.log("create");
       meeting = await createMeeting(session, userId);
+      console.log(`Create meeting: ${userId} created meeting ${meeting.id}`);
+    } else {
+      console.log(
+        `Create meeting: ${userId} can't create meeting - already created`,
+      );
     }
 
     socket.emit("createdMeeting", meeting);
