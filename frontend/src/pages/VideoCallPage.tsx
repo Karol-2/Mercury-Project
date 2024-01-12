@@ -5,9 +5,10 @@ import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Socket } from "socket.io-client";
 import stunServers from "../stun/stunServers";
+import Meeting from "../models/Meeting";
 
 function VideoCallPage() {
-  const { user, socket, userId, meetingId } = useUser();
+  const { userId, socket, meeting } = useUser();
   const navigate = useNavigate();
   const localStream = useRef<HTMLVideoElement>(null);
   const remoteStream = useRef<HTMLVideoElement>(null);
@@ -18,25 +19,20 @@ function VideoCallPage() {
   }, [userId]);
 
   useEffect(() => {
-    if (!meetingId) {
+    if (!meeting) {
       navigate("/");
     }
-  }, [meetingId]);
+  }, [meeting]);
 
   useEffect(() => {
-    if (socket) {
-      prepareWebRTC(socket);
+    if (socket && meeting) {
+      prepareWebRTC(socket, meeting);
     }
   }, []);
 
-  async function prepareWebRTC(socket: Socket) {
+  async function prepareWebRTC(socket: Socket, meeting: Meeting) {
     const peerConnection = new RTCPeerConnection(stunServers);
-    let polite = false;
-
-    socket.on("first", () => {
-      console.log("SOCKET: first");
-      polite = true;
-    });
+    let polite = meeting.state == "created";
 
     try {
       const stream = await navigator.mediaDevices.getUserMedia({

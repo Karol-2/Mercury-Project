@@ -9,8 +9,6 @@ import { isExpired, decodeToken } from "react-jwt";
 import Cookies from "js-cookie";
 import dataService from "../services/data";
 import User from "../models/User";
-import { useDispatch } from "react-redux";
-import createSocketConnection from "../redux/actions/createSocketConnection";
 import { Socket, io } from "socket.io-client";
 import Meeting from "../models/Meeting";
 
@@ -175,7 +173,7 @@ function UserProvider({ children }: { children: React.ReactNode }) {
     socket.emit("createMeeting");
 
     const meetingId = await waitForMeeting;
-    setMeeting({id: meetingId, state: "created"});
+    setMeeting({ id: meetingId, state: "created" });
     return meetingId;
   };
 
@@ -192,7 +190,7 @@ function UserProvider({ children }: { children: React.ReactNode }) {
     socket.emit("joinMeeting", [friendId]);
 
     const meetingId = await waitForMeeting;
-    setMeeting({id: meetingId, state: "joined"});
+    setMeeting({ id: meetingId, state: "joined" });
     return meetingId;
   };
 

@@ -13,12 +13,13 @@ function ProfilePage() {
     user,
     userId,
     setUser,
-    meetingId,
+    meeting,
     updateUser,
     deleteUser,
     createMeeting,
     joinMeeting,
   } = useUser();
+
   const [isEditing, setIsEditing] = useState(false);
   const [friends, setFriends] = useState([]);
 
@@ -40,10 +41,10 @@ function ProfilePage() {
   };
 
   useEffect(() => {
-    if (meetingId) {
+    if (meeting) {
       navigate("/meeting");
     }
-  }, [meetingId]);
+  }, [meeting]);
 
   useEffect(() => {
     if (userId === null) navigate("/login");
