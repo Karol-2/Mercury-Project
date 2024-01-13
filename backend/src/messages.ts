@@ -1,9 +1,9 @@
-import Chat from "./models/Chat";
-import ChatModel from "./mongoDB/ChatModel";
+import Message from "./models/Message";
+import MessageModel from "./mongoDB/MessageModel";
 
-export async function addMessageToDb(message: Chat) {
+export async function addMessageToDb(message: Message) {
   try {
-    await ChatModel.create(message);
+    await MessageModel.create(message);
   } catch (err) {
     console.error(err);
   }
