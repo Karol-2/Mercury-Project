@@ -90,7 +90,7 @@ function SearchPage() {
     <>
       <Navbar />
       <section className=" min-h-screen mx-50 lg:mx-72 ">
-        <div>
+        <div className="mx-50 my-20 flex justify-center">
           <form
             className="flex flex-row gap-5 max-w-3xl w-full mt-5"
             onSubmit={handleSearch}
