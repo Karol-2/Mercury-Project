@@ -58,15 +58,15 @@ function Navbar() {
         </span>
       </div>
       {user && (
-        <div className="h-24 self-center flex gap-4 items-center">
+        <div className="h-24 self-center flex flex-row gap-4 items-center">
           {navLinks.map((link) => (
             <Link
               key={link.to}
               to={link.to}
-              className="p-5 rounded-lg transition duration-250 ease-in-out hover:bg-my-orange font-bold text-lg active:translate-y-1"
+              className=" p-5 rounded-lg transition duration-250 ease-in-out hover:bg-my-orange font-bold text-lg active:translate-y-1"
             >
               <FontAwesomeIcon icon={link.icon}/>
-             <span className=" ml-2">{link.text}</span> 
+             <span  className=" hidden md:inline ml-2">{link.text}</span> 
              
             </Link>
           ))}

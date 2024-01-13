@@ -92,26 +92,27 @@ function SearchPage() {
       <section className=" min-h-screen mx-50 lg:mx-72 ">
         <div className="mx-50 my-20 flex justify-center">
           <form
-            className="flex flex-row gap-5 max-w-3xl w-full mt-5"
+            className="flex flex-col md:flex-row gap-5 max-w-3xl w-full mt-5"
             onSubmit={handleSearch}
-          ><div className=" w-full">
-             <input
-              type="text"
-              placeholder="John Doe"
-              className="form-input text-my-darker"
-              onChange={(e) => setSearchState(e.target.value)}
-            ></input>
-             <p className="text-lg">
-              Enter your friend's name in the field above.
-            </p>
-          </div>
-           
+          >
+            <div className=" w-full">
+              <input
+                type="text"
+                placeholder="John Doe"
+                className="form-input text-my-darker"
+                onChange={(e) => setSearchState(e.target.value)}
+              ></input>
+              <p className="text-lg">
+                Enter your friend's name in the field above.
+              </p>
+            </div>
+
             <button
               type="submit"
               className="btn bg-my-purple text-xs px-7 py-5"
             >
-              <div className="flex gap-3 items-center">
-                <span>Search</span>
+              <div className="flex gap-3 items-center text-cente justify-center">
+                <span className=" text-center">Search</span>
                 <FontAwesomeIcon icon={faMagnifyingGlass} />
               </div>
             </button>
@@ -128,7 +129,7 @@ function SearchPage() {
               />
             ))
           ) : (
-           <></>
+            <></>
           )}
         </div>
       </section>

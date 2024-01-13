@@ -75,8 +75,6 @@ function ProfilePageForm(props: ProfilePageFormProps) {
               user.country || ""
             )}
           </p>
-          <h1 className="text-2xl font-bold">Login Credentials</h1>
-          <hr className="text-my-orange mb-2"></hr>
           <p>
             E-mail:{" "}
             {isEditing ? (
@@ -91,22 +89,9 @@ function ProfilePageForm(props: ProfilePageFormProps) {
               user.mail || ""
             )}
           </p>
-          <p>
-            Password:{" "}
-            {isEditing ? (
-              <input
-                type="text"
-                name="password"
-                value={user.password}
-                onChange={handleChange}
-                className=" text-my-dark"
-              />
-            ) : (
-              user.password || ""
-            )}
-          </p>
+         
         </div>
-        <div className="my-5 grid grid-cols-2">
+        <div className="my-5 grid grid-cols-1 md:grid-cols-2">
           {isEditing ? (
             <button onClick={handleSaveClick} className="btn primary w-full">
               Save

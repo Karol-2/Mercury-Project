@@ -67,7 +67,7 @@ function FoundUser(props: FoundUserProps) {
   }
 
   return (
-    <div className="flex flex-row bg-my-dark p-5 rounded-lg mt-5">
+    <div className="flex flex-col items-center md:flex-row bg-my-dark p-5 rounded-lg mt-5">
       <img
         src={user.profile_picture}
         className="rounded-full w-40 h-40 border-my-orange border-4 object-cover"
