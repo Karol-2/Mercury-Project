@@ -117,14 +117,14 @@ io.on("connection", async (socket: Socket) => {
     const receiveSockets = await getAllSockets(session, toUserId);
     session.close();
 
-    sendSockets.forEach((userSocket) =>
-      socket.to(userSocket.id).emit("message", message),
-    );
+    sendSockets.forEach((userSocket) => {
+      socket.to(userSocket.id).emit("message", message);
+    });
 
     const receivedMessage = { ...message, type: "received" };
-    receiveSockets.forEach((userSocket) =>
-      socket.to(userSocket.id).emit("message", receivedMessage),
-    );
+    receiveSockets.forEach((userSocket) => {
+      socket.to(userSocket.id).emit("message", receivedMessage);
+    });
   });
 
   socket.on("disconnect", async (_reason) => {
