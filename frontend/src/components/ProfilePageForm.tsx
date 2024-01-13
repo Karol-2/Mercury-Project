@@ -19,13 +19,11 @@ function ProfilePageForm(props: ProfilePageFormProps) {
 
   const {
     user,
-    friends,
     isEditing,
     handleEditClick,
     handleSaveClick,
     handleChange,
     createMeeting,
-    joinMeeting,
     deleteUser,
   } = props;
 
