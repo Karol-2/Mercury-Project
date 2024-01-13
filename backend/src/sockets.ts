@@ -17,6 +17,19 @@ export async function connectToSocket(
   );
 }
 
+export async function getAllSockets(session: Session, userId: string) {
+  const socketResponse = await session.run(
+    `
+    MATCH (u:User { id: $userId })-[:CONNECTED_TO]->(s:Socket { id: $socketId })
+    RETURN s
+    `,
+    {
+      userId,
+    },
+  );
+  return socketResponse.records.map((r) => r.get("s").properties);
+}
+
 export async function disconnectFromSocket(
   session: Session,
   userId: string,
@@ -29,7 +42,7 @@ export async function disconnectFromSocket(
     `,
     {
       userId,
-      socketId
+      socketId,
     },
   );
 }
