@@ -6,12 +6,16 @@ import User from "../models/User";
 import { useUser } from "../helpers/UserProvider";
 import ProfilePageForm from "../components/ProfilePageForm";
 import dataService from "../services/data";
+import Transition from "../components/Transition";
 
 function ProfilePage() {
   const navigate = useNavigate();
   const { user, userId, setUser, updateUser, deleteUser } = useUser();
   const [isEditing, setIsEditing] = useState(false);
   const [friends, setFriends] = useState([]);
+
+  const [showAnimation, setShowAnim] = useState(false)
+  const [showContent, setShowContent] = useState(false)
 
   const handleEditClick = () => {
     setIsEditing(true);
@@ -30,6 +34,13 @@ function ProfilePage() {
     setUser({ ...user, [name]: value } as User);
   };
 
+  useEffect(()=>{
+    setShowAnim(true)
+    setTimeout(()=>{
+      setShowContent(true)
+    },100)
+  },[])
+
   useEffect(() => {
     if (userId === null) navigate("/login");
 
@@ -47,7 +58,8 @@ function ProfilePage() {
   return (
     <>
       <Navbar />
-      {user && friends ? (
+       {showAnimation && <Transition startAnimation={showAnimation} />}
+      {user && friends && showContent ? (
         <ProfilePageForm
           user={user}
           friends={friends}
@@ -60,7 +72,8 @@ function ProfilePage() {
       ) : (
         <div className="text-lg">Loading...</div>
       )}
-      <Footer />
+      {showContent &&  <Footer />}
+     
     </>
   );
 }

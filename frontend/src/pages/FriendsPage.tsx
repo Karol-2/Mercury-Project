@@ -15,6 +15,7 @@ import Navbar from "../components/Navbar";
 import User from "../models/User";
 import setUserFriends from "../redux/actions/setUserFriends";
 import dataService from "../services/data";
+import Transition from "../components/Transition";
 
 function FriendsPage() {
   const navigate = useNavigate();
@@ -28,9 +29,19 @@ function FriendsPage() {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [friendToDelete, setFriendToDelete] = useState<User | null>(null);
 
+  const [showAnimation, setShowAnim] = useState(false)
+  const [showContent, setShowContent] = useState(false)
+
   useEffect(() => {
     if (user === null) navigate("/login");
   }, [user]);
+
+  useEffect(()=>{
+    setShowAnim(true)
+    setTimeout(()=>{
+      setShowContent(true)
+    },100)
+  },[])
 
   useEffect(() => {
     const fetchFriendRequests = async () => {
@@ -95,7 +106,10 @@ function FriendsPage() {
   return (
     <>
       <Navbar />
-      <div className="mx-50 my-20 lg:mx-56" id="wrapper">
+      {showAnimation && <Transition startAnimation={showAnimation} />}
+      {showContent ? (
+        <>
+         <div className="mx-50 my-20 lg:mx-56" id="wrapper">
         <section className="grid grid-cols-1 lg:grid-cols-2 gap-8 ">
           <div id="friends" className=" bg-my-dark p-10 rounded-xl">
             <h1 className="text-3xl font-bold">Friends:</h1>
@@ -178,6 +192,10 @@ function FriendsPage() {
         </section>
       </div>
       <Footer />
+        </>
+
+      ): ""}
+     
     </>
   );
 }

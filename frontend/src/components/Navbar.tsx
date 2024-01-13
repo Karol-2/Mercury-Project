@@ -50,7 +50,7 @@ function Navbar() {
   };
 
   return (
-    <nav className="bg-my-dark py-2 px-5 flex flex-col sm:flex-row justify-between items-center">
+    <nav className="bg-my-dark py-2 px-5 flex flex-col sm:flex-row justify-between items-center z-50">
       <div className="flex flex-row select-none">
         <img src={LogoSVG} alt="Mercury Logo" className="h-20 w-20 pr-5" />
         <span className="self-center text-my-orange font-bold text-xl md:text-2xl">
