@@ -8,7 +8,7 @@ export interface MessageProps {
 }
 
 function Message(props: MessageProps) {
-  const { type, content } = props;
+  const { type, fromUserProfilePicture, content } = props;
 
   let align = "";
   let flexDirection = "";
@@ -35,7 +35,7 @@ function Message(props: MessageProps) {
         {content}
       </div>
       <img
-        // src={author_image}
+        src={fromUserProfilePicture || ""}
         className="object-cover h-12 w-12 rounded-full"
         alt=""
       />
