@@ -18,9 +18,23 @@ interface ChatBoxProps {
 
 function ChatBox({ user, socket, friendId }: ChatBoxProps) {
   const messages = useRef<MessageProps[]>([]);
+
+  const handleScroll = (ref: HTMLDivElement | null) => {
+    if (ref && ref.parentElement) {
+      ref.parentElement.scrollTop = ref.offsetTop;
+    }
+  };
+
   const [refreshMessages, setRefreshMessages] = useState<number>(0);
   const messageElems = useMemo(
-    () => messages.current.map((e, i) => <Message key={i} {...e} />),
+    () =>
+      messages.current.map((e, i) => {
+        let msgRefFunc = (_ref: HTMLDivElement | null) => {};
+        if (i == messages.current.length - 1) {
+          msgRefFunc = handleScroll;
+        }
+        return <Message key={i} {...e} msgRef={msgRefFunc} />;
+      }),
     [refreshMessages],
   );
 
