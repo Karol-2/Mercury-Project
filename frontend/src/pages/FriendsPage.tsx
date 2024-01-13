@@ -125,7 +125,7 @@ function FriendsPage() {
                     <p className="font-semibold text-2xl">
                       <span className=""> {friend.first_name} {friend.last_name} </span>
                       <button
-                        className={` text-my-red text-sm my-2 p-2 rounded-md`}
+                        className={` text-my-red text-sm my-2 p-2 rounded-md transition hover:scale-110 hover:bg-my-darker active:translate-x-2`}
                         onClick={() => {
                           setShowDeleteModal(true);
                           setFriendToDelete(friend);
