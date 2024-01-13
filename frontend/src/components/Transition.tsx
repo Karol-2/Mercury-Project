@@ -13,7 +13,7 @@ const Transition: React.FC<TransitionProps> = ({ startAnimation }) => {
     
     await controls.start({ y: 0, opacity: 1});
 
-    await new Promise((resolve) => setTimeout(resolve,80));
+    await new Promise((resolve) => setTimeout(resolve,1));
 
     await controls.start({ y: "-100%" });
 
