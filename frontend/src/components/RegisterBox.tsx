@@ -184,7 +184,7 @@ function RegisterBox() {
             type="file"
             accept="image/*"
             onChange={handleFileChange}
-            className="opacity-0 absolute top-0 left-0 w-full h-full cursor-pointer"
+            className="opacity-0 w-4 h-4 cursor-pointer"
           />
         </label>
 
@@ -198,9 +198,9 @@ function RegisterBox() {
       </div>
 
       
-      <div className="flex flex-col">
+      <div className="flex flex-col justify-center">
      
-      <p className=""> {pictureFile?.name}</p>
+      <p className="text-center"> {pictureFile?.name}</p>
       { pictureFile && (<button
               className=" my-2 p-2 rounded-lg transition duration-250 ease-in-out bg-my-orange hover:bg-my-orange-dark font-bold text-lg active:translate-y-1"
               onClick={() => {setProfilePictureBase64(""); setPictureFile(undefined)}}
