@@ -43,7 +43,7 @@ function UserProvider({ children }: { children: React.ReactNode }) {
   // null -> user not logged in
   // string -> user logged in, userID correct
   const [userId, setUserId] = useState<string | null | undefined>(undefined);
-  const [user, setUser] = useState<User | null | undefined>(null);
+  const [user, setUser] = useState<User | null | undefined>(undefined);
   const [token, setToken] = useState<object | null>(null);
   const [socket, setSocket] = useState<Socket | null>(null);
   const [meeting, setMeeting] = useState<Meeting | null>(null);
