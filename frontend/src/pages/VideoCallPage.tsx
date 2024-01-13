@@ -117,7 +117,11 @@ function VideoCallPage() {
   return (
     <>
       <Navbar />
-      <div className="flex gap-5 p-10">
+      <div className="gap-5 p-10">
+      <div>
+        <button className="btn primary w-36" onClick={()=> navigate(-1)}>Go Back</button>
+      </div>
+        <div className="flex flex-col md:flex-row gap-5">
         <video
           id="large-feed"
           ref={localStream}
@@ -134,6 +138,8 @@ function VideoCallPage() {
           controls
           playsInline
         ></video>
+        </div>
+       
       </div>
       <Footer />
     </>

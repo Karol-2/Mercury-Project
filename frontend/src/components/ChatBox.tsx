@@ -7,6 +7,7 @@ import User from "../models/User";
 import Message, { MessageProps } from "./Message";
 import { RootState } from "../redux/store";
 import dataService from "../services/data";
+import { useNavigate } from "react-router-dom";
 
 interface ChatBoxProps {
   user: User;
@@ -16,6 +17,8 @@ interface ChatBoxProps {
 
 function ChatBox({ user, friendId, friend_profile_picture }: ChatBoxProps) {
   const [messages, setMessages] = useState<MessageProps[]>([]);
+
+  const navigate = useNavigate();
   const enterPressed = useRef<boolean>(false);
   const socket: Socket = useSelector((state: RootState) => state.socket);
   socket.on("message", (message: MessageProps) => {
@@ -45,6 +48,7 @@ function ChatBox({ user, friendId, friend_profile_picture }: ChatBoxProps) {
 
     fetchMessages();
   }, []);
+
 
   const handleKeyPress = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key != "Enter") return;
@@ -81,7 +85,11 @@ function ChatBox({ user, friendId, friend_profile_picture }: ChatBoxProps) {
   };
 
   return (
-    <div className="flex flex-col justify-end w-full p-2 h-[90vh]">
+    <div className="flex flex-col justify-end w-full p-10 h-[90vh]">
+      <div>
+        <button className="btn primary w-36" onClick={()=> navigate(-1)}>Go Back</button>
+      </div>
+    
       <div className="w-full px-5 flex flex-col justify-between overflow-y-scroll">
         {messages.map((e, i) => (
           <Message key={i} {...e} />

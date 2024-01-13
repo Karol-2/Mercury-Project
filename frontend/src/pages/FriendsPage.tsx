@@ -109,7 +109,17 @@ function FriendsPage() {
                   />
                   <div className=" ml-5 flex flex-col justify-evenly">
                     <p className="font-semibold text-2xl">
-                      {friend.first_name} {friend.last_name}
+                      <span className=""> {friend.first_name} {friend.last_name} </span>
+                      <button
+                        className={` text-my-red text-sm my-2 p-2 rounded-md`}
+                        onClick={() => {
+                          setShowDeleteModal(true);
+                          setFriendToDelete(friend);
+                        }}
+                      >
+                        <FontAwesomeIcon icon={faUserMinus} />
+                      </button>
+                      
                     </p>
                     <div className="flex flex-col xl:flex-row">
                       <button
@@ -124,15 +134,7 @@ function FriendsPage() {
                       >
                         <FontAwesomeIcon icon={faCommentAlt} />
                       </button>
-                      <button
-                        className={`btn small bg-my-red text-xs my-2`}
-                        onClick={() => {
-                          setShowDeleteModal(true);
-                          setFriendToDelete(friend);
-                        }}
-                      >
-                        <FontAwesomeIcon icon={faUserMinus} />
-                      </button>
+                      
                      
                     </div>
                     {showDeleteModal && friendToDelete && (

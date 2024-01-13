@@ -26,7 +26,7 @@ export default function CallToAction() {
               future of communication now.
             </p>
             <Link to="/register">
-              <button className="btn secondary mt-20" onClick={scrollToTop}>
+              <button className="btn secondary mt-20 w-60" onClick={scrollToTop}>
                 Join Us!
               </button>
             </Link>
