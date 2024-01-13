@@ -14,8 +14,8 @@ function ProfilePage() {
   const [isEditing, setIsEditing] = useState(false);
   const [friends, setFriends] = useState([]);
 
-  const [showAnimation, setShowAnim] = useState(false)
-  const [showContent, setShowContent] = useState(false)
+  const [showAnimation, setShowAnim] = useState(false);
+  const [showContent, setShowContent] = useState(false);
 
   const handleEditClick = () => {
     setIsEditing(true);
@@ -34,12 +34,12 @@ function ProfilePage() {
     setUser({ ...user, [name]: value } as User);
   };
 
-  useEffect(()=>{
-    setShowAnim(true)
-    setTimeout(()=>{
-      setShowContent(true)
-    },100)
-  },[])
+  useEffect(() => {
+    setShowAnim(true);
+    setTimeout(() => {
+      setShowContent(true);
+    }, 100);
+  }, []);
 
   useEffect(() => {
     if (userId === null) navigate("/login");
@@ -58,7 +58,7 @@ function ProfilePage() {
   return (
     <>
       <Navbar />
-       {showAnimation && <Transition startAnimation={showAnimation} />}
+      {showAnimation && <Transition startAnimation={showAnimation} />}
       {user && friends && showContent ? (
         <ProfilePageForm
           user={user}
@@ -72,8 +72,7 @@ function ProfilePage() {
       ) : (
         <div className="text-lg">Loading...</div>
       )}
-      {showContent &&  <Footer />}
-     
+      {showContent && <Footer />}
     </>
   );
 }

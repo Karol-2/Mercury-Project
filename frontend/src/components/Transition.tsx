@@ -10,19 +10,19 @@ const Transition: React.FC<TransitionProps> = ({ startAnimation }) => {
 
   const animateSquare = async () => {
     console.log("start anim");
-    
-    await controls.start({ y: 0, opacity: 1});
 
-    await new Promise((resolve) => setTimeout(resolve,1));
+    await controls.start({ y: 0, opacity: 1 });
+
+    await new Promise((resolve) => setTimeout(resolve, 1));
 
     await controls.start({ y: "-100%" });
 
-    await controls.start({  opacity: 0 });
+    await controls.start({ opacity: 0 });
   };
 
   useEffect(() => {
     console.log(startAnimation);
-    
+
     if (startAnimation) {
       animateSquare();
     }
@@ -39,7 +39,7 @@ const Transition: React.FC<TransitionProps> = ({ startAnimation }) => {
           top: 0,
           zIndex: 10,
         }}
-        initial={{ y: "-100%"}}
+        initial={{ y: "-100%" }}
         animate={controls}
       />
     </div>

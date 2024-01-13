@@ -17,7 +17,6 @@ function LoginBox() {
   };
 
   useEffect(() => {
-    
     if (userId === undefined) return;
 
     if (userId === null) {

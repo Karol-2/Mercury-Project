@@ -2,9 +2,14 @@ import { Link, useNavigate } from "react-router-dom";
 import LogoSVG from "/logo.svg";
 import { useUser } from "../helpers/UserProvider";
 import { useState } from "react";
-import { faMagnifyingGlass, faUser, faUsers, faRightFromBracket } from "@fortawesome/free-solid-svg-icons";
+import {
+  faMagnifyingGlass,
+  faUser,
+  faUsers,
+  faRightFromBracket,
+} from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-<FontAwesomeIcon icon={faMagnifyingGlass} />
+<FontAwesomeIcon icon={faMagnifyingGlass} />;
 
 function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -24,7 +29,7 @@ function Navbar() {
   const navLinks = [
     { to: "/search", text: "Search", icon: faMagnifyingGlass },
     { to: "/profile", text: "My Profile", icon: faUser },
-    { to: "/friends", text: "Friends", icon: faUsers }
+    { to: "/friends", text: "Friends", icon: faUsers },
   ];
 
   const menuPosition = "absolute right-1 top-20";
@@ -65,9 +70,8 @@ function Navbar() {
               to={link.to}
               className=" p-5 rounded-lg transition duration-250 ease-in-out hover:bg-my-orange font-bold text-lg active:translate-y-1"
             >
-              <FontAwesomeIcon icon={link.icon}/>
-             <span  className=" hidden md:inline ml-2">{link.text}</span> 
-             
+              <FontAwesomeIcon icon={link.icon} />
+              <span className=" hidden md:inline ml-2">{link.text}</span>
             </Link>
           ))}
           <div
@@ -93,8 +97,8 @@ function Navbar() {
                 onMouseLeave={handleDropdownLeave}
               >
                 <button onClick={handleLogout} className={linkStyle}>
-                 <FontAwesomeIcon icon={faRightFromBracket}></FontAwesomeIcon> 
-                 <span className=" ml-2 font-semibold">Logout</span>
+                  <FontAwesomeIcon icon={faRightFromBracket}></FontAwesomeIcon>
+                  <span className=" ml-2 font-semibold">Logout</span>
                 </button>
               </div>
             )}

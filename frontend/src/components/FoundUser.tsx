@@ -82,7 +82,7 @@ function FoundUser(props: FoundUserProps) {
           disabled={isFriend || requestSent}
           onClick={handleAddFriend}
         >
-          <span >{buttonText}</span>
+          <span>{buttonText}</span>
         </button>
       </div>
     </div>

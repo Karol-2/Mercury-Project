@@ -49,7 +49,6 @@ function ChatBox({ user, friendId, friend_profile_picture }: ChatBoxProps) {
     fetchMessages();
   }, []);
 
-
   const handleKeyPress = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key != "Enter") return;
     if (e.shiftKey) return;
@@ -87,9 +86,11 @@ function ChatBox({ user, friendId, friend_profile_picture }: ChatBoxProps) {
   return (
     <div className="flex flex-col justify-end w-full p-10 h-[90vh]">
       <div>
-        <button className="btn primary w-36" onClick={()=> navigate(-1)}>Go Back</button>
+        <button className="btn primary w-36" onClick={() => navigate(-1)}>
+          Go Back
+        </button>
       </div>
-    
+
       <div className="w-full px-5 flex flex-col justify-between overflow-y-scroll">
         {messages.map((e, i) => (
           <Message key={i} {...e} />

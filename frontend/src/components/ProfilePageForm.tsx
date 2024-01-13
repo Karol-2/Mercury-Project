@@ -89,7 +89,6 @@ function ProfilePageForm(props: ProfilePageFormProps) {
               user.mail || ""
             )}
           </p>
-         
         </div>
         <div className="my-5 grid grid-cols-1 md:grid-cols-2">
           {isEditing ? (
@@ -101,7 +100,10 @@ function ProfilePageForm(props: ProfilePageFormProps) {
               Edit
             </button>
           )}
-          <button onClick={()=>setShowDeleteModal(true)} className="btn secondary w-full">
+          <button
+            onClick={() => setShowDeleteModal(true)}
+            className="btn secondary w-full"
+          >
             Remove account
           </button>
 
@@ -113,7 +115,6 @@ function ProfilePageForm(props: ProfilePageFormProps) {
             ></Modal>
           )}
         </div>
-        
       </div>
     </section>
   );

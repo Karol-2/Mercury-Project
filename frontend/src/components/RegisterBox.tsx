@@ -197,18 +197,19 @@ function RegisterBox() {
         )}
       </div>
 
-      
       <div className="flex flex-col justify-center">
-     
-      <p className="text-center"> {pictureFile?.name}</p>
-      { pictureFile && (<button
-              className=" my-2 p-2 rounded-lg transition duration-250 ease-in-out bg-my-orange hover:bg-my-orange-dark font-bold text-lg active:translate-y-1"
-              onClick={() => {setProfilePictureBase64(""); setPictureFile(undefined)}}
-            >
-              Clear
-            </button>
-      )}
-     
+        <p className="text-center"> {pictureFile?.name}</p>
+        {pictureFile && (
+          <button
+            className=" my-2 p-2 rounded-lg transition duration-250 ease-in-out bg-my-orange hover:bg-my-orange-dark font-bold text-lg active:translate-y-1"
+            onClick={() => {
+              setProfilePictureBase64("");
+              setPictureFile(undefined);
+            }}
+          >
+            Clear
+          </button>
+        )}
       </div>
       <div {...errorProps}>{errors.profile_picture?.message}</div>
 
