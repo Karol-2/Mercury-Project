@@ -118,28 +118,34 @@ function VideoCallPage() {
     <>
       <Navbar />
       <div className="gap-5 p-10">
-      <div>
-        <button className="btn primary w-36" onClick={()=> navigate(-1)}>Go Back</button>
-      </div>
-        <div className="flex flex-col md:flex-row gap-5">
-        <video
-          id="large-feed"
-          ref={localStream}
-          className="rounded-lg flex-1"
-          autoPlay
-          controls
-          playsInline
-        ></video>
-        <video
-          id="small-feed"
-          ref={remoteStream}
-          className="rounded-lg flex-1"
-          autoPlay
-          controls
-          playsInline
-        ></video>
+        <div>
+          <button className="btn primary w-36" onClick={() => navigate(-1)}>
+            Go Back
+          </button>
         </div>
-       
+        <div className="flex flex-col md:flex-row gap-5">
+          <video
+            id="large-feed"
+            ref={localStream}
+            className="rounded-lg flex-1"
+            autoPlay
+            controls
+            playsInline
+          ></video>
+          <video
+            id="small-feed"
+            ref={remoteStream}
+            className="rounded-lg flex-1"
+            autoPlay
+            controls
+            playsInline
+          ></video>
+        </div>
+        {/* <div id="controls">
+          <button>Mic</button>
+          <button>Video</button>
+          <button>Leave</button>
+        </div> */}
       </div>
       <Footer />
     </>
