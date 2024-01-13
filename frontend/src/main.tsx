@@ -1,18 +1,17 @@
-import ReactDOM from "react-dom/client";
-import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
-import { Provider } from "react-redux";
 import { AnimatePresence } from "framer-motion";
+import ReactDOM from "react-dom/client";
+import { Provider } from "react-redux";
+import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
 
+import FriendsPage from "./pages/FriendsPage.tsx";
 import HomePage from "./pages/HomePage.tsx";
 import LoginPage from "./pages/LoginPage.tsx";
-import RegisterPage from "./pages/RegisterPage.tsx";
-import ProfilePage from "./pages/ProfilePage.tsx";
-import AdminPage from "./pages/AdminPage.tsx";
 import MessagingPage from "./pages/MessagingPage.tsx";
-import FriendsPage from "./pages/FriendsPage.tsx";
+import PageNotFound from "./pages/PageNotFound.tsx";
+import ProfilePage from "./pages/ProfilePage.tsx";
+import RegisterPage from "./pages/RegisterPage.tsx";
 import SearchPage from "./pages/SearchPage.tsx";
 import VideoCallPage from "./pages/VideoCallPage.tsx";
-import PageNotFound from "./pages/PageNotFound.tsx";
 
 import "./styles/styles.scss";
 
@@ -32,7 +31,6 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
             <Route path="/profile" element={<ProfilePage />} />
-            <Route path="/admin" element={<AdminPage />} />
             <Route path="/messages/:friendId" element={<MessagingPage />} />
             <Route path="/friends" element={<FriendsPage />} />
             <Route path="/search" element={<SearchPage />} />

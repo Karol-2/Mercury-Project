@@ -20,7 +20,6 @@ function Navbar() {
 
   const navLinks = [
     { to: "/search", text: "Search" },
-    { to: "/messages", text: "Messages" },
   ];
 
   const menuPosition = "absolute right-1 top-24";

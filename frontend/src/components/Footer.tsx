@@ -53,7 +53,7 @@ export default function Footer() {
             </button>
 
             <p className="font-thin mt-20">
-              &#169; 2023 Mercury. All Rights Reserved.
+              &#169; 2024 Mercury. All Rights Reserved.
             </p>
           </div>
         </div>

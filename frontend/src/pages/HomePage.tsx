@@ -1,4 +1,3 @@
-import Carousel from "../layout/Carousel";
 import Footer from "../components/Footer";
 import PhotoAndText from "../layout/PhotoAndText";
 import Reasons from "../layout/Reasons";
@@ -12,7 +11,6 @@ function HomePage() {
       <WelcomeMessage />
       <PhotoAndText />
       <Reasons />
-      <Carousel />
       <Technologies />
       <CallToAction />
       <Footer />
