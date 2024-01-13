@@ -3,7 +3,7 @@ export interface MessageProps {
   sentDate: Date;
   fromUserId: string;
   fromUserProfilePicture?: string;
-  msgRef: (ref: HTMLDivElement) => void;
+  msgRef?: (ref: HTMLDivElement) => void;
   toUserId: string;
   content: string;
 }
