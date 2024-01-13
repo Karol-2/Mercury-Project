@@ -20,7 +20,7 @@ export async function connectToSocket(
 export async function getAllSockets(session: Session, userId: string) {
   const socketResponse = await session.run(
     `
-    MATCH (u:User { id: $userId })-[:CONNECTED_TO]->(s:Socket { id: $socketId })
+    MATCH (u:User { id: $userId })-[:CONNECTED_TO]->(s:Socket)
     RETURN s
     `,
     {
