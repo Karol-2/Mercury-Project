@@ -1,0 +1,215 @@
+\documentclass{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[polish]{babel}
+\usepackage{caption}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{url}
+
+
+\title{Mercury}
+\author{Karol Krawczykiewicz, Grzegorz Rogoziński, Jan Król, Piotr Maszczak}
+\date{Październik 2023 - Styczeń 2024}
+
+\begin{document}
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.2\textwidth]{pics/logo.png}
+\end{figure}
+
+\maketitle
+\section{Informacje ogólne}
+\textbf{Nazwa projektu:} Mercury
+\\
+\\
+\textbf{Technologie:} Express, MongoDB, Neo4j, React, Redux, Sockets, TailwindCSS, TypeScript, WebRTC
+\\
+\\
+\textbf{Protokoły:} UDP, ICE, SDP
+\\
+\\
+\textbf{Repozytorium GitHub:}
+\url{https://github.com/Karol-2/Mercury-Project}
+
+\section{Opis projektu}
+Mercury jest aplikacją webową, która zapewnia komunikację tekstową oraz na żywo. Aplikacja jest dostosowana do przeglądarek internetowych na komputerach i telefonach, umożliwiając użytkownikom współpracę na różnych urządzeniach. Ponadto, system zapewnia możliwości wyszukiwania, dodawania i usuwania znajomych.
+
+
+\newpage
+\section{Opis działania}
+\subsection{Połączenia}
+
+Aplikacja React łączy się z API backendu. Ten zaś, posiada zabezpieczone połączenie z 2 bazami danych. System składa się z 4 elementów:
+\begin{enumerate}
+  \item Frontend - działa na \url{http://localhost:5173}
+  \item Backend - działa na \url{http://localhost:5000}
+  \item Baza Neo4j - przechowuje dane użytkowników, działa na porcie 7687
+  \item Baza MongoDB - przechowuje dane o chatach,  działa na porcie 27017
+\end{enumerate}
+API Backendu udostępnia ścieżki dotyczące autoryzacji, obsługi czatów, edycji relacji i obsługi użytkowników. Zapytania są zabezpieczone tokenami.
+
+\subsection{Uruchomienie}
+Aplikację można uruchomić na dwa sposoby:
+\begin{enumerate}
+    \item Uruchamiając backend i frontend lokalnie, używając narzędzia npm, i łącząc z lokalnymi wersjami baz danych.
+    \item Używając kontenerów Docker, dzięki plikowi \textbf{compose.yml} z konfiguracją.
+\end{enumerate}
+
+\newpage
+\section{Modele baz danych}
+\subsection{Model użytkownika}
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.5\textwidth]{pics/user_model.png}
+\end{figure}
+
+Model użytkownika składa się z ośmiu pól: \textbf{id} (identyfikator), \textbf{socketId} (identyfikator WebSocket), \textbf{first\_name} (imię), \textbf{last\_name} (nazwisko), \textbf{country} (dwu-literowy kod państwa), 
+\textbf{profile\_picture} (obraz zaszyfrowany base64), \textbf{mail} (adres email) i \textbf{password} (zaszyfrowane hasło).
+
+\newpage
+\subsection{Relacje między użytkownikami}
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.8\textwidth]{pics/friends_nodes.png}
+    \caption*{Użytkownicy z dwustronną relacją}
+\end{figure}
+
+Jeżeli dwaj użytkownicy są przyjaciółmi, istnieje miedzy nimi relacja \\
+\textbf{IS\_FRIENDS\_WITH}. Obowiązuje ona w dwie strony.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.8\textwidth]{pics/send_request.png}
+    \caption*{Użytkownicy z jednostronną relacją}
+\end{figure}
+
+W sytuacji gdy jeden użytkownik wyśle zaproszenie do drugiego, nawiązuje się między nimi relacja \textbf{SENT\_INVITE\_TO}. Osoba, od której wychodzi strzałka, wysłała prośbę o dodanie do osoby, przy której jest grot strzałki.
+Gdy zostaje ono zaakceptowane, usuwane są dotychczasowe relacje i nadawana jest dwustronna relacja \textbf{IS\_FRIENDS\_WITH}.
+
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=0.8\textwidth]{pics/no_friends_nodes.png}
+    \caption*{Użytkownicy bez relacji}
+\end{figure}
+
+W przypadku anulowania prośby lub usunięcia ze znajomych, wszystkie relacje między dwoma użytkownikami zostają usunięte.
+
+\subsection{Model chatu}
+\begin{figure}[h]
+    \centering
+    \includegraphics{pics/model_mongo.png}
+\end{figure}
+
+Model chatu zawiera dane o wiadomościach tekstowych przesyłanych między użytkownikami. Składają się na niego pola: \textbf{id} (id wiadomości), \textbf{authorId} (id nadawcy), \textbf{receiverId} (id odbiorcy), \textbf{content} (wiadomość), \textbf{created\_date} (data wysłania). 
+
+\newpage
+\section{Najważniejsze systemy}
+\subsection{System rejestracji i logowania}
+
+Rejestracja nowego użytkownika odbywa się po wybraniu opcji Register na ekranie głównym, lub poprzez wejście na odpowiedni endpoint: \\
+\url{http://localhost:5173/register}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[height=0.8\textwidth]{pics/register.png}
+    \caption*{Formularz rejestracyjny}
+\end{figure}
+
+Użytkownik, aby móc się zarejestrować, musi podać swoje dane, które są w odpowiedni sposób walidowane. Reguły w formularzu rejestracji:
+\begin{enumerate}
+    \item Imię i nazwisko z przynajmniej 2 znakami
+    \item Kod państwa o dokładnie 2 literach
+    \item Brak zajętego konta o tym samym mailu
+    \item Email o poprawnym formacie
+    \item Hasło z przynamniej 8 znakami
+\end{enumerate}
+
+Zdjęcie profilowe nie jest wymagane. W przypadku braku wprowadzenia własnego zdjęcia, system sam wprowadza domyślne zdjęcie. Wybór zdjęcia jest widoczny jako miniaturka, również z możliwością usunięcia.
+
+Dane z formularza są walidowane w czasie rzeczywistym przy użyciu biblioteki Zod i React hooka useForm. Po wypełnieniu formularza i wciśnięciu przycisku 'Register' przesłany obrazek (lub w przypadku braku, to obrazek domyślny) jest przekodowywany na format base64. Hasło jest szyfrowany za pomocą biblioteki Bcrypt. Następnie sprawdzane jest, czy podany maila z formularza nie jest zajęty w systemie. Jeśli jest zajęty, to wyświetlony jest komunikat z tym związany, formularz nie jest czyszczony w celu poprawienia maila. W przypadku poprawności danych, system zapisuje nowego użytkownika oraz następuje zmiana strony na logowanie na endpointcie:
+\url{http://localhost:5173/login}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[height=0.8\textwidth]{pics/login.png}
+    \caption*{Formularz logowania}
+\end{figure}
+
+Formularz logowania wymaga podania maila oraz hasła. Po poprawnym podaniu danych jest tworzona sesja z tokenem przy użyciu JWT oraz ciasteczek z js-cookie. Strona zmienia się na endpoint
+\url{http://localhost:5173/profile} do którego ma się tylko dostęp podczas sesji. Zawiera on wszystkie dane, które zostały wcześniej podane w rejestracji.
+
+\newpage
+\subsection{System szukania znajomych}
+Wyszukiwanie znajomych odbywa się na endpointcie \url{http://localhost:5173/search}. Po wpisaniu w pasek wyszukiwania danej frazy i zatwierdzeniu jest pokazywane 10 pierwszych wyników, które są najbardziej zbliżone do tej frazy na podstawie imienia i nazwiska. W celu wyszukiwania podobieństwa jest wykorzystywany własny algorytm oparty o algorytmie Odległości Levenshteina. Każda osoba na liście zawiera przycisk informujący relację z danym kontaktem.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[height=0.6\textwidth]{pics/search.png}
+    \caption*{Okno wyszukiwania znajomych}
+\end{figure}
+
+\newpage
+\subsection{System dodawania do znajomych}
+Po wybraniu kontaktu, który ma zostać dodany do sieci znajomych, wysyłany jest Request i tworzona relacja \textbf{SENT\_INVITE\_TO} w bazie Neo4j. Przychodzące zaproszenia i znajomych można sprawdzić w zakładce \textit{Friends} lub na endpointcie \url{http://localhost:5173/friends}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=1\textwidth]{pics/friends.png}
+    \caption*{Ekran listy znajomych i przychodzących zaproszeń}
+\end{figure}
+
+Zaproszenia do znajomych są wczytywane cały czas na żywo, poprzez wysyłanie requesta do bazy danych o sprawdzeniu relacjach z zalogowanym użytkownikiem. 
+% Endpointy wysyłane na bazę danych dla przykładowego id:
+% \begin{enumerate}
+%     \item /users/userId/friend-requests - (GET) wczytanie wszystkich zaproszeń do znajomych
+%     \item /users/userId/friends - (GET) wczytanie wszystkich obecnych znajomych
+%     \item /users/userId/remove/friendId - (DELETE) odrzucenie zaproszenia, usunięcie wszelkich relacji pomiędzy użytkownikiem o id 'userId' oraz 'friendId'
+%     \item /users/userId/accept/friendId - (POST) - zaakceptowanie zaproszenia, stworzenie relacji \textbf{IS\_FRIENDS\_WITH} z użytkownikiem o id 'userId' z 'friendId'
+% \end{enumerate}
+
+\subsection{System wideo rozmowy}
+Użycie WebRTC \textit{(Web Real-Time Communication)} pozwala nawiązać połączenie typu \textit{peer to peer} między dwoma użytkownikami i wymieniać się na bieżąco sygnałem audio i wideo. To rozwiązanie nie potrzebuje serwera, co zmniejsza opóźnienie między użytkownikami. WebRTC transportuje dane z użyciem protokołów UDP, który jest ceniony za swoją szybkość
+\\\\
+ Schemat komunikacji
+ \begin{enumerate}
+     \item Gdy Użytkownik1 chce połączyć się z Użytkownikiem2, wysyła on odpowiednią wiadomość o chęci dołączenia.
+     \item  Użytkownik2 chcąc połączyć się, akceptuje 'ofertę' i wysyła Użytkownikowi1 swoje informacje.
+     \item  Po tym, gdy użytkownicy wymienią się danymi, nawiązuje się połączenie, każdy użytkownik zna SDP drugiego.
+     \item Używając metody ICE, każdy użytkownik uderza do \textit{stun server} by uzyskać swój publiczny adres IP.
+     \item Gdy \textit{stun server} odpowie, odebrane dane są poprzez użytkownika transportowane do drugiego. Tak samo działa to u drugiego użytkownika.
+     \item Kiedy dane znajdą wspólną drogę komunikacji, połączenie jest już gotowe i mogą być przesyłane informacje w obie strony.
+ \end{enumerate}
+
+Wysyłane jest organizowane za pomocą procesu o nazwie ICE\textit{(Interactive Connectivity Establishment)} sygnaling.
+
+ W danych, które są zawierane podczas dołączenia do rozmowy między użytkownikami, znajduje się protokół SDP \textit{(Session Decription Protocol)}, który zawiera informacje typu: kodek, adres, typ nośnika, dane audio, dane wideo. Użytkownicy również wymieniają się '\textit{ICE candidates}', którym jest publiczny adres IP i port, który przyjmuje dostarczane dane.
+
+\subsection{System chatu}
+
+Chat ze znajomymi jest dostępny poprzez wybranie zielonego przycisku chatu obok znajomego w liście dostępnych znajomych. Nowy chat jest tworzony wraz z przypisanym id. Aby wysłać wiadomość, należy wcisnąć Enter.
+
+Wiadomości wysyłane są w czasie rzeczywistym, a cała konwersacja pomiędzy użytkownikami jest zapisywana do bazy MongoDB. Do komunikacji wykorzystwane są gniazda WebSocket. Historia wiadomości jest dostępna pod endpointem: \textbf{/chat/userId/friendId}
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.8\textwidth]{pics/messages.png}
+    \caption*{Przykładowy ekran chatu}
+\end{figure}
+
+
+\section{Źródła}
+\begin{itemize}
+    \item Dokumentacja Framer-motion: \url{https://www.framer.com/motion/}
+    \item Dokumentacja Zod: \url{https://zod.dev/}
+    \item Dokumentacja Bcrypt: \url{https://www.npmjs.com/package/bcrypt}
+    \item Dokumentacja Express: \url{https://expressjs.com/en/api.html}
+    \item Artykuł Praca Zespołowa na Github: \\
+    \url{https://www.freecodecamp.org/news/how-to-use-git-and-github-in-a-team-like-a-pro/}
+    \item Kurs WebRTC React: \\
+    \url{https://www.udemy.com/course/mastering-webrtc-part-2-real-time-video-and-screen-share/}
+    \item Kurs WebRTC: \url{https://www.youtube.com/watch?v=QsH8FL0952k}
+\end{itemize}
+
+\end{document}
