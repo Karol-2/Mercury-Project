@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 
 import { Socket } from "socket.io-client";
 
@@ -16,24 +16,67 @@ interface ChatBoxProps {
   friend_profile_picture: string;
 }
 
-function ChatBox({
-  user,
-  socket,
-  friendId,
-  friend_profile_picture,
-}: ChatBoxProps) {
-  const [messages, setMessages] = useState<MessageProps[]>([]);
+function ChatBox({ user, socket, friendId }: ChatBoxProps) {
+  const messages = useRef<MessageProps[]>([]);
+  const [refreshMessages, setRefreshMessages] = useState<number>(0);
+  const messageElems = useMemo(
+    () => messages.current.map((e, i) => <Message key={i} {...e} />),
+    [refreshMessages],
+  );
+
+  const [profilePictures, setProfilePictures] = useState<
+    Record<string, string>
+  >({});
   const enterPressed = useRef<boolean>(false);
   const [notificationPlaying, setNotificationPlaying] =
     useState<boolean>(false);
 
-  socket.on("message", (message: MessageProps) => {
+  const addMessages = async (addedMessages: MessageProps[]) => {
+    const newMessages: MessageProps[] = [];
+    for (const message of addedMessages) {
+      const profilePicture = await getProfilePicture(message.fromUserId);
+      newMessages.push({ ...message, fromUserProfilePicture: profilePicture });
+    }
+
+    const allNewMessages = [...messages.current, ...newMessages];
+    messages.current = allNewMessages;
+  };
+
+  const getProfilePicture = async (userId: string) => {
+    const profilePicture = profilePictures[userId];
+    if (profilePicture) return profilePicture;
+
+    const userResponse = await dataService.fetchData(
+      `/users/${userId}`,
+      "GET",
+      {},
+    );
+    const fetchProfilePicture = userResponse.user.profile_picture;
+
+    setProfilePictures({ ...profilePictures, [userId]: fetchProfilePicture });
+    return fetchProfilePicture;
+  };
+
+  const messageListener = async (message: MessageProps) => {
     if (message.type != "sent") {
       setNotificationPlaying(true);
     }
+    await addMessages([message]);
+    setRefreshMessages(refreshMessages + 1);
+  };
 
-    setMessages([...messages, message]);
-  });
+  useEffect(() => {
+    socket.on("message", messageListener);
+    return () => {
+      socket.off("message", messageListener);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (refreshMessages != 0) {
+      setRefreshMessages(0);
+    }
+  }, [refreshMessages]);
 
   useEffect(() => {
     if (notificationPlaying) {
@@ -61,19 +104,9 @@ function ChatBox({
         "GET",
         {},
       );
-      const messageArr = messageResponse.messages.map(
-        (message: MessageProps) => {
-          console.log(message);
-          return {
-            ...message,
-            author_image:
-              message.type === "sent"
-                ? user.profile_picture
-                : friend_profile_picture,
-          };
-        },
-      );
-      setMessages(messageArr);
+
+      await addMessages(messageResponse.messages);
+      setRefreshMessages(refreshMessages + 1);
     }
 
     fetchMessages();
@@ -100,7 +133,7 @@ function ChatBox({
     e.preventDefault();
   };
 
-  const sendMessage = (toUserId: string, content: string) => {
+  const sendMessage = async (toUserId: string, content: string) => {
     const message: MessageProps = {
       type: "sent",
       sentDate: new Date(),
@@ -109,16 +142,15 @@ function ChatBox({
       content,
     };
 
-    setMessages([...messages, message]);
+    await addMessages([message]);
+    setRefreshMessages(refreshMessages + 1);
     socket.emit("message", message);
   };
 
   return (
     <div className="flex flex-col justify-end w-full p-2 h-[90vh]">
       <div className="w-full px-5 flex flex-col justify-between overflow-y-scroll">
-        {messages.map((e, i) => (
-          <Message key={i} {...e} />
-        ))}
+        {messageElems}
       </div>
       <textarea
         className="w-3/6 text-3xl bg-my-dark form-input"

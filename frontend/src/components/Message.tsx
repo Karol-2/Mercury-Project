@@ -2,6 +2,7 @@ export interface MessageProps {
   type: "sent" | "received" | "info";
   sentDate: Date;
   fromUserId: string;
+  fromUserProfilePicture?: string;
   toUserId: string;
   content: string;
 }
