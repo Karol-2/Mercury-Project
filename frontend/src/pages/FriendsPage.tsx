@@ -19,7 +19,7 @@ import dataService from "../services/data";
 function FriendsPage() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { user } = useUser();
+  const { user, meeting, joinMeeting } = useUser();
 
   const [friends, setFriends] = useState([]);
   const [friendsRequests, setFriendsRequests] = useState([]);
@@ -92,6 +92,13 @@ function FriendsPage() {
       setRefresh(() => !refresh);
     }
   };
+
+  useEffect(() => {
+    if (meeting?.id) {
+      navigate("/meeting");
+    }
+  }, [meeting]);
+
   return (
     <>
       <Navbar />
@@ -114,7 +121,7 @@ function FriendsPage() {
                     <div className="flex flex-row">
                       <button
                         className={`btn small bg-my-purple text-xs`}
-                        onClick={() => console.log("meeting")}
+                        onClick={() => joinMeeting(friend.id)}
                       >
                         <FontAwesomeIcon icon={faVideo} />
                       </button>
