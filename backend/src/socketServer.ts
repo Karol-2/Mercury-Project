@@ -110,7 +110,6 @@ io.on("connection", async (socket: Socket) => {
   socket.on("message", async (message) => {
     const { toUserId } = message;
     await addMessageToDb(message);
-    console.log(message);
 
     const session = driver.session();
     const sendSockets = await getAllSockets(session, userId);
