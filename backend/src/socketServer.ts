@@ -2,7 +2,11 @@ import servers from "./server";
 import dotenv from "dotenv";
 import driver from "./driver/driver";
 import { Socket } from "socket.io";
-import { connectToSocket, disconnectFromSocket } from "./sockets";
+import {
+  connectToSocket,
+  disconnectFromSocket,
+  getAllSockets,
+} from "./sockets";
 import { isFriend } from "./users";
 import Meeting from "./models/Meeting";
 import {
@@ -11,6 +15,7 @@ import {
   isInMeeting,
   joinMeeting,
 } from "./meetings";
+import { addMessageToDb } from "./messages";
 
 const { io } = servers;
 
@@ -38,10 +43,10 @@ io.on("connection", async (socket: Socket) => {
     }
   };
 
-  const session = driver.session()
+  const session = driver.session();
   await connectToSocket(session, userId, socket.id);
-  session.close()
-  
+  session.close();
+
   console.log("Client connected");
 
   socket.on("createMeeting", async () => {
@@ -103,16 +108,29 @@ io.on("connection", async (socket: Socket) => {
   });
 
   socket.on("message", async (message) => {
-    // const { receiverId } = message;
-    // const socketId = await getSocketId(receiverId);
-    // await addMessageToDb(message);
-    // socket.to(socketId).emit("message", { ...message, type: "received" });
+    const { toUserId } = message;
+    await addMessageToDb(message);
+    console.log(message);
+
+    const session = driver.session();
+    const sendSockets = await getAllSockets(session, userId);
+    const receiveSockets = await getAllSockets(session, toUserId);
+    session.close();
+
+    sendSockets.forEach((userSocket) =>
+      socket.to(userSocket.id).emit("message", message),
+    );
+
+    const receivedMessage = { ...message, type: "received" };
+    receiveSockets.forEach((userSocket) =>
+      socket.to(userSocket.id).emit("message", receivedMessage),
+    );
   });
 
   socket.on("disconnect", async (_reason) => {
     const session = driver.session();
     await leaveMeeting(session, userId);
-    await disconnectFromSocket(session, userId, socket.id)
+    await disconnectFromSocket(session, userId, socket.id);
     session.close();
     setMeeting(null);
     console.log("Client disconnected");

@@ -1,14 +1,13 @@
 export interface MessageProps {
   type: "sent" | "received" | "info";
-  author_image: string;
-  authorId: string;
-  receiverId?: string;
+  sentDate: Date;
+  fromUserId: string;
+  toUserId: string;
   content: string;
-  created_date: Date;
 }
 
 function Message(props: MessageProps) {
-  const { type, author_image, content } = props;
+  const { type, content } = props;
 
   let align = "";
   let flexDirection = "";
@@ -35,7 +34,7 @@ function Message(props: MessageProps) {
         {content}
       </div>
       <img
-        src={author_image}
+        // src={author_image}
         className="object-cover h-12 w-12 rounded-full"
         alt=""
       />

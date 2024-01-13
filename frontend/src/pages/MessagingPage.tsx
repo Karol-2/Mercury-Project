@@ -14,9 +14,9 @@ function MessagingPage() {
   const friends = useSelector((state: RootState) => state.friends);
   const { friendId } = useParams();
   const friend = friends.find((f: User) => f.id === friendId);
-  const { user } = useUser();
+  const { user, socket } = useUser();
 
-  if (!user || !friendId) {
+  if (!user || !socket || !friendId) {
     return <PageNotFound />;
   }
 
@@ -25,6 +25,7 @@ function MessagingPage() {
       <Navbar />
       <ChatBox
         user={user}
+        socket={socket}
         friendId={friendId}
         friend_profile_picture={friend.profile_picture}
       />

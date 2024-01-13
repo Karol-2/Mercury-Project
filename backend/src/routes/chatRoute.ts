@@ -1,26 +1,27 @@
 import { Router } from "express";
-import ChatModel from "../mongoDB/ChatModel";
+import Message from "../models/Message";
+import MessageModel from "../mongoDB/MessageModel";
 
 const chatRouter = Router();
 
 chatRouter.get("/:user1Id/:user2Id", async (req, res) => {
   try {
     const { user1Id, user2Id } = req.params;
-    const messageRequest = await ChatModel.find({
+    const messageRequest = await MessageModel.find({
       $or: [
-        { authorId: user1Id, receiverId: user2Id },
-        { authorId: user2Id, receiverId: user1Id },
+        { fromUserId: user1Id, toUserId: user2Id },
+        { fromUserId: user2Id, toUserId: user1Id },
       ],
     }).sort({ created_date: "asc" });
 
-    const messages = messageRequest.map((m) => {
-      const { authorId, receiverId, content, created_date } = m;
+    const messages = messageRequest.map((m: Message) => {
+      const { sentDate, fromUserId, toUserId, content } = m;
       return {
-        authorId,
-        receiverId,
+        type: fromUserId === user1Id ? "sent" : "received",
+        sentDate,
+        fromUserId,
+        toUserId,
         content,
-        created_date,
-        type: authorId === user1Id ? "sent" : "received",
       };
     });
 

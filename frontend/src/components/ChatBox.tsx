@@ -1,31 +1,37 @@
 import React, { useEffect, useRef, useState } from "react";
-import { useSelector } from "react-redux";
 
 import { Socket } from "socket.io-client";
 
 import User from "../models/User";
 import notificationSoundUrl from "../misc/notification.mp3";
 import Message, { MessageProps } from "./Message";
-import { RootState } from "../redux/store";
 import dataService from "../services/data";
 
 const notificationSound = new Audio(notificationSoundUrl);
 
 interface ChatBoxProps {
   user: User;
+  socket: Socket;
   friendId: string;
   friend_profile_picture: string;
 }
 
-function ChatBox({ user, friendId, friend_profile_picture }: ChatBoxProps) {
+function ChatBox({
+  user,
+  socket,
+  friendId,
+  friend_profile_picture,
+}: ChatBoxProps) {
   const [messages, setMessages] = useState<MessageProps[]>([]);
   const enterPressed = useRef<boolean>(false);
-  const socket: Socket = useSelector((state: RootState) => state.socket);
   const [notificationPlaying, setNotificationPlaying] =
     useState<boolean>(false);
 
   socket.on("message", (message: MessageProps) => {
-    setNotificationPlaying(true);
+    if (message.type != "sent") {
+      setNotificationPlaying(true);
+    }
+
     setMessages([...messages, message]);
   });
 
@@ -57,6 +63,7 @@ function ChatBox({ user, friendId, friend_profile_picture }: ChatBoxProps) {
       );
       const messageArr = messageResponse.messages.map(
         (message: MessageProps) => {
+          console.log(message);
           return {
             ...message,
             author_image:
@@ -82,7 +89,7 @@ function ChatBox({ user, friendId, friend_profile_picture }: ChatBoxProps) {
       const text = e.currentTarget.value.trim();
       if (!text) return;
 
-      sendMessage(user, text);
+      sendMessage(user.id, text);
       e.currentTarget.value = "";
     }
   };
@@ -93,15 +100,15 @@ function ChatBox({ user, friendId, friend_profile_picture }: ChatBoxProps) {
     e.preventDefault();
   };
 
-  const sendMessage = (author: User, content: string) => {
+  const sendMessage = (toUserId: string, content: string) => {
     const message: MessageProps = {
       type: "sent",
-      authorId: author.id,
-      author_image: author.profile_picture,
+      sentDate: new Date(),
+      fromUserId: toUserId,
+      toUserId: friendId,
       content,
-      receiverId: friendId,
-      created_date: new Date(),
     };
+
     setMessages([...messages, message]);
     socket.emit("message", message);
   };
