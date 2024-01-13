@@ -15,7 +15,7 @@ export async function isFriend(
       { firstUserId, secondUserId },
     );
 
-    return request.records.length > 0
+    return request.records.length > 0;
   } catch (err) {
     return false;
   }
