@@ -9,7 +9,7 @@ function LoginBox() {
   const [password, setPassword] = useState("");
   const [loginMsg, setLoginMsg] = useState("");
 
-  const { userId, login: userLogin } = useUser() || { login: () => {} };
+  const { userId, login: userLogin } = useUser();
   const firstVisit = useRef<boolean>(true);
 
   const loginFunc = async () => {
