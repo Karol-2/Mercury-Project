@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import User from "../models/User";
 import Modal from "./Modal";
-import { useNavigate } from "react-router-dom";
 
 export interface ProfilePageFormProps {
   user: User;
@@ -16,7 +15,6 @@ export interface ProfilePageFormProps {
 }
 
 function ProfilePageForm(props: ProfilePageFormProps) {
-  const navigate = useNavigate();
   const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   const {
