@@ -100,26 +100,32 @@ function FriendsPage() {
           <div id="friends" className=" bg-my-dark p-10 rounded-xl">
             <h1 className="text-3xl font-bold">Friends:</h1>
             <hr className="text-my-orange"></hr>
-            <ul>
+            <ul className="">
               {friends.map((friend: User) => (
                 <li key={friend.id} className="flex flex-row mt-5">
                   <img
                     src={friend.profile_picture}
-                    className="rounded-full w-20 h-20 border-my-orange border-2 object-cover"
+                    className="rounded-full w-28 h-28 border-my-orange border-2 object-cover"
                   />
                   <div className=" ml-5 flex flex-col justify-evenly">
                     <p className="font-semibold text-2xl">
                       {friend.first_name} {friend.last_name}
                     </p>
-                    <div className="flex flex-row">
+                    <div className="flex flex-col xl:flex-row">
                       <button
-                        className={`btn small bg-my-purple text-xs`}
-                        onClick={() => console.log("meeting")}
+                        className={`btn small bg-my-orange text-xs my-2`}
+                        onClick={() => navigate("/meeting")}
                       >
                         <FontAwesomeIcon icon={faVideo} />
                       </button>
                       <button
-                        className={`btn small bg-my-red text-xs`}
+                        className={`btn small bg-my-purple text-xs my-2`}
+                        onClick={() => navigate(`/messages/${friend.id}`)}
+                      >
+                        <FontAwesomeIcon icon={faCommentAlt} />
+                      </button>
+                      <button
+                        className={`btn small bg-my-red text-xs my-2`}
                         onClick={() => {
                           setShowDeleteModal(true);
                           setFriendToDelete(friend);
@@ -127,12 +133,7 @@ function FriendsPage() {
                       >
                         <FontAwesomeIcon icon={faUserMinus} />
                       </button>
-                      <button
-                        className={`btn small bg-my-green text-xs`}
-                        onClick={() => navigate(`/messages/${friend.id}`)}
-                      >
-                        <FontAwesomeIcon icon={faCommentAlt} />
-                      </button>
+                     
                     </div>
                     {showDeleteModal && friendToDelete && (
                       <Modal
