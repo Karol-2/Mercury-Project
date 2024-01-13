@@ -13,7 +13,6 @@ interface ChatBoxProps {
   user: User;
   socket: Socket;
   friendId: string;
-  friend_profile_picture: string;
 }
 
 function ChatBox({ user, socket, friendId }: ChatBoxProps) {
