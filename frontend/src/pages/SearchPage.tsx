@@ -94,13 +94,18 @@ function SearchPage() {
           <form
             className="flex flex-row gap-5 max-w-3xl w-full mt-5"
             onSubmit={handleSearch}
-          >
-            <input
+          ><div className=" w-full">
+             <input
               type="text"
               placeholder="John Doe"
               className="form-input text-my-darker"
               onChange={(e) => setSearchState(e.target.value)}
             ></input>
+             <p className="text-lg">
+              Enter your friend's name in the field above.
+            </p>
+          </div>
+           
             <button
               type="submit"
               className="btn bg-my-purple text-xs px-7 py-5"
@@ -123,9 +128,7 @@ function SearchPage() {
               />
             ))
           ) : (
-            <p className="text-lg">
-              Enter your friend's name in the field above.
-            </p>
+           <></>
           )}
         </div>
       </section>

@@ -78,11 +78,11 @@ function FoundUser(props: FoundUserProps) {
         </p>
         <p>{user.country}</p>
         <button
-          className={`btn small text-xs w-52 ${buttonColor}`}
+          className={`btn small text-xs ${buttonColor}`}
           disabled={isFriend || requestSent}
           onClick={handleAddFriend}
         >
-          {buttonText}
+          <span >{buttonText}</span>
         </button>
       </div>
     </div>
