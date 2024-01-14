@@ -8,7 +8,7 @@ import stunServers from "../stun/stunServers";
 import Meeting from "../models/Meeting";
 
 function VideoCallPage() {
-  const { userId, socket, meeting } = useUser();
+  const { userId, socket, meeting, leaveMeeting } = useUser();
   const navigate = useNavigate();
   const localStream = useRef<HTMLVideoElement>(null);
   const remoteStream = useRef<HTMLVideoElement>(null);
@@ -20,7 +20,7 @@ function VideoCallPage() {
 
   useEffect(() => {
     if (!meeting) {
-      navigate("/");
+      navigate("/profile");
     }
   }, [meeting]);
 
@@ -129,6 +129,11 @@ function VideoCallPage() {
           controls
           playsInline
         ></video>
+      </div>
+      <div>
+        <button onClick={leaveMeeting} className="btn secondary">
+          Leave the meeting
+        </button>
       </div>
       <Footer />
     </>
