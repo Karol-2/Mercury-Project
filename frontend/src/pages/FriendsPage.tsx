@@ -151,7 +151,14 @@ function FriendsPage() {
                             <FontAwesomeIcon icon={faCommentAlt} />
                           </button>
                         </div>
-                        {showDeleteModal && friendToDelete && (
+                        
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              {showDeleteModal && friendToDelete && (
                           <Modal
                             text={`Are you sure that you want remove ${friendToDelete.first_name} ${friendToDelete.last_name} from your friends ?`}
                             handleYes={() => {
@@ -161,11 +168,6 @@ function FriendsPage() {
                             handleNo={() => setShowDeleteModal(false)}
                           ></Modal>
                         )}
-                      </div>
-                    </li>
-                  ))}
-                </ul>
-              </div>
 
               <div id="friend-requests" className="">
                 <div className="p-10 rounded-xl bg-my-dark">
