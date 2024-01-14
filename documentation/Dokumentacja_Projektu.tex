@@ -45,7 +45,9 @@ Aplikacja React łączy się z API backendu. Ten zaś, posiada zabezpieczone po�
 \begin{enumerate}
   \item Frontend - działa na \url{http://localhost:5173}
   \item Backend - działa na \url{http://localhost:5000}
-  \item Baza Neo4j - przechowuje dane użytkowników, działa na porcie 7687
+  \item Baza Neo4j - przechowuje dane użytkowników,
+  działa na \url{bolt://localhost:7687} do komunikacji z bazą danych
+  i \url{http://localhost:7474} do testowania kwerend i wizualizacji danych
   \item Baza MongoDB - przechowuje dane o chatach,  działa na porcie 27017
 \end{enumerate}
 API Backendu udostępnia ścieżki dotyczące autoryzacji, obsługi czatów, edycji relacji i obsługi użytkowników. Zapytania są zabezpieczone tokenami.
