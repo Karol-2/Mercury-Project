@@ -93,6 +93,16 @@ io.on("connection", async (socket: Socket) => {
     session.close();
   });
 
+  socket.on("leaveMeeting", async () => {
+    const session = driver.session();
+    await leaveMeeting(session, userId);
+    session.close();
+
+    setMeeting(null);
+    console.log(`User ${userId} left the meeting`)
+    socket.emit("leftMeeting");
+  });
+
   socket.on("iceCandidate", (candidate) => {
     const meetingRoom = getMeetingRoom();
     if (meetingRoom) {

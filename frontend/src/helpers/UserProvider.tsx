@@ -23,6 +23,7 @@ export interface UserContextValue {
   updateUser: () => Promise<boolean>;
   deleteUser: () => Promise<boolean>;
   createMeeting: () => Promise<string | void>;
+  leaveMeeting: () => Promise<void>;
   joinMeeting: (friendId: string) => Promise<string | void>;
 }
 
@@ -194,6 +195,21 @@ function UserProvider({ children }: { children: React.ReactNode }) {
     return meetingId;
   };
 
+  const leaveMeeting = async () => {
+    if (!socket) return;
+
+    const waitForLeaveMeeting = new Promise<void>((resolve) => {
+      socket.once("leftMeeting", () => {
+        return resolve();
+      });
+    });
+
+    socket.emit("leaveMeeting");
+
+    await waitForLeaveMeeting;
+    setMeeting(null);
+  };
+
   useEffect(() => {
     if (token) {
       const newUserId = (token as any).userId;
@@ -227,6 +243,7 @@ function UserProvider({ children }: { children: React.ReactNode }) {
         deleteUser,
         createMeeting,
         joinMeeting,
+        leaveMeeting,
       }}
     >
       {children}
