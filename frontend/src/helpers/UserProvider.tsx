@@ -133,6 +133,7 @@ function UserProvider({ children }: { children: React.ReactNode }) {
       setUserId(null);
       setUser(null);
       sessionStorage.removeItem("token");
+      socket?.disconnect();
       return true;
     }
 
