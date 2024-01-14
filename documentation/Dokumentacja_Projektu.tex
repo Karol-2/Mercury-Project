@@ -281,6 +281,11 @@ Wiadomości wysyłane są w czasie rzeczywistym, a cała konwersacja pomiędzy u
     \caption*{Przykładowy ekran chatu}
 \end{figure}
 
+\subsection{WebSocket}
+Połączenia WebSocket przechowywane w bazie danych w formie węzłów o etykiecie Socket.
+Po zalogowaniu się utworzona jest relacja \verb|(:User)-[:CONNECTED_TO]->(:Socket)|.
+Przy dowolnej próbie zamknięcia połączenia (wylogowanie się, zamknięcie karty w przeglądarce)
+jest usuwana relacja i węzeł z socketem, gdy nie ma żadnych innych relacji.
 
 \section{Źródła}
 \begin{itemize}
