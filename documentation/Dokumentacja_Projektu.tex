@@ -264,7 +264,7 @@ Organizacją procesu zajmuje się ICE\textit{(Interactive Connectivity Establis
  W danych, które są zawierane podczas dołączenia do rozmowy między użytkownikami, znajduje się protokół SDP \textit{(Session Decription Protocol)}, który zawiera informacje typu: kodek, adres, typ nośnika, dane audio, dane wideo. Użytkownicy również wymieniają się '\textit{ICE candidates}', którym jest publiczny adres IP i port, który przyjmuje dostarczane dane.
 
 Od strony backendu spotkania przechowywane są w formie węzłów o etykiecie Meeting.
-Po dołączeniu do spotkania utworzona jest relacja `(:User)-[:IS_IN_MEETING]->(:Meeting)`.
+Po dołączeniu do spotkania utworzona jest relacja \verb|(:User)-[:IS_IN_MEETING]->(:Meeting)|.
 Przy dowolnej próbie wyjścia ze spotkania (wciśnięcie przycisku do wyjścia ze spotkania,
 przejście na inną stronę, zamknięcie karty w przeglądarce) jest usuwana relacja
 i węzeł ze spotkaniem, gdy nie ma żadnych innych relacji.
