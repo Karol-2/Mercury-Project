@@ -155,8 +155,26 @@ na logowanie na endpointcie: \url{http://localhost:5173/login}
     \caption*{Formularz logowania}
 \end{figure}
 
-Formularz logowania wymaga podania maila oraz hasła. Po poprawnym podaniu danych jest tworzona sesja z tokenem przy użyciu JWT oraz ciasteczek z js-cookie. Strona zmienia się na endpoint
-\url{http://localhost:5173/profile} do którego ma się tylko dostęp podczas sesji. Zawiera on wszystkie dane, które zostały wcześniej podane w rejestracji.
+Formularz logowania wymaga podania maila oraz hasła. Po poprawnym podaniu danych
+jest tworzona sesja z parą tokenów:
+\begin{enumerate}
+  \item access token - token o krótkim czasie ważności (900 sekund - 15 minut)
+  przechowywany w sessionStorage
+  \item refresh token - token o długim czasie ważności (1209600 sekund - 2 tygodnie)
+  przechowywany na serwerze w ramach ciasteczka secure, httpOnly (przechowywany
+  po stronie serwera)
+\end{enumerate}
+Access token pozwala na dostęp do zasobów. Każdy, kto go posiada ma dobrowolny
+dostęp do zasobów danego użytkownika. Z tego powodu ważny jest jego krótki czas ważności.
+W przypadku utraty ważności klient używa refresh token'a do otrzymania nowego
+access token'a. Ta operacja jest bezpieczna, ponieważ refresh token
+jest przechowywany od strony serwera.
+
+Od strony backendu są używane biblioteki cookie-parser i jsonwebtoken
+a od strony frontendu biblioteka js-cookie.
+Po zalogowaniu się następuje przekierowanie na URL \url{http://localhost:5173/profile}
+do którego ma się tylko dostęp podczas sesji. Zawiera on wszystkie dane, które zostały
+wcześniej podane w rejestracji.
 
 \newpage
 \subsection{System szukania znajomych}
