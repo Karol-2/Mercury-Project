@@ -25,7 +25,7 @@
 \textbf{Nazwa projektu:} Mercury
 \\
 \\
-\textbf{Technologie:} Express, MongoDB, Neo4j, React, Redux, Sockets, TailwindCSS, TypeScript, WebRTC
+\textbf{Technologie:} Express, MongoDB, Neo4j, React, Redux, Sockets, Tailwind, SCSS, TypeScript, WebRTC
 \\
 \\
 \textbf{Protokoły:} HTTP, UDP, ICE, SDP
@@ -68,7 +68,7 @@ Aplikację można uruchomić na dwa sposoby:
     \includegraphics[width=0.5\textwidth]{pics/user_model.png}
 \end{figure}
 
-Model użytkownika składa się z ośmiu pól: \nolinebreak
+Model użytkownika składa się z siedmiu pól: \nolinebreak
 \begin{enumerate}[itemsep=0mm]
   \item \textbf{id} - identyfikator
   \item \textbf{first\_name} - imię
@@ -77,6 +77,7 @@ Model użytkownika składa się z ośmiu pól: \nolinebreak
   \item \textbf{profile\_picture} - obraz zaszyfrowany base64
   \item \textbf{mail} - adres email
   \item \textbf{password} - zaszyfrowane hasło
+\\
 \end{enumerate}
 
 \newpage
@@ -176,7 +177,6 @@ Po zalogowaniu się następuje przekierowanie na URL \url{http://localhost:5173/
 do którego ma się tylko dostęp podczas sesji. Zawiera on wszystkie dane, które zostały
 wcześniej podane w rejestracji.
 
-\newpage
 \subsection{System szukania znajomych}
 Wyszukiwanie znajomych odbywa się na endpointcie \url{http://localhost:5173/search}.
 Po wpisaniu w pasek wyszukiwania danej frazy i zatwierdzeniu jest pokazywane
@@ -196,8 +196,9 @@ Imię i nazwisko są przechowywane jako wektor wartości.
 Jeżeli jedna para imienia i nazwiska jest podobna do drugiej
 to odległość między dwoma wektorami powinna być mała. W tym przypadku metryka
 wykorzystywana do porównania wektorów to cosine similarity.
-
+\newpage
 Do zamiany tekstu na wektor (word embedding) jest wykorzystywany własny algorytm.
+
 Miał on do zrealizowania cele:
 \begin{enumerate}[itemsep=0mm]
   \item nie powinien wykorzystywać sztucznej inteligencji (brak danych testowych
@@ -234,13 +235,13 @@ Po wybraniu kontaktu, który ma zostać dodany do sieci znajomych, wysyłany jes
 \end{figure}
 
 Zaproszenia do znajomych są wczytywane cały czas na żywo, poprzez wysyłanie requesta do bazy danych o sprawdzeniu relacjach z zalogowanym użytkownikiem. 
-% Endpointy wysyłane na bazę danych dla przykładowego id:
-% \begin{enumerate}
-%     \item /users/userId/friend-requests - (GET) wczytanie wszystkich zaproszeń do znajomych
-%     \item /users/userId/friends - (GET) wczytanie wszystkich obecnych znajomych
-%     \item /users/userId/remove/friendId - (DELETE) odrzucenie zaproszenia, usunięcie wszelkich relacji pomiędzy użytkownikiem o id 'userId' oraz 'friendId'
-%     \item /users/userId/accept/friendId - (POST) - zaakceptowanie zaproszenia, stworzenie relacji \textbf{IS\_FRIENDS\_WITH} z użytkownikiem o id 'userId' z 'friendId'
-% \end{enumerate}
+Endpointy wysyłane na bazę danych dla przykładowego id:
+\begin{enumerate}
+    \item /users/userId/friend-requests - (GET) wczytanie wszystkich zaproszeń do znajomych
+    \item /users/userId/friends - (GET) wczytanie wszystkich obecnych znajomych
+    \item /users/userId/remove/friendId - (DELETE) odrzucenie zaproszenia, usunięcie wszelkich relacji pomiędzy użytkownikiem o id 'userId' oraz 'friendId'
+    \item /users/userId/accept/friendId - (POST) - zaakceptowanie zaproszenia, stworzenie relacji \textbf{IS\_FRIENDS\_WITH} z użytkownikiem o id 'userId' z 'friendId'
+\end{enumerate}
 
 \subsection{System wideo rozmowy}
 Użycie WebRTC \textit{(Web Real-Time Communication)} pozwala nawiązać połączenie typu \textit{peer to peer} między dwoma użytkownikami i wymieniać się na bieżąco sygnałem audio i wideo. To rozwiązanie nie potrzebuje serwera, co zmniejsza opóźnienie między użytkownikami. WebRTC transportuje dane z użyciem protokołów UDP, który jest ceniony za swoją szybkość
@@ -254,17 +255,16 @@ Użycie WebRTC \textit{(Web Real-Time Communication)} pozwala nawiązać połąc
      \item Gdy \textit{stun server} odpowie, odebrane dane są poprzez użytkownika transportowane do drugiego. Tak samo działa to u drugiego użytkownika.
      \item Kiedy dane znajdą wspólną drogę komunikacji, połączenie jest już gotowe i mogą być przesyłane informacje w obie strony.
  \end{enumerate}
-
+\\\\
 Protokół WebRTC zajmuje się tylko przesyłaniem strumieni audio i wideo.
 Do przesyłania komunikatów o dołączeniu wykorzystuje się inny protokół - w tym
-projekcie komunikacja odbywa się przez web sockety.
-
-Organizacją procesu zajmuje się ICE\textit{(Interactive Connectivity Establishment)} sygnaling.
-
+projekcie komunikacja odbywa się przez web sockety. Organizacją procesu zajmuje się ICE\textit{(Interactive Connectivity Establishment)} sygnaling.
+\\\\
  W danych, które są zawierane podczas dołączenia do rozmowy między użytkownikami, znajduje się protokół SDP \textit{(Session Decription Protocol)}, który zawiera informacje typu: kodek, adres, typ nośnika, dane audio, dane wideo. Użytkownicy również wymieniają się '\textit{ICE candidates}', którym jest publiczny adres IP i port, który przyjmuje dostarczane dane.
-
+\\\\
 Od strony backendu spotkania przechowywane są w formie węzłów o etykiecie Meeting.
-Po dołączeniu do spotkania utworzona jest relacja \verb|(:User)-[:IS_IN_MEETING]->(:Meeting)|.
+Po dołączeniu do spotkania utworzona jest relacja:
+$$ \verb|(:User)-[:IS_IN_MEETING]->(:Meeting)|. $$
 Przy dowolnej próbie wyjścia ze spotkania (wciśnięcie przycisku do wyjścia ze spotkania,
 przejście na inną stronę, zamknięcie karty w przeglądarce) jest usuwana relacja
 i węzeł ze spotkaniem, gdy nie ma żadnych innych relacji.
@@ -272,31 +272,28 @@ i węzeł ze spotkaniem, gdy nie ma żadnych innych relacji.
 \subsection{System chatu}
 
 Chat ze znajomymi jest dostępny poprzez wybranie zielonego przycisku chatu obok znajomego w liście dostępnych znajomych. Nowy chat jest tworzony wraz z przypisanym id. Aby wysłać wiadomość, należy wcisnąć Enter.
-
-Wiadomości wysyłane są w czasie rzeczywistym, a cała konwersacja pomiędzy użytkownikami jest zapisywana do bazy MongoDB. Do komunikacji wykorzystwane są gniazda WebSocket. Historia wiadomości jest dostępna pod endpointem: \textbf{/chat/userId/friendId}
-
+\\
 \begin{figure}[h]
     \centering
     \includegraphics[width=0.8\textwidth]{pics/messages.png}
     \caption*{Przykładowy ekran chatu}
 \end{figure}
+\\
+Wiadomości wysyłane są w czasie rzeczywistym, a cała konwersacja pomiędzy użytkownikami jest zapisywana do bazy MongoDB. Do komunikacji wykorzystwane są gniazda WebSocket. Historia wiadomości jest dostępna pod endpointem: \textbf{/chat/userId/friendId}
+
 
 \subsection{WebSocket}
 Połączenia WebSocket przechowywane w bazie danych w formie węzłów o etykiecie Socket.
-Po zalogowaniu się utworzona jest relacja \verb|(:User)-[:CONNECTED_TO]->(:Socket)|.
+Po zalogowaniu się utworzona jest relacja $$\verb|(:User)-[:CONNECTED_TO]->(:Socket)|.$$
 Przy dowolnej próbie zamknięcia połączenia (wylogowanie się, zamknięcie karty w przeglądarce)
 jest usuwana relacja i węzeł z socketem, gdy nie ma żadnych innych relacji.
 
 \section{Źródła}
-\begin{itemize}
+\begin{itemize}[itemsep=0mm]
     \item Dokumentacja Framer-motion: \url{https://www.framer.com/motion/}
     \item Dokumentacja Zod: \url{https://zod.dev/}
     \item Dokumentacja Bcrypt: \url{https://www.npmjs.com/package/bcrypt}
     \item Dokumentacja Express: \url{https://expressjs.com/en/api.html}
-    \item Artykuł Praca Zespołowa na Github: \\
-    \url{https://www.freecodecamp.org/news/how-to-use-git-and-github-in-a-team-like-a-pro/}
-    \item Kurs WebRTC React: \\
-    \url{https://www.udemy.com/course/mastering-webrtc-part-2-real-time-video-and-screen-share/}
     \item Kurs WebRTC: \url{https://www.youtube.com/watch?v=QsH8FL0952k}
 \end{itemize}
 
