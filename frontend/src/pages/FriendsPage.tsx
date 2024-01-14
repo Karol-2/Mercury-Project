@@ -19,7 +19,7 @@ import dataService from "../services/data";
 function FriendsPage() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { user } = useUser();
+  const { user, meeting, createMeeting, joinMeeting } = useUser();
 
   const [friends, setFriends] = useState([]);
   const [friendsRequests, setFriendsRequests] = useState([]);
@@ -92,12 +92,28 @@ function FriendsPage() {
       setRefresh(() => !refresh);
     }
   };
+
+  useEffect(() => {
+    if (meeting?.id) {
+      navigate("/meeting");
+    }
+  }, [meeting]);
+
   return (
     <>
       <Navbar />
       <div className="mx-50 my-20 lg:mx-56" id="wrapper">
         <section className="grid grid-cols-1 lg:grid-cols-2 gap-8 ">
-          <div id="friends" className=" bg-my-dark p-10 rounded-xl">
+          <div
+            id="friends"
+            className="flex flex-col bg-my-dark p-10 rounded-xl"
+          >
+            <button
+              onClick={createMeeting}
+              className="btn secondary w-full mb-4"
+            >
+              Create a meeting
+            </button>
             <h1 className="text-3xl font-bold">Friends:</h1>
             <hr className="text-my-orange"></hr>
             <ul>
@@ -114,7 +130,7 @@ function FriendsPage() {
                     <div className="flex flex-row">
                       <button
                         className={`btn small bg-my-purple text-xs`}
-                        onClick={() => console.log("meeting")}
+                        onClick={() => joinMeeting(friend.id)}
                       >
                         <FontAwesomeIcon icon={faVideo} />
                       </button>

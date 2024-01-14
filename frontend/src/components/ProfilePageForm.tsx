@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import User from "../models/User";
 import Modal from "./Modal";
-import { useNavigate } from "react-router-dom";
 
 export interface ProfilePageFormProps {
   user: User;
@@ -10,16 +9,16 @@ export interface ProfilePageFormProps {
   handleEditClick: () => void;
   handleSaveClick: () => void;
   handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  createMeeting: () => void;
+  joinMeeting: (friendId: string) => void;
   deleteUser: () => void;
 }
 
 function ProfilePageForm(props: ProfilePageFormProps) {
-  const navigate = useNavigate();
   const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   const {
     user,
-    friends,
     isEditing,
     handleEditClick,
     handleSaveClick,
@@ -119,7 +118,6 @@ function ProfilePageForm(props: ProfilePageFormProps) {
           <button onClick={deleteUser} className="btn secondary">
             Remove account
           </button>
-
           {showDeleteModal && (
             <Modal
               text={`Are you sure that you want to delete you account?`}
@@ -127,22 +125,6 @@ function ProfilePageForm(props: ProfilePageFormProps) {
               handleNo={() => setShowDeleteModal(false)}
             ></Modal>
           )}
-        </div>
-        <div className="my-5">
-          <h2 className="text-4xl font-extrabold dark:text-white">Friends</h2>
-          <ul className="list-disc">
-            {friends.map((friend) => (
-              <li className="my-1" key={friend.id}>
-                {`${friend.first_name} ${friend.last_name}`}
-                <button
-                  className="mx-2 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 border border-blue-700 rounded"
-                  onClick={() => navigate("/meeting")}
-                >
-                  Meeting
-                </button>
-              </li>
-            ))}
-          </ul>
         </div>
       </div>
     </section>

@@ -1,23 +1,8 @@
 import Footer from "../components/Footer";
 import LoginBox from "../components/LoginBox";
 import Banner from "../components/Banner";
-import { useUser } from "../helpers/UserProvider";
-import { useEffect } from "react";
-import { useDispatch } from "react-redux";
-import createSocketConnection from "../redux/actions/createSocketConnection";
 
 function LoginPage() {
-  const user = useUser();
-  const dispatch = useDispatch();
-
-  useEffect(() => {
-    console.log("LoginPage:", user);
-    const { userId } = user;
-    if (userId !== null) {
-      dispatch(createSocketConnection(userId!));
-    }
-  }, [user]);
-
   return (
     <div className=" min-h-screen flex flex-col bg-my-darker con">
       <Banner />

@@ -1,33 +1,38 @@
-import { useParams } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useEffect, useRef } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import ChatBox from "../components/ChatBox";
 import { useUser } from "../helpers/UserProvider";
-import PageNotFound from "./PageNotFound";
-
-import { RootState } from "../redux/store";
-import User from "../models/User";
 
 function MessagingPage() {
-  const friends = useSelector((state: RootState) => state.friends);
+  const navigate = useNavigate();
+  const navigating = useRef<boolean>(false);
   const { friendId } = useParams();
-  const friend = friends.find((f: User) => f.id === friendId);
-  const { user } = useUser();
+  const { user, socket } = useUser();
 
-  if (!user || !friendId) {
-    return <PageNotFound />;
-  }
+  useEffect(() => {
+    if (navigating.current) return;
+    if (user === undefined) return;
+
+    if (user === null) {
+      navigating.current = true;
+      navigate("/login");
+    } else if (friendId === null) {
+      navigating.current = true;
+      navigate("/friends");
+    }
+  }, [user, friendId]);
+
+  const showChatBox = user && socket && friendId;
 
   return (
     <>
       <Navbar />
-      <ChatBox
-        user={user}
-        friendId={friendId}
-        friend_profile_picture={friend.profile_picture}
-      />
+      {showChatBox ? (
+        <ChatBox user={user} socket={socket} friendId={friendId} />
+      ) : null}
       <Footer />
     </>
   );
