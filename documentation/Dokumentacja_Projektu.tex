@@ -3,6 +3,7 @@
 \usepackage[utf8]{inputenc}
 \usepackage[polish]{babel}
 \usepackage{caption}
+\usepackage{enumitem}
 \usepackage{amsmath}
 \usepackage{graphicx}
 \usepackage{url}
@@ -67,8 +68,16 @@ Aplikację można uruchomić na dwa sposoby:
     \includegraphics[width=0.5\textwidth]{pics/user_model.png}
 \end{figure}
 
-Model użytkownika składa się z ośmiu pól: \textbf{id} (identyfikator), \textbf{socketId} (identyfikator WebSocket), \textbf{first\_name} (imię), \textbf{last\_name} (nazwisko), \textbf{country} (dwu-literowy kod państwa), 
-\textbf{profile\_picture} (obraz zaszyfrowany base64), \textbf{mail} (adres email) i \textbf{password} (zaszyfrowane hasło).
+Model użytkownika składa się z ośmiu pól: \nolinebreak
+\begin{enumerate}[itemsep=0mm]
+  \item \textbf{id} - identyfikator
+  \item \textbf{first\_name} - imię
+  \item \textbf{last\_name} - nazwisko
+  \item \textbf{country} - dwuliterowy kod państwa
+  \item \textbf{profile\_picture} - obraz zaszyfrowany base64
+  \item \textbf{mail} - adres email
+  \item \textbf{password} - zaszyfrowane hasło
+\end{enumerate}
 
 \newpage
 \subsection{Relacje między użytkownikami}
