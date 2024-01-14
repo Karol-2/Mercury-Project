@@ -3,7 +3,12 @@ import LogoSVG from "/logo.svg";
 import { useUser } from "../helpers/UserProvider";
 import { useState } from "react";
 
-function Navbar() {
+export interface NavbarProps {
+  handleNavigate?: (to: String) => void;
+}
+
+function Navbar(props: NavbarProps) {
+  const { handleNavigate } = props;
   const [isOpen, setIsOpen] = useState(false);
 
   const navigate = useNavigate();
@@ -44,6 +49,9 @@ function Navbar() {
               key={link.to}
               to={link.to}
               className="p-5 rounded-lg transition duration-250 ease-in-out hover:bg-my-orange font-bold text-lg"
+              onClick={
+                handleNavigate ? () => handleNavigate(link.to) : undefined
+              }
             >
               {link.text}
             </Link>
