@@ -6,7 +6,6 @@ import User from "../models/User";
 import notificationSoundUrl from "../misc/notification.mp3";
 import Message, { MessageProps } from "./Message";
 import dataService from "../services/data";
-import { useNavigate } from "react-router-dom";
 
 const notificationSound = new Audio(notificationSoundUrl);
 
@@ -165,12 +164,7 @@ function ChatBox({ user, socket, friendId }: ChatBoxProps) {
 
   return (
     <div className="flex flex-col justify-end w-full p-10 h-[90vh]">
-      <div>
-        <button className="btn primary w-36" onClick={() => navigate(-1)}>
-          Go Back
-        </button>
-      </div>
-
+     
       <div className="w-full px-5 flex flex-col justify-between overflow-y-scroll">
         {messageElems}
       </div>

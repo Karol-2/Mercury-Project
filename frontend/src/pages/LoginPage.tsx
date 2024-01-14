@@ -15,9 +15,6 @@ function LoginPage() {
     }, 100);
   }, []);
 
-
-
-function LoginPage() {
   return (
     <>
       {showAnimation && <Transition startAnimation={showAnimation} />}
