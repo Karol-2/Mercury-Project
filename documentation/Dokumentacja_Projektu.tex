@@ -3,6 +3,7 @@
 \usepackage[utf8]{inputenc}
 \usepackage[polish]{babel}
 \usepackage{caption}
+\usepackage{enumitem}
 \usepackage{amsmath}
 \usepackage{graphicx}
 \usepackage{url}
@@ -27,7 +28,7 @@
 \textbf{Technologie:} Express, MongoDB, Neo4j, React, Redux, Sockets, TailwindCSS, TypeScript, WebRTC
 \\
 \\
-\textbf{Protokoły:} UDP, ICE, SDP
+\textbf{Protokoły:} HTTP, UDP, ICE, SDP
 \\
 \\
 \textbf{Repozytorium GitHub:}
@@ -45,7 +46,9 @@ Aplikacja React łączy się z API backendu. Ten zaś, posiada zabezpieczone po�
 \begin{enumerate}
   \item Frontend - działa na \url{http://localhost:5173}
   \item Backend - działa na \url{http://localhost:5000}
-  \item Baza Neo4j - przechowuje dane użytkowników, działa na porcie 7687
+  \item Baza Neo4j - przechowuje dane użytkowników,
+  działa na \url{bolt://localhost:7687} do komunikacji z bazą danych
+  i \url{http://localhost:7474} do testowania kwerend i wizualizacji danych
   \item Baza MongoDB - przechowuje dane o chatach,  działa na porcie 27017
 \end{enumerate}
 API Backendu udostępnia ścieżki dotyczące autoryzacji, obsługi czatów, edycji relacji i obsługi użytkowników. Zapytania są zabezpieczone tokenami.
@@ -65,8 +68,16 @@ Aplikację można uruchomić na dwa sposoby:
     \includegraphics[width=0.5\textwidth]{pics/user_model.png}
 \end{figure}
 
-Model użytkownika składa się z ośmiu pól: \textbf{id} (identyfikator), \textbf{socketId} (identyfikator WebSocket), \textbf{first\_name} (imię), \textbf{last\_name} (nazwisko), \textbf{country} (dwu-literowy kod państwa), 
-\textbf{profile\_picture} (obraz zaszyfrowany base64), \textbf{mail} (adres email) i \textbf{password} (zaszyfrowane hasło).
+Model użytkownika składa się z ośmiu pól: \nolinebreak
+\begin{enumerate}[itemsep=0mm]
+  \item \textbf{id} - identyfikator
+  \item \textbf{first\_name} - imię
+  \item \textbf{last\_name} - nazwisko
+  \item \textbf{country} - dwuliterowy kod państwa
+  \item \textbf{profile\_picture} - obraz zaszyfrowany base64
+  \item \textbf{mail} - adres email
+  \item \textbf{password} - zaszyfrowane hasło
+\end{enumerate}
 
 \newpage
 \subsection{Relacje między użytkownikami}
@@ -128,8 +139,15 @@ Użytkownik, aby móc się zarejestrować, musi podać swoje dane, które są w 
 
 Zdjęcie profilowe nie jest wymagane. W przypadku braku wprowadzenia własnego zdjęcia, system sam wprowadza domyślne zdjęcie. Wybór zdjęcia jest widoczny jako miniaturka, również z możliwością usunięcia.
 
-Dane z formularza są walidowane w czasie rzeczywistym przy użyciu biblioteki Zod i React hooka useForm. Po wypełnieniu formularza i wciśnięciu przycisku 'Register' przesłany obrazek (lub w przypadku braku, to obrazek domyślny) jest przekodowywany na format base64. Hasło jest szyfrowany za pomocą biblioteki Bcrypt. Następnie sprawdzane jest, czy podany maila z formularza nie jest zajęty w systemie. Jeśli jest zajęty, to wyświetlony jest komunikat z tym związany, formularz nie jest czyszczony w celu poprawienia maila. W przypadku poprawności danych, system zapisuje nowego użytkownika oraz następuje zmiana strony na logowanie na endpointcie:
-\url{http://localhost:5173/login}
+Dane z formularza są walidowane w czasie rzeczywistym przy użyciu biblioteki Zod
+i React hooka useForm. Po wypełnieniu formularza i wciśnięciu przycisku 'Register'
+przesłany obrazek (lub w przypadku braku, to obrazek domyślny) jest przekodowywany
+na format base64. Hasło jest szyfrowane za pomocą biblioteki bcrypt. Następnie
+sprawdzane jest, czy podany maila z formularza nie jest zajęty w systemie.
+Jeśli jest zajęty, to wyświetlony jest komunikat z tym związany, formularz
+nie jest czyszczony w celu poprawienia maila. W przypadku poprawności danych,
+system zapisuje nowego użytkownika oraz następuje zmiana strony
+na logowanie na endpointcie: \url{http://localhost:5173/login}
 
 \begin{figure}[h]
     \centering
@@ -137,18 +155,73 @@ Dane z formularza są walidowane w czasie rzeczywistym przy użyciu biblioteki Z
     \caption*{Formularz logowania}
 \end{figure}
 
-Formularz logowania wymaga podania maila oraz hasła. Po poprawnym podaniu danych jest tworzona sesja z tokenem przy użyciu JWT oraz ciasteczek z js-cookie. Strona zmienia się na endpoint
-\url{http://localhost:5173/profile} do którego ma się tylko dostęp podczas sesji. Zawiera on wszystkie dane, które zostały wcześniej podane w rejestracji.
+Formularz logowania wymaga podania maila oraz hasła. Po poprawnym podaniu danych
+jest tworzona sesja z parą tokenów:
+\begin{enumerate}
+  \item access token - token o krótkim czasie ważności (900 sekund - 15 minut)
+  przechowywany w sessionStorage
+  \item refresh token - token o długim czasie ważności (1209600 sekund - 2 tygodnie)
+  przechowywany na serwerze w ramach ciasteczka secure, httpOnly (przechowywany
+  po stronie serwera)
+\end{enumerate}
+Access token pozwala na dostęp do zasobów. Każdy, kto go posiada ma dobrowolny
+dostęp do zasobów danego użytkownika. Z tego powodu ważny jest jego krótki czas ważności.
+W przypadku utraty ważności klient używa refresh token'a do otrzymania nowego
+access token'a. Ta operacja jest bezpieczna, ponieważ refresh token
+jest przechowywany od strony serwera.
+
+Od strony backendu są używane biblioteki cookie-parser i jsonwebtoken
+a od strony frontendu biblioteka js-cookie.
+Po zalogowaniu się następuje przekierowanie na URL \url{http://localhost:5173/profile}
+do którego ma się tylko dostęp podczas sesji. Zawiera on wszystkie dane, które zostały
+wcześniej podane w rejestracji.
 
 \newpage
 \subsection{System szukania znajomych}
-Wyszukiwanie znajomych odbywa się na endpointcie \url{http://localhost:5173/search}. Po wpisaniu w pasek wyszukiwania danej frazy i zatwierdzeniu jest pokazywane 10 pierwszych wyników, które są najbardziej zbliżone do tej frazy na podstawie imienia i nazwiska. W celu wyszukiwania podobieństwa jest wykorzystywany własny algorytm oparty o algorytmie Odległości Levenshteina. Każda osoba na liście zawiera przycisk informujący relację z danym kontaktem.
+Wyszukiwanie znajomych odbywa się na endpointcie \url{http://localhost:5173/search}.
+Po wpisaniu w pasek wyszukiwania danej frazy i zatwierdzeniu jest pokazywane
+10 pierwszych wyników, które są najbardziej zbliżone do tej frazy
+na podstawie imienia i nazwiska. W celu wyszukiwania podobieństwa jest wykorzystywany
+własny algorytm oparty o algorytmie odległości Levenshteina.
+Każda osoba na liście zawiera przycisk informujący relację z danym kontaktem.
 
 \begin{figure}[h]
     \centering
     \includegraphics[height=0.6\textwidth]{pics/search.png}
     \caption*{Okno wyszukiwania znajomych}
 \end{figure}
+
+Od strony backendu jest wykorzystany vector search index.
+Imię i nazwisko są przechowywane jako wektor wartości.
+Jeżeli jedna para imienia i nazwiska jest podobna do drugiej
+to odległość między dwoma wektorami powinna być mała. W tym przypadku metryka
+wykorzystywana do porównania wektorów to cosine similarity.
+
+Do zamiany tekstu na wektor (word embedding) jest wykorzystywany własny algorytm.
+Miał on do zrealizowania cele:
+\begin{enumerate}[itemsep=0mm]
+  \item nie powinien wykorzystywać sztucznej inteligencji (brak danych testowych
+  i długiego trenowania),
+  \item słowa z literami, które są blisko siebie na układzie QWERTY
+  powinny być podobne,
+  \item słowa z literami zamienionymi miejscami powinny być podobne,
+  \item słowa z brakującymi lub dodanymi literami powinny być podobne,
+  \item część słowa powinna być podobna do całego słowa.
+\end{enumerate}
+Pierwszym krokiem algorytmu jest zamiana każdej litery na wartość z zakresu
+$[-1, 1]$. Wartość wskazuje, po której stronie klawiatury znajduje się klawisz,
+na przykład litera Q ma wartość -1, P ma wartość 1.
+Porównanie dwóch słów o tej samej długości, ale np. ze zmienioną literą
+A na Q będzie dawało mały wynik a na przykład z A na L - większy.
+
+Drugim krokiem jest użycie interpolacji liniowej do rozszerzenia wektorów
+do tej samej, stałej długości. Słowo dłuższe albo krótsze o jedną literę
+nadal będą się dobrze pokrywać i dadzą bliski wynik.
+
+Trzecim krokiem jest połączenie poprzedniego wyliczonego wektora
+z wektorem z posortowanymi wartościami. Przy porównywaniu dwóch słów,
+w tym jednym z zamienionymi literami pierwszy wektor da niższy wynik
+ale drugi wyższy, co zwiększa odporność algorytmu na zamianę liter.
 
 \newpage
 \subsection{System dodawania do znajomych}
@@ -182,9 +255,19 @@ Użycie WebRTC \textit{(Web Real-Time Communication)} pozwala nawiązać połąc
      \item Kiedy dane znajdą wspólną drogę komunikacji, połączenie jest już gotowe i mogą być przesyłane informacje w obie strony.
  \end{enumerate}
 
-Wysyłane jest organizowane za pomocą procesu o nazwie ICE\textit{(Interactive Connectivity Establishment)} sygnaling.
+Protokół WebRTC zajmuje się tylko przesyłaniem strumieni audio i wideo.
+Do przesyłania komunikatów o dołączeniu wykorzystuje się inny protokół - w tym
+projekcie komunikacja odbywa się przez web sockety.
+
+Organizacją procesu zajmuje się ICE\textit{(Interactive Connectivity Establishment)} sygnaling.
 
  W danych, które są zawierane podczas dołączenia do rozmowy między użytkownikami, znajduje się protokół SDP \textit{(Session Decription Protocol)}, który zawiera informacje typu: kodek, adres, typ nośnika, dane audio, dane wideo. Użytkownicy również wymieniają się '\textit{ICE candidates}', którym jest publiczny adres IP i port, który przyjmuje dostarczane dane.
+
+Od strony backendu spotkania przechowywane są w formie węzłów o etykiecie Meeting.
+Po dołączeniu do spotkania utworzona jest relacja \verb|(:User)-[:IS_IN_MEETING]->(:Meeting)|.
+Przy dowolnej próbie wyjścia ze spotkania (wciśnięcie przycisku do wyjścia ze spotkania,
+przejście na inną stronę, zamknięcie karty w przeglądarce) jest usuwana relacja
+i węzeł ze spotkaniem, gdy nie ma żadnych innych relacji.
 
 \subsection{System chatu}
 
@@ -198,6 +281,11 @@ Wiadomości wysyłane są w czasie rzeczywistym, a cała konwersacja pomiędzy u
     \caption*{Przykładowy ekran chatu}
 \end{figure}
 
+\subsection{WebSocket}
+Połączenia WebSocket przechowywane w bazie danych w formie węzłów o etykiecie Socket.
+Po zalogowaniu się utworzona jest relacja \verb|(:User)-[:CONNECTED_TO]->(:Socket)|.
+Przy dowolnej próbie zamknięcia połączenia (wylogowanie się, zamknięcie karty w przeglądarce)
+jest usuwana relacja i węzeł z socketem, gdy nie ma żadnych innych relacji.
 
 \section{Źródła}
 \begin{itemize}
