@@ -146,7 +146,7 @@ function VideoCallPage() {
 
   return (
     <>
-      <Navbar />
+      <Navbar handleNavigate={() => handleLeaveMeeting()} />
       <div className="flex gap-5 p-10">
         <video
           id="large-feed"
