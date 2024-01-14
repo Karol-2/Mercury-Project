@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { useUser } from "../helpers/UserProvider";
 
-import { faUserMinus } from "@fortawesome/free-solid-svg-icons";
+import { faUserMinus, faPlus } from "@fortawesome/free-solid-svg-icons";
 import { faVideo } from "@fortawesome/free-solid-svg-icons";
 import { faCommentAlt } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -20,7 +20,7 @@ import Transition from "../components/Transition";
 function FriendsPage() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { user, meeting, createMeeting } = useUser();
+  const { user, meeting, createMeeting, joinMeeting } = useUser();
 
   const [friends, setFriends] = useState([]);
   const [friendsRequests, setFriendsRequests] = useState([]);
@@ -121,9 +121,10 @@ function FriendsPage() {
               <div id="friends" className=" bg-my-dark p-10 rounded-xl">
                 <button
                   onClick={createMeeting}
-                  className="btn secondary w-full mb-4"
+                  className="btn primary w-full mb-4"
                 >
-                  Create a meeting
+                  <FontAwesomeIcon icon={faPlus}></FontAwesomeIcon>
+                  <span className="ml-2">Create a meeting</span>
                 </button>
                 <h1 className="text-3xl font-bold">Friends:</h1>
                 <hr className="text-my-orange"></hr>
@@ -141,7 +142,7 @@ function FriendsPage() {
                             {friend.first_name} {friend.last_name}{" "}
                           </span>
                           <button
-                            className={` text-my-red text-sm my-2 p-2 rounded-md transition hover:scale-110 hover:bg-my-darker active:translate-x-2`}
+                            className={` text-my-red text-sm my-2 p-2 rounded-md transition hover:scale-110 hover:bg-my-red hover:text-my-light active:translate-x-2`}
                             onClick={() => {
                               setShowDeleteModal(true);
                               setFriendToDelete(friend);
@@ -153,7 +154,7 @@ function FriendsPage() {
                         <div className="flex flex-col xl:flex-row">
                           <button
                             className={`btn small bg-my-orange text-xs my-2`}
-                            onClick={() => navigate("/meeting")}
+                            onClick={() => joinMeeting(friend.id)}
                           >
                             <FontAwesomeIcon icon={faVideo} />
                           </button>
