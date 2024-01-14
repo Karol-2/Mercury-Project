@@ -255,7 +255,11 @@ Użycie WebRTC \textit{(Web Real-Time Communication)} pozwala nawiązać połąc
      \item Kiedy dane znajdą wspólną drogę komunikacji, połączenie jest już gotowe i mogą być przesyłane informacje w obie strony.
  \end{enumerate}
 
-Wysyłane jest organizowane za pomocą procesu o nazwie ICE\textit{(Interactive Connectivity Establishment)} sygnaling.
+Protokół WebRTC zajmuje się tylko przesyłaniem strumieni audio i wideo.
+Do przesyłania komunikatów o dołączeniu wykorzystuje się inny protokół - w tym
+projekcie komunikacja odbywa się przez web sockety.
+
+Organizacją procesu zajmuje się ICE\textit{(Interactive Connectivity Establishment)} sygnaling.
 
  W danych, które są zawierane podczas dołączenia do rozmowy między użytkownikami, znajduje się protokół SDP \textit{(Session Decription Protocol)}, który zawiera informacje typu: kodek, adres, typ nośnika, dane audio, dane wideo. Użytkownicy również wymieniają się '\textit{ICE candidates}', którym jest publiczny adres IP i port, który przyjmuje dostarczane dane.
 
