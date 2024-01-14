@@ -191,6 +191,38 @@ Każda osoba na liście zawiera przycisk informujący relację z danym kontaktem
     \caption*{Okno wyszukiwania znajomych}
 \end{figure}
 
+Od strony backendu jest wykorzystany vector search index.
+Imię i nazwisko są przechowywane jako wektor wartości.
+Jeżeli jedna para imienia i nazwiska jest podobna do drugiej
+to odległość między dwoma wektorami powinna być mała. W tym przypadku metryka
+wykorzystywana do porównania wektorów to cosine similarity.
+
+Do zamiany tekstu na wektor (word embedding) jest wykorzystywany własny algorytm.
+Miał on do zrealizowania cele:
+\begin{enumerate}[itemsep=0mm]
+  \item nie powinien wykorzystywać sztucznej inteligencji (brak danych testowych
+  i długiego trenowania),
+  \item słowa z literami, które są blisko siebie na układzie QWERTY
+  powinny być podobne,
+  \item słowa z literami zamienionymi miejscami powinny być podobne,
+  \item słowa z brakującymi lub dodanymi literami powinny być podobne,
+  \item część słowa powinna być podobna do całego słowa.
+\end{enumerate}
+Pierwszym krokiem algorytmu jest zamiana każdej litery na wartość z zakresu
+$[-1, 1]$. Wartość wskazuje, po której stronie klawiatury znajduje się klawisz,
+na przykład litera Q ma wartość -1, P ma wartość 1.
+Porównanie dwóch słów o tej samej długości, ale np. ze zmienioną literą
+A na Q będzie dawało mały wynik a na przykład z A na L - większy.
+
+Drugim krokiem jest użycie interpolacji liniowej do rozszerzenia wektorów
+do tej samej, stałej długości. Słowo dłuższe albo krótsze o jedną literę
+nadal będą się dobrze pokrywać i dadzą bliski wynik.
+
+Trzecim krokiem jest połączenie poprzedniego wyliczonego wektora
+z wektorem z posortowanymi wartościami. Przy porównywaniu dwóch słów,
+w tym jednym z zamienionymi literami pierwszy wektor da niższy wynik
+ale drugi wyższy, co zwiększa odporność algorytmu na zamianę liter.
+
 \newpage
 \subsection{System dodawania do znajomych}
 Po wybraniu kontaktu, który ma zostać dodany do sieci znajomych, wysyłany jest Request i tworzona relacja \textbf{SENT\_INVITE\_TO} w bazie Neo4j. Przychodzące zaproszenia i znajomych można sprawdzić w zakładce \textit{Friends} lub na endpointcie \url{http://localhost:5173/friends}
