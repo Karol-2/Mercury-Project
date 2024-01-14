@@ -120,7 +120,15 @@ function UserProvider({ children }: { children: React.ReactNode }) {
   const logout = async () => {
     if (!userId) return true;
 
-    const data = await dataService.fetchData("/auth/logout", "POST");
+    const tokenStr = sessionStorage.getItem("token");
+
+    const data = await dataService.fetchData("/auth/logout", "POST", {
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${tokenStr}`,
+      },
+    });
+
     if (data.status == "ok") {
       setUserId(null);
       setUser(null);

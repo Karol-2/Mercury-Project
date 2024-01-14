@@ -99,7 +99,7 @@ io.on("connection", async (socket: Socket) => {
     session.close();
 
     setMeeting(null);
-    console.log(`User ${userId} left the meeting`)
+    console.log(`User ${userId} left the meeting`);
     socket.emit("leftMeeting");
   });
 
