@@ -4,40 +4,46 @@ import { useUser } from "../helpers/UserProvider";
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Socket } from "socket.io-client";
-import socketConnection from "../webSocket/socketConnection";
 import stunServers from "../stun/stunServers";
+import Meeting from "../models/Meeting";
+
 function VideoCallPage() {
-  const { user, userId } = useUser();
+  const { userId, socket, meeting, leaveMeeting } = useUser();
+  const firstRefresh = useRef<boolean>(true);
   const navigate = useNavigate();
   const localStream = useRef<HTMLVideoElement>(null);
   const remoteStream = useRef<HTMLVideoElement>(null);
   const [makingOffer, setMakingOffer] = useState(false);
-  //const socket: Socket = useSelector((state: RootState) => state.socket);
-  //console.log(socket)
-  const socket = socketConnection();
+  const peerConnectionRef = useRef<RTCPeerConnection | null>(null);
+
+  const getPeerConnection = () => peerConnectionRef.current;
 
   useEffect(() => {
     if (userId === null) navigate("/login");
   }, [userId]);
 
   useEffect(() => {
-    if (user === undefined) {
-      return;
+    if (!meeting) {
+      navigate("/profile");
     }
-  }, [user]);
+  }, [meeting]);
 
   useEffect(() => {
-    prepareWebRTC();
+    if (!firstRefresh.current) return;
+    firstRefresh.current = false;
+
+    if (socket && meeting) {
+      peerConnectionRef.current = new RTCPeerConnection(stunServers);
+      prepareWebRTC(socket, meeting, peerConnectionRef.current);
+    }
   }, []);
 
-  async function prepareWebRTC() {
-    const peerConnection = new RTCPeerConnection(stunServers);
-    let polite = false;
-
-    socket.on("first", () => {
-      console.log("SOCKET: first");
-      polite = true;
-    });
+  async function prepareWebRTC(
+    socket: Socket,
+    meeting: Meeting,
+    peerConnection: RTCPeerConnection,
+  ) {
+    let polite = meeting.state == "created";
 
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
@@ -76,6 +82,9 @@ function VideoCallPage() {
 
     let ignoreOffer = false;
     socket.on("description", async (description) => {
+      const peerConnection = getPeerConnection();
+      if (!peerConnection) return;
+
       console.log("SOCKET: description");
       const offerCollision =
         description.type === "offer" &&
@@ -93,6 +102,9 @@ function VideoCallPage() {
     });
 
     socket.on("iceCandidate", async (candidate) => {
+      const peerConnection = getPeerConnection();
+      if (!peerConnection) return;
+
       console.log("SOCKET: iceCandidate");
       try {
         await peerConnection.addIceCandidate(candidate);
@@ -114,15 +126,28 @@ function VideoCallPage() {
     }
   }
 
+  const handleLeaveMeeting = async () => {
+    if (localStream.current) {
+      (localStream.current.srcObject as MediaStream)
+        .getTracks()
+        .forEach((track) => {
+          track.stop();
+        });
+      localStream.current.srcObject = null;
+    }
+
+    if (remoteStream.current) {
+      remoteStream.current.srcObject = null;
+    }
+    peerConnectionRef.current?.close();
+    peerConnectionRef.current = null;
+    leaveMeeting();
+  };
+
   return (
     <>
-      <Navbar />
+       <Navbar handleNavigate={() => handleLeaveMeeting()} />
       <div className="gap-5 p-10">
-        <div>
-          <button className="btn primary w-36" onClick={() => navigate(-1)}>
-            Go Back
-          </button>
-        </div>
         <div className="flex flex-col md:flex-row gap-5">
           <video
             id="large-feed"
@@ -141,11 +166,11 @@ function VideoCallPage() {
             playsInline
           ></video>
         </div>
-        {/* <div id="controls">
-          <button>Mic</button>
-          <button>Video</button>
-          <button>Leave</button>
-        </div> */}
+      </div>
+      <div>
+        <button onClick={() => handleLeaveMeeting()} className="btn secondary">
+          Leave the meeting
+        </button>
       </div>
       <Footer />
     </>

@@ -20,7 +20,7 @@ import Transition from "../components/Transition";
 function FriendsPage() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { user } = useUser();
+  const { user, meeting, createMeeting, joinMeeting } = useUser();
 
   const [friends, setFriends] = useState([]);
   const [friendsRequests, setFriendsRequests] = useState([]);
@@ -103,6 +103,13 @@ function FriendsPage() {
       setRefresh(() => !refresh);
     }
   };
+
+  useEffect(() => {
+    if (meeting?.id) {
+      navigate("/meeting");
+    }
+  }, [meeting]);
+
   return (
     <>
       <Navbar />
@@ -112,6 +119,12 @@ function FriendsPage() {
           <div className="mx-50 my-20 lg:mx-56" id="wrapper">
             <section className="grid grid-cols-1 lg:grid-cols-2 gap-8 ">
               <div id="friends" className=" bg-my-dark p-10 rounded-xl">
+                 <button
+              onClick={createMeeting}
+              className="btn secondary w-full mb-4"
+            >
+              Create a meeting
+            </button>
                 <h1 className="text-3xl font-bold">Friends:</h1>
                 <hr className="text-my-orange"></hr>
                 <ul className="">
@@ -168,6 +181,7 @@ function FriendsPage() {
                             handleNo={() => setShowDeleteModal(false)}
                           ></Modal>
                         )}
+
 
               <div id="friend-requests" className="">
                 <div className="p-10 rounded-xl bg-my-dark">

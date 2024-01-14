@@ -9,6 +9,8 @@ export interface ProfilePageFormProps {
   handleEditClick: () => void;
   handleSaveClick: () => void;
   handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  createMeeting: () => void;
+  joinMeeting: (friendId: string) => void;
   deleteUser: () => void;
 }
 
@@ -106,7 +108,6 @@ function ProfilePageForm(props: ProfilePageFormProps) {
           >
             Remove account
           </button>
-
           {showDeleteModal && (
             <Modal
               text={`Are you sure that you want to delete you account?`}

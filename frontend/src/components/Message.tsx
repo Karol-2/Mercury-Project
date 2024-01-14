@@ -1,14 +1,15 @@
 export interface MessageProps {
   type: "sent" | "received" | "info";
-  author_image: string;
-  authorId: string;
-  receiverId?: string;
+  sentDate: Date;
+  fromUserId: string;
+  fromUserProfilePicture?: string;
+  msgRef?: (ref: HTMLDivElement) => void;
+  toUserId: string;
   content: string;
-  created_date: Date;
 }
 
 function Message(props: MessageProps) {
-  const { type, author_image, content } = props;
+  const { type, fromUserProfilePicture, msgRef, content } = props;
 
   let align = "";
   let flexDirection = "";
@@ -28,14 +29,17 @@ function Message(props: MessageProps) {
   }
 
   return (
-    <div className={`${align} flex ${flexDirection} justify-center gap-5 mb-4`}>
+    <div
+      className={`${align} flex ${flexDirection} justify-center gap-5 mb-4`}
+      ref={msgRef}
+    >
       <div
         className={`mr-2 py-3 px-4 ${bgColor} ${rounded} text-white text-2xl`}
       >
         {content}
       </div>
       <img
-        src={author_image}
+        src={fromUserProfilePicture || ""}
         className="object-cover h-12 w-12 rounded-full"
         alt=""
       />

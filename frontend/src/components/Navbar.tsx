@@ -11,7 +11,12 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 <FontAwesomeIcon icon={faMagnifyingGlass} />;
 
-function Navbar() {
+export interface NavbarProps {
+  handleNavigate?: (to: String) => void;
+}
+
+function Navbar(props: NavbarProps) {
+  const { handleNavigate } = props;
   const [isOpen, setIsOpen] = useState(false);
 
   const navigate = useNavigate();
@@ -68,7 +73,11 @@ function Navbar() {
             <Link
               key={link.to}
               to={link.to}
-              className=" p-5 rounded-lg transition duration-250 ease-in-out hover:bg-my-orange font-bold text-lg active:translate-y-1"
+
+              className="p-5 rounded-lg transition duration-250 ease-in-out hover:bg-my-orange font-bold text-lg active:translate-y-1"
+              onClick={
+                handleNavigate ? () => handleNavigate(link.to) : undefined
+              }
             >
               <FontAwesomeIcon icon={link.icon} />
               <span className=" hidden md:inline ml-2">{link.text}</span>

@@ -10,7 +10,17 @@ import Transition from "../components/Transition";
 
 function ProfilePage() {
   const navigate = useNavigate();
-  const { user, userId, setUser, updateUser, deleteUser } = useUser();
+  const {
+    user,
+    userId,
+    setUser,
+    meeting,
+    updateUser,
+    deleteUser,
+    createMeeting,
+    joinMeeting,
+  } = useUser();
+
   const [isEditing, setIsEditing] = useState(false);
   const [friends, setFriends] = useState([]);
 
@@ -41,6 +51,13 @@ function ProfilePage() {
     }, 100);
   }, []);
 
+   useEffect(() => {
+    if (meeting?.id) {
+      navigate("/meeting");
+    }
+  }, [meeting]);
+
+
   useEffect(() => {
     if (userId === null) navigate("/login");
 
@@ -67,6 +84,8 @@ function ProfilePage() {
           handleEditClick={handleEditClick}
           handleSaveClick={handleSaveClick}
           handleChange={handleChange}
+          createMeeting={createMeeting}
+          joinMeeting={joinMeeting}
           deleteUser={deleteUser}
         />
       ) : (
