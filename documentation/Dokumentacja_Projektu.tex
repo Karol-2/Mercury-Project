@@ -139,8 +139,15 @@ Użytkownik, aby móc się zarejestrować, musi podać swoje dane, które są w 
 
 Zdjęcie profilowe nie jest wymagane. W przypadku braku wprowadzenia własnego zdjęcia, system sam wprowadza domyślne zdjęcie. Wybór zdjęcia jest widoczny jako miniaturka, również z możliwością usunięcia.
 
-Dane z formularza są walidowane w czasie rzeczywistym przy użyciu biblioteki Zod i React hooka useForm. Po wypełnieniu formularza i wciśnięciu przycisku 'Register' przesłany obrazek (lub w przypadku braku, to obrazek domyślny) jest przekodowywany na format base64. Hasło jest szyfrowany za pomocą biblioteki Bcrypt. Następnie sprawdzane jest, czy podany maila z formularza nie jest zajęty w systemie. Jeśli jest zajęty, to wyświetlony jest komunikat z tym związany, formularz nie jest czyszczony w celu poprawienia maila. W przypadku poprawności danych, system zapisuje nowego użytkownika oraz następuje zmiana strony na logowanie na endpointcie:
-\url{http://localhost:5173/login}
+Dane z formularza są walidowane w czasie rzeczywistym przy użyciu biblioteki Zod
+i React hooka useForm. Po wypełnieniu formularza i wciśnięciu przycisku 'Register'
+przesłany obrazek (lub w przypadku braku, to obrazek domyślny) jest przekodowywany
+na format base64. Hasło jest szyfrowane za pomocą biblioteki bcrypt. Następnie
+sprawdzane jest, czy podany maila z formularza nie jest zajęty w systemie.
+Jeśli jest zajęty, to wyświetlony jest komunikat z tym związany, formularz
+nie jest czyszczony w celu poprawienia maila. W przypadku poprawności danych,
+system zapisuje nowego użytkownika oraz następuje zmiana strony
+na logowanie na endpointcie: \url{http://localhost:5173/login}
 
 \begin{figure}[h]
     \centering
