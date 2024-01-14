@@ -9,6 +9,7 @@ import { faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useNavigate } from "react-router-dom";
 import editDistance from "../misc/editDistance";
+import Transition from "../components/Transition";
 
 function SearchPage() {
   const navigate = useNavigate();
@@ -17,7 +18,17 @@ function SearchPage() {
   const [usersFound, setUsersFound] = useState<[[User, number]]>();
   const [usersFriends, setUsersFriends] = useState([]);
 
+  const [showAnimation, setShowAnim] = useState(false);
+  const [showContent, setShowContent] = useState(false);
+
   const { user, userId } = useUser();
+
+  useEffect(() => {
+    setShowAnim(true);
+    setTimeout(() => {
+      setShowContent(true);
+    }, 100);
+  }, []);
 
   useEffect(() => {
     if (userId === null) navigate("/login");
@@ -89,47 +100,58 @@ function SearchPage() {
   return (
     <>
       <Navbar />
-      <section className=" min-h-screen mx-50 lg:mx-72 ">
-        <div>
-          <form
-            className="flex flex-row gap-5 max-w-3xl w-full mt-5"
-            onSubmit={handleSearch}
-          >
-            <input
-              type="text"
-              placeholder="John Doe"
-              className="form-input text-my-darker"
-              onChange={(e) => setSearchState(e.target.value)}
-            ></input>
-            <button
-              type="submit"
-              className="btn bg-my-purple text-xs px-7 py-5"
-            >
-              <div className="flex gap-3 items-center">
-                <span>Search</span>
-                <FontAwesomeIcon icon={faMagnifyingGlass} />
-              </div>
-            </button>
-          </form>
-        </div>
-        <div>
-          {usersFound && usersFound.length > 0 ? (
-            usersFound.map((user, index) => (
-              <FoundUser
-                user={user[0]}
-                key={String(index)}
-                currentId={userId}
-                isFriend={isFriend(usersFriends, user[0])}
-              />
-            ))
-          ) : (
-            <p className="text-lg">
-              Enter your friend's name in the field above.
-            </p>
-          )}
-        </div>
-      </section>
-      <Footer />
+      {showAnimation && <Transition startAnimation={showAnimation} />}
+      {showContent ? (
+        <>
+          <section className=" min-h-screen mx-50 lg:mx-72 ">
+            <div className="mx-50 my-20 flex justify-center">
+              <form
+                className="flex flex-col md:flex-row gap-5 max-w-3xl w-full mt-5"
+                onSubmit={handleSearch}
+              >
+                <div className=" w-full">
+                  <input
+                    type="text"
+                    placeholder="John Doe"
+                    className="form-input text-my-darker"
+                    onChange={(e) => setSearchState(e.target.value)}
+                  ></input>
+                  <p className="text-lg">
+                    Enter your friend's name in the field above.
+                  </p>
+                </div>
+
+                <button
+                  type="submit"
+                  className="btn bg-my-purple text-xs px-7 py-5"
+                >
+                  <div className="flex gap-3 items-center text-cente justify-center">
+                    <span className=" text-center">Search</span>
+                    <FontAwesomeIcon icon={faMagnifyingGlass} />
+                  </div>
+                </button>
+              </form>
+            </div>
+            <div>
+              {usersFound && usersFound.length > 0 ? (
+                usersFound.map((user, index) => (
+                  <FoundUser
+                    user={user[0]}
+                    key={String(index)}
+                    currentId={userId}
+                    isFriend={isFriend(usersFriends, user[0])}
+                  />
+                ))
+              ) : (
+                <></>
+              )}
+            </div>
+          </section>
+          <Footer />
+        </>
+      ) : (
+        ""
+      )}
     </>
   );
 }

@@ -40,6 +40,7 @@ function ChatBox({ user, socket, friendId }: ChatBoxProps) {
   const [profilePictures, setProfilePictures] = useState<
     Record<string, string>
   >({});
+
   const enterPressed = useRef<boolean>(false);
   const [notificationPlaying, setNotificationPlaying] =
     useState<boolean>(false);
@@ -161,7 +162,7 @@ function ChatBox({ user, socket, friendId }: ChatBoxProps) {
   };
 
   return (
-    <div className="flex flex-col justify-end w-full p-2 h-[90vh]">
+    <div className="flex flex-col justify-end w-full p-10 h-[90vh]">
       <div className="w-full px-5 flex flex-col justify-between overflow-y-scroll">
         {messageElems}
       </div>

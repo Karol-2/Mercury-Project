@@ -147,23 +147,25 @@ function VideoCallPage() {
   return (
     <>
       <Navbar handleNavigate={() => handleLeaveMeeting()} />
-      <div className="flex gap-5 p-10">
-        <video
-          id="large-feed"
-          ref={localStream}
-          className="rounded-lg flex-1"
-          autoPlay
-          controls
-          playsInline
-        ></video>
-        <video
-          id="small-feed"
-          ref={remoteStream}
-          className="rounded-lg flex-1"
-          autoPlay
-          controls
-          playsInline
-        ></video>
+      <div className="gap-5 p-10">
+        <div className="flex flex-col md:flex-row gap-5">
+          <video
+            id="large-feed"
+            ref={localStream}
+            className="rounded-lg flex-1"
+            autoPlay
+            controls
+            playsInline
+          ></video>
+          <video
+            id="small-feed"
+            ref={remoteStream}
+            className="rounded-lg flex-1"
+            autoPlay
+            controls
+            playsInline
+          ></video>
+        </div>
       </div>
       <div>
         <button onClick={() => handleLeaveMeeting()} className="btn secondary">

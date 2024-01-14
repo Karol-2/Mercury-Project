@@ -8,7 +8,7 @@
 .btn {
   text-align: center;
   font-size: 1.5rem;
-  border-radius: 3rem;
+  border-radius: 2rem;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
   transition: 0.25s ease-in-out;
 
@@ -90,12 +90,12 @@
 }
 
 .fly-in-btm {
-  animation: fly-in-bottom 2s ease-in-out;
-  transition: 1s;
+  animation: fly-in-bottom 1s ease-in-out;
+  transition: 0.5s;
 }
 
 .fade-in {
-  animation: fade-in 0.5s 2s ease-in-out forwards;
+  animation: fade-in 0.5s 1s ease-in-out forwards;
   opacity: 0;
 
   &:after {

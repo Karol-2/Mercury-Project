@@ -67,7 +67,7 @@ function FoundUser(props: FoundUserProps) {
   }
 
   return (
-    <div className="flex flex-row bg-my-dark p-5 rounded-lg mt-5">
+    <div className="flex flex-col items-center md:flex-row bg-my-dark p-5 rounded-lg mt-5">
       <img
         src={user.profile_picture}
         className="rounded-full w-40 h-40 border-my-orange border-4 object-cover"
@@ -78,11 +78,11 @@ function FoundUser(props: FoundUserProps) {
         </p>
         <p>{user.country}</p>
         <button
-          className={`btn small text-xs w-52 ${buttonColor}`}
+          className={`btn small text-xs ${buttonColor}`}
           disabled={isFriend || requestSent}
           onClick={handleAddFriend}
         >
-          {buttonText}
+          <span>{buttonText}</span>
         </button>
       </div>
     </div>

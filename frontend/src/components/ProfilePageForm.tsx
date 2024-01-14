@@ -32,8 +32,13 @@ function ProfilePageForm(props: ProfilePageFormProps) {
         <h1 className="text-3xl font-bold">Your profile</h1>
         <hr className="text-my-orange"></hr>
         <div>
-          <img src={user.profile_picture} alt="Profile" className="my-5" />
-          <p>{user.id}</p>
+          <img
+            src={user.profile_picture}
+            alt="Profile"
+            className="my-5 w-96 h-96 object-cover"
+          />
+          <h1 className="text-2xl font-bold">Personal Data</h1>
+          <hr className="text-my-orange mb-2"></hr>
           <p>
             First Name:{" "}
             {isEditing ? (
@@ -42,7 +47,7 @@ function ProfilePageForm(props: ProfilePageFormProps) {
                 name="first_name"
                 value={user.first_name}
                 onChange={handleChange}
-                className=" text-my-dark"
+                className=" text-my-dark "
               />
             ) : (
               user.first_name || ""
@@ -90,32 +95,21 @@ function ProfilePageForm(props: ProfilePageFormProps) {
               user.mail || ""
             )}
           </p>
-          <p>
-            Password:{" "}
-            {isEditing ? (
-              <input
-                type="text"
-                name="password"
-                value={user.password}
-                onChange={handleChange}
-                className=" text-my-dark"
-              />
-            ) : (
-              user.password || ""
-            )}
-          </p>
         </div>
-        <div className="my-5">
+        <div className="my-5 grid grid-cols-1 md:grid-cols-2">
           {isEditing ? (
-            <button onClick={handleSaveClick} className="btn primary">
+            <button onClick={handleSaveClick} className="btn primary w-full">
               Save
             </button>
           ) : (
-            <button onClick={handleEditClick} className="btn primary">
+            <button onClick={handleEditClick} className="btn primary w-full">
               Edit
             </button>
           )}
-          <button onClick={deleteUser} className="btn secondary">
+          <button
+            onClick={() => setShowDeleteModal(true)}
+            className="btn secondary w-full"
+          >
             Remove account
           </button>
           {showDeleteModal && (

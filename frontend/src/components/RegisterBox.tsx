@@ -175,7 +175,7 @@ function RegisterBox() {
       <div className="flex items-center justify-center space-x-4 rounded-xl">
         <label
           htmlFor="upload-button"
-          className="relative cursor-pointer bg-gray-200 rounded-xl py-2 px-4 border border-gray-300"
+          className=" my-2 p-2 rounded-lg transition duration-250 ease-in-out bg-my-orange hover:bg-my-orange-dark font-bold text-lg active:translate-y-1"
         >
           <span className="cursor-pointer">Choose a file</span>
           <input
@@ -184,28 +184,33 @@ function RegisterBox() {
             type="file"
             accept="image/*"
             onChange={handleFileChange}
-            className="opacity-0 absolute top-0 left-0 w-full h-full cursor-pointer"
+            className="opacity-0 w-4 h-4 cursor-pointer"
           />
         </label>
 
         {profilePictureBase64 && (
-          <>
-            <img
-              src={profilePictureBase64}
-              alt="Profile"
-              className="w-20 h-20 object-cover border border-gray-300 rounded-xl"
-            />
-            <button
-              className="btn secondary"
-              onClick={() => setProfilePictureBase64("")}
-            >
-              Clear
-            </button>
-          </>
+          <img
+            src={profilePictureBase64}
+            alt="Profile"
+            className="w-20 h-20 object-cover border border-gray-300 rounded-xl"
+          />
         )}
       </div>
 
-      <p className=" text-center"> {pictureFile?.name}</p>
+      <div className="flex flex-col justify-center">
+        <p className="text-center"> {pictureFile?.name}</p>
+        {pictureFile && (
+          <button
+            className=" my-2 p-2 rounded-lg transition duration-250 ease-in-out bg-my-orange hover:bg-my-orange-dark font-bold text-lg active:translate-y-1"
+            onClick={() => {
+              setProfilePictureBase64("");
+              setPictureFile(undefined);
+            }}
+          >
+            Clear
+          </button>
+        )}
+      </div>
       <div {...errorProps}>{errors.profile_picture?.message}</div>
 
       <div className="py-5">
