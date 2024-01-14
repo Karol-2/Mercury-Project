@@ -51,12 +51,11 @@ function ProfilePage() {
     }, 100);
   }, []);
 
-   useEffect(() => {
+  useEffect(() => {
     if (meeting?.id) {
       navigate("/meeting");
     }
   }, [meeting]);
-
 
   useEffect(() => {
     if (userId === null) navigate("/login");

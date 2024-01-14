@@ -119,12 +119,12 @@ function FriendsPage() {
           <div className="mx-50 my-20 lg:mx-56" id="wrapper">
             <section className="grid grid-cols-1 lg:grid-cols-2 gap-8 ">
               <div id="friends" className=" bg-my-dark p-10 rounded-xl">
-                 <button
-              onClick={createMeeting}
-              className="btn secondary w-full mb-4"
-            >
-              Create a meeting
-            </button>
+                <button
+                  onClick={createMeeting}
+                  className="btn secondary w-full mb-4"
+                >
+                  Create a meeting
+                </button>
                 <h1 className="text-3xl font-bold">Friends:</h1>
                 <hr className="text-my-orange"></hr>
                 <ul className="">
@@ -164,7 +164,6 @@ function FriendsPage() {
                             <FontAwesomeIcon icon={faCommentAlt} />
                           </button>
                         </div>
-                        
                       </div>
                     </li>
                   ))}
@@ -172,16 +171,15 @@ function FriendsPage() {
               </div>
 
               {showDeleteModal && friendToDelete && (
-                          <Modal
-                            text={`Are you sure that you want remove ${friendToDelete.first_name} ${friendToDelete.last_name} from your friends ?`}
-                            handleYes={() => {
-                              handleDeclineRequest(friendToDelete);
-                              setFriendToDelete(null);
-                            }}
-                            handleNo={() => setShowDeleteModal(false)}
-                          ></Modal>
-                        )}
-
+                <Modal
+                  text={`Are you sure that you want remove ${friendToDelete.first_name} ${friendToDelete.last_name} from your friends ?`}
+                  handleYes={() => {
+                    handleDeclineRequest(friendToDelete);
+                    setFriendToDelete(null);
+                  }}
+                  handleNo={() => setShowDeleteModal(false)}
+                ></Modal>
+              )}
 
               <div id="friend-requests" className="">
                 <div className="p-10 rounded-xl bg-my-dark">

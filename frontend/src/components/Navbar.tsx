@@ -73,7 +73,6 @@ function Navbar(props: NavbarProps) {
             <Link
               key={link.to}
               to={link.to}
-
               className="p-5 rounded-lg transition duration-250 ease-in-out hover:bg-my-orange font-bold text-lg active:translate-y-1"
               onClick={
                 handleNavigate ? () => handleNavigate(link.to) : undefined

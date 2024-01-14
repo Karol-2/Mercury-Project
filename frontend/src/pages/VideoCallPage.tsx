@@ -146,7 +146,7 @@ function VideoCallPage() {
 
   return (
     <>
-       <Navbar handleNavigate={() => handleLeaveMeeting()} />
+      <Navbar handleNavigate={() => handleLeaveMeeting()} />
       <div className="gap-5 p-10">
         <div className="flex flex-col md:flex-row gap-5">
           <video
