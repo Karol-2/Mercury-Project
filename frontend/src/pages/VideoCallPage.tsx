@@ -6,6 +6,8 @@ import { useNavigate } from "react-router-dom";
 import { Socket } from "socket.io-client";
 import stunServers from "../stun/stunServers";
 import Meeting from "../models/Meeting";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faPhoneSlash} from "@fortawesome/free-solid-svg-icons";
 
 function VideoCallPage() {
   const { userId, socket, meeting, leaveMeeting } = useUser();
@@ -147,7 +149,7 @@ function VideoCallPage() {
   return (
     <>
       <Navbar handleNavigate={() => handleLeaveMeeting()} />
-      <div className="gap-5 p-10">
+      <div className="flex flex-col justify-center gap-5 p-10">
         <div className="flex flex-col md:flex-row gap-5">
           <video
             id="large-feed"
@@ -167,9 +169,10 @@ function VideoCallPage() {
           ></video>
         </div>
       </div>
-      <div>
-        <button onClick={() => handleLeaveMeeting()} className="btn secondary">
-          Leave the meeting
+      <div className=" flex justify-center">
+        <button onClick={() => handleLeaveMeeting()} className="btn bg-my-red p-6">
+          <FontAwesomeIcon icon={faPhoneSlash}></FontAwesomeIcon>
+          <span className="ml-2">Leave</span>
         </button>
       </div>
       <Footer />
