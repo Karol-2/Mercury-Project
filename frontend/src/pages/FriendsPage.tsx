@@ -19,7 +19,7 @@ import dataService from "../services/data";
 function FriendsPage() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { user, meeting, joinMeeting } = useUser();
+  const { user, meeting, createMeeting, joinMeeting } = useUser();
 
   const [friends, setFriends] = useState([]);
   const [friendsRequests, setFriendsRequests] = useState([]);
@@ -104,7 +104,16 @@ function FriendsPage() {
       <Navbar />
       <div className="mx-50 my-20 lg:mx-56" id="wrapper">
         <section className="grid grid-cols-1 lg:grid-cols-2 gap-8 ">
-          <div id="friends" className=" bg-my-dark p-10 rounded-xl">
+          <div
+            id="friends"
+            className="flex flex-col bg-my-dark p-10 rounded-xl"
+          >
+            <button
+              onClick={createMeeting}
+              className="btn secondary w-full mb-4"
+            >
+              Create a meeting
+            </button>
             <h1 className="text-3xl font-bold">Friends:</h1>
             <hr className="text-my-orange"></hr>
             <ul>
