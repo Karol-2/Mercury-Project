@@ -9,10 +9,14 @@ import Meeting from "../models/Meeting";
 
 function VideoCallPage() {
   const { userId, socket, meeting, leaveMeeting } = useUser();
+  const firstRefresh = useRef<boolean>(true);
   const navigate = useNavigate();
   const localStream = useRef<HTMLVideoElement>(null);
   const remoteStream = useRef<HTMLVideoElement>(null);
   const [makingOffer, setMakingOffer] = useState(false);
+  const peerConnectionRef = useRef<RTCPeerConnection | null>(null);
+
+  const getPeerConnection = () => peerConnectionRef.current;
 
   useEffect(() => {
     if (userId === null) navigate("/login");
@@ -25,13 +29,20 @@ function VideoCallPage() {
   }, [meeting]);
 
   useEffect(() => {
+    if (!firstRefresh.current) return;
+    firstRefresh.current = false;
+
     if (socket && meeting) {
-      prepareWebRTC(socket, meeting);
+      peerConnectionRef.current = new RTCPeerConnection(stunServers);
+      prepareWebRTC(socket, meeting, peerConnectionRef.current);
     }
   }, []);
 
-  async function prepareWebRTC(socket: Socket, meeting: Meeting) {
-    const peerConnection = new RTCPeerConnection(stunServers);
+  async function prepareWebRTC(
+    socket: Socket,
+    meeting: Meeting,
+    peerConnection: RTCPeerConnection,
+  ) {
     let polite = meeting.state == "created";
 
     try {
@@ -71,6 +82,9 @@ function VideoCallPage() {
 
     let ignoreOffer = false;
     socket.on("description", async (description) => {
+      const peerConnection = getPeerConnection();
+      if (!peerConnection) return;
+
       console.log("SOCKET: description");
       const offerCollision =
         description.type === "offer" &&
@@ -88,6 +102,9 @@ function VideoCallPage() {
     });
 
     socket.on("iceCandidate", async (candidate) => {
+      const peerConnection = getPeerConnection();
+      if (!peerConnection) return;
+
       console.log("SOCKET: iceCandidate");
       try {
         await peerConnection.addIceCandidate(candidate);
@@ -108,6 +125,24 @@ function VideoCallPage() {
       setMakingOffer(false);
     }
   }
+
+  const handleLeaveMeeting = async () => {
+    if (localStream.current) {
+      (localStream.current.srcObject as MediaStream)
+        .getTracks()
+        .forEach((track) => {
+          track.stop();
+        });
+      localStream.current.srcObject = null;
+    }
+
+    if (remoteStream.current) {
+      remoteStream.current.srcObject = null;
+    }
+    peerConnectionRef.current?.close();
+    peerConnectionRef.current = null;
+    leaveMeeting();
+  };
 
   return (
     <>
@@ -131,7 +166,7 @@ function VideoCallPage() {
         ></video>
       </div>
       <div>
-        <button onClick={leaveMeeting} className="btn secondary">
+        <button onClick={() => handleLeaveMeeting()} className="btn secondary">
           Leave the meeting
         </button>
       </div>
