@@ -20,7 +20,7 @@ import Transition from "../components/Transition";
 function FriendsPage() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { user, meeting, createMeeting, joinMeeting } = useUser();
+  const { user, meeting, createMeeting } = useUser();
 
   const [friends, setFriends] = useState([]);
   const [friendsRequests, setFriendsRequests] = useState([]);
