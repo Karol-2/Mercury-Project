@@ -4,36 +4,49 @@ import { useUser } from "../helpers/UserProvider";
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Socket } from "socket.io-client";
-import socketConnection from "../webSocket/socketConnection";
 import stunServers from "../stun/stunServers";
+import Meeting from "../models/Meeting";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faPhoneSlash} from "@fortawesome/free-solid-svg-icons";
+
 function VideoCallPage() {
-  const { user, userId } = useUser();
+  const { userId, socket, meeting, leaveMeeting } = useUser();
+  const firstRefresh = useRef<boolean>(true);
   const navigate = useNavigate();
   const localStream = useRef<HTMLVideoElement>(null);
   const remoteStream = useRef<HTMLVideoElement>(null);
   const [makingOffer, setMakingOffer] = useState(false);
+  const peerConnectionRef = useRef<RTCPeerConnection | null>(null);
+
+  const getPeerConnection = () => peerConnectionRef.current;
 
   useEffect(() => {
     if (userId === null) navigate("/login");
   }, [userId]);
 
   useEffect(() => {
-    if (user === undefined) {
-      return;
+    if (!meeting) {
+      navigate("/profile");
     }
-  }, [user]);
+  }, [meeting]);
 
   useEffect(() => {
-    prepareWebRTC();
+    if (!firstRefresh.current) return;
+    firstRefresh.current = false;
+
+    if (socket && meeting) {
+      peerConnectionRef.current = new RTCPeerConnection(stunServers);
+      prepareWebRTC(socket, meeting, peerConnectionRef.current);
+    }
   }, []);
 
-  async function prepareWebRTC() {
-    const socket = socketConnection();
-    const peerConnection = new RTCPeerConnection(stunServers);
-    let polite = false;
-    socket.on("first", () => {
-      polite = true;
-    });
+  async function prepareWebRTC(
+    socket: Socket,
+    meeting: Meeting,
+    peerConnection: RTCPeerConnection,
+  ) {
+    let polite = meeting.state == "created";
+
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
         audio: true,
@@ -71,6 +84,10 @@ function VideoCallPage() {
 
     let ignoreOffer = false;
     socket.on("description", async (description) => {
+      const peerConnection = getPeerConnection();
+      if (!peerConnection) return;
+
+      console.log("SOCKET: description");
       const offerCollision =
         description.type === "offer" &&
         (makingOffer || peerConnection.signalingState !== "stable");
@@ -85,7 +102,12 @@ function VideoCallPage() {
         socket.emit("description", peerConnection.localDescription!);
       }
     });
+
     socket.on("iceCandidate", async (candidate) => {
+      const peerConnection = getPeerConnection();
+      if (!peerConnection) return;
+
+      console.log("SOCKET: iceCandidate");
       try {
         await peerConnection.addIceCandidate(candidate);
       } catch (err) {
@@ -106,26 +128,52 @@ function VideoCallPage() {
     }
   }
 
+  const handleLeaveMeeting = async () => {
+    if (localStream.current) {
+      (localStream.current.srcObject as MediaStream)
+        .getTracks()
+        .forEach((track) => {
+          track.stop();
+        });
+      localStream.current.srcObject = null;
+    }
+
+    if (remoteStream.current) {
+      remoteStream.current.srcObject = null;
+    }
+    peerConnectionRef.current?.close();
+    peerConnectionRef.current = null;
+    leaveMeeting();
+  };
+
   return (
     <>
-      <Navbar />
-      <div className="flex gap-5 p-10">
-        <video
-          id="large-feed"
-          ref={localStream}
-          className="rounded-lg flex-1"
-          autoPlay
-          controls
-          playsInline
-        ></video>
-        <video
-          id="small-feed"
-          ref={remoteStream}
-          className="rounded-lg flex-1"
-          autoPlay
-          controls
-          playsInline
-        ></video>
+      <Navbar handleNavigate={() => handleLeaveMeeting()} />
+      <div className="flex flex-col justify-center gap-5 p-10">
+        <div className="flex flex-col md:flex-row gap-5">
+          <video
+            id="large-feed"
+            ref={localStream}
+            className="rounded-lg flex-1"
+            autoPlay
+            controls
+            playsInline
+          ></video>
+          <video
+            id="small-feed"
+            ref={remoteStream}
+            className="rounded-lg flex-1"
+            autoPlay
+            controls
+            playsInline
+          ></video>
+        </div>
+      </div>
+      <div className=" flex justify-center">
+        <button onClick={() => handleLeaveMeeting()} className="btn bg-my-red p-6">
+          <FontAwesomeIcon icon={faPhoneSlash}></FontAwesomeIcon>
+          <span className="ml-2">Leave</span>
+        </button>
       </div>
       <Footer />
     </>

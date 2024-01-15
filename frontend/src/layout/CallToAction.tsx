@@ -9,7 +9,7 @@ export default function CallToAction() {
   return (
     <section className="flex flex-col">
       <div className="mx-50 lg:mx-96 py-40">
-        <h1 className="text-center font-bold text-5xl">Let`s work together!</h1>
+        <h1 className="text-center font-bold text-5xl">Let's work together!</h1>
         <motion.div
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
@@ -26,7 +26,10 @@ export default function CallToAction() {
               future of communication now.
             </p>
             <Link to="/register">
-              <button className="btn secondary mt-20" onClick={scrollToTop}>
+              <button
+                className="btn secondary mt-20 w-60"
+                onClick={scrollToTop}
+              >
                 Join Us!
               </button>
             </Link>

@@ -1,10 +1,12 @@
 import { v4 as uuidv4 } from "uuid";
 
-import driver from "../driver/driver";
-import userData from "./users";
-import wordToVec from "../misc/wordToVec";
+import driver from "./driver/driver";
+import bcrypt from "bcrypt";
 
-async function isDatabaseEmpty() {
+import userData from "./data/users";
+import wordToVec from "./misc/wordToVec";
+
+export async function isDatabaseEmpty() {
   const session = driver.session();
   try {
     const result = await session.run(
@@ -20,7 +22,7 @@ async function isDatabaseEmpty() {
   }
 }
 
-async function importInitialData() {
+export async function importInitialData() {
   const isEmpty = await isDatabaseEmpty();
   if (!isEmpty) {
     return "Database is not empty";
@@ -42,10 +44,14 @@ async function importInitialData() {
       const userClean: any = Object.assign({}, user);
       delete userClean.friend_ids;
       delete userClean.chats;
+
       userClean.id = userId;
       userClean.name_embedding = wordToVec(
         userClean.first_name + userClean.last_name,
       );
+      const { password } = userClean;
+      const passwordHashed = await bcrypt.hash(password, 10);
+      userClean.password = passwordHashed;
 
       await session.run(createUserQuery, { user: userClean });
     }
@@ -91,4 +97,9 @@ async function importInitialData() {
   }
 }
 
-export default importInitialData;
+export async function cleanUpData() {
+  const session = driver.session();
+  await session.run(`MATCH (m:Meeting) DETACH DELETE m`);
+  await session.run(`MATCH (s:Socket) DETACH DELETE s`);
+  session.close();
+}

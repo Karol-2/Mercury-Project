@@ -12,6 +12,11 @@ services:
       - ./db/data:/data
       - ./db/conf:/conf
 
+  chats:
+    image: mongo:4.4.26
+    ports:
+      - 27017:27017
+
   frontend:
     build: ./frontend
     ports:
@@ -25,9 +30,11 @@ services:
       - 5000:5000
     depends_on:
       - db
+      - chats
     command: sh -c "/wait && npm run prod"
     environment:
       - NEO4J_URI=neo4j://db:7687
+      - MONGODB_URI=mongodb://chats:27017
       - WAIT_HOSTS=db:7474
       - WAIT_BEFORE_HOSTS=15
       - WAIT_AFTER_HOSTS=3

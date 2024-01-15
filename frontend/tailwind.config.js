@@ -15,6 +15,7 @@ export default {
     },
     colors: {
       "my-orange": "#FF8001",
+      "my-orange-dark": "#a85a0c",
       "my-purple": "#3E0C70",
       "my-red": "#CA1A1A",
       "my-cancel": "#FF7976",
@@ -23,6 +24,7 @@ export default {
       "my-darker": "#121519",
       "my-light": "#EDE9E9",
       "my-lighter": "#F4F4F4",
+      "my-green": "#3E4F13",
     },
     extend: {},
   },

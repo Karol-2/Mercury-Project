@@ -1,16 +1,16 @@
 import { useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { useUser } from "../helpers/UserProvider";
 
 function LoginBox() {
   const navigate = useNavigate();
-
   const [login, setLogin] = useState("");
   const [password, setPassword] = useState("");
   const [loginMsg, setLoginMsg] = useState("");
 
-  const { userId, login: userLogin } = useUser() || { login: () => {} };
+  const { userId, login: userLogin } = useUser();
+  const firstVisit = useRef<boolean>(true);
 
   const loginFunc = async () => {
     userLogin(login, password);
@@ -20,9 +20,14 @@ function LoginBox() {
     if (userId === undefined) return;
 
     if (userId === null) {
+      if (firstVisit.current) {
+        firstVisit.current = false;
+        return;
+      }
+
       setLoginMsg("Bad credentials");
     } else {
-      navigate("/messages", { replace: true });
+      navigate("/profile", { replace: true });
       setLoginMsg("Logging in...");
     }
   }, [userId]);
@@ -48,7 +53,10 @@ function LoginBox() {
         onChange={(e) => setPassword(e.target.value)}
       />
 
-      <button className="btn small bg-my-orange" onClick={() => loginFunc()}>
+      <button
+        className="btn small my-4 bg-my-orange"
+        onClick={() => loginFunc()}
+      >
         Login
       </button>
       <div className="text-center">

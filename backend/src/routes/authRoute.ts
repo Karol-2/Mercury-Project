@@ -1,11 +1,22 @@
 import { Router, Request } from "express";
 
+import bcrypt from "bcrypt";
+
 import driver from "../driver/driver";
-import { generateAccessToken, generateRefreshToken } from "../misc/jwt";
+import {
+  JWTRequest,
+  authenticateToken,
+  generateAccessToken,
+  generateRefreshToken,
+} from "../misc/jwt";
 
 import jwt, { JwtPayload } from "jsonwebtoken";
 import { TokenErrorResponse } from "../types/authResponse";
 import { CustomResponse, OkResponse } from "../models/Response";
+import { OkErrorResponse } from "../types/userResponse";
+import User from "../models/User";
+import { leaveMeeting } from "../meetings";
+import { disconnectFromSocket } from "../sockets";
 
 const authRouter = Router();
 
@@ -40,7 +51,8 @@ authRouter.post("/login", async (req: Request, res: TokenErrorResponse) => {
     const user = userRequest.records[0].get("u").properties;
     await session.close();
 
-    if (user.password != password) {
+    const passwordCorrect = await bcrypt.compare(password, user.password);
+    if (!passwordCorrect) {
       return res.status(401).json({ status: "unauthorized" });
     }
 
@@ -54,11 +66,24 @@ authRouter.post("/login", async (req: Request, res: TokenErrorResponse) => {
 
 authRouter.post(
   "/logout",
-  async (_req: Request, res: CustomResponse<OkResponse>) => {
+  authenticateToken,
+  async (req: JWTRequest, res: OkErrorResponse) => {
     res.clearCookie("refreshToken", {
       secure: true,
       httpOnly: true,
     });
+
+    const userId = (req.token as any).userId;
+
+    try {
+      const session = driver.session();
+      await leaveMeeting(session, userId);
+      await session.close();
+    } catch (err) {
+      console.log("Error:", err);
+      return res.status(404).json({ status: "error", errors: err as object });
+    }
+
     res.json({ status: "ok" });
   },
 );

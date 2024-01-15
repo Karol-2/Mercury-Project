@@ -9,15 +9,22 @@ import { isExpired, decodeToken } from "react-jwt";
 import Cookies from "js-cookie";
 import dataService from "../services/data";
 import User from "../models/User";
+import { Socket, io } from "socket.io-client";
+import Meeting from "../models/Meeting";
 
 export interface UserContextValue {
   userId: string | null | undefined;
   user: User | null | undefined;
+  socket: Socket | null;
+  meeting: Meeting | null;
   setUser: React.Dispatch<React.SetStateAction<User | null | undefined>>;
   login: (mail: string, password: string) => Promise<void>;
   logout: () => Promise<boolean>;
   updateUser: () => Promise<boolean>;
   deleteUser: () => Promise<boolean>;
+  createMeeting: () => Promise<string | void>;
+  leaveMeeting: () => Promise<void>;
+  joinMeeting: (friendId: string) => Promise<string | void>;
 }
 
 const UserContext = createContext<UserContextValue | null>(null);
@@ -37,8 +44,20 @@ function UserProvider({ children }: { children: React.ReactNode }) {
   // null -> user not logged in
   // string -> user logged in, userID correct
   const [userId, setUserId] = useState<string | null | undefined>(undefined);
-  const [user, setUser] = useState<User | null | undefined>(null);
+  const [user, setUser] = useState<User | null | undefined>(undefined);
   const [token, setToken] = useState<object | null>(null);
+  const [socket, setSocket] = useState<Socket | null>(null);
+  const [meeting, setMeeting] = useState<Meeting | null>(null);
+
+  useEffect(() => {
+    if (!user) {
+      setSocket(null);
+      return;
+    }
+    if (socket && socket.connected) return;
+    setSocket(io("http://localhost:5000", { auth: { userId } }));
+  }, [user]);
+
   const firstRefresh = useRef(true);
 
   const trySetToken = (tokenStr: string | null): boolean => {
@@ -101,11 +120,20 @@ function UserProvider({ children }: { children: React.ReactNode }) {
   const logout = async () => {
     if (!userId) return true;
 
-    const data = await dataService.fetchData("/auth/logout", "POST");
+    const tokenStr = sessionStorage.getItem("token");
+
+    const data = await dataService.fetchData("/auth/logout", "POST", {
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${tokenStr}`,
+      },
+    });
+
     if (data.status == "ok") {
       setUserId(null);
       setUser(null);
       sessionStorage.removeItem("token");
+      socket?.disconnect();
       return true;
     }
 
@@ -142,6 +170,55 @@ function UserProvider({ children }: { children: React.ReactNode }) {
     return false;
   };
 
+  const createMeeting = async () => {
+    if (!socket) return;
+
+    const waitForMeeting = new Promise<string>((resolve) => {
+      socket.once("createdMeeting", (meeting) => {
+        const meetingId = (meeting?.id || "") as string;
+        return resolve(meetingId);
+      });
+    });
+
+    socket.emit("createMeeting");
+
+    const meetingId = await waitForMeeting;
+    setMeeting({ id: meetingId, state: "created" });
+    return meetingId;
+  };
+
+  const joinMeeting = async (friendId: string) => {
+    if (!socket) return;
+
+    const waitForMeeting = new Promise<string>((resolve) => {
+      socket.once("joinedMeeting", (meeting) => {
+        const meetingId = (meeting?.id || "") as string;
+        return resolve(meetingId);
+      });
+    });
+
+    socket.emit("joinMeeting", [friendId]);
+
+    const meetingId = await waitForMeeting;
+    setMeeting({ id: meetingId, state: "joined" });
+    return meetingId;
+  };
+
+  const leaveMeeting = async () => {
+    if (!socket) return;
+
+    const waitForLeaveMeeting = new Promise<void>((resolve) => {
+      socket.once("leftMeeting", () => {
+        return resolve();
+      });
+    });
+
+    socket.emit("leaveMeeting");
+
+    await waitForLeaveMeeting;
+    setMeeting(null);
+  };
+
   useEffect(() => {
     if (token) {
       const newUserId = (token as any).userId;
@@ -163,7 +240,20 @@ function UserProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <UserContext.Provider
-      value={{ userId, user, setUser, login, logout, updateUser, deleteUser }}
+      value={{
+        userId,
+        user,
+        setUser,
+        socket,
+        meeting,
+        login,
+        logout,
+        updateUser,
+        deleteUser,
+        createMeeting,
+        joinMeeting,
+        leaveMeeting,
+      }}
     >
       {children}
     </UserContext.Provider>

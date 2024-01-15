@@ -1,5 +1,3 @@
-import Chat from "./Chat";
-
 export default interface User {
   id: string;
   first_name: string;
@@ -9,5 +7,5 @@ export default interface User {
   mail: string;
   password: string;
   friend_ids?: number[];
-  chats?: Chat[];
+  socketId?: string;
 }
