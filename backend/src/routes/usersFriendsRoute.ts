@@ -2,7 +2,7 @@ import { Router, Request, Response } from "express";
 import { Session } from "neo4j-driver";
 import driver from "../driver/driver";
 import User from "../models/User";
-import { OkErrorResponse, FriendsErrorResponse } from "../types/userResponse";
+import { OkErrorResponse, FriendsErrorResponse, UsersErrorResponse } from "../types/userResponse";
 
 const friendshipRouter = Router();
 
@@ -84,6 +84,38 @@ friendshipRouter.get(
     }
   },
 );
+
+friendshipRouter.get(
+  "/:userId/friend-suggestions",
+  async (req: Request, res: UsersErrorResponse) => {
+    try {
+      const session: Session = driver.session();
+      const userId: string = req.params.userId;
+
+      const user = await userExists(session, res, userId);
+      if ("json" in user) {
+        await session.close();
+        return res;
+      }
+
+      const friendSuggestionsQuery = await session.run(
+        `MATCH (u:User {id: $userId})-[:IS_FRIENDS_WITH]->(friend:User)-[:IS_FRIENDS_WITH]->(suggested:User)
+          WHERE NOT (u)-[:IS_FRIENDS_WITH]->(suggested) AND suggested.id <> $userId
+          RETURN DISTINCT suggested
+          ORDER BY suggested.last_name, suggested.first_name`,
+        { userId },
+      );
+      await session.close();
+
+      const users: User[] = friendSuggestionsQuery.records.map((record) => record.get("suggested").properties);
+      return res.json({ status: "ok", users });
+    } catch (err) {
+      console.log("Error:", err);
+      return res.status(404).json({ status: "error", errors: err as object });
+    }
+  },
+);
+
 
 friendshipRouter.delete(
   "/:userId1/remove/:userId2",
