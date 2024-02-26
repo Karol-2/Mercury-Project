@@ -16,6 +16,7 @@ import User from "../models/User";
 import setUserFriends from "../redux/actions/setUserFriends";
 import dataService from "../services/data";
 import Transition from "../components/Transition";
+import FoundUser from "../components/FoundUser";
 
 function FriendsPage() {
   const navigate = useNavigate();
@@ -25,6 +26,8 @@ function FriendsPage() {
   const [friends, setFriends] = useState([]);
   const [friendsRequests, setFriendsRequests] = useState([]);
   const [refresh, setRefresh] = useState(false);
+
+  const [friendSuggestions, setFriendSuggestions] = useState([]);
 
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [friendToDelete, setFriendToDelete] = useState<User | null>(null);
@@ -42,6 +45,21 @@ function FriendsPage() {
       setShowContent(true);
     }, 100);
   }, []);
+
+  useEffect(()=>{
+    const fetchFriendSuggestions = async () => {
+      if (user) {
+        const friendsRequestsResponse = await dataService.fetchData(
+          `/users/${user.id}/friend-suggestions`,
+          "GET",
+          {},
+        );
+        setFriendSuggestions(friendsRequestsResponse.users);
+      }
+    };
+    fetchFriendSuggestions();
+
+  },[])
 
   useEffect(() => {
     const fetchFriendRequests = async () => {
@@ -204,6 +222,15 @@ function FriendsPage() {
                   )}
                 </div>
               </div>
+            </section>
+            <section id="suggestions" className=" mt-8">
+              <div>
+                <h1 className="text-3xl font-bold">Friends Suggestions:</h1>
+                {user && friendSuggestions && friendSuggestions.map((suggsetion: User, index: number) => (
+                  <FoundUser user={suggsetion} key={String(index)} currentId={user.id} isFriend={false}  />
+                ))}
+              </div>
+
             </section>
           </div>
           <Footer />
