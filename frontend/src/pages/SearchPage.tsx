@@ -10,6 +10,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useNavigate } from "react-router-dom";
 import editDistance from "../misc/editDistance";
 import Transition from "../components/Transition";
+import Paginator from "../components/Paginator";
 
 function SearchPage() {
   const navigate = useNavigate();
@@ -132,7 +133,7 @@ function SearchPage() {
                 </button>
               </form>
             </div>
-            <div>
+            {/* <div>
               {usersFound && usersFound.length > 0 ? (
                 usersFound.map((user, index) => (
                   <FoundUser
@@ -145,7 +146,23 @@ function SearchPage() {
               ) : (
                 <></>
               )}
-            </div>
+            </div> */}
+            {usersFound && (<div>
+            <h1>TEST</h1>
+            <Paginator 
+              users={usersFound.map((match: [User, number])=> match[0])} 
+              itemsPerPage={3}
+              renderItem={(user)=> <FoundUser
+                user={user}
+                key={String(0)}
+                currentId={userId}
+                isFriend={isFriend(usersFriends, user)}
+              />}
+              >
+
+            </Paginator>
+            </div>)}
+           
           </section>
           <Footer />
         </>
