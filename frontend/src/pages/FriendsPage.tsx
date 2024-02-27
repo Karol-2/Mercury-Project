@@ -3,14 +3,11 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { useUser } from "../helpers/UserProvider";
 
-import { faUserMinus, faPlus } from "@fortawesome/free-solid-svg-icons";
-import { faVideo } from "@fortawesome/free-solid-svg-icons";
-import { faCommentAlt } from "@fortawesome/free-solid-svg-icons";
+import { faPlus } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import Footer from "../components/Footer";
 import FriendRequest from "../components/FriendRequest";
-import Modal from "../components/Modal";
 import Navbar from "../components/Navbar";
 import User from "../models/User";
 import setUserFriends from "../redux/actions/setUserFriends";
@@ -18,6 +15,7 @@ import dataService from "../services/data";
 import Transition from "../components/Transition";
 import FoundUser from "../components/FoundUser";
 import Friend from "../components/Friend";
+import Paginator from "../components/Paginator";
 
 function FriendsPage() {
   const navigate = useNavigate();
@@ -145,10 +143,10 @@ function FriendsPage() {
                 <h1 className="text-3xl font-bold">Friends:</h1>
                 <hr className="text-my-orange"></hr>
                 <ul className="">
-                  {friends.map((friend: User) => (
-                  <Friend friend={friend} handleDeclineRequest={handleDeclineRequest} joinMeeting={joinMeeting}>
-                  </Friend>
-                  ))}
+                  <Paginator users={friends} itemsPerPage={5} renderItem={
+                    (user)=> <Friend friend={user} handleDeclineRequest={handleDeclineRequest} joinMeeting={joinMeeting}/>
+                    } />
+
                 </ul>
               </div>
 
@@ -178,9 +176,12 @@ function FriendsPage() {
             <section id="suggestions" className=" mt-8">
               <div>
                 <h1 className="text-3xl font-bold">Friends Suggestions:</h1>
-                {user && friendSuggestions && friendSuggestions.map((suggsetion: User, index: number) => (
-                  <FoundUser user={suggsetion} key={String(index)} currentId={user.id} isFriend={false}  />
-                ))}
+                {user && friendSuggestions && (
+                  <Paginator users={friendSuggestions} itemsPerPage={3} renderItem={
+                    (user)=><FoundUser user={user} key={String(1)} currentId={user.id} isFriend={false}  />
+                  } />
+          
+                )}
               </div>
 
             </section>
