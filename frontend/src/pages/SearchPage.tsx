@@ -133,25 +133,10 @@ function SearchPage() {
                 </button>
               </form>
             </div>
-            {/* <div>
-              {usersFound && usersFound.length > 0 ? (
-                usersFound.map((user, index) => (
-                  <FoundUser
-                    user={user[0]}
-                    key={String(index)}
-                    currentId={userId}
-                    isFriend={isFriend(usersFriends, user[0])}
-                  />
-                ))
-              ) : (
-                <></>
-              )}
-            </div> */}
             {usersFound && (<div>
-            <h1>TEST</h1>
             <Paginator 
               users={usersFound.map((match: [User, number])=> match[0])} 
-              itemsPerPage={3}
+              itemsPerPage={5}
               renderItem={(user)=> <FoundUser
                 user={user}
                 key={String(0)}

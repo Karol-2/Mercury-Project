@@ -10,8 +10,6 @@ export interface PaginatorProps {
   renderItem: (user: User) => React.ReactNode
 }
 
-
-
 function Paginator(props: PaginatorProps) {
 
     const [currentPageNum, setCurrentPageNum] = useState(1);
