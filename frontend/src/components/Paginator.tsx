@@ -4,7 +4,7 @@ import { useState } from "react";
 import User from "../models/User";
 
 
-export interface PaginatorProps {
+interface PaginatorProps {
   users: User[],
   itemsPerPage: number,
   renderItem: (user: User) => React.ReactNode

@@ -133,20 +133,21 @@ function SearchPage() {
                 </button>
               </form>
             </div>
-            {usersFound && (<div>
-            <Paginator 
-              users={usersFound.map((match: [User, number])=> match[0])} 
-              itemsPerPage={5}
-              renderItem={(user)=> <FoundUser
-                user={user}
-                key={String(0)}
-                currentId={userId}
-                isFriend={isFriend(usersFriends, user)}
-              />}
-              >
+            {usersFound && (
+              <Paginator 
+                users={usersFound.map((match: [User, number]) => match[0])} 
+                itemsPerPage={5}
+                renderItem={(user) => (
+                  <FoundUser
+                    user={user}
+                    key={String(0)}
+                    currentId={userId}
+                    isFriend={isFriend(usersFriends, user)}
+                  />
+                )}
+              />
+            )}
 
-            </Paginator>
-            </div>)}
            
           </section>
           <Footer />
