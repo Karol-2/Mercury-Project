@@ -3,19 +3,19 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { useUser } from "../helpers/UserProvider";
 
-import { faUserMinus, faPlus } from "@fortawesome/free-solid-svg-icons";
-import { faVideo } from "@fortawesome/free-solid-svg-icons";
-import { faCommentAlt } from "@fortawesome/free-solid-svg-icons";
+import { faPlus } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import Footer from "../components/Footer";
 import FriendRequest from "../components/FriendRequest";
-import Modal from "../components/Modal";
 import Navbar from "../components/Navbar";
 import User from "../models/User";
 import setUserFriends from "../redux/actions/setUserFriends";
 import dataService from "../services/data";
 import Transition from "../components/Transition";
+import FoundUser from "../components/FoundUser";
+import Friend from "../components/Friend";
+import Paginator from "../components/Paginator";
 
 function FriendsPage() {
   const navigate = useNavigate();
@@ -26,8 +26,7 @@ function FriendsPage() {
   const [friendsRequests, setFriendsRequests] = useState([]);
   const [refresh, setRefresh] = useState(false);
 
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [friendToDelete, setFriendToDelete] = useState<User | null>(null);
+  const [friendSuggestions, setFriendSuggestions] = useState([]);
 
   const [showAnimation, setShowAnim] = useState(false);
   const [showContent, setShowContent] = useState(false);
@@ -41,6 +40,20 @@ function FriendsPage() {
     setTimeout(() => {
       setShowContent(true);
     }, 100);
+  }, []);
+
+  useEffect(() => {
+    const fetchFriendSuggestions = async () => {
+      if (user) {
+        const friendsRequestsResponse = await dataService.fetchData(
+          `/users/${user.id}/friend-suggestions`,
+          "GET",
+          {},
+        );
+        setFriendSuggestions(friendsRequestsResponse.users);
+      }
+    };
+    fetchFriendSuggestions();
   }, []);
 
   useEffect(() => {
@@ -129,60 +142,25 @@ function FriendsPage() {
                 <h1 className="text-3xl font-bold">Friends:</h1>
                 <hr className="text-my-orange"></hr>
                 <ul className="">
-                  {friends.map((friend: User) => (
-                    <li key={friend.id} className="flex flex-row mt-5">
-                      <img
-                        src={friend.profile_picture}
-                        className="rounded-full w-28 h-28 border-my-orange border-2 object-cover"
-                      />
-                      <div className=" ml-5 flex flex-col justify-evenly">
-                        <p className="font-semibold text-2xl">
-                          <span className="">
-                            {" "}
-                            {friend.first_name} {friend.last_name}{" "}
-                          </span>
-                          <button
-                            className={` text-my-red text-sm my-2 p-2 rounded-md transition hover:scale-110 hover:bg-my-red hover:text-my-light active:translate-x-2`}
-                            onClick={() => {
-                              setShowDeleteModal(true);
-                              setFriendToDelete(friend);
-                            }}
-                          >
-                            <FontAwesomeIcon icon={faUserMinus} />
-                          </button>
-                        </p>
-                        <div className="flex flex-col xl:flex-row">
-                          <button
-                            className={`btn small bg-my-orange text-xs my-2`}
-                            onClick={() => joinMeeting(friend.id)}
-                          >
-                            <FontAwesomeIcon icon={faVideo} />
-                          </button>
-                          <button
-                            className={`btn small bg-my-purple text-xs my-2`}
-                            onClick={() => navigate(`/messages/${friend.id}`)}
-                          >
-                            <FontAwesomeIcon icon={faCommentAlt} />
-                          </button>
-                        </div>
-                      </div>
-                    </li>
-                  ))}
+                  {friends && friends.length > 0 ? (
+                    <Paginator
+                      users={friends}
+                      itemsPerPage={5}
+                      renderItem={(user) => (
+                        <Friend
+                          friend={user}
+                          handleDeclineRequest={handleDeclineRequest}
+                          joinMeeting={joinMeeting}
+                        />
+                      )}
+                    />
+                  ) : (
+                    <p>You don't have any friends.</p>
+                  )}
                 </ul>
               </div>
 
-              {showDeleteModal && friendToDelete && (
-                <Modal
-                  text={`Are you sure that you want remove ${friendToDelete.first_name} ${friendToDelete.last_name} from your friends ?`}
-                  handleYes={() => {
-                    handleDeclineRequest(friendToDelete);
-                    setFriendToDelete(null);
-                  }}
-                  handleNo={() => setShowDeleteModal(false)}
-                ></Modal>
-              )}
-
-              <div id="friend-requests" className="">
+              <div id="friend-requests">
                 <div className="p-10 rounded-xl bg-my-dark">
                   <h1 className="text-3xl font-bold">Friend requests:</h1>
                   <hr className="text-my-orange"></hr>
@@ -203,6 +181,27 @@ function FriendsPage() {
                     </p>
                   )}
                 </div>
+              </div>
+            </section>
+            <section id="suggestions" className=" mt-8">
+              <div>
+                <h1 className="text-3xl font-bold">Friends Suggestions:</h1>
+                {user && friendSuggestions && friendSuggestions.length > 0 ? (
+                  <Paginator
+                    users={friendSuggestions}
+                    itemsPerPage={3}
+                    renderItem={(user) => (
+                      <FoundUser
+                        user={user}
+                        key={String(1)}
+                        currentId={user.id}
+                        isFriend={false}
+                      />
+                    )}
+                  />
+                ) : (
+                  "You need to add more friends to show valid suggestions."
+                )}
               </div>
             </section>
           </div>

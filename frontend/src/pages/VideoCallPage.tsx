@@ -7,7 +7,7 @@ import { Socket } from "socket.io-client";
 import stunServers from "../stun/stunServers";
 import Meeting from "../models/Meeting";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPhoneSlash} from "@fortawesome/free-solid-svg-icons";
+import { faPhoneSlash } from "@fortawesome/free-solid-svg-icons";
 
 function VideoCallPage() {
   const { userId, socket, meeting, leaveMeeting } = useUser();
@@ -170,7 +170,10 @@ function VideoCallPage() {
         </div>
       </div>
       <div className=" flex justify-center">
-        <button onClick={() => handleLeaveMeeting()} className="btn bg-my-red p-6">
+        <button
+          onClick={() => handleLeaveMeeting()}
+          className="btn bg-my-red p-6"
+        >
           <FontAwesomeIcon icon={faPhoneSlash}></FontAwesomeIcon>
           <span className="ml-2">Leave</span>
         </button>
