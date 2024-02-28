@@ -101,13 +101,12 @@ friendshipRouter.get(
       const friendSuggestionsQuery = await session.run(
         `MATCH (u:User {id: $userId})-[:IS_FRIENDS_WITH]->(friend:User)-[:IS_FRIENDS_WITH]->(suggested:User)
           WHERE NOT (u)-[:IS_FRIENDS_WITH]->(suggested) AND suggested.id <> $userId
-          RETURN DISTINCT suggested
-          ORDER BY suggested.last_name, suggested.first_name`,
+          RETURN DISTINCT suggested`,
         { userId },
       );
       await session.close();
 
-      const users: User[] = friendSuggestionsQuery.records.map((record) => record.get("suggested").properties);
+      const users: User[] = friendSuggestionsQuery.records.map((record) => record.get("suggested").properties).slice(0,15);
       return res.json({ status: "ok", users });
     } catch (err) {
       console.log("Error:", err);
