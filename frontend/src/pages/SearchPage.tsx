@@ -134,8 +134,8 @@ function SearchPage() {
               </form>
             </div>
             {usersFound && (
-              <Paginator 
-                users={usersFound.map((match: [User, number]) => match[0])} 
+              <Paginator
+                users={usersFound.map((match: [User, number]) => match[0])}
                 itemsPerPage={5}
                 renderItem={(user) => (
                   <FoundUser
@@ -147,8 +147,6 @@ function SearchPage() {
                 )}
               />
             )}
-
-           
           </section>
           <Footer />
         </>

@@ -42,7 +42,7 @@ function FriendsPage() {
     }, 100);
   }, []);
 
-  useEffect(()=>{
+  useEffect(() => {
     const fetchFriendSuggestions = async () => {
       if (user) {
         const friendsRequestsResponse = await dataService.fetchData(
@@ -54,8 +54,7 @@ function FriendsPage() {
       }
     };
     fetchFriendSuggestions();
-
-  },[])
+  }, []);
 
   useEffect(() => {
     const fetchFriendRequests = async () => {
@@ -144,11 +143,20 @@ function FriendsPage() {
                 <hr className="text-my-orange"></hr>
                 <ul className="">
                   {friends && friends.length > 0 ? (
-                  <Paginator users={friends} itemsPerPage={5} renderItem={
-                    (user)=> <Friend friend={user} handleDeclineRequest={handleDeclineRequest} joinMeeting={joinMeeting}/>
-                    } />
-                  ):<p>You don't have any friends.</p>}
-              
+                    <Paginator
+                      users={friends}
+                      itemsPerPage={5}
+                      renderItem={(user) => (
+                        <Friend
+                          friend={user}
+                          handleDeclineRequest={handleDeclineRequest}
+                          joinMeeting={joinMeeting}
+                        />
+                      )}
+                    />
+                  ) : (
+                    <p>You don't have any friends.</p>
+                  )}
                 </ul>
               </div>
 
@@ -178,14 +186,23 @@ function FriendsPage() {
             <section id="suggestions" className=" mt-8">
               <div>
                 <h1 className="text-3xl font-bold">Friends Suggestions:</h1>
-                {user && friendSuggestions && friendSuggestions.length > 0 ?(
-                  <Paginator users={friendSuggestions} itemsPerPage={3} renderItem={
-                    (user)=><FoundUser user={user} key={String(1)} currentId={user.id} isFriend={false}  />
-                  } />
-          
-                ):"You need to add more friends to show valid suggestions."}
+                {user && friendSuggestions && friendSuggestions.length > 0 ? (
+                  <Paginator
+                    users={friendSuggestions}
+                    itemsPerPage={3}
+                    renderItem={(user) => (
+                      <FoundUser
+                        user={user}
+                        key={String(1)}
+                        currentId={user.id}
+                        isFriend={false}
+                      />
+                    )}
+                  />
+                ) : (
+                  "You need to add more friends to show valid suggestions."
+                )}
               </div>
-
             </section>
           </div>
           <Footer />

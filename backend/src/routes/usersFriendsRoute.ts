@@ -2,7 +2,11 @@ import { Router, Request, Response } from "express";
 import { Session } from "neo4j-driver";
 import driver from "../driver/driver";
 import User from "../models/User";
-import { OkErrorResponse, FriendsErrorResponse, UsersErrorResponse } from "../types/userResponse";
+import {
+  OkErrorResponse,
+  FriendsErrorResponse,
+  UsersErrorResponse,
+} from "../types/userResponse";
 
 const friendshipRouter = Router();
 
@@ -106,7 +110,9 @@ friendshipRouter.get(
       );
       await session.close();
 
-      const users: User[] = friendSuggestionsQuery.records.map((record) => record.get("suggested").properties).slice(0,15);
+      const users: User[] = friendSuggestionsQuery.records
+        .map((record) => record.get("suggested").properties)
+        .slice(0, 15);
       return res.json({ status: "ok", users });
     } catch (err) {
       console.log("Error:", err);
@@ -114,7 +120,6 @@ friendshipRouter.get(
     }
   },
 );
-
 
 friendshipRouter.delete(
   "/:userId1/remove/:userId2",
