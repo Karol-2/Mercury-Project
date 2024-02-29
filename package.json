@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Projekt zespołowy - Zespół 6",
   "scripts": {
-    "prettier:fix": "prettier --write .",
+    "prettier:fix": "prettier --write frontend/ backend/",
     "prettier:check": "prettier --check ."
   },
   "author": {
