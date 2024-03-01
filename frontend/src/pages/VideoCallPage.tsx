@@ -10,7 +10,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPhoneSlash, faMicrophone, faMicrophoneSlash, faVideo, faVideoSlash } from "@fortawesome/free-solid-svg-icons";
 
 function VideoCallPage() {
-  const { userId, socket, meeting, leaveMeeting } = useUser();
+  const { user, userId, socket, meeting, leaveMeeting } = useUser();
   const [stream, setStream] = useState<MediaStream | null>(null);
   const firstRefresh = useRef<boolean>(true);
   const navigate = useNavigate();
@@ -115,7 +115,6 @@ function VideoCallPage() {
       const peerConnection = getPeerConnection();
       if (!peerConnection) return;
 
-      console.log("SOCKET: description");
       const offerCollision =
         description.type === "offer" &&
         (makingOffer || peerConnection.signalingState !== "stable");
@@ -135,7 +134,6 @@ function VideoCallPage() {
       const peerConnection = getPeerConnection();
       if (!peerConnection) return;
 
-      console.log("SOCKET: iceCandidate");
       try {
         await peerConnection.addIceCandidate(candidate);
       } catch (err) {
@@ -196,27 +194,36 @@ function VideoCallPage() {
             playsInline
           ></video>
         </div>
+        <div className="flex">
+          <span className="flex-1 text-center">{user?.first_name+" "+user?.last_name}</span>
+          <span className="flex-1 text-center"></span>
+        </div>
       </div>
-      <div className=" flex justify-center">
-        <button className="btn p-6" onClick={startStopAudio}>
-          {audio 
-            ? <FontAwesomeIcon icon={faMicrophone} />
-            : <FontAwesomeIcon icon={faMicrophoneSlash} />
-          }
-        </button>
-        <button className="btn p-6" onClick={startStopVideo}>
-          {video 
-            ? <FontAwesomeIcon icon={faVideo} /> 
-            : <FontAwesomeIcon icon={faVideoSlash} />
-          }
-        </button>
-        <button
-          onClick={() => handleLeaveMeeting()}
-          className="btn bg-my-red p-6"
-        >
-          <FontAwesomeIcon icon={faPhoneSlash}></FontAwesomeIcon>
-          <span className="ml-2">Leave</span>
-        </button>
+      <div className="flex px-10">
+        <div className="flex-1"></div>
+        <div className="flex flex-1 justify-center">
+          <button className="btn p-6" onClick={startStopAudio}>
+            {audio 
+              ? <FontAwesomeIcon icon={faMicrophone} />
+              : <FontAwesomeIcon icon={faMicrophoneSlash} />
+            }
+          </button>
+          <button className="btn p-6" onClick={startStopVideo}>
+            {video 
+              ? <FontAwesomeIcon icon={faVideo} /> 
+              : <FontAwesomeIcon icon={faVideoSlash} />
+            }
+          </button>
+        </div>
+        <div className="flex flex-1 justify-end">
+          <button
+            onClick={() => handleLeaveMeeting()}
+            className="btn bg-my-red p-6"
+          >
+            <FontAwesomeIcon icon={faPhoneSlash}></FontAwesomeIcon>
+            <span className="ml-2">Leave</span>
+          </button>
+        </div>
       </div>
       <Footer />
     </>
