@@ -7,7 +7,13 @@ import { Socket } from "socket.io-client";
 import stunServers from "../stun/stunServers";
 import Meeting from "../models/Meeting";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPhoneSlash, faMicrophone, faMicrophoneSlash, faVideo, faVideoSlash } from "@fortawesome/free-solid-svg-icons";
+import {
+  faPhoneSlash,
+  faMicrophone,
+  faMicrophoneSlash,
+  faVideo,
+  faVideoSlash,
+} from "@fortawesome/free-solid-svg-icons";
 
 function VideoCallPage() {
   const { user, userId, socket, meeting, leaveMeeting } = useUser();
@@ -47,10 +53,10 @@ function VideoCallPage() {
       const tracks = stream.getAudioTracks();
       if (audio) {
         setAudio(false);
-        tracks.forEach(track => track.enabled = false);
+        tracks.forEach((track) => (track.enabled = false));
       } else {
         setAudio(true);
-        tracks.forEach(track => track.enabled = true);
+        tracks.forEach((track) => (track.enabled = true));
       }
     }
   }
@@ -59,10 +65,10 @@ function VideoCallPage() {
       const tracks = stream.getVideoTracks();
       if (video) {
         setVideo(false);
-        tracks.forEach(track => track.enabled = false);
+        tracks.forEach((track) => (track.enabled = false));
       } else {
         setVideo(true);
-        tracks.forEach(track => track.enabled = true);
+        tracks.forEach((track) => (track.enabled = true));
       }
     }
   }
@@ -195,7 +201,9 @@ function VideoCallPage() {
           ></video>
         </div>
         <div className="flex">
-          <span className="flex-1 text-center">{user?.first_name+" "+user?.last_name}</span>
+          <span className="flex-1 text-center">
+            {user?.first_name + " " + user?.last_name}
+          </span>
           <span className="flex-1 text-center"></span>
         </div>
       </div>
@@ -203,16 +211,18 @@ function VideoCallPage() {
         <div className="flex-1"></div>
         <div className="flex flex-1 justify-center">
           <button className="btn p-6" onClick={startStopAudio}>
-            {audio 
-              ? <FontAwesomeIcon icon={faMicrophone} />
-              : <FontAwesomeIcon icon={faMicrophoneSlash} />
-            }
+            {audio ? (
+              <FontAwesomeIcon icon={faMicrophone} />
+            ) : (
+              <FontAwesomeIcon icon={faMicrophoneSlash} />
+            )}
           </button>
           <button className="btn p-6" onClick={startStopVideo}>
-            {video 
-              ? <FontAwesomeIcon icon={faVideo} /> 
-              : <FontAwesomeIcon icon={faVideoSlash} />
-            }
+            {video ? (
+              <FontAwesomeIcon icon={faVideo} />
+            ) : (
+              <FontAwesomeIcon icon={faVideoSlash} />
+            )}
           </button>
         </div>
         <div className="flex flex-1 justify-end">
