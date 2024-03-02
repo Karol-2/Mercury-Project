@@ -27,7 +27,7 @@ function VideoCallPage() {
   const [video, setVideo] = useState(true);
   const peerConnectionRef = useRef<RTCPeerConnection | null>(null);
   const getPeerConnection = () => peerConnectionRef.current;
-
+  const [yourParticipant, setYourParticipant] = useState("");
   useEffect(() => {
     if (userId === null) navigate("/login");
   }, [userId]);
@@ -134,6 +134,7 @@ function VideoCallPage() {
         await peerConnection.setLocalDescription();
         socket.emit("description", peerConnection.localDescription!);
       }
+      socket.emit("name", `${user?.first_name} ${user?.last_name}`);
     });
 
     socket.on("iceCandidate", async (candidate) => {
@@ -145,6 +146,10 @@ function VideoCallPage() {
       } catch (err) {
         console.error(err);
       }
+    });
+
+    socket.on("name", (name) => {
+      setYourParticipant(name);
     });
   }
 
@@ -204,7 +209,7 @@ function VideoCallPage() {
           <span className="flex-1 text-center">
             {user?.first_name + " " + user?.last_name}
           </span>
-          <span className="flex-1 text-center"></span>
+          <span className="flex-1 text-center">{yourParticipant}</span>
         </div>
       </div>
       <div className="flex px-10">
