@@ -41,3 +41,12 @@ jobs:
       #   with:
       #     commit_message: Apply formatting changes
       #     branch: ${{ github.head_ref }}
+
+  cypress-run:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Cypress run
+        uses: cypress-io/github-action@v6
