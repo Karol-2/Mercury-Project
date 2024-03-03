@@ -232,6 +232,7 @@ function RegisterBox() {
 
       <input
         disabled={isSubmitting}
+        data-testid="Register"
         type="submit"
         className="btn small bg-my-orange disabled:bg-my-dark"
         value="Register"
