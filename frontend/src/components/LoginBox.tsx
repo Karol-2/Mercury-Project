@@ -42,6 +42,7 @@ function LoginBox() {
         type="text"
         className="text-my-dark form-input"
         placeholder="E-mail"
+        name="email"
         onChange={(e) => setLogin(e.target.value)}
       />
 
@@ -50,11 +51,13 @@ function LoginBox() {
         type="password"
         className="text-my-dark form-input"
         placeholder="Password"
+        name="password"
         onChange={(e) => setPassword(e.target.value)}
       />
 
       <button
         className="btn small my-4 bg-my-orange"
+        data-testid="Login"
         onClick={() => loginFunc()}
       >
         Login
