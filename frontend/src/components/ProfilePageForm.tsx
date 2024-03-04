@@ -107,6 +107,7 @@ function ProfilePageForm(props: ProfilePageFormProps) {
             </button>
           )}
           <button
+            data-testid="RemoveAccount"
             onClick={() => setShowDeleteModal(true)}
             className="btn secondary w-full"
           >
