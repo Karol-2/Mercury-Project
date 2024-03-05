@@ -15,7 +15,7 @@ import VideoCallPage from "./pages/VideoCallPage.tsx";
 
 import "./styles/styles.scss";
 
-import UserProvider from "./helpers/UserProvider.tsx";
+import RestUserProvider from "./helpers/UserProvider.tsx";
 import { store } from "./redux/store.ts";
 import MeetingProvider from "./helpers/MeetingProvider.tsx";
 
@@ -25,7 +25,7 @@ body.className = "bg-my-darker text-my-light";
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <Provider store={store}>
     <AnimatePresence mode="wait">
-      <UserProvider>
+      <RestUserProvider>
         <MeetingProvider>
           <Router>
             <Routes location={location} key={location.pathname}>
@@ -41,7 +41,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
             </Routes>
           </Router>
         </MeetingProvider>
-      </UserProvider>
+      </RestUserProvider>
     </AnimatePresence>
   </Provider>,
 );

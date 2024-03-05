@@ -33,7 +33,7 @@ function useUser() {
   return context;
 }
 
-function UserProvider({ children }: { children: React.ReactNode }) {
+function RestUserProvider({ children }: { children: React.ReactNode }) {
   // userId:
   // undefined -> user state is loading
   // null -> user not logged in
@@ -202,4 +202,4 @@ function UserProvider({ children }: { children: React.ReactNode }) {
 }
 
 export { useUser };
-export default UserProvider;
+export default RestUserProvider;
