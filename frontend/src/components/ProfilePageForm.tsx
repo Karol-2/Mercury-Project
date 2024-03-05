@@ -3,7 +3,7 @@ import User from "../models/User";
 import Modal from "./Modal";
 
 export interface ProfilePageFormProps {
-  user: User;
+  user: Partial<User>;
   friends: User[];
   isEditing: boolean;
   handleEditClick: () => void;
