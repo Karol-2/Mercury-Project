@@ -1,28 +1,10 @@
-import React, {
-  useState,
-  useEffect,
-  useRef,
-  createContext,
-  useContext,
-} from "react";
+import React, { useState, useEffect, useRef, useContext } from "react";
 import { isExpired, decodeToken } from "react-jwt";
 import Cookies from "js-cookie";
 import dataService from "../services/data";
 import User from "../models/User";
 import { Socket, io } from "socket.io-client";
-
-export interface UserContextValue {
-  userId: string | null | undefined;
-  user: User | null | undefined;
-  socket: Socket | null;
-  setUser: React.Dispatch<React.SetStateAction<User | null | undefined>>;
-  login: (mail: string, password: string) => Promise<void>;
-  logout: () => Promise<boolean>;
-  updateUser: () => Promise<boolean>;
-  deleteUser: () => Promise<boolean>;
-}
-
-const UserContext = createContext<UserContextValue | null>(null);
+import UserContext from "./UserContext";
 
 function useUser() {
   const context = useContext(UserContext);
