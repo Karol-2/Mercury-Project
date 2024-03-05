@@ -11,7 +11,7 @@ import { faPhoneSlash} from "@fortawesome/free-solid-svg-icons";
 import { useMeeting } from "../helpers/MeetingProvider";
 
 function VideoCallPage() {
-  const { userId, socket } = useUser();
+  const { userState, socket } = useUser();
   const { meeting, leaveMeeting } = useMeeting();
   const firstRefresh = useRef<boolean>(true);
   const navigate = useNavigate();
@@ -23,8 +23,8 @@ function VideoCallPage() {
   const getPeerConnection = () => peerConnectionRef.current;
 
   useEffect(() => {
-    if (userId === null) navigate("/login");
-  }, [userId]);
+    if (userState.status == "anonymous") navigate("/login");
+  }, [userState]);
 
   useEffect(() => {
     if (!meeting) {

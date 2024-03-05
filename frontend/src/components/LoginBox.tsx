@@ -9,7 +9,7 @@ function LoginBox() {
   const [password, setPassword] = useState("");
   const [loginMsg, setLoginMsg] = useState("");
 
-  const { userId, login: userLogin } = useUser();
+  const { userState, login: userLogin } = useUser();
   const firstVisit = useRef<boolean>(true);
 
   const loginFunc = async () => {
@@ -17,9 +17,9 @@ function LoginBox() {
   };
 
   useEffect(() => {
-    if (userId === undefined) return;
+    if (userState.status == "loading") return;
 
-    if (userId === null) {
+    if (userState.status == "anonymous") {
       if (firstVisit.current) {
         firstVisit.current = false;
         return;
@@ -30,7 +30,7 @@ function LoginBox() {
       navigate("/profile", { replace: true });
       setLoginMsg("Logging in...");
     }
-  }, [userId]);
+  }, [userState]);
 
   return (
     <div

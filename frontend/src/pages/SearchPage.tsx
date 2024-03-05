@@ -21,7 +21,7 @@ function SearchPage() {
   const [showAnimation, setShowAnim] = useState(false);
   const [showContent, setShowContent] = useState(false);
 
-  const { user, userId } = useUser();
+  const { user, userState } = useUser();
 
   useEffect(() => {
     setShowAnim(true);
@@ -31,11 +31,15 @@ function SearchPage() {
   }, []);
 
   useEffect(() => {
-    if (userId === null) navigate("/login");
+    if (userState.status == "loading") return;
+    if (userState.status == "anonymous"){
+      navigate("/login");
+      return;
+    }
 
     const fetchFriends = async () => {
       const friendsResponse = await dataService.fetchData(
-        `/users/${userId}/friends`,
+        `/users/${userState.user.id}/friends`,
         "GET",
         {},
       );
@@ -53,7 +57,11 @@ function SearchPage() {
   const handleSearch = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    if (userId === null) navigate("/login");
+    if (userState.status == "loading") return;
+    if (userState.status == "anonymous"){
+      navigate("/login");
+      return;
+    }
 
     if (searchState.trim() === "") {
       return;
@@ -134,12 +142,12 @@ function SearchPage() {
             </div>
             <div>
               {usersFound && usersFound.length > 0 ? (
-                usersFound.map((user, index) => (
+                usersFound.map((foundUser, index) => (
                   <FoundUser
-                    user={user[0]}
+                    user={foundUser[0]}
                     key={String(index)}
-                    currentId={userId}
-                    isFriend={isFriend(usersFriends, user[0])}
+                    currentId={user!.id}
+                    isFriend={isFriend(usersFriends, foundUser[0])}
                   />
                 ))
               ) : (

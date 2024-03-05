@@ -21,7 +21,7 @@ import Transition from "../components/Transition";
 function FriendsPage() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { user } = useUser();
+  const { user, userState } = useUser();
   const { meeting, createMeeting, joinMeeting} = useMeeting();
 
   const [friends, setFriends] = useState([]);
@@ -35,7 +35,7 @@ function FriendsPage() {
   const [showContent, setShowContent] = useState(false);
 
   useEffect(() => {
-    if (user === null) navigate("/login");
+    if (userState.status == "anonymous") navigate("/login");
   }, [user]);
 
   useEffect(() => {

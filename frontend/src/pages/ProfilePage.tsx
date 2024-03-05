@@ -11,7 +11,8 @@ import { useMeeting } from "../helpers/MeetingProvider";
 
 function ProfilePage() {
   const navigate = useNavigate();
-  const { user, userId, setUser, updateUser, deleteUser } = useUser();
+  const { user, userState, updateUser, deleteUser } = useUser();
+  const [formUser, setFormUser] = useState<Partial<User>>(user || {});
   const { meeting, createMeeting, joinMeeting } = useMeeting();
 
   const [isEditing, setIsEditing] = useState(false);
@@ -26,7 +27,7 @@ function ProfilePage() {
 
   const handleSaveClick = () => {
     setIsEditing(false);
-    updateUser().then((updated) => {
+    updateUser(formUser).then((updated) => {
       if (updated) console.log("Updated");
       else throw new Error("Error while updating user");
     });
@@ -34,7 +35,7 @@ function ProfilePage() {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setUser({ ...user, [name]: value } as User);
+    setFormUser({ ...user, [name]: value } as User);
   };
 
   useEffect(() => {
@@ -51,18 +52,18 @@ function ProfilePage() {
   }, [meeting]);
 
   useEffect(() => {
-    if (userId === null) navigate("/login");
+    if (userState.status == "anonymous") navigate("/login");
 
     const fetchFriends = async () => {
       const friendsResponse = await dataService.fetchData(
-        `/users/${userId}/friends`,
+        `/users/${user!.id}/friends`,
         "GET",
       );
       setFriends(friendsResponse.friends);
     };
 
     fetchFriends();
-  }, [userId]);
+  }, [userState]);
 
   return (
     <>
@@ -70,7 +71,7 @@ function ProfilePage() {
       {showAnimation && <Transition startAnimation={showAnimation} />}
       {user && friends && showContent ? (
         <ProfilePageForm
-          user={user}
+          user={formUser}
           friends={friends}
           isEditing={isEditing}
           handleEditClick={handleEditClick}

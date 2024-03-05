@@ -24,6 +24,7 @@ function Navbar(props: NavbarProps) {
 
   const handleLogout = async () => {
     const logged_out = await logout();
+
     if (logged_out) {
       navigate("/");
     } else {

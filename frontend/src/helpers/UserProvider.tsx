@@ -1,10 +1,11 @@
-import React, { useState, useEffect, useRef, useContext } from "react";
+import React, { useState, useEffect, useRef, useContext, useMemo } from "react";
 import { isExpired, decodeToken } from "react-jwt";
 import Cookies from "js-cookie";
 import dataService from "../services/data";
 import User from "../models/User";
 import { Socket, io } from "socket.io-client";
 import UserContext from "./UserContext";
+import UserState from "../models/UserState";
 
 function useUser() {
   const context = useContext(UserContext);
@@ -16,34 +17,42 @@ function useUser() {
 }
 
 function RestUserProvider({ children }: { children: React.ReactNode }) {
-  // userId:
-  // undefined -> user state is loading
-  // null -> user not logged in
-  // string -> user logged in, userID correct
-  const [userId, setUserId] = useState<string | null | undefined>(undefined);
-  const [user, setUser] = useState<User | null | undefined>(undefined);
+  const [userState, setUserState] = useState<UserState>({ status: "loading" });
+  const user = useMemo(() => userState.status == "logged_in" ? userState.user : null, [userState])
   const [token, setToken] = useState<object | null>(null);
   const [socket, setSocket] = useState<Socket | null>(null);
 
+  const setUserAnonymous = () => {
+    setUserState({ status: "anonymous" });
+  };
+
+  const setUserLoggedIn = (user: User) => {
+    setUserState({ status: "logged_in", user });
+  };
+
   useEffect(() => {
-    if (!user) {
+    if (userState.status != "logged_in") {
       setSocket(null);
       return;
     }
     if (socket && socket.connected) return;
+
+    const userId = userState.user.id;
     setSocket(io("http://localhost:5000", { auth: { userId } }));
-  }, [user]);
+  }, [userState]);
 
   const firstRefresh = useRef(true);
 
   const trySetToken = (tokenStr: string | null): boolean => {
     if (tokenStr) {
       const decodedToken = decodeToken(tokenStr);
+
       if (decodedToken && !isExpired(tokenStr)) {
         setToken(decodedToken);
         return true;
       }
     }
+
     return false;
   };
 
@@ -68,11 +77,11 @@ function RestUserProvider({ children }: { children: React.ReactNode }) {
       }
     }
 
-    setUserId(null);
+    setUserAnonymous();
   };
 
   const login = async (mail: string, password: string) => {
-    if (userId) return;
+    if (userState.status == "logged_in") return;
 
     const response = await dataService.fetchData("/auth/login", "POST", {
       headers: {
@@ -85,7 +94,7 @@ function RestUserProvider({ children }: { children: React.ReactNode }) {
     });
 
     if (response.status != "ok") {
-      setUserId(null);
+      setUserAnonymous();
       return;
     }
 
@@ -94,7 +103,7 @@ function RestUserProvider({ children }: { children: React.ReactNode }) {
   };
 
   const logout = async () => {
-    if (!userId) return true;
+    if (userState.status == "anonymous") return true;
 
     const tokenStr = sessionStorage.getItem("token");
 
@@ -106,8 +115,7 @@ function RestUserProvider({ children }: { children: React.ReactNode }) {
     });
 
     if (data.status == "ok") {
-      setUserId(null);
-      setUser(null);
+      setUserAnonymous();
       sessionStorage.removeItem("token");
       socket?.disconnect();
       return true;
@@ -116,9 +124,10 @@ function RestUserProvider({ children }: { children: React.ReactNode }) {
     return false;
   };
 
-  const updateUser = async () => {
-    if (!user) return false;
+  const updateUser = async (updateUser: Partial<User>) => {
+    if (userState.status != "logged_in") return false;
 
+    const user = {...userState.user, ...updateUser};
     const response = await dataService.fetchData(`/users/${user.id}`, "PUT", {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(user),
@@ -133,12 +142,13 @@ function RestUserProvider({ children }: { children: React.ReactNode }) {
   };
 
   const deleteUser = async () => {
-    if (!user) return true;
+    if (userState.status != "logged_in") return true;
 
+    const user = userState.user!;
     const response = await dataService.fetchData(`/users/${user.id}`, "DELETE");
+
     if (response.status === "ok") {
-      setUserId(null);
-      setUser(null);
+      setUserAnonymous();
       return true;
     }
 
@@ -150,8 +160,7 @@ function RestUserProvider({ children }: { children: React.ReactNode }) {
     if (token) {
       const newUserId = (token as any).userId;
       dataService.fetchData(`/users/${newUserId}`, "GET").then((response) => {
-        setUserId(newUserId);
-        setUser(response.user as any);
+        setUserLoggedIn(response.user);
       });
     }
   }, [token]);
@@ -162,15 +171,14 @@ function RestUserProvider({ children }: { children: React.ReactNode }) {
   }
 
   useEffect(() => {
-    console.log(userId);
-  }, [userId]);
+    console.log(userState);
+  }, [userState]);
 
   return (
     <UserContext.Provider
       value={{
-        userId,
         user,
-        setUser,
+        userState,
         socket,
         login,
         logout,

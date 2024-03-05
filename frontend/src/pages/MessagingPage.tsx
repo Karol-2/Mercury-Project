@@ -10,13 +10,13 @@ function MessagingPage() {
   const navigate = useNavigate();
   const navigating = useRef<boolean>(false);
   const { friendId } = useParams();
-  const { user, socket } = useUser();
+  const { user, userState, socket } = useUser();
 
   useEffect(() => {
     if (navigating.current) return;
-    if (user === undefined) return;
+    if (userState.status == "loading") return;
 
-    if (user === null) {
+    if (userState.status == "anonymous") {
       navigating.current = true;
       navigate("/login");
     } else if (friendId === null) {
