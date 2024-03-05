@@ -17,11 +17,13 @@ import User from "../models/User";
 import setUserFriends from "../redux/actions/setUserFriends";
 import dataService from "../services/data";
 import Transition from "../components/Transition";
+import { useProtected } from "../helpers/Protected";
 
 function FriendsPage() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { user, userState } = useUser();
+  const { userState } = useUser();
+  const { user } = useProtected();
   const { meeting, createMeeting, joinMeeting} = useMeeting();
 
   const [friends, setFriends] = useState([]);

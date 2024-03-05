@@ -5,12 +5,14 @@ import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import ChatBox from "../components/ChatBox";
 import { useUser } from "../helpers/UserProvider";
+import { useProtected } from "../helpers/Protected";
 
 function MessagingPage() {
   const navigate = useNavigate();
   const navigating = useRef<boolean>(false);
   const { friendId } = useParams();
-  const { user, userState, socket } = useUser();
+  const { userState, socket } = useUser();
+  const { user } = useProtected();
 
   useEffect(() => {
     if (navigating.current) return;

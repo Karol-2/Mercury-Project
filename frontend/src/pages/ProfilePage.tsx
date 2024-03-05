@@ -8,11 +8,13 @@ import ProfilePageForm from "../components/ProfilePageForm";
 import dataService from "../services/data";
 import Transition from "../components/Transition";
 import { useMeeting } from "../helpers/MeetingProvider";
+import { useProtected } from "../helpers/Protected";
 
 function ProfilePage() {
   const navigate = useNavigate();
-  const { user, userState, updateUser, deleteUser } = useUser();
-  const [formUser, setFormUser] = useState<Partial<User>>(user || {});
+  const { userState, updateUser, deleteUser } = useUser();
+  const { user } = useProtected();
+  const [formUser, setFormUser] = useState<Partial<User>>(user);
   const { meeting, createMeeting, joinMeeting } = useMeeting();
 
   const [isEditing, setIsEditing] = useState(false);

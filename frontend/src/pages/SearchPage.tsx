@@ -10,6 +10,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useNavigate } from "react-router-dom";
 import editDistance from "../misc/editDistance";
 import Transition from "../components/Transition";
+import { useProtected } from "../helpers/Protected";
 
 function SearchPage() {
   const navigate = useNavigate();
@@ -21,7 +22,8 @@ function SearchPage() {
   const [showAnimation, setShowAnim] = useState(false);
   const [showContent, setShowContent] = useState(false);
 
-  const { user, userState } = useUser();
+  const { userState } = useUser();
+  const { user } = useProtected();
 
   useEffect(() => {
     setShowAnim(true);
