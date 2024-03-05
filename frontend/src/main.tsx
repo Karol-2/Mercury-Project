@@ -17,6 +17,7 @@ import "./styles/styles.scss";
 
 import UserProvider from "./helpers/UserProvider.tsx";
 import { store } from "./redux/store.ts";
+import MeetingProvider from "./helpers/MeetingProvider.tsx";
 
 const body = document.getElementsByTagName("body")[0]!;
 body.className = "bg-my-darker text-my-light";
@@ -25,19 +26,21 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
   <Provider store={store}>
     <AnimatePresence mode="wait">
       <UserProvider>
-        <Router>
-          <Routes location={location} key={location.pathname}>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/register" element={<RegisterPage />} />
-            <Route path="/profile" element={<ProfilePage />} />
-            <Route path="/messages/:friendId" element={<MessagingPage />} />
-            <Route path="/friends" element={<FriendsPage />} />
-            <Route path="/search" element={<SearchPage />} />
-            <Route path="/meeting" element={<VideoCallPage />} />
-            <Route path="/*" element={<PageNotFound />} />
-          </Routes>
-        </Router>
+        <MeetingProvider>
+          <Router>
+            <Routes location={location} key={location.pathname}>
+              <Route path="/" element={<HomePage />} />
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="/register" element={<RegisterPage />} />
+              <Route path="/profile" element={<ProfilePage />} />
+              <Route path="/messages/:friendId" element={<MessagingPage />} />
+              <Route path="/friends" element={<FriendsPage />} />
+              <Route path="/search" element={<SearchPage />} />
+              <Route path="/meeting" element={<VideoCallPage />} />
+              <Route path="/*" element={<PageNotFound />} />
+            </Routes>
+          </Router>
+        </MeetingProvider>
       </UserProvider>
     </AnimatePresence>
   </Provider>,

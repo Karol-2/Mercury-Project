@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { useUser } from "../helpers/UserProvider";
+import { useMeeting } from "../helpers/MeetingProvider";
 
 import { faUserMinus, faPlus } from "@fortawesome/free-solid-svg-icons";
 import { faVideo } from "@fortawesome/free-solid-svg-icons";
@@ -20,7 +21,8 @@ import Transition from "../components/Transition";
 function FriendsPage() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { user, meeting, createMeeting, joinMeeting } = useUser();
+  const { user } = useUser();
+  const { meeting, createMeeting, joinMeeting} = useMeeting();
 
   const [friends, setFriends] = useState([]);
   const [friendsRequests, setFriendsRequests] = useState([]);

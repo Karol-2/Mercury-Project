@@ -8,9 +8,11 @@ import stunServers from "../stun/stunServers";
 import Meeting from "../models/Meeting";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPhoneSlash} from "@fortawesome/free-solid-svg-icons";
+import { useMeeting } from "../helpers/MeetingProvider";
 
 function VideoCallPage() {
-  const { userId, socket, meeting, leaveMeeting } = useUser();
+  const { userId, socket } = useUser();
+  const { meeting, leaveMeeting } = useMeeting();
   const firstRefresh = useRef<boolean>(true);
   const navigate = useNavigate();
   const localStream = useRef<HTMLVideoElement>(null);

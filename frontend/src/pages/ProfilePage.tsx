@@ -7,19 +7,12 @@ import { useUser } from "../helpers/UserProvider";
 import ProfilePageForm from "../components/ProfilePageForm";
 import dataService from "../services/data";
 import Transition from "../components/Transition";
+import { useMeeting } from "../helpers/MeetingProvider";
 
 function ProfilePage() {
   const navigate = useNavigate();
-  const {
-    user,
-    userId,
-    setUser,
-    meeting,
-    updateUser,
-    deleteUser,
-    createMeeting,
-    joinMeeting,
-  } = useUser();
+  const { user, userId, setUser, updateUser, deleteUser } = useUser();
+  const { meeting, createMeeting, joinMeeting } = useMeeting();
 
   const [isEditing, setIsEditing] = useState(false);
   const [friends, setFriends] = useState([]);
