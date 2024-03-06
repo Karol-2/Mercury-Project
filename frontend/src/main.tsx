@@ -15,7 +15,7 @@ import VideoCallPage from "./pages/VideoCallPage.tsx";
 
 import "./styles/styles.scss";
 
-import RestUserProvider from "./helpers/UserProvider.tsx";
+import RestUserProvider from "./helpers/RestUserProvider.tsx";
 import { store } from "./redux/store.ts";
 import MeetingProvider from "./helpers/MeetingProvider.tsx";
 import Protected from "./helpers/Protected.tsx";
