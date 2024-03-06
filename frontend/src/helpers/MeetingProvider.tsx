@@ -1,6 +1,6 @@
 import { createContext, useContext, useState } from "react";
 import Meeting from "../models/Meeting";
-import { useUser } from "./UserProvider";
+import { useUser } from "./UserContext";
 
 export interface MeetingContextValue {
   meeting: Meeting | null;

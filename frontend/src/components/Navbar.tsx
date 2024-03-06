@@ -1,6 +1,6 @@
 import { Link, useNavigate } from "react-router-dom";
 import LogoSVG from "/logo.svg";
-import { useUser } from "../helpers/UserProvider";
+import { useUser } from "../helpers/UserContext";
 import { useState } from "react";
 import {
   faMagnifyingGlass,

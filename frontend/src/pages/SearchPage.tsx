@@ -3,7 +3,7 @@ import Footer from "../components/Footer";
 import dataService from "../services/data";
 import { useEffect, useState } from "react";
 import FoundUser from "../components/FoundUser";
-import { useUser } from "../helpers/UserProvider";
+import { useUser } from "../helpers/UserContext";
 import User from "../models/User";
 import { faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";

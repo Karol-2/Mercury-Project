@@ -6,17 +6,11 @@ import User from "../models/User";
 import { Socket, io } from "socket.io-client";
 import UserContext from "./UserContext";
 import UserState from "../models/UserState";
-
-function useUser() {
-  const context = useContext(UserContext);
-  if (!context) {
-    throw new Error("useUser must be used within a UserProvider");
-  }
-
-  return context;
-}
+import { useNavigate } from "react-router-dom";
 
 function RestUserProvider({ children }: { children: React.ReactNode }) {
+  const navigate = useNavigate();
+  
   const [userState, setUserState] = useState<UserState>({ status: "loading" });
   const user = useMemo(() => userState.status == "logged_in" ? userState.user : null, [userState])
   const [token, setToken] = useState<object | null>(null);
@@ -79,6 +73,10 @@ function RestUserProvider({ children }: { children: React.ReactNode }) {
 
     setUserAnonymous();
   };
+
+  const redirectToLogin = () => {
+    navigate("/login");
+  }
 
   const login = async (mail: string, password: string) => {
     if (userState.status == "logged_in") return;
@@ -180,6 +178,7 @@ function RestUserProvider({ children }: { children: React.ReactNode }) {
         user,
         userState,
         socket,
+        redirectToLogin,
         login,
         logout,
         updateUser,
@@ -191,5 +190,4 @@ function RestUserProvider({ children }: { children: React.ReactNode }) {
   );
 }
 
-export { useUser };
 export default RestUserProvider;

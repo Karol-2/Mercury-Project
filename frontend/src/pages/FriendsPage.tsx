@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
-import { useUser } from "../helpers/UserProvider";
+import { useUser } from "../helpers/UserContext";
 import { useMeeting } from "../helpers/MeetingProvider";
 
 import { faUserMinus, faPlus } from "@fortawesome/free-solid-svg-icons";

@@ -34,9 +34,9 @@ const protectedRoutes = [
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <Provider store={store}>
     <AnimatePresence mode="wait">
-      <RestUserProvider>
-        <MeetingProvider>
-          <Router>
+      <Router>
+        <RestUserProvider>
+          <MeetingProvider>
             <Routes location={location} key={location.pathname}>
               <Route path="/" element={<HomePage />} />
               <Route path="/login" element={<LoginPage />} />
@@ -50,9 +50,9 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
               ))}
               <Route path="/*" element={<PageNotFound />} />
             </Routes>
-          </Router>
-        </MeetingProvider>
-      </RestUserProvider>
+          </MeetingProvider>
+        </RestUserProvider>
+      </Router>
     </AnimatePresence>
   </Provider>,
 );
