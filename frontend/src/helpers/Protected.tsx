@@ -24,12 +24,11 @@ export interface ProtectedProps {
 }
 
 function Protected({ loadingElement, children }: ProtectedProps) {
-  const navigate = useNavigate();
-  const { userState } = useUser();
+  const { userState, redirectToLogin } = useUser();
 
   useEffect(() => {
     if (userState.status == "anonymous") {
-      navigate("/login");
+      redirectToLogin();
     }
   }, [userState])
 
