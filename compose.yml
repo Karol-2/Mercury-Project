@@ -38,3 +38,12 @@ services:
       - WAIT_HOSTS=db:7474
       - WAIT_BEFORE_HOSTS=15
       - WAIT_AFTER_HOSTS=3
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:24.0
+    command: start-dev
+    environment:
+      - KEYCLOAK_ADMIN=admin
+      - KEYCLOAK_ADMIN_PASSWORD=admin
+    ports:
+      - 3000:8080
