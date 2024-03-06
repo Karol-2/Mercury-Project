@@ -1,3 +1,4 @@
+import { useUser } from "../helpers/UserContext";
 import LogoSVG from "/logo.svg";
 import { Link } from "react-router-dom";
 
@@ -6,6 +7,8 @@ const scrollToTop = (): void => {
 };
 
 export default function WelcomeMessage() {
+  const { redirectToLogin } = useUser();
+
   return (
     <div className="relative overflow-hidden" id="background">
       <div
@@ -44,14 +47,13 @@ export default function WelcomeMessage() {
                 className=" z-50 flex flex-col lg:flex-row"
                 id="buttons-section"
               >
-                <Link to="/login">
-                  <button
-                    className="btn primary w-64 m-5 fade-in"
-                    id="login-button"
-                  >
-                    Login
-                  </button>
-                </Link>
+                <button
+                  className="btn primary w-64 m-5 fade-in"
+                  id="login-button"
+                  onClick={() => redirectToLogin()}
+                >
+                  Login
+                </button>
                 <Link to="/register">
                   <button
                     className="btn secondary w-64 m-5 text-my-light fade-in"
