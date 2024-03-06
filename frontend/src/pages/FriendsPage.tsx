@@ -37,10 +37,6 @@ function FriendsPage() {
   const [showContent, setShowContent] = useState(false);
 
   useEffect(() => {
-    if (userState.status == "anonymous") navigate("/login");
-  }, [user]);
-
-  useEffect(() => {
     setShowAnim(true);
     setTimeout(() => {
       setShowContent(true);

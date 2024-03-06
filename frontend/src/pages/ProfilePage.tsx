@@ -54,8 +54,6 @@ function ProfilePage() {
   }, [meeting]);
 
   useEffect(() => {
-    if (userState.status == "anonymous") navigate("/login");
-
     const fetchFriends = async () => {
       const friendsResponse = await dataService.fetchData(
         `/users/${user!.id}/friends`,

@@ -18,10 +18,7 @@ function MessagingPage() {
     if (navigating.current) return;
     if (userState.status == "loading") return;
 
-    if (userState.status == "anonymous") {
-      navigating.current = true;
-      navigate("/login");
-    } else if (friendId === null) {
+    if (friendId === null) {
       navigating.current = true;
       navigate("/friends");
     }

@@ -13,8 +13,6 @@ import Transition from "../components/Transition";
 import { useProtected } from "../helpers/Protected";
 
 function SearchPage() {
-  const navigate = useNavigate();
-
   const [searchState, setSearchState] = useState("");
   const [usersFound, setUsersFound] = useState<[[User, number]]>();
   const [usersFriends, setUsersFriends] = useState([]);
@@ -34,14 +32,10 @@ function SearchPage() {
 
   useEffect(() => {
     if (userState.status == "loading") return;
-    if (userState.status == "anonymous"){
-      navigate("/login");
-      return;
-    }
 
     const fetchFriends = async () => {
       const friendsResponse = await dataService.fetchData(
-        `/users/${userState.user.id}/friends`,
+        `/users/${user.id}/friends`,
         "GET",
         {},
       );
@@ -59,11 +53,7 @@ function SearchPage() {
   const handleSearch = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    if (userState.status == "loading") return;
-    if (userState.status == "anonymous"){
-      navigate("/login");
-      return;
-    }
+    if (userState.status != "logged_in") return;
 
     if (searchState.trim() === "") {
       return;

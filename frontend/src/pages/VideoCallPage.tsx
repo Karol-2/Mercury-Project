@@ -11,7 +11,7 @@ import { faPhoneSlash} from "@fortawesome/free-solid-svg-icons";
 import { useMeeting } from "../helpers/MeetingProvider";
 
 function VideoCallPage() {
-  const { userState, socket } = useUser();
+  const { socket } = useUser();
   const { meeting, leaveMeeting } = useMeeting();
   const firstRefresh = useRef<boolean>(true);
   const navigate = useNavigate();
@@ -21,10 +21,6 @@ function VideoCallPage() {
   const peerConnectionRef = useRef<RTCPeerConnection | null>(null);
 
   const getPeerConnection = () => peerConnectionRef.current;
-
-  useEffect(() => {
-    if (userState.status == "anonymous") navigate("/login");
-  }, [userState]);
 
   useEffect(() => {
     if (!meeting) {
