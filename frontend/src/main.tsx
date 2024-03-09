@@ -17,6 +17,7 @@ import "./styles/styles.scss";
 
 import UserProvider from "./helpers/UserProvider.tsx";
 import { store } from "./redux/store.ts";
+import EditDataPage from "./pages/EditDataPage.tsx";
 
 const body = document.getElementsByTagName("body")[0]!;
 body.className = "bg-my-darker text-my-light";
@@ -31,6 +32,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
             <Route path="/profile" element={<ProfilePage />} />
+            <Route path="/edit" element={<EditDataPage />} />
             <Route path="/messages/:friendId" element={<MessagingPage />} />
             <Route path="/friends" element={<FriendsPage />} />
             <Route path="/search" element={<SearchPage />} />

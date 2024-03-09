@@ -1,16 +1,10 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import User from "../models/User";
 import Modal from "./Modal";
 
 export interface ProfilePageFormProps {
   user: User;
-  friends: User[];
-  isEditing: boolean;
   handleEditClick: () => void;
-  handleSaveClick: () => void;
-  handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  createMeeting: () => void;
-  joinMeeting: (friendId: string) => void;
   deleteUser: () => void;
 }
 
@@ -19,10 +13,7 @@ function ProfilePageForm(props: ProfilePageFormProps) {
 
   const {
     user,
-    isEditing,
     handleEditClick,
-    handleSaveClick,
-    handleChange,
     deleteUser,
   } = props;
 
@@ -40,72 +31,21 @@ function ProfilePageForm(props: ProfilePageFormProps) {
           <h1 className="text-2xl font-bold">Personal Data</h1>
           <hr className="text-my-orange mb-2"></hr>
           <p>
-            First Name:{" "}
-            {isEditing ? (
-              <input
-                type="text"
-                name="first_name"
-                value={user.first_name}
-                onChange={handleChange}
-                className=" text-my-dark "
-              />
-            ) : (
-              user.first_name || ""
-            )}
+            Name: {user.first_name || ""} {user.last_name || ""}
           </p>
           <p>
-            Last Name:{" "}
-            {isEditing ? (
-              <input
-                type="text"
-                name="last_name"
-                value={user.last_name}
-                onChange={handleChange}
-                className=" text-my-dark"
-              />
-            ) : (
-              user.last_name || ""
-            )}
+            Country: {user.country || ""}
           </p>
           <p>
-            Country:{" "}
-            {isEditing ? (
-              <input
-                type="text"
-                name="country"
-                value={user.country}
-                onChange={handleChange}
-                className=" text-my-dark"
-              />
-            ) : (
-              user.country || ""
-            )}
-          </p>
-          <p>
-            E-mail:{" "}
-            {isEditing ? (
-              <input
-                type="text"
-                name="mail"
-                value={user.mail}
-                onChange={handleChange}
-                className=" text-my-dark"
-              />
-            ) : (
-              user.mail || ""
-            )}
+            E-mail: {user.mail || ""}
           </p>
         </div>
         <div className="my-5 grid grid-cols-1 md:grid-cols-2">
-          {isEditing ? (
-            <button onClick={handleSaveClick} className="btn primary w-full">
-              Save
-            </button>
-          ) : (
+        
             <button onClick={handleEditClick} className="btn primary w-full">
               Edit
             </button>
-          )}
+        
           <button
             data-testid="RemoveAccount"
             onClick={() => setShowDeleteModal(true)}
