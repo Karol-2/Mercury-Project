@@ -8,7 +8,7 @@ import HomePage from "./pages/HomePage.tsx";
 import LoginPage from "./pages/LoginPage.tsx";
 import MessagingPage from "./pages/MessagingPage.tsx";
 import PageNotFound from "./pages/PageNotFound.tsx";
-import ProfilePage from "./pages/ProfilePage.tsx";
+import ProfilePage from "./pages/Profile.tsx";
 import RegisterPage from "./pages/RegisterPage.tsx";
 import SearchPage from "./pages/SearchPage.tsx";
 import VideoCallPage from "./pages/VideoCallPage.tsx";

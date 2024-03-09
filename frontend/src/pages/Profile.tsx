@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import Footer from "../components/Footer";
 import Navbar from "../components/Navbar";
 import { useUser } from "../helpers/UserProvider";
-import ProfilePageForm from "../components/ProfilePageForm";
+import Profile from "../components/ProfilePageForm";
 import Transition from "../components/Transition";
 
 function ProfilePage() {
@@ -45,7 +45,7 @@ function ProfilePage() {
       <Navbar />
       {showAnimation && <Transition startAnimation={showAnimation} />}
       {user && showContent ? (
-        <ProfilePageForm
+        <Profile
           user={user}
           handleEditClick={handleEditClick}
           deleteUser={deleteUser}

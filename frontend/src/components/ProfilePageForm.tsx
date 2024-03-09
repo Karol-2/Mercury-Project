@@ -8,7 +8,7 @@ export interface ProfilePageFormProps {
   deleteUser: () => void;
 }
 
-function ProfilePageForm(props: ProfilePageFormProps) {
+function Profile(props: ProfilePageFormProps) {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   const {
@@ -66,4 +66,4 @@ function ProfilePageForm(props: ProfilePageFormProps) {
   );
 }
 
-export default ProfilePageForm;
+export default Profile;
