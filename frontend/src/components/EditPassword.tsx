@@ -74,8 +74,6 @@ function EditPassword(props: EditDetails) {
                 }
                 throw response;
       }
-     
-  
     };
   
   
@@ -85,6 +83,7 @@ function EditPassword(props: EditDetails) {
         await editPassword(passwords);
  
         handleLogout()
+        navigate("/login")
        
         
       } catch (e) {

@@ -42,6 +42,8 @@ export const changePasswordSchema: z.ZodType<PasswordForm> = z.object({
   .min(8, "Password should be at least eight characters long"),
   repeat_password: z
   .string()
-  .min(8, "Password should be at least eight characters long"),
+}).refine((data) => data.new_password === data.repeat_password, {
+  message: "Passwords must match!",
+  path: ["repeat_password"],
 })
 
