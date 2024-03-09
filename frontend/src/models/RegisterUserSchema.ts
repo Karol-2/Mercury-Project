@@ -29,7 +29,8 @@ export const userEditDetails: z.ZodType<Partial<FrontendUser>> = z.object({
   country: z
     .string()
     .length(2, "Country code should be 2 characters long")
-    .toUpperCase(),
+    .toUpperCase()
+    ,
   mail: z.string().email()
 })
 

@@ -106,7 +106,7 @@ function EditPassword(props: EditDetails) {
         <h1 className="text-3xl font-bold text-my-orange">Change Password</h1>
        <hr className="text-my-orange"></hr>
         <form
-     id="register-box"
+     id="password-box"
      className=" flex flex-col gap-2 bg-my-dark sm:p-10 lg:px-44 rounded-xl"
      onSubmit={handleSubmit(submit)}
    >
@@ -116,6 +116,7 @@ function EditPassword(props: EditDetails) {
        {...register("old_password")}
        value={formData.old_password}
        onChange={handleChange}
+       type="password"
      />
      <div {...errorProps}>{errors.old_password?.message}</div>
      
@@ -125,6 +126,7 @@ function EditPassword(props: EditDetails) {
        {...register("new_password")}
        value={formData.new_password}
        onChange={handleChange}
+       type="password"
      />
      <div {...errorProps}>{errors.new_password?.message}</div>
 
@@ -132,6 +134,7 @@ function EditPassword(props: EditDetails) {
      <input
        {...inputProps}
        {...register("repeat_password")}
+       type="password"
        value={formData.repeat_password}
        onChange={handleChange}
      />

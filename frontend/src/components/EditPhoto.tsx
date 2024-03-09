@@ -78,7 +78,9 @@ function EditPhoto(props: EditDetails) {
 
 
   return (
-    <div  className=" flex flex-col gap-2 bg-my-dark p-10 xl:px-44 rounded-xl">
+    <div  
+    id="photo-box"
+    className=" flex flex-col gap-2 bg-my-dark p-10 xl:px-44 rounded-xl">
             <h1 className="text-3xl font-bold text-my-orange">Change Photo</h1>
          <hr className="text-my-orange"></hr>
       <div id="box"
