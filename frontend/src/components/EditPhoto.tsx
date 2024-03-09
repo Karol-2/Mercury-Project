@@ -23,6 +23,8 @@ function EditPhoto(props: EditDetails) {
           const reader = new FileReader();
           reader.onloadend = () => {
             const base64 = reader.result as string;
+            // console.log(base64.slice(0,40));
+            
             setProfilePictureBase64(base64);
             resolve(base64);
           };
@@ -42,12 +44,9 @@ function EditPhoto(props: EditDetails) {
     };
   
     const editPhoto = async (): Promise<void> => {
-        const userToSave: User = {
-            ...user,
-            profile_picture: profilePictureBase64
-        }
-        console.log(userToSave);
-        setUser(userToSave)
+        user.profile_picture = profilePictureBase64
+        // console.log(user);
+        setUser(user)
 
         updateUser().then((updated) => {
             if (updated) console.log("Updated");

@@ -147,6 +147,7 @@ function EditPassword(props: EditDetails) {
        className="btn small bg-my-orange disabled:bg-my-dark"
        value="Change"
      />
+     <p>WARNING: You will be logged out!</p>
 
    </form>
    </div>
