@@ -25,7 +25,7 @@ function EditDataPage() {
     {showAnimation && <Transition startAnimation={showAnimation} />}
     {user && showContent ? (
       <>
-         <div className="mx-50 my-20 lg:mx-56" id="wrapper">
+         <div className="mx-50 my-20 lg:mx-56 grid grid-cols-1 gap-8" id="wrapper">
           <EditDetails user={user} updateUser={updateUser} setUser={setUser} />
           <EditPhoto  user={user} updateUser={updateUser} setUser={setUser} />
           <EditPassword  user={user} logout={logout} />

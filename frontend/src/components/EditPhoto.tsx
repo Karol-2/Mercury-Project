@@ -79,10 +79,12 @@ function EditPhoto(props: EditDetails) {
 
 
   return (
-    <div id="wrapper" className=" medium:w-[25vw] flex flex-col gap-2 bg-my-dark p-10 px-20 rounded-xl">
+    <div  className=" flex flex-col gap-2 bg-my-dark p-10 md:px-44 rounded-xl">
             <h1 className="text-3xl font-bold text-my-orange">Change Photo</h1>
          <hr className="text-my-orange"></hr>
-      <div id="box" className="medium:w-[25vw] flex flex-col gap-2 bg-my-dark p-10 px-20 rounded-xl">
+      <div id="box"
+           className=" flex flex-col gap-2 bg-my-dark sm:p-10 md:px-44 rounded-xl"
+      >
 
 
          <div className="flex items-center justify-center space-x-4 rounded-xl">

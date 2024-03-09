@@ -102,15 +102,15 @@ function EditDetails(props: EditDetails) {
 
 
   return (
-    <div  className=" medium:w-[25vw] flex flex-col gap-2 bg-my-dark p-10 px-20 rounded-xl">
+    <div  className=" flex flex-col gap-2 bg-my-dark p-10 md:px-44 rounded-xl">
          <h1 className="text-3xl font-bold text-my-orange">Edit Details</h1>
         <hr className="text-my-orange"></hr>
          <form
       id="register-box"
-      className="medium:w-[25vw] flex flex-col gap-2 bg-my-dark p-10 px-20 rounded-xl"
+      className=" flex flex-col gap-2 bg-my-dark sm:p-10 md:px-44 rounded-xl"
       onSubmit={handleSubmit(submit)}
     >
-      <div>First name:</div>
+      <div>First name</div>
       <input
         {...inputProps}
         {...register("first_name")}
@@ -118,7 +118,7 @@ function EditDetails(props: EditDetails) {
         onChange={handleChange}
       />
       <div {...errorProps}>{errors.first_name?.message}</div>
-      <div>Last Name:</div>
+      <div>Last Name</div>
       <input
         {...inputProps}
         {...register("last_name")}
@@ -128,7 +128,7 @@ function EditDetails(props: EditDetails) {
       <div {...errorProps}>{errors.last_name?.message}</div>
       <div>
         <div className="flex gap-2 items-center">
-          <div>Country Code:</div>
+          <div>Country Code</div>
           <input
             {...inputProps}
             {...register("country", countryOptions)}
@@ -140,7 +140,7 @@ function EditDetails(props: EditDetails) {
       </div>
 
       <div className="py-5">
-        <div>E-mail:</div>
+        <div>E-mail</div>
         <input {...inputProps} {...register("mail")} placeholder="E-mail"  value={formData.mail}
             onChange={handleChange} />
         <div {...errorProps}>{errors.mail?.message}</div>
