@@ -78,7 +78,7 @@ function EditPhoto(props: EditDetails) {
 
 
   return (
-    <div  className=" flex flex-col gap-2 bg-my-dark p-10 md:px-44 rounded-xl">
+    <div  className=" flex flex-col gap-2 bg-my-dark p-10 xl:px-44 rounded-xl">
             <h1 className="text-3xl font-bold text-my-orange">Change Photo</h1>
          <hr className="text-my-orange"></hr>
       <div id="box"
@@ -110,7 +110,7 @@ function EditPhoto(props: EditDetails) {
           />
         )}
       </div>
-      <button className="btn small bg-my-purple" onClick={()=>submit()}>Change Profile Picture</button>
+      <button className="btn small bg-my-purple" onClick={()=>submit()}>Change</button>
       <div className="pb-4 text-[#f88]">{submitError}</div>
       </div>
        
