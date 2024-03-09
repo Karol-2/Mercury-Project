@@ -3,9 +3,10 @@ import Footer from "../components/Footer";
 import Navbar from "../components/Navbar";
 import Transition from "../components/Transition";
 import { useUser } from "../helpers/UserProvider";
+import EditDetails from "../components/EditDetails";
 
 function EditDataPage() {
-    const {user} = useUser();
+    const {user, updateUser, setUser} = useUser();
     const [showAnimation, setShowAnim] = useState(false);
     const [showContent, setShowContent] = useState(false);
 
@@ -21,7 +22,10 @@ function EditDataPage() {
     <Navbar />
     {showAnimation && <Transition startAnimation={showAnimation} />}
     {user && showContent ? (
+      <>
         <h1>Editing</h1>
+        <EditDetails user={user} updateUser={updateUser} setUser={setUser} />
+        </>
     ) : (
       <div className="text-lg">Loading...</div>
     )}

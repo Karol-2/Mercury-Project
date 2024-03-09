@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { userSchema } from "../models/RegisterUserSchema";
+import { userRegisterSchema } from "../models/RegisterUserSchema";
 import { FrontendUser } from "../models/User";
 import * as userPlaceholder from "../assets/user-placeholder.jpg";
 
@@ -13,7 +13,7 @@ function RegisterBox() {
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm<FrontendUser>({
-    resolver: zodResolver(userSchema),
+    resolver: zodResolver(userRegisterSchema),
   });
 
   const [submitError, setSubmitError] = useState<string>("");
