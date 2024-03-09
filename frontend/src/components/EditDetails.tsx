@@ -103,6 +103,8 @@ function EditDetails(props: EditDetails) {
 
   return (
     <div  className=" medium:w-[25vw] flex flex-col gap-2 bg-my-dark p-10 px-20 rounded-xl">
+         <h1 className="text-3xl font-bold text-my-orange">Edit Details</h1>
+        <hr className="text-my-orange"></hr>
          <form
       id="register-box"
       className="medium:w-[25vw] flex flex-col gap-2 bg-my-dark p-10 px-20 rounded-xl"

@@ -4,6 +4,7 @@ import Navbar from "../components/Navbar";
 import Transition from "../components/Transition";
 import { useUser } from "../helpers/UserProvider";
 import EditDetails from "../components/EditDetails";
+import EditPhoto from "../components/EditPhoto";
 
 function EditDataPage() {
     const {user, updateUser, setUser} = useUser();
@@ -23,8 +24,11 @@ function EditDataPage() {
     {showAnimation && <Transition startAnimation={showAnimation} />}
     {user && showContent ? (
       <>
-        <h1>Editing</h1>
-        <EditDetails user={user} updateUser={updateUser} setUser={setUser} />
+         <div className="mx-50 my-20 lg:mx-56" id="wrapper">
+          <EditDetails user={user} updateUser={updateUser} setUser={setUser} />
+          <EditPhoto  user={user} updateUser={updateUser} setUser={setUser} />
+         </div>
+       
         </>
     ) : (
       <div className="text-lg">Loading...</div>
