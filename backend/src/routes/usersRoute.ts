@@ -311,10 +311,7 @@ usersRouter.post("/:userId/change-password", async (req: Request, res: OkErrorRe
     const userId = req.params.userId;
     const passwords: ChangePasswordReq = req.body;
     
-    const {old_password, new_password, repeat_password} = passwords
-
-    console.log(old_password,new_password,repeat_password);
-    
+    const {old_password, new_password, repeat_password} = passwords   
 
     const session = driver.session();
     const user = await userExists(session, { id: userId });
@@ -328,7 +325,7 @@ usersRouter.post("/:userId/change-password", async (req: Request, res: OkErrorRe
     const match: boolean = await bcrypt.compare(old_password, user.password);
 
     if(!match) {
-      return res.status(400).json({ status: "error", errors: {"error":"Invalid current password"} });
+      return res.status(400).json({ status: "error", errors: {"error":""} });
     }
 
     // check if there are two same password

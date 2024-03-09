@@ -4,7 +4,8 @@ import { changePasswordSchema } from "../models/RegisterUserSchema";
 import { useNavigate } from "react-router-dom";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { PasswordForm } from "../models/PasswordForm.model";
+import { PasswordForm } from "../models/PasswordForm";
+import { ChangePasswordError } from "../models/ChangePasswordResponse";
 
 export interface EditDetails {
     user: User;
@@ -58,7 +59,7 @@ function EditPassword(props: EditDetails) {
     };
   
   
-    const editPassword = async (passwords: PasswordForm): Promise<boolean> => {
+    const editPassword = async (passwords: PasswordForm): Promise<void> => {
         if (user) {
           const response = await fetch(`http://localhost:5000/users/${user.id}/change-password`, {
                   method: "POST",
@@ -69,21 +70,22 @@ function EditPassword(props: EditDetails) {
                 });
 
                 if (response.ok){
-                  return true
+                  return
                 }
+                throw response;
       }
-      return false
-        
+     
+  
     };
   
   
     const submit = async (passwords: PasswordForm) => {
         
       try {    
-        const result = await editPassword(passwords);
-        if(result){
-          handleLogout()
-        }
+        await editPassword(passwords);
+ 
+        handleLogout()
+       
         
       } catch (e) {
         if (e instanceof Error) {
@@ -92,7 +94,7 @@ function EditPassword(props: EditDetails) {
         }
   
         if ((e as Response).status == 400) {
-          setSubmitError("User already exists");
+          setSubmitError("Invalid Password");
         } else {
           setSubmitError("Unknown error");
         }
