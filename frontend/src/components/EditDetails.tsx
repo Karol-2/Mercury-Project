@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import User, { FrontendUser } from "../models/User";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { userEditDetails } from "../models/RegisterUserSchema";
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { Dispatch, SetStateAction, useState } from "react";
 
 export interface EditDetails {
     user: User;
@@ -16,6 +16,7 @@ function EditDetails(props: EditDetails) {
     const updateUser = props.updateUser;
     const setUser = props.setUser;
     const navigate = useNavigate();
+
     const {
       register,
       handleSubmit,
@@ -26,20 +27,12 @@ function EditDetails(props: EditDetails) {
   
     const [submitError, setSubmitError] = useState<string>("");
     const [formData, setFormData] = useState({
-        first_name: '',
-        last_name: '',
-        country: '',
-        mail: ''
+        first_name: user.first_name,
+        last_name: user.last_name,
+        country: user.country,
+        mail: user.mail
 
     })
-    useEffect(() => {
-        setFormData({
-          first_name: user.first_name,
-          last_name: user.last_name,
-          country: user.country,
-          mail: user.mail
-        });
-      }, [user]);
 
       const handleChange = (e) => {
         const { name, value } = e.target;
