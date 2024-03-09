@@ -79,9 +79,11 @@ function EditPhoto(props: EditDetails) {
 
 
   return (
-    <div  className=" medium:w-[25vw] flex flex-col gap-2 bg-my-dark p-10 px-20 rounded-xl">
-         <h1 className="text-3xl font-bold text-my-orange">Change Photo</h1>
+    <div id="wrapper" className=" medium:w-[25vw] flex flex-col gap-2 bg-my-dark p-10 px-20 rounded-xl">
+            <h1 className="text-3xl font-bold text-my-orange">Change Photo</h1>
          <hr className="text-my-orange"></hr>
+      <div id="box" className="medium:w-[25vw] flex flex-col gap-2 bg-my-dark p-10 px-20 rounded-xl">
+
 
          <div className="flex items-center justify-center space-x-4 rounded-xl">
         <label
@@ -109,6 +111,8 @@ function EditPhoto(props: EditDetails) {
       </div>
       <button className="btn small bg-my-purple" onClick={()=>submit()}>Change Profile Picture</button>
       <div className="pb-4 text-[#f88]">{submitError}</div>
+      </div>
+       
     </div>
   );
 }

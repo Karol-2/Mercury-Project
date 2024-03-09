@@ -1,5 +1,6 @@
 import * as z from "zod";
 import { FrontendUser } from "./User";
+import { PasswordForm } from "./PasswordForm.model";
 
 export const userRegisterSchema: z.ZodType<Partial<FrontendUser>> = z.object({
   first_name: z
@@ -31,3 +32,16 @@ export const userEditDetails: z.ZodType<Partial<FrontendUser>> = z.object({
     .toUpperCase(),
   mail: z.string().email()
 })
+
+export const changePasswordSchema: z.ZodType<PasswordForm> = z.object({
+  old_password: z
+    .string()
+    .min(8, "Password should be at least eight characters long"),
+  new_password: z
+  .string()
+  .min(8, "Password should be at least eight characters long"),
+  repeat_password: z
+  .string()
+  .min(8, "Password should be at least eight characters long"),
+})
+

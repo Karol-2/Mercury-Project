@@ -5,6 +5,7 @@ import Transition from "../components/Transition";
 import { useUser } from "../helpers/UserProvider";
 import EditDetails from "../components/EditDetails";
 import EditPhoto from "../components/EditPhoto";
+import EditPassword from "../components/EditPassword";
 
 function EditDataPage() {
     const {user, updateUser, setUser} = useUser();
@@ -27,6 +28,7 @@ function EditDataPage() {
          <div className="mx-50 my-20 lg:mx-56" id="wrapper">
           <EditDetails user={user} updateUser={updateUser} setUser={setUser} />
           <EditPhoto  user={user} updateUser={updateUser} setUser={setUser} />
+          <EditPassword  user={user} updateUser={updateUser} setUser={setUser} />
          </div>
        
         </>
