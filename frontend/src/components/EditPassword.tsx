@@ -1,5 +1,5 @@
-import { Dispatch, SetStateAction, useState } from "react";
-import User, { FrontendUser } from "../models/User";
+import { useState } from "react";
+import User from "../models/User";
 import { changePasswordSchema } from "../models/RegisterUserSchema";
 import { useNavigate } from "react-router-dom";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -8,16 +8,13 @@ import { PasswordForm } from "../models/PasswordForm.model";
 
 export interface EditDetails {
     user: User;
-    updateUser: () => Promise<boolean>,
-    setUser: Dispatch<SetStateAction<User | null | undefined>>
+    logout: () => Promise<boolean>
   }
 
 
 function EditPassword(props: EditDetails) {
 
-    const user: User = props.user;
-    const updateUser = props.updateUser;
-    const setUser = props.setUser;
+    const {user, logout} = props
     const navigate = useNavigate();
 
     const {
@@ -44,6 +41,14 @@ function EditPassword(props: EditDetails) {
         }));
       };
   
+      const handleLogout = async () => {
+        const logged_out = await logout();
+        if (logged_out) {
+          navigate("/");
+        } else {
+          throw new Error("Couldn't log out");
+        }
+      };
     const errorProps = {
       className: "pb-4 text-[#f88]",
     };
@@ -53,33 +58,33 @@ function EditPassword(props: EditDetails) {
     };
   
   
-    // const editUser = async (newUser: FrontendUser): Promise<void> => {
-    //     const userToSave: User = {
-    //         ...user,
-    //         first_name: newUser.first_name,
-    //         last_name: newUser.last_name,
-    //         country: newUser.country,
-    //         mail: newUser.mail
-    //     }
-    //     console.log(userToSave);
-    //     setUser(userToSave)
+    const editPassword = async (passwords: PasswordForm): Promise<boolean> => {
+        if (user) {
+          const response = await fetch(`http://localhost:5000/users/${user.id}/change-password`, {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/json",
+                  },
+                  body: JSON.stringify(passwords),
+                });
 
-    //     updateUser().then((updated) => {
-    //         if (updated) console.log("Updated");
-    //         else throw new Error("Error while updating user");
-    //       });
+                if (response.ok){
+                  return true
+                }
+      }
+      return false
         
-    // };
+    };
   
   
     const submit = async (passwords: PasswordForm) => {
-        console.log("ok");
         
-      try {
-        // const changedUser = await editUser(user);
-  
-        console.log(passwords);
-        // navigate("/profile");
+      try {    
+        const result = await editPassword(passwords);
+        if(result){
+          handleLogout()
+        }
+        
       } catch (e) {
         if (e instanceof Error) {
           setSubmitError("Can't connect to the server");

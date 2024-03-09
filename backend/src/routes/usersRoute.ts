@@ -17,6 +17,7 @@ import usersFriendsRoute from "./usersFriendsRoute";
 
 import removeKeys from "../misc/removeKeys";
 import { ChangePasswordReq } from "../models/ChangePasswordReq";
+import { log } from "console";
 
 const filterUser = (user: User) => removeKeys({ ...user }, ["name_embedding"]);
 
@@ -309,8 +310,11 @@ usersRouter.post("/:userId/change-password", async (req: Request, res: OkErrorRe
   try {
     const userId = req.params.userId;
     const passwords: ChangePasswordReq = req.body;
-
+    
     const {old_password, new_password, repeat_password} = passwords
+
+    console.log(old_password,new_password,repeat_password);
+    
 
     const session = driver.session();
     const user = await userExists(session, { id: userId });
@@ -320,11 +324,13 @@ usersRouter.post("/:userId/change-password", async (req: Request, res: OkErrorRe
     }
 
     // check validation of the old password
-    bcrypt.compare(old_password, user.password, function(err, result) {
-      if(err){
-        return res.status(400).json({ status: "error", errors: {"error":"Invalid current password"} });
-      }
-  });
+
+    const match: boolean = await bcrypt.compare(old_password, user.password);
+
+    if(!match) {
+      return res.status(400).json({ status: "error", errors: {"error":"Invalid current password"} });
+    }
+
     // check if there are two same password
       if(new_password !== repeat_password){
         return res.status(400).json({ status: "error", errors: {"error":"Passwords don't match"} });
@@ -333,10 +339,10 @@ usersRouter.post("/:userId/change-password", async (req: Request, res: OkErrorRe
       const passwordHashed = await bcrypt.hash(new_password, 10);
 
 
-    const newUser = { ...user, password: passwordHashed };
+    const updatedUser = { ...user, password: passwordHashed };
     await session.run(`MATCH (u:User {id: $userId}) SET u=$user`, {
       userId,
-      user: newUser,
+      user: updatedUser,
     });
     await session.close();
 
