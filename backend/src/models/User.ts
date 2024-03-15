@@ -5,7 +5,4 @@ export default interface User {
   country: string;
   profile_picture: string;
   mail: string;
-  password: string;
-  friend_ids?: number[];
-  socketId?: string;
 }
