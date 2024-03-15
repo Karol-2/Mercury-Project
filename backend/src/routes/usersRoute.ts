@@ -334,12 +334,10 @@ usersRouter.post(
 
       // check if there are two same password
       if (new_password !== repeat_password) {
-        return res
-          .status(400)
-          .json({
-            status: "error",
-            errors: { "error": "Passwords don't match" },
-          });
+        return res.status(400).json({
+          status: "error",
+          errors: { "error": "Passwords don't match" },
+        });
       }
 
       const passwordHashed = await bcrypt.hash(new_password, 10);
