@@ -90,11 +90,13 @@ friendshipRouter.get(
 );
 
 friendshipRouter.get(
-  "/:userId/friend-suggestions",
-  async (req: Request, res: UsersErrorResponse) => {
+  "/:userId/friend-suggestions/:page",
+  async (req: Request, res: Response) => {
     try {
       const session: Session = driver.session();
       const userId: string = req.params.userId;
+      const page: number = parseInt(req.params.page);
+      const maxUsersOnPage = 3;
 
       const user = await userExists(session, res, userId);
       if ("json" in user) {
@@ -108,15 +110,28 @@ friendshipRouter.get(
           RETURN DISTINCT suggested`,
         { userId },
       );
-      await session.close();
 
-      const users: User[] = friendSuggestionsQuery.records
+      const allUsers: User[] = friendSuggestionsQuery.records
         .map((record) => record.get("suggested").properties)
         .slice(0, 15);
-      return res.json({ status: "ok", users });
+
+      const users = allUsers.slice(
+        (page - 1) * maxUsersOnPage,
+        page * maxUsersOnPage,
+      );
+
+      await session.close();
+
+      return res.json({
+        status: "ok",
+        size: allUsers.length,
+        users,
+      });
     } catch (err) {
-      console.log("Error:", err);
-      return res.status(404).json({ status: "error", errors: err as object });
+      console.error("Error:", err);
+      return res
+        .status(500)
+        .json({ status: "error", message: "Internal server error" });
     }
   },
 );
