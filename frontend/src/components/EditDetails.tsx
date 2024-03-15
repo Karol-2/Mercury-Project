@@ -6,7 +6,6 @@ import { userEditDetails } from "../models/RegisterUserSchema";
 import { ChangeEvent, Dispatch, SetStateAction, useState } from "react";
 import countriesData from '../assets/countries.json'; 
 import Select from 'react-select';
-import CountrySelection from "../models/CountrySelection";
 
 export interface EditDetails {
     user: User;
