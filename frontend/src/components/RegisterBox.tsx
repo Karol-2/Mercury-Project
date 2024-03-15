@@ -57,7 +57,8 @@ function RegisterBox() {
   const [country, setCountry] = useState(countriesData[0].Country)
 
 
-  const handleCountryChange = (e) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const handleCountryChange = (e: any) => {
     const selectedCountry = e ? e.value : '';
     setCountry(selectedCountry);
   };

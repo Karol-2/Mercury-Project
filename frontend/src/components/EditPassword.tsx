@@ -1,11 +1,10 @@
-import { useState } from "react";
+import { ChangeEvent, useState } from "react";
 import User from "../models/User";
 import { changePasswordSchema } from "../models/RegisterUserSchema";
 import { useNavigate } from "react-router-dom";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { PasswordForm } from "../models/PasswordForm";
-import { ChangePasswordError } from "../models/ChangePasswordResponse";
 
 export interface EditDetails {
     user: User;
@@ -34,7 +33,7 @@ function EditPassword(props: EditDetails) {
 
     })
 
-      const handleChange = (e) => {
+      const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
         setFormData(prevData => ({
           ...prevData,

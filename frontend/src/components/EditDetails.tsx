@@ -3,9 +3,10 @@ import { useNavigate } from "react-router-dom";
 import User, { FrontendUser } from "../models/User";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { userEditDetails } from "../models/RegisterUserSchema";
-import { Dispatch, SetStateAction, useState } from "react";
+import { ChangeEvent, Dispatch, SetStateAction, useState } from "react";
 import countriesData from '../assets/countries.json'; 
 import Select from 'react-select';
+import CountrySelection from "../models/CountrySelection";
 
 export interface EditDetails {
     user: User;
@@ -28,7 +29,7 @@ function EditDetails(props: EditDetails) {
     });
   
     const [submitError, setSubmitError] = useState<string>("");
-    const [country, setCountry] = useState(user.country)
+    const [country, setCountry] = useState<string>(user.country)
     const [formData, setFormData] = useState({
         first_name: user.first_name,
         last_name: user.last_name,
@@ -37,8 +38,9 @@ function EditDetails(props: EditDetails) {
     })
 
 
-    const handleCountryChange = (e) => {
-      const selectedCountry = e ? e.value : '';
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const handleCountryChange = (selection: any) => {
+      const selectedCountry = selection ? selection.value : '';
       
       setCountry(selectedCountry);
       setFormData(prevState => {
@@ -47,7 +49,9 @@ function EditDetails(props: EditDetails) {
       
     };
 
-    const handleChange = (e) => {
+    const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+      console.log(e);
+      
       const { name, value } = e.target;
       setFormData(prevData => ({
         ...prevData,
