@@ -26,11 +26,8 @@ export const userEditDetails: z.ZodType<Partial<FrontendUser>> = z.object({
   last_name: z
     .string()
     .min(2, "Last name should be at least two characters long"),
-  country: z
-    .string()
-    .length(2, "Country code should be 2 characters long")
-    .toUpperCase()
-    ,
+  // country: z
+  //   .string().min(1),
   mail: z.string().email()
 })
 

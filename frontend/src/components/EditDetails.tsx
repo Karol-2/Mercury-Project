@@ -4,6 +4,8 @@ import User, { FrontendUser } from "../models/User";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { userEditDetails } from "../models/RegisterUserSchema";
 import { Dispatch, SetStateAction, useState } from "react";
+import countriesData from '../assets/countries.json'; 
+import Select from 'react-select';
 
 export interface EditDetails {
     user: User;
@@ -26,21 +28,32 @@ function EditDetails(props: EditDetails) {
     });
   
     const [submitError, setSubmitError] = useState<string>("");
+    const [country, setCountry] = useState(user.country)
     const [formData, setFormData] = useState({
         first_name: user.first_name,
         last_name: user.last_name,
-        country: user.country,
-        mail: user.mail
-
+        mail: user.mail,
+        country: country,
     })
 
-      const handleChange = (e) => {
-        const { name, value } = e.target;
-        setFormData(prevData => ({
-          ...prevData,
-          [name]: value,
-        }));
-      };
+
+    const handleCountryChange = (e) => {
+      const selectedCountry = e ? e.value : '';
+      
+      setCountry(selectedCountry);
+      setFormData(prevState => {
+        return { ...prevState, country: selectedCountry };
+      });
+      
+    };
+
+    const handleChange = (e) => {
+      const { name, value } = e.target;
+      setFormData(prevData => ({
+        ...prevData,
+        [name]: value,
+      }));
+    };
   
     const errorProps = {
       className: "pb-4 text-[#f88]",
@@ -50,26 +63,19 @@ function EditDetails(props: EditDetails) {
       className: "text-my-dark form-input",
     };
   
-    const countryOptions = {
-      onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
-        const input = e.target;
-        const start = input.selectionStart;
-        const end = input.selectionEnd;
-  
-        input.value = e.target.value.toUpperCase();
-        input.setSelectionRange(start, end);
-      },
-    };
+    const countryOptions = countriesData.map((country) => ({
+      value: country.Country,
+      label: country.Country,
+    }));
   
     const editUser = async (newUser: FrontendUser): Promise<void> => {
         const userToSave: User = {
             ...user,
             first_name: newUser.first_name,
             last_name: newUser.last_name,
-            country: newUser.country,
+            country: country,
             mail: newUser.mail
         }
-        console.log(userToSave);
         setUser(userToSave)
 
         updateUser().then((updated) => {
@@ -81,10 +87,10 @@ function EditDetails(props: EditDetails) {
   
   
     const submit = async (user: FrontendUser) => {
-      try {
-        const changedUser = await editUser(user);
+      try {       
+       
+        await editUser(user);
   
-        console.log(changedUser);
         navigate("/profile");
       } catch (e) {
         if (e instanceof Error) {
@@ -106,7 +112,7 @@ function EditDetails(props: EditDetails) {
          <h1 className="text-3xl font-bold text-my-orange">Edit Details</h1>
         <hr className="text-my-orange"></hr>
          <form
-      id="register-box"
+      id="details-box"
       className=" flex flex-col gap-2 bg-my-dark sm:p-10 md:px-44 rounded-xl"
       onSubmit={handleSubmit(submit)}
     >
@@ -128,13 +134,14 @@ function EditDetails(props: EditDetails) {
       <div {...errorProps}>{errors.last_name?.message}</div>
       <div>
         <div className="flex gap-2 items-center">
-          <div>Country Code</div>
-          <input
-            {...inputProps}
-            {...register("country", countryOptions)}
-            value={formData.country}
-            onChange={handleChange}
-          />
+          <div>Country</div>
+          <Select
+           {...inputProps}
+           {...register("country")}
+        value={countryOptions.find(option => option.value === formData.country)}
+        onChange={handleCountryChange}
+        options={countryOptions}
+      />
         </div>
         <div {...errorProps}>{errors.country?.message}</div>
       </div>
