@@ -90,13 +90,13 @@ friendshipRouter.get(
 );
 
 friendshipRouter.get(
-  "/:userId/friend-suggestions/:page",
+  "/:userId/friend-suggestions",
   async (req: Request, res: Response) => {
     try {
       const session: Session = driver.session();
       const userId: string = req.params.userId;
-      const page: number = parseInt(req.params.page);
-      const maxUsersOnPage = 3;
+      const page: number = parseInt(req.query.page as string);
+      const maxUsersOnPage: number = parseInt(req.query.maxUsers as string);
 
       const user = await userExists(session, res, userId);
       if ("json" in user) {
@@ -121,6 +121,13 @@ friendshipRouter.get(
       );
 
       await session.close();
+
+      if (users.length === 0) {
+        return res.status(404).json({
+          status: "not found",
+          message: "No users found with given queries",
+        });
+      }
 
       return res.json({
         status: "ok",
