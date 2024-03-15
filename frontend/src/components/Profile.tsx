@@ -11,11 +11,7 @@ export interface ProfilePageFormProps {
 function Profile(props: ProfilePageFormProps) {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
 
-  const {
-    user,
-    handleEditClick,
-    deleteUser,
-  } = props;
+  const { user, handleEditClick, deleteUser } = props;
 
   return (
     <section className="bg-my-darker min-h-screen flex justify-center ">
@@ -33,19 +29,14 @@ function Profile(props: ProfilePageFormProps) {
           <p>
             Name: {user.first_name || ""} {user.last_name || ""}
           </p>
-          <p>
-            Country: {user.country || ""}
-          </p>
-          <p>
-            E-mail: {user.mail || ""}
-          </p>
+          <p>Country: {user.country || ""}</p>
+          <p>E-mail: {user.mail || ""}</p>
         </div>
         <div className="my-5 grid grid-cols-1 md:grid-cols-2">
-        
-            <button onClick={handleEditClick} className="btn primary w-full">
-              Edit
-            </button>
-        
+          <button onClick={handleEditClick} className="btn primary w-full">
+            Edit
+          </button>
+
           <button
             data-testid="RemoveAccount"
             onClick={() => setShowDeleteModal(true)}

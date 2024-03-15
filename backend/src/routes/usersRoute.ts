@@ -306,49 +306,58 @@ usersRouter.put("/:userId", async (req: Request, res: OkErrorResponse) => {
   }
 });
 
-usersRouter.post("/:userId/change-password", async (req: Request, res: OkErrorResponse) => {
-  try {
-    const userId = req.params.userId;
-    const passwords: ChangePasswordReq = req.body;
-    
-    const {old_password, new_password, repeat_password} = passwords   
+usersRouter.post(
+  "/:userId/change-password",
+  async (req: Request, res: OkErrorResponse) => {
+    try {
+      const userId = req.params.userId;
+      const passwords: ChangePasswordReq = req.body;
 
-    const session = driver.session();
-    const user = await userExists(session, { id: userId });
+      const { old_password, new_password, repeat_password } = passwords;
 
-    if (!user) {
-      return userNotFoundRes(res);
-    }
+      const session = driver.session();
+      const user = await userExists(session, { id: userId });
 
-    // check validation of the old password
+      if (!user) {
+        return userNotFoundRes(res);
+      }
 
-    const match: boolean = await bcrypt.compare(old_password, user.password);
+      // check validation of the old password
 
-    if(!match) {
-      return res.status(400).json({ status: "error", errors: {"error":""} });
-    }
+      const match: boolean = await bcrypt.compare(old_password, user.password);
 
-    // check if there are two same password
-      if(new_password !== repeat_password){
-        return res.status(400).json({ status: "error", errors: {"error":"Passwords don't match"} });
+      if (!match) {
+        return res
+          .status(400)
+          .json({ status: "error", errors: { "error": "" } });
+      }
+
+      // check if there are two same password
+      if (new_password !== repeat_password) {
+        return res
+          .status(400)
+          .json({
+            status: "error",
+            errors: { "error": "Passwords don't match" },
+          });
       }
 
       const passwordHashed = await bcrypt.hash(new_password, 10);
 
+      const updatedUser = { ...user, password: passwordHashed };
+      await session.run(`MATCH (u:User {id: $userId}) SET u=$user`, {
+        userId,
+        user: updatedUser,
+      });
+      await session.close();
 
-    const updatedUser = { ...user, password: passwordHashed };
-    await session.run(`MATCH (u:User {id: $userId}) SET u=$user`, {
-      userId,
-      user: updatedUser,
-    });
-    await session.close();
-
-    return res.json({ status: "ok" });
-  } catch (err) {
-    console.log("Error:", err);
-    return res.status(404).json({ status: "error", errors: err as object });
-  }
-});
+      return res.json({ status: "ok" });
+    } catch (err) {
+      console.log("Error:", err);
+      return res.status(404).json({ status: "error", errors: err as object });
+    }
+  },
+);
 
 usersRouter.delete("/:userId", async (req: Request, res: OkErrorResponse) => {
   try {

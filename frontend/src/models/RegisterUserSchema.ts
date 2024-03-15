@@ -28,20 +28,20 @@ export const userEditDetails: z.ZodType<Partial<FrontendUser>> = z.object({
     .min(2, "Last name should be at least two characters long"),
   // country: z
   //   .string().min(1),
-  mail: z.string().email()
-})
+  mail: z.string().email(),
+});
 
-export const changePasswordSchema: z.ZodType<PasswordForm> = z.object({
-  old_password: z
-    .string()
-    .min(8, "Password should be at least eight characters long"),
-  new_password: z
-  .string()
-  .min(8, "Password should be at least eight characters long"),
-  repeat_password: z
-  .string()
-}).refine((data) => data.new_password === data.repeat_password, {
-  message: "Passwords must match!",
-  path: ["repeat_password"],
-})
-
+export const changePasswordSchema: z.ZodType<PasswordForm> = z
+  .object({
+    old_password: z
+      .string()
+      .min(8, "Password should be at least eight characters long"),
+    new_password: z
+      .string()
+      .min(8, "Password should be at least eight characters long"),
+    repeat_password: z.string(),
+  })
+  .refine((data) => data.new_password === data.repeat_password, {
+    message: "Passwords must match!",
+    path: ["repeat_password"],
+  });

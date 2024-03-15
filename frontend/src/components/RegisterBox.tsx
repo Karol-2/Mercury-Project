@@ -5,8 +5,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { userRegisterSchema } from "../models/RegisterUserSchema";
 import { FrontendUser } from "../models/User";
 import * as userPlaceholder from "../assets/user-placeholder.jpg";
-import Select from 'react-select';
-import countriesData from '../assets/countries.json'; 
+import Select from "react-select";
+import countriesData from "../assets/countries.json";
 
 function RegisterBox() {
   const navigate = useNavigate();
@@ -54,12 +54,11 @@ function RegisterBox() {
     return userJson.user;
   };
 
-  const [country, setCountry] = useState(countriesData[0].Country)
-
+  const [country, setCountry] = useState(countriesData[0].Country);
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleCountryChange = (e: any) => {
-    const selectedCountry = e ? e.value : '';
+    const selectedCountry = e ? e.value : "";
     setCountry(selectedCountry);
   };
 
@@ -74,7 +73,6 @@ function RegisterBox() {
       reader.readAsDataURL(file);
     });
   };
-
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -174,7 +172,7 @@ function RegisterBox() {
             {...register("country")}
             options={countryOptions}
             onChange={handleCountryChange}
-            value={countryOptions.find(option => option.value === country)}
+            value={countryOptions.find((option) => option.value === country)}
           />
         </div>
         <div {...errorProps}>{errors.country?.message}</div>

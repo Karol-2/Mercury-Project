@@ -8,18 +8,13 @@ import Transition from "../components/Transition";
 
 function ProfilePage() {
   const navigate = useNavigate();
-  const {
-    user,
-    userId,
-    meeting,
-    deleteUser,
-  } = useUser();
+  const { user, userId, meeting, deleteUser } = useUser();
 
   const [showAnimation, setShowAnim] = useState(false);
   const [showContent, setShowContent] = useState(false);
 
   const handleEditClick = () => {
-    navigate("/edit")
+    navigate("/edit");
   };
 
   useEffect(() => {
@@ -37,7 +32,6 @@ function ProfilePage() {
 
   useEffect(() => {
     if (userId === null) navigate("/login");
-
   }, [userId]);
 
   return (
