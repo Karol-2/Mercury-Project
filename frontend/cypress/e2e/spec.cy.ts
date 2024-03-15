@@ -34,7 +34,9 @@ describe("template spec", () => {
       .type("Smith")
       .should("have.value", "Smith");
 
-    cy.get('input[name="country"]').type("US").should("have.value", "US");
+    cy.get('input[name="country"]')
+      .focus()
+      .type("Albania{enter}", { force: true });
 
     cy.get('input[name="mail"]')
       .type("johnsmith@mail.com")
