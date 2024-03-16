@@ -1,8 +1,20 @@
 import { expect, test } from "vitest";
 
-const userId: string = "7aacd3c1-8579-4297-9c8e-dffd77a79b28";
+let userId: number;
 let page: number = 3;
 let maxUsers: number = 5;
+
+test("Search user", async () => {
+  const response = await fetch("http://localhost:5000/users/search?q=a");
+
+  const responseData = await response.json();
+  const users = responseData.users;
+  const status = responseData.status;
+
+  expect(status).toBe("ok");
+
+  userId = users[0][0].id;
+});
 
 test("Get friend suggestions", async () => {
   const response = await fetch(
@@ -14,7 +26,7 @@ test("Get friend suggestions", async () => {
   const status = responseData.status;
 
   expect(status).toBe("ok");
-  expect(size).toBe(14);
+  expect(size).toBe(15);
 });
 
 test("Less users than max on page", async () => {
@@ -29,12 +41,12 @@ test("Less users than max on page", async () => {
   const users = responseData.users;
 
   expect(status).toBe("ok");
-  expect(size).toBe(14);
-  expect(users.length).toBe(2);
+  expect(size).toBe(15);
+  expect(users.length).toBe(3);
 });
 
 test("Not found users", async () => {
-  maxUsers = 7;
+  maxUsers = 8;
   const response = await fetch(
     `http://localhost:5000/users/${userId}/friend-suggestions?page=${page}&maxUsers=${maxUsers}`,
   );
