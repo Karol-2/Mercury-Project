@@ -1,24 +1,38 @@
 {
   "realm" : "master",
   "users" : [ {
-    "id" : "d483964a-1c4c-498d-ad99-bedd8f2a7746",
+    "id" : "90dcdf75-3ca7-454b-a9be-eff8dec5ca76",
     "username" : "admin",
     "emailVerified" : false,
-    "createdTimestamp" : 1709811792253,
+    "createdTimestamp" : 1709889626142,
     "enabled" : true,
     "totp" : false,
     "credentials" : [ {
-      "id" : "d08a0463-858d-49c3-894f-9b638e549e47",
+      "id" : "f98c9aff-88ba-4704-9a2a-a1d288d4b790",
       "type" : "password",
-      "createdDate" : 1709811793466,
-      "secretData" : "{\"value\":\"asK+Bg4K0+yQbxEcLCMsG3S35VQetZYwh7zdeg4kuLwsX7m88uvKEk6ljxbH3LUDuBPNgzLI8xORaEJ8s1M69w==\",\"salt\":\"FBbTSluhb20qsCcKQug9xw==\",\"additionalParameters\":{}}",
+      "createdDate" : 1709889627065,
+      "secretData" : "{\"value\":\"1SzkrndwOOSFr6tfUpHWetUBcZJ59vrm0Dy0MyW3VVmxcVZO7f3/H4NwdgeE6SgHc7rm5iKJ2zpgGsxDSd9JUA==\",\"salt\":\"NbvB/HVnIx/HaGhaydhDUA==\",\"additionalParameters\":{}}",
       "credentialData" : "{\"hashIterations\":210000,\"algorithm\":\"pbkdf2-sha512\",\"additionalParameters\":{}}"
     } ],
     "disableableCredentialTypes" : [ ],
     "requiredActions" : [ ],
-    "realmRoles" : [ "admin", "default-roles-master" ],
+    "realmRoles" : [ "default-roles-master", "admin" ],
+    "notBefore" : 0,
+    "groups" : [ ]
+  }, {
+    "id" : "c735851c-6ada-4e6e-8406-d3eb2a75a170",
+    "username" : "service-account-mercury-backend",
+    "emailVerified" : false,
+    "createdTimestamp" : 1710581718176,
+    "enabled" : true,
+    "totp" : false,
+    "serviceAccountClientId" : "mercury-backend",
+    "credentials" : [ ],
+    "disableableCredentialTypes" : [ ],
+    "requiredActions" : [ ],
+    "realmRoles" : [ "default-roles-master" ],
     "clientRoles" : {
-      "mercury-realm" : [ "query-clients", "manage-events", "query-realms", "manage-clients", "query-groups", "query-users", "view-events", "manage-users", "manage-realm", "view-realm", "manage-identity-providers", "create-client", "view-authorization", "manage-authorization", "view-users", "view-identity-providers", "view-clients" ]
+      "mercury-realm" : [ "view-users" ]
     },
     "notBefore" : 0,
     "groups" : [ ]
