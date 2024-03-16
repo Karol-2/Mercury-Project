@@ -16,6 +16,8 @@ import {
 import usersFriendsRoute from "./usersFriendsRoute";
 
 import removeKeys from "../misc/removeKeys";
+import { ChangePasswordReq } from "../models/ChangePasswordReq";
+import { log } from "console";
 
 const filterUser = (user: User) => removeKeys({ ...user }, ["name_embedding"]);
 
@@ -303,6 +305,57 @@ usersRouter.put("/:userId", async (req: Request, res: OkErrorResponse) => {
     return res.status(404).json({ status: "error", errors: err as object });
   }
 });
+
+usersRouter.post(
+  "/:userId/change-password",
+  async (req: Request, res: OkErrorResponse) => {
+    try {
+      const userId = req.params.userId;
+      const passwords: ChangePasswordReq = req.body;
+
+      const { old_password, new_password, repeat_password } = passwords;
+
+      const session = driver.session();
+      const user = await userExists(session, { id: userId });
+
+      if (!user) {
+        return userNotFoundRes(res);
+      }
+
+      // check validation of the old password
+
+      const match: boolean = await bcrypt.compare(old_password, user.password);
+
+      if (!match) {
+        return res
+          .status(400)
+          .json({ status: "error", errors: { "error": "" } });
+      }
+
+      // check if there are two same password
+      if (new_password !== repeat_password) {
+        return res.status(400).json({
+          status: "error",
+          errors: { "error": "Passwords don't match" },
+        });
+      }
+
+      const passwordHashed = await bcrypt.hash(new_password, 10);
+
+      const updatedUser = { ...user, password: passwordHashed };
+      await session.run(`MATCH (u:User {id: $userId}) SET u=$user`, {
+        userId,
+        user: updatedUser,
+      });
+      await session.close();
+
+      return res.json({ status: "ok" });
+    } catch (err) {
+      console.log("Error:", err);
+      return res.status(404).json({ status: "error", errors: err as object });
+    }
+  },
+);
 
 usersRouter.delete("/:userId", async (req: Request, res: OkErrorResponse) => {
   try {
