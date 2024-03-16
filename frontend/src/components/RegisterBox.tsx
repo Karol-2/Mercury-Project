@@ -2,9 +2,11 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { userSchema } from "../models/RegisterUserSchema";
+import { userRegisterSchema } from "../models/RegisterUserSchema";
 import { FrontendUser } from "../models/User";
 import * as userPlaceholder from "../assets/user-placeholder.jpg";
+import Select from "react-select";
+import countriesData from "../assets/countries.json";
 
 function RegisterBox() {
   const navigate = useNavigate();
@@ -13,7 +15,7 @@ function RegisterBox() {
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm<FrontendUser>({
-    resolver: zodResolver(userSchema),
+    resolver: zodResolver(userRegisterSchema),
   });
 
   const [submitError, setSubmitError] = useState<string>("");
@@ -28,16 +30,10 @@ function RegisterBox() {
     className: "text-my-dark form-input",
   };
 
-  const countryOptions = {
-    onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
-      const input = e.target;
-      const start = input.selectionStart;
-      const end = input.selectionEnd;
-
-      input.value = e.target.value.toUpperCase();
-      input.setSelectionRange(start, end);
-    },
-  };
+  const countryOptions = countriesData.map((country) => ({
+    value: country.Country,
+    label: country.Country,
+  }));
 
   const registerUser = async (user: FrontendUser): Promise<FrontendUser> => {
     const response = await fetch("http://localhost:5000/users", {
@@ -53,9 +49,17 @@ function RegisterBox() {
     }
 
     const userJson = await response.json();
-    console.log("Register " + JSON.stringify(userJson));
+    // console.log("Register " + JSON.stringify(userJson));
 
     return userJson.user;
+  };
+
+  const [country, setCountry] = useState(countriesData[0].Country);
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const handleCountryChange = (e: any) => {
+    const selectedCountry = e ? e.value : "";
+    setCountry(selectedCountry);
   };
 
   const encodePicture = async (file: File): Promise<string> => {
@@ -121,9 +125,10 @@ function RegisterBox() {
         user.profile_picture = profilePictureBase64;
       }
 
-      const registered = await registerUser(user);
+      user.country = country;
+      await registerUser(user);
 
-      console.log(registered);
+      // console.log(registered);
       navigate("/login");
     } catch (e) {
       if (e instanceof Error) {
@@ -145,14 +150,14 @@ function RegisterBox() {
       className="medium:w-[25vw] flex flex-col gap-2 bg-my-dark p-10 px-20 rounded-xl"
       onSubmit={handleSubmit(submit)}
     >
-      <div>First name:</div>
+      <div>First name</div>
       <input
         {...inputProps}
         {...register("first_name")}
         placeholder="First name"
       />
       <div {...errorProps}>{errors.first_name?.message}</div>
-      <div>Last Name:</div>
+      <div>Last Name</div>
       <input
         {...inputProps}
         {...register("last_name")}
@@ -161,17 +166,19 @@ function RegisterBox() {
       <div {...errorProps}>{errors.last_name?.message}</div>
       <div>
         <div className="flex gap-2 items-center">
-          <div>Country Code:</div>
-          <input
+          <div>Country</div>
+          <Select
             {...inputProps}
-            {...register("country", countryOptions)}
-            placeholder="XX"
+            {...register("country")}
+            options={countryOptions}
+            onChange={handleCountryChange}
+            value={countryOptions.find((option) => option.value === country)}
           />
         </div>
         <div {...errorProps}>{errors.country?.message}</div>
       </div>
 
-      <div>Profile picture:</div>
+      <div>Profile picture</div>
       <div className="flex items-center justify-center space-x-4 rounded-xl">
         <label
           htmlFor="upload-button"
@@ -214,11 +221,11 @@ function RegisterBox() {
       <div {...errorProps}>{errors.profile_picture?.message}</div>
 
       <div className="py-5">
-        <div>E-mail:</div>
+        <div>E-mail</div>
         <input {...inputProps} {...register("mail")} placeholder="E-mail" />
         <div {...errorProps}>{errors.mail?.message}</div>
 
-        <div>Password:</div>
+        <div>Password</div>
         <input
           {...inputProps}
           {...register("password")}
