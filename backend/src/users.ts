@@ -61,6 +61,18 @@ export async function getUser(
   session: Session,
   props: Partial<User>,
 ): Promise<User | null> {
+  const user = await getDbUser(session, props)
+  if (!user) {
+    return null
+  }
+
+  return filterUser(user)
+}
+
+export async function getDbUser(
+  session: Session,
+  props: Partial<User>
+): Promise<DbUser | null> {
   const propsStr = Object.keys(props)
     .map((k) => `${k}: $${k}`)
     .join(", ");
@@ -75,7 +87,7 @@ export async function getUser(
   }
 
   const user = userExistsResult.records[0].get("u").properties as DbUser;
-  return filterUser(user);
+  return user;
 }
 
 export async function getAllUsers(session: Session) {
