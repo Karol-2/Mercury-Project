@@ -9,12 +9,13 @@ import DbUser from "./models/DbUser";
 export const filterUser = (user: DbUser): User =>
   removeKeys({ ...user }, ["name_embedding"]);
 
-type UserCreate = User | { errors: Record<string, string> };
+type CreateUser = Omit<User, "id"> & { password: string };
+type UserCreateResult = User | { errors: Record<string, string> };
 
 export async function createUser(
   session: Session,
-  userData: DbUser,
-): Promise<UserCreate> {
+  userData: CreateUser,
+): Promise<UserCreateResult> {
   const existsUser = await getUser(session, { mail: userData.mail });
 
   if (existsUser) {
@@ -40,17 +41,21 @@ export async function createUser(
 
   const { password } = userData;
   const passwordHashed = await bcrypt.hash(password, 10);
-
-  const newUserData = { ...userData } as DbUser
-  newUserData.id = uuidv4();
-  newUserData.name_embedding = firstNameEmbedding.map((e1, i) => {
+  const id = uuidv4();
+  const nameEmbedding = firstNameEmbedding.map((e1, i) => {
     const e2 = lastNameEmbedding[i];
     return (e1 + e2) / 2;
   });
-  newUserData.password = passwordHashed;
+
+  const newUserData: DbUser = {
+    ...userData,
+    id,
+    name_embedding: nameEmbedding,
+    password: passwordHashed,
+  };
 
   const userResult = await session.run(`CREATE (u:User $user) RETURN u`, {
-    user: userData,
+    user: newUserData,
   });
 
   const user = filterUser(userResult.records[0].get("u").properties);
@@ -61,17 +66,17 @@ export async function getUser(
   session: Session,
   props: Partial<User>,
 ): Promise<User | null> {
-  const user = await getDbUser(session, props)
+  const user = await getDbUser(session, props);
   if (!user) {
-    return null
+    return null;
   }
 
-  return filterUser(user)
+  return filterUser(user);
 }
 
 export async function getDbUser(
   session: Session,
-  props: Partial<User>
+  props: Partial<User>,
 ): Promise<DbUser | null> {
   const propsStr = Object.keys(props)
     .map((k) => `${k}: $${k}`)
@@ -143,24 +148,24 @@ export async function updateUser(
     user: newUser,
   });
 
-  return true
+  return true;
 }
 
 export async function deleteUser(
   session: Session,
-  userId: string
+  userId: string,
 ): Promise<boolean> {
-    const user = await getUser(session, { id: userId });
+  const user = await getUser(session, { id: userId });
 
-    if (!user) {
-      return false;
-    }
+  if (!user) {
+    return false;
+  }
 
-    await session.run(`MATCH (u:User {id: $userId}) DETACH DELETE u`, {
-      userId,
-    });
+  await session.run(`MATCH (u:User {id: $userId}) DETACH DELETE u`, {
+    userId,
+  });
 
-    return true;
+  return true;
 }
 
 export async function getFriends(
