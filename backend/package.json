@@ -14,6 +14,7 @@
     "prod": "node build/index.js"
   },
   "dependencies": {
+    "@keycloak/keycloak-admin-client": "^24.0.1",
     "@types/jsonwebtoken": "^9.0.5",
     "axios": "^1.6.2",
     "bcrypt": "^5.1.1",
