@@ -1,6 +1,23 @@
 {
   "realm" : "mercury",
   "users" : [ {
+    "id" : "88a81486-ad52-42c8-b180-f143663a3ef9",
+    "username" : "service-account-mercury-backend",
+    "emailVerified" : false,
+    "createdTimestamp" : 1710663416356,
+    "enabled" : true,
+    "totp" : false,
+    "serviceAccountClientId" : "mercury-backend",
+    "credentials" : [ ],
+    "disableableCredentialTypes" : [ ],
+    "requiredActions" : [ ],
+    "realmRoles" : [ "default-roles-mercury" ],
+    "clientRoles" : {
+      "realm-management" : [ "manage-users", "view-users" ]
+    },
+    "notBefore" : 0,
+    "groups" : [ ]
+  }, {
     "id" : "4458155c-2881-44b2-8839-c6995faa2b26",
     "username" : "user",
     "firstName" : "John",
