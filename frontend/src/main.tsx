@@ -13,12 +13,13 @@ import RegisterPage from "./pages/RegisterPage.tsx";
 import SearchPage from "./pages/SearchPage.tsx";
 import VideoCallPage from "./pages/VideoCallPage.tsx";
 import NotificationsPage from "./pages/NotificationsPage.tsx";
+import EditDataPage from "./pages/EditDataPage.tsx";
+import RoomCallPage from "./pages/RoomCallPage.tsx";
 
 import "./styles/styles.scss";
 
 import UserProvider from "./helpers/UserProvider.tsx";
 import { store } from "./redux/store.ts";
-import EditDataPage from "./pages/EditDataPage.tsx";
 
 const body = document.getElementsByTagName("body")[0]!;
 body.className = "bg-my-darker text-my-light";
@@ -38,6 +39,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
             <Route path="/friends" element={<FriendsPage />} />
             <Route path="/search" element={<SearchPage />} />
             <Route path="/meeting" element={<VideoCallPage />} />
+            <Route path="/room/:roomId" element={<RoomCallPage />} />
             <Route path="/notifications" element={<NotificationsPage />} />
             <Route path="/*" element={<PageNotFound />} />
           </Routes>
