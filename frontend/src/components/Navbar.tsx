@@ -3,6 +3,7 @@ import LogoSVG from "/logo.svg";
 import { useUser } from "../helpers/UserProvider";
 import { useState } from "react";
 import {
+  faBell,
   faMagnifyingGlass,
   faUser,
   faUsers,
@@ -32,6 +33,7 @@ function Navbar(props: NavbarProps) {
   };
 
   const navLinks = [
+    { to: "/notifications", text: "Notifications", icon: faBell },
     { to: "/search", text: "Search", icon: faMagnifyingGlass },
     { to: "/profile", text: "My Profile", icon: faUser },
     { to: "/friends", text: "Friends", icon: faUsers },
