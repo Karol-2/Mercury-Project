@@ -137,7 +137,7 @@ function FriendsPage() {
                   className="btn primary w-full mb-4"
                 >
                   <FontAwesomeIcon icon={faPlus}></FontAwesomeIcon>
-                  <span className="ml-2">Create a meeting</span>
+                  <span className="ml-2">Create a room</span>
                 </button>
                 <h1 className="text-3xl font-bold">Friends:</h1>
                 <hr className="text-my-orange"></hr>
