@@ -62,6 +62,12 @@ export async function createUser(
   return user;
 }
 
+export async function registerUser(
+  userData: CreateUser,
+): Promise<UserCreateResult> {
+  return {errors: {}}
+}
+
 export async function getUser(
   session: Session,
   props: Partial<User>,

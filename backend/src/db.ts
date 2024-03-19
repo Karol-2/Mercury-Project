@@ -1,7 +1,7 @@
 import driver from "./driver/driver";
 
 import userData from "./data/users";
-import { createUser } from "./users";
+import { createUser, registerUser } from "./users";
 
 export async function isDatabaseEmpty() {
   const session = driver.session();
@@ -20,6 +20,15 @@ export async function isDatabaseEmpty() {
 }
 
 export async function importInitialData() {
+  registerUser({
+    first_name: "John",
+    last_name: "Smith",
+    country: "PL",
+    profile_picture: "",
+    mail: "jsmith@example.com",
+    password: "password"
+  })
+
   const isEmpty = await isDatabaseEmpty();
   if (!isEmpty) {
     return "Database is not empty";
