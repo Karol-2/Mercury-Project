@@ -1,5 +1,5 @@
 import { model, Schema } from "mongoose";
-import Message from "../models/Message";
+import Message from "../models/Message.js";
 
 const chatSchema = new Schema<Message>({
   type: { type: String, required: true },
@@ -9,6 +9,6 @@ const chatSchema = new Schema<Message>({
   content: { type: String, required: true },
 });
 
-const MessageModel = model("Chat", chatSchema, "messages");
+const MessageModel = model<Message>("Chat", chatSchema, "messages");
 
 export default MessageModel;

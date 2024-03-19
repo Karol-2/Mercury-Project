@@ -1,14 +1,14 @@
 import { Router, Request, Response } from "express";
-import driver from "../driver/driver";
-import { JWTRequest, authenticateToken } from "../misc/jwt";
+import driver from "../driver/driver.js";
+import { JWTRequest, authenticateToken } from "../misc/jwt.js";
 import {
   FriendsErrorResponse,
   OkErrorResponse,
   UserErrorResponse,
   UsersErrorResponse,
   UsersSearchErrorResponse,
-} from "../types/userResponse";
-import usersFriendsRoute from "./usersFriendsRoute";
+} from "../types/userResponse.js";
+import usersFriendsRoute from "./usersFriendsRoute.js";
 import {
   getAllUsers,
   searchUser as searchUsers,
@@ -17,7 +17,7 @@ import {
   createUser,
   updateUser,
   deleteUser,
-} from "../users";
+} from "../users.js";
 
 const usersRouter = Router();
 

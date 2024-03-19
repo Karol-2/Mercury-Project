@@ -1,21 +1,21 @@
-import servers from "./server";
+import servers from "./server.js";
 import dotenv from "dotenv";
-import driver from "./driver/driver";
+import driver from "./driver/driver.js";
 import { Socket } from "socket.io";
 import {
   connectToSocket,
   disconnectFromSocket,
   getAllSockets,
-} from "./sockets";
-import { isFriend } from "./users";
-import Meeting from "./models/Meeting";
+} from "./sockets.js";
+import { isFriend } from "./users.js";
+import Meeting from "./models/Meeting.js";
 import {
   createMeeting,
   leaveMeeting,
   isInMeeting,
   joinMeeting,
-} from "./meetings";
-import { addMessageToDb } from "./messages";
+} from "./meetings.js";
+import { addMessageToDb } from "./messages.js";
 
 const { io } = servers;
 

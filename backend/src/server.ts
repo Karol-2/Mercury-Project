@@ -5,8 +5,8 @@ import { Server as SocketServer } from "socket.io";
 import { createServer } from "http";
 import { connect } from "mongoose";
 import cookieParser from "cookie-parser";
-import ServerToClientEvents from "./events/ServerToClientEvents";
-import ClientToServerEvents from "./events/ClientToServerEvents";
+import ServerToClientEvents from "./events/ServerToClientEvents.js";
+import ClientToServerEvents from "./events/ClientToServerEvents.js";
 
 dotenv.config();
 

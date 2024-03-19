@@ -1,4 +1,4 @@
-import User from "./User";
+import User from "./User.js";
 
 import { Response } from "express";
 import { Jwt } from "jsonwebtoken";

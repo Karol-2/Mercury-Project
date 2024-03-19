@@ -1,4 +1,4 @@
-import User from "./User";
+import User from "./User.js";
 
 export default interface DbUser extends User {
   password: string;

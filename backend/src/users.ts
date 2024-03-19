@@ -1,10 +1,10 @@
 import { Session } from "neo4j-driver";
 import { v4 as uuidv4 } from "uuid";
 import bcrypt from "bcrypt";
-import User from "./models/User";
-import removeKeys from "./misc/removeKeys";
-import wordToVec from "./misc/wordToVec";
-import DbUser from "./models/DbUser";
+import User from "./models/User.js";
+import removeKeys from "./misc/removeKeys.js";
+import wordToVec from "./misc/wordToVec.js";
+import DbUser from "./models/DbUser.js";
 
 export const filterUser = (user: DbUser): User =>
   removeKeys({ ...user }, ["name_embedding"]);

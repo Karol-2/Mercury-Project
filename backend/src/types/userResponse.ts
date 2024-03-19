@@ -6,7 +6,7 @@ import {
   UsersResponse,
   FriendsResponse,
   UsersSearchResponse,
-} from "../models/Response";
+} from "../models/Response.js";
 
 export type UsersErrorResponse = CustomResponse<UsersResponse | ErrorResponse>;
 export type UserErrorResponse = CustomResponse<UserResponse | ErrorResponse>;

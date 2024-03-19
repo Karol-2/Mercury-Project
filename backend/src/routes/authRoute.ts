@@ -2,19 +2,19 @@ import { Router, Request } from "express";
 
 import bcrypt from "bcrypt";
 
-import driver from "../driver/driver";
+import driver from "../driver/driver.js";
 import {
   JWTRequest,
   authenticateToken,
   generateAccessToken,
   generateRefreshToken,
-} from "../misc/jwt";
+} from "../misc/jwt.js";
 
 import jwt, { JwtPayload } from "jsonwebtoken";
-import { TokenErrorResponse } from "../types/authResponse";
-import { OkErrorResponse } from "../types/userResponse";
-import { leaveMeeting } from "../meetings";
-import { getDbUser } from "../users";
+import { TokenErrorResponse } from "../types/authResponse.js";
+import { OkErrorResponse } from "../types/userResponse.js";
+import { leaveMeeting } from "../meetings.js";
+import { getDbUser } from "../users.js";
 
 const authRouter = Router();
 

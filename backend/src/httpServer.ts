@@ -1,9 +1,9 @@
 import dotenv from "dotenv";
-import servers from "./server";
-import usersRouter from "./routes/usersRoute";
-import authRouter from "./routes/authRoute";
-import chatRouter from "./routes/chatRoute";
-import { cleanUpData, importInitialData } from "./db";
+import servers from "./server.js";
+import usersRouter from "./routes/usersRoute.js";
+import authRouter from "./routes/authRoute.js";
+import chatRouter from "./routes/chatRoute.js";
+import { cleanUpData, importInitialData } from "./db.js";
 
 const { app } = servers;
 

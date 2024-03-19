@@ -1,7 +1,7 @@
-import driver from "./driver/driver";
+import driver from "./driver/driver.js";
 
-import userData from "./data/users";
-import { createUser, registerUser } from "./users";
+import userData from "./data/users.js";
+import { createUser, registerUser } from "./users.js";
 
 export async function isDatabaseEmpty() {
   const session = driver.session();

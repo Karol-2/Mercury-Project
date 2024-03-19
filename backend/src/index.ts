@@ -1,2 +1,2 @@
-import "./httpServer";
-import "./socketServer";
+import "./httpServer.js";
+import "./socketServer.js";

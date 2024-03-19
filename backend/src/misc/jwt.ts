@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
-import { AuthResponse, CustomResponse } from "../models/Response";
-import DecodedData from "../models/DecodedData";
+import { AuthResponse, CustomResponse } from "../models/Response.js";
+import DecodedData from "../models/DecodedData.js";
 
 export interface JWTRequest extends Request {
   token?: jwt.Jwt;
