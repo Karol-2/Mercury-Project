@@ -5,9 +5,34 @@ import User from "./models/User.js";
 import removeKeys from "./misc/removeKeys.js";
 import wordToVec from "./misc/wordToVec.js";
 import DbUser from "./models/DbUser.js";
+import kcAdminClient from "./kcAdminClient.js";
+import UserRepresentation from "@keycloak/keycloak-admin-client/lib/defs/userRepresentation.js";
 
 export const filterUser = (user: DbUser): User =>
   removeKeys({ ...user }, ["name_embedding"]);
+
+const createUserToKeycloakUser = (user: CreateUser): UserRepresentation => ({
+  enabled: true,
+  firstName: user.first_name,
+  lastName: user.last_name,
+  credentials: [
+    {
+      type: "password",
+      value: user.password,
+      temporary: false,
+    },
+  ],
+  email: user.mail,
+  emailVerified: true,
+});
+
+function getResponse(e: any): Response {
+  if (!e || !e.response) {
+    throw e;
+  }
+
+  return e.response;
+}
 
 type CreateUser = Omit<User, "id"> & { password: string };
 type UserCreateResult = User | { errors: Record<string, string> };
@@ -65,7 +90,19 @@ export async function createUser(
 export async function registerUser(
   userData: CreateUser,
 ): Promise<UserCreateResult> {
-  return {errors: {}}
+  try {
+    await kcAdminClient.users.create(createUserToKeycloakUser(userData));
+  } catch (e) {
+    const response = getResponse(e);
+
+    if (response.status == 409) {
+      return { errors: { id: "already exists" } };
+    } else {
+      throw e;
+    }
+  }
+
+  return { errors: {} };
 }
 
 export async function getUser(
