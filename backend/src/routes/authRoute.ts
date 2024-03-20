@@ -38,7 +38,7 @@ authRouter.post("/login", async (req: Request, res: TokenErrorResponse) => {
   try {
     const user = await getDbUser(session, { mail });
 
-    if (!user) {
+    if (!user || !("password" in user)) {
       return res.status(401).json({ status: "unauthorized" });
     }
 
