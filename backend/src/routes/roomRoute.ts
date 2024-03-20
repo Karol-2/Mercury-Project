@@ -50,4 +50,18 @@ roomRouter.post("/", async (req, res) => {
 });
 
 
+roomRouter.delete("/:roomId", async (req, res) => {
+    try {
+        const roomId = req.params.roomId;
+        const session = driver.session();
+        await session.run(`MATCH (r:Room {roomId: $roomId}) DETACH DELETE r`, {roomId});
+        await session.close();
+        return res.json({status: "ok"});
+    } catch (err) {
+        console.log("Error:", err);
+        return res.status(404).json({ status: "error", errors: err as object });
+    }
+});
+
+
 export default roomRouter;
