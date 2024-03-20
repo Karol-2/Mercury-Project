@@ -227,10 +227,14 @@ export async function deleteUser(
   session: Session,
   userId: string,
 ): Promise<boolean> {
-  const user = await getUser(session, { id: userId });
+  const user = await getDbUser(session, { id: userId });
 
   if (!user) {
     return false;
+  }
+
+  if (!("password" in user) && user.issuer == "mercury") {
+    await kcAdminClient.users.del({ id: user.issuer_id });
   }
 
   await session.run(`MATCH (u:User {id: $userId}) DETACH DELETE u`, {
