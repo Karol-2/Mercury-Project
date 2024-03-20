@@ -6,11 +6,15 @@ import { useSelector } from "react-redux";
 import { RootState } from "../redux/store";
 import User from "../models/User";
 import { useUser } from "../helpers/UserProvider";
+import { useParams } from "react-router-dom";
+import dataService from "../services/data";
 function RoomCallPage() {
     const localRef = useRef<HTMLVideoElement>(null);
     const [localStream, setLocalStream] = useState<MediaStream | null>(null);
     const friends: User[] = useSelector((state: RootState) => state.friends);
-    const {socket} = useUser();
+    const {socket, userId, user} = useUser();
+    const params = useParams();
+    const roomId = params.roomId;
     const getStream = async () => {
         const stream = await fetchUserMedia();
         setLocalStream(stream);
@@ -18,7 +22,17 @@ function RoomCallPage() {
         localRef.current!.play();
     }
     const inviteFriendToRoom = async (friendId: string) => {
-        console.log(friendId);
+        const myFullName = `${user?.first_name} ${user?.last_name}`;
+        await dataService.fetchData("/room", "POST", {headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+            roomId,
+            from: userId, 
+            to: friendId, 
+            userName: myFullName
+        }),});
+        socket?.emit("newRoom", {roomId, from: userId, to: friendId, userName: myFullName});
     }
     useEffect(() => {
         getStream();

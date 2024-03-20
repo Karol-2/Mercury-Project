@@ -143,6 +143,10 @@ io.on("connection", async (socket: Socket) => {
     });
   });
 
+  socket.on("newRoom", (roomId) => {
+    console.log("[NEW ROOM]: ", roomId);
+  });
+
   socket.on("disconnect", async (_reason) => {
     const session = driver.session();
     await leaveMeeting(session, userId);
