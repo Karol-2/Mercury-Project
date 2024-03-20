@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useContext, useMemo } from "react";
 import dataService from "../services/data";
-import User from "../models/User";
+import User, { FrontendUser } from "../models/User";
 import { Socket, io } from "socket.io-client";
 import UserContext from "./UserContext";
 import UserState from "../models/UserState";
@@ -20,16 +20,19 @@ function KeycloakUserProvider({ children }: { children: React.ReactNode }) {
     const keycloak = keycloakRef.current!;
     const tokenDecoded: any = await keycloak.loadUserInfo();
 
-    const userId = tokenDecoded.sub
-    const searchParams = new URLSearchParams({issuer: "mercury"})
+    const userId = tokenDecoded.sub;
+    const searchParams = new URLSearchParams({ issuer: "mercury" });
 
-    const response = await dataService.fetchData(`/users/${userId}?${searchParams}`, "GET");
+    const response = await dataService.fetchData(
+      `/users/${userId}?${searchParams}`,
+      "GET",
+    );
     if (response.status != "ok") {
-      console.error("Couldn't fetch user data: ", response)
-      return
+      console.error("Couldn't fetch user data: ", response);
+      return;
     }
 
-    setUserLoggedIn(response.user)
+    setUserLoggedIn(response.user);
   };
 
   useEffect(() => {
@@ -115,6 +118,25 @@ function KeycloakUserProvider({ children }: { children: React.ReactNode }) {
     return true;
   };
 
+  const registerUser = async (user: FrontendUser): Promise<FrontendUser> => {
+    const response = await fetch("http://localhost:5000/users", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({...user, issuer: "mercury"}),
+    });
+
+    if (!response.ok) {
+      throw response;
+    }
+
+    const userJson = await response.json();
+    console.log("Register " + JSON.stringify(userJson));
+
+    return userJson.user;
+  };
+
   const updateUser = async (updateUser: Partial<User>) => {
     if (userState.status != "logged_in") return false;
 
@@ -160,6 +182,7 @@ function KeycloakUserProvider({ children }: { children: React.ReactNode }) {
         login,
         redirectToLogin,
         logout,
+        registerUser,
         updateUser,
         deleteUser,
       }}

@@ -1,13 +1,13 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { userSchema } from "../models/RegisterUserSchema";
 import { FrontendUser } from "../models/User";
 import * as userPlaceholder from "../assets/user-placeholder.jpg";
+import { useUser } from "../helpers/UserContext";
 
 function RegisterBox() {
-  const navigate = useNavigate();
   const {
     register,
     handleSubmit,
@@ -15,6 +15,8 @@ function RegisterBox() {
   } = useForm<FrontendUser>({
     resolver: zodResolver(userSchema),
   });
+
+  const { registerUser, redirectToLogin } = useUser();
 
   const [submitError, setSubmitError] = useState<string>("");
   const [profilePictureBase64, setProfilePictureBase64] = useState<string>("");
@@ -37,25 +39,6 @@ function RegisterBox() {
       input.value = e.target.value.toUpperCase();
       input.setSelectionRange(start, end);
     },
-  };
-
-  const registerUser = async (user: FrontendUser): Promise<FrontendUser> => {
-    const response = await fetch("http://localhost:5000/users", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(user),
-    });
-
-    if (!response.ok) {
-      throw response;
-    }
-
-    const userJson = await response.json();
-    console.log("Register " + JSON.stringify(userJson));
-
-    return userJson.user;
   };
 
   const encodePicture = async (file: File): Promise<string> => {
@@ -124,7 +107,7 @@ function RegisterBox() {
       const registered = await registerUser(user);
 
       console.log(registered);
-      navigate("/login");
+      redirectToLogin();
     } catch (e) {
       if (e instanceof Error) {
         setSubmitError("Can't connect to the server");

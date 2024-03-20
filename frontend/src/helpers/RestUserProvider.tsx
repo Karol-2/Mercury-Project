@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useContext, useMemo } from "react";
 import { isExpired, decodeToken } from "react-jwt";
 import Cookies from "js-cookie";
 import dataService from "../services/data";
-import User from "../models/User";
+import User, { FrontendUser } from "../models/User";
 import { Socket, io } from "socket.io-client";
 import UserContext from "./UserContext";
 import UserState from "../models/UserState";
@@ -122,6 +122,25 @@ function RestUserProvider({ children }: { children: React.ReactNode }) {
     return false;
   };
 
+  const registerUser = async (user: FrontendUser): Promise<FrontendUser> => {
+    const response = await fetch("http://localhost:5000/users", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(user),
+    });
+
+    if (!response.ok) {
+      throw response;
+    }
+
+    const userJson = await response.json();
+    console.log("Register " + JSON.stringify(userJson));
+
+    return userJson.user;
+  };
+
   const updateUser = async (updateUser: Partial<User>) => {
     if (userState.status != "logged_in") return false;
 
@@ -181,6 +200,7 @@ function RestUserProvider({ children }: { children: React.ReactNode }) {
         redirectToLogin,
         login,
         logout,
+        registerUser,
         updateUser,
         deleteUser,
       }}

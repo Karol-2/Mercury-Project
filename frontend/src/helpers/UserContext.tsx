@@ -1,16 +1,16 @@
 import { createContext, useContext } from "react";
 import { Socket } from "socket.io-client";
-import User from "../models/User";
+import User, { FrontendUser } from "../models/User";
 import UserState from "../models/UserState";
 
 export interface UserContextValue {
   user: User | null;
   userState: UserState;
   socket: Socket | null;
-  // setUser: React.Dispatch<React.SetStateAction<User | null | undefined>>;
   login: (mail: string, password: string) => Promise<void>;
   redirectToLogin: () => void;
   logout: () => Promise<boolean>;
+  registerUser: (user: FrontendUser) => Promise<FrontendUser>;
   updateUser: (updateUser: Partial<User>) => Promise<boolean>;
   deleteUser: () => Promise<boolean>;
 }
