@@ -20,14 +20,20 @@ export async function isDatabaseEmpty() {
 }
 
 export async function importInitialData() {
-  registerUser({
-    first_name: "John",
-    last_name: "Smith",
-    country: "PL",
-    profile_picture: "",
-    mail: "jsmith@example.com",
-    password: "password"
-  })
+  const testUser = await registerUser({
+      first_name: "John",
+      last_name: "Smith",
+      country: "PL",
+      profile_picture: "",
+      mail: "jsmith@example.com",
+      password: "password",
+    })
+
+  if ("errors" in testUser) {
+    console.log("Couldn't register test user: ", testUser.errors)
+  } else {
+    console.log("Test user created: ", testUser)
+  }
 
   const isEmpty = await isDatabaseEmpty();
   if (!isEmpty) {
