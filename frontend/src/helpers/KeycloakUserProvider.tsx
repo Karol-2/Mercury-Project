@@ -5,8 +5,10 @@ import { Socket, io } from "socket.io-client";
 import UserContext from "./UserContext";
 import UserState from "../models/UserState";
 import Keycloak from "keycloak-js";
+import { useNavigate } from "react-router-dom";
 
 function KeycloakUserProvider({ children }: { children: React.ReactNode }) {
+  const navigate = useNavigate();
   const [userState, setUserState] = useState<UserState>({ status: "loading" });
   const user = useMemo(
     () => (userState.status == "logged_in" ? userState.user : null),
@@ -99,7 +101,7 @@ function KeycloakUserProvider({ children }: { children: React.ReactNode }) {
     }
 
     const keycloak = keycloakRef.current;
-    keycloak.login({redirectUri: "http://localhost:5173/profile"});
+    keycloak.login({ redirectUri: "http://localhost:5173/profile" });
   };
 
   const login = async (_mail: string, _password: string) => {
@@ -162,6 +164,12 @@ function KeycloakUserProvider({ children }: { children: React.ReactNode }) {
 
     if (response.status === "ok") {
       setUserAnonymous();
+
+      if (keycloakRef.current) {
+        const keycloak = keycloakRef.current;
+        navigate("/");
+      }
+
       return true;
     }
 
