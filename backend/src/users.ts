@@ -209,9 +209,16 @@ export async function updateUser(
   userId: string,
   newUserProps: Partial<User>,
 ): Promise<boolean> {
-  const user = await getUser(session, { id: userId });
+  const user = await getDbUser(session, { id: userId });
   if (!user) {
     return false;
+  }
+
+  if (!("password" in user) && user.issuer == "mercury") {
+    await kcAdminClient.users.update({ id: user.issuer_id }, {
+      firstName: newUserProps.first_name,
+      lastName: newUserProps.last_name
+    });
   }
 
   const newUser = { ...user, ...newUserProps };
