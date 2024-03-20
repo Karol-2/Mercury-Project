@@ -18,6 +18,7 @@ import {
   updateUser,
   deleteUser,
 } from "../users.js";
+import DbUser from "../models/DbUser.js";
 
 const usersRouter = Router();
 
@@ -88,10 +89,23 @@ usersRouter.get(
 
 usersRouter.get("/:userId", async (req: Request, res: UserErrorResponse) => {
   const userId = req.params.userId;
+  const issuer = req.query.issuer as string;
+
+  let props: Partial<DbUser>;
+  if (issuer) {
+    props = {
+      issuer: issuer,
+      issuer_id: userId,
+    };
+  } else {
+    props = {
+      id: userId,
+    };
+  }
 
   const session = driver.session();
   try {
-    const user = await getUser(session, { id: userId });
+    const user = await getUser(session, props);
     if (!user) {
       return userNotFoundRes(res);
     }
