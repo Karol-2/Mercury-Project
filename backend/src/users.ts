@@ -7,11 +7,22 @@ import wordToVec from "./misc/wordToVec.js";
 import DbUser from "./models/DbUser.js";
 import kcAdminClient from "./kcAdminClient.js";
 import UserRepresentation from "@keycloak/keycloak-admin-client/lib/defs/userRepresentation.js";
+import driver from "./driver/driver.js";
+import { Either } from "./misc/Either.js";
+import NativeUser from "./models/NativeUser.js";
+import ExternalUser from "./models/ExternalUser.js";
 
-export const filterUser = (user: DbUser): User =>
-  removeKeys({ ...user }, ["name_embedding"]);
+export const filterUser = (user: DbUser): User => {
+  if ("password" in user) {
+    return removeKeys(user, ["name_embedding", "password"]);
+  } else {
+    return removeKeys(user, ["name_embedding", "issuer", "issuer_id"]);
+  }
+};
 
-const createUserToKeycloakUser = (user: CreateUser): UserRepresentation => ({
+const registerUserToKeycloakUser = (
+  user: RegisterUser,
+): UserRepresentation => ({
   enabled: true,
   firstName: user.first_name,
   lastName: user.last_name,
@@ -26,16 +37,29 @@ const createUserToKeycloakUser = (user: CreateUser): UserRepresentation => ({
   emailVerified: true,
 });
 
-function getResponse(e: any): Response {
+function getResponse(e: any): Response | null {
   if (!e || !e.response) {
-    throw e;
+    return null;
   }
 
   return e.response;
 }
 
-type CreateUser = Omit<User, "id"> & { password: string };
+type RegisterUser = Omit<User, "id"> & NativeUser;
+type CreateUser = Omit<User, "id"> & Either<NativeUser, ExternalUser>;
 type UserCreateResult = User | { errors: Record<string, string> };
+
+async function createUserQuery(
+  session: Session,
+  userData: DbUser,
+): Promise<User> {
+  const userResult = await session.run(`CREATE (u:User $user) RETURN u`, {
+    user: userData,
+  });
+
+  const user = filterUser(userResult.records[0].get("u").properties);
+  return user;
+}
 
 export async function createUser(
   session: Session,
@@ -64,45 +88,50 @@ export async function createUser(
     return { errors };
   }
 
-  const { password } = userData;
-  const passwordHashed = await bcrypt.hash(password, 10);
   const id = uuidv4();
   const nameEmbedding = firstNameEmbedding.map((e1, i) => {
     const e2 = lastNameEmbedding[i];
     return (e1 + e2) / 2;
   });
 
-  const newUserData: DbUser = {
-    ...userData,
-    id,
-    name_embedding: nameEmbedding,
-    password: passwordHashed,
-  };
+  let user = { ...userData, id, name_embedding: nameEmbedding } as DbUser;
 
-  const userResult = await session.run(`CREATE (u:User $user) RETURN u`, {
-    user: newUserData,
-  });
+  if ("password" in userData) {
+    const { password } = userData;
+    const passwordHashed = await bcrypt.hash(password, 10);
+    user = { ...user, password: passwordHashed };
+  }
 
-  const user = filterUser(userResult.records[0].get("u").properties);
-  return user;
+  return createUserQuery(session, user);
 }
 
 export async function registerUser(
-  userData: CreateUser,
+  userData: RegisterUser,
 ): Promise<UserCreateResult> {
+  const session = driver.session();
   try {
-    await kcAdminClient.users.create(createUserToKeycloakUser(userData));
+    const { id: keycloakId } = await kcAdminClient.users.create(
+      registerUserToKeycloakUser(userData),
+    );
+
+    const dbUserData: CreateUser = {
+      ...removeKeys(userData, ["password"]),
+      issuer: "mercury",
+      issuer_id: keycloakId,
+    };
+
+    const user = await createUser(session, dbUserData);
+    return user;
   } catch (e) {
     const response = getResponse(e);
-
-    if (response.status == 409) {
+    if (response != null && response.status == 409) {
       return { errors: { id: "already exists" } };
     } else {
       throw e;
     }
+  } finally {
+    session.close();
   }
-
-  return { errors: {} };
 }
 
 export async function getUser(
