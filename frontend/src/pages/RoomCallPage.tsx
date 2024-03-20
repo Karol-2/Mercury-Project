@@ -9,7 +9,10 @@ function RoomCallPage() {
     return (
         <>
             <Navbar />
-            <div>Room call page</div>
+            <div>
+                <video 
+                ></video>
+            </div>
             <Footer />
         </>
     )
