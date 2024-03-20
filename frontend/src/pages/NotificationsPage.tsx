@@ -4,16 +4,17 @@ import { useEffect, useState } from "react";
 import dataService from "../services/data";
 import { useUser } from "../helpers/UserProvider";
 import RoomNotification from "../models/RoomNotification";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "../redux/store";
+import addNotification from "../redux/actions/addNotification";
 function NotificationsPage() {
-    const {userId} = useUser();
-    const [roomNotifications, setRoomNotifications] = useState<RoomNotification[]>([]);
+    const {userId, socket} = useUser();
+    const dispatch = useDispatch();
+    const roomNotifications: RoomNotification[] = useSelector((state: RootState) => state.notifications);
     useEffect(() => {
-        async function fetchRoomNoticifactions() {
-            const roomNotificationsRequest = await dataService.fetchData(`/room/${userId}`, "GET", {});
-            const roomNotifications = roomNotificationsRequest.rooms;
-            setRoomNotifications(roomNotifications);
-        }
-        fetchRoomNoticifactions();
+        socket?.on("newRoom", (notification: RoomNotification) => {
+            dispatch(addNotification(notification));
+        });
     }, []);
     return (
         <>

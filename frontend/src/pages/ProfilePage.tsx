@@ -5,9 +5,13 @@ import Navbar from "../components/Navbar";
 import { useUser } from "../helpers/UserProvider";
 import Profile from "../components/Profile";
 import Transition from "../components/Transition";
+import dataService from "../services/data";
+import { useDispatch } from "react-redux";
+import setNotifications from "../redux/actions/setNotifications";
 
 function ProfilePage() {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const { user, userId, meeting, deleteUser } = useUser();
 
   const [showAnimation, setShowAnim] = useState(false);
@@ -16,6 +20,10 @@ function ProfilePage() {
   const handleEditClick = () => {
     navigate("/edit");
   };
+  const fetchNotifications = async () => {
+    const roomNotificationsRequest = await dataService.fetchData(`/room/${userId}`, "GET", {});
+    dispatch(setNotifications(roomNotificationsRequest.rooms));
+  }
 
   useEffect(() => {
     setShowAnim(true);
@@ -33,6 +41,10 @@ function ProfilePage() {
   useEffect(() => {
     if (userId === null) navigate("/login");
   }, [userId]);
+
+  useEffect(() => {
+    fetchNotifications();
+  }, []);
 
   return (
     <>

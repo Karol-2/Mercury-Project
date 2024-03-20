@@ -53,8 +53,8 @@ function RoomCallPage() {
                     <ul>
                         {friends.map(friend => 
                             <li key={friend.id}>
-                                <span>{`${friend.first_name} ${friend.last_name}`}</span>
-                                <button onClick={() => inviteFriendToRoom(friend.id)}> invite</button>
+                                <span>{`${friend.first_name} ${friend.last_name}`} </span>
+                                <button onClick={() => inviteFriendToRoom(friend.id)}>click</button>
                             </li>
                         )}
                     </ul>
