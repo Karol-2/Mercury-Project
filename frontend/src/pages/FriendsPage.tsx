@@ -139,6 +139,7 @@ function FriendsPage() {
                   <FontAwesomeIcon icon={faPlus}></FontAwesomeIcon>
                   <span className="ml-2">Create a room</span>
                 </button>
+                <button onClick={() => navigate(`/room/abcd`)}>Test room</button>
                 <h1 className="text-3xl font-bold">Friends:</h1>
                 <hr className="text-my-orange"></hr>
                 <ul className="">
