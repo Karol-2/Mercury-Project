@@ -19,15 +19,12 @@ function Navbar(props: NavbarProps) {
   const { handleNavigate } = props;
   const [isOpen, setIsOpen] = useState(false);
 
-  const navigate = useNavigate();
   const { user, logout } = useUser();
 
   const handleLogout = async () => {
     const logged_out = await logout();
 
-    if (logged_out) {
-      navigate("/");
-    } else {
+    if (!logged_out) {
       throw new Error("Couldn't log out");
     }
   };

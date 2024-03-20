@@ -99,7 +99,7 @@ function KeycloakUserProvider({ children }: { children: React.ReactNode }) {
     }
 
     const keycloak = keycloakRef.current;
-    keycloak.login();
+    keycloak.login({redirectUri: "http://localhost:5173/profile"});
   };
 
   const login = async (_mail: string, _password: string) => {
@@ -114,7 +114,7 @@ function KeycloakUserProvider({ children }: { children: React.ReactNode }) {
     }
 
     const keycloak = keycloakRef.current;
-    keycloak.logout();
+    keycloak.logout({ redirectUri: "http://localhost:5173" });
     return true;
   };
 
@@ -124,7 +124,7 @@ function KeycloakUserProvider({ children }: { children: React.ReactNode }) {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({...user, issuer: "mercury"}),
+      body: JSON.stringify({ ...user, issuer: "mercury" }),
     });
 
     if (!response.ok) {
