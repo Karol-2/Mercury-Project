@@ -17,6 +17,8 @@ import {
   createUser,
   updateUser,
   deleteUser,
+  UserCreateResult,
+  registerUser,
 } from "../users.js";
 import DbUser from "../models/DbUser.js";
 
@@ -143,11 +145,16 @@ usersRouter.get(
 
 usersRouter.post("/", async (req: Request, res: UserErrorResponse) => {
   // TODO: verify user fields
-  const newUserProps = req.body;
+  const { issuer, ...newUserProps } = req.body;
 
   const session = driver.session();
   try {
-    const user = await createUser(session, newUserProps);
+    let user: UserCreateResult;
+    if (issuer) {
+      user = await registerUser(newUserProps);
+    } else {
+      user = await createUser(session, newUserProps);
+    }
 
     if ("errors" in user) {
       const errors = user["errors"];

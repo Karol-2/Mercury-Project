@@ -47,7 +47,7 @@ function getResponse(e: any): Response | null {
 
 type RegisterUser = Omit<User, "id"> & NativeUser;
 type CreateUser = Omit<User, "id"> & Either<NativeUser, ExternalUser>;
-type UserCreateResult = User | { errors: Record<string, string> };
+export type UserCreateResult = User | { errors: Record<string, string> };
 
 async function createUserQuery(
   session: Session,
