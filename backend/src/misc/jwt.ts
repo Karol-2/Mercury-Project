@@ -37,6 +37,28 @@ export async function authenticateToken(
   }
 }
 
+export async function getToken(
+  req: JWTRequest,
+  res: Response,
+  next: NextFunction,
+) {
+  const authHeader = req.headers["authorization"];
+  const token = authHeader && authHeader.split(" ")[1];
+
+  try {
+    if (token) {
+      const verifiedToken = jwt.verify(token, process.env.TOKEN_SECRET!);
+      req.token = verifiedToken as jwt.Jwt;
+    } else {
+      req.token = undefined;
+    }
+
+    next();
+  } catch (e) {
+    return res.status(403).json({ status: "forbidden" });
+  }
+}
+
 export function decodeSocketData(
   handshakeData: string,
   linkSecret: string,
