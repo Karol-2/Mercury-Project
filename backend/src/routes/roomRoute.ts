@@ -12,7 +12,10 @@ roomRouter.get("/:userId", async (req, res) => {
             RETURN room
         `, {userId});
         await session.close();
-        const rooms = roomsQuery.records.map((record) => record.get("room").properties);
+        const rooms = roomsQuery.records.map((record) => record.get("room").properties).map(record => ({
+            ...record,
+            title: "Join meeting",
+        }));
         return res.json({status: "ok", rooms});
     } catch (err) {
         console.log("Error:", err);
