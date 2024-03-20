@@ -49,8 +49,3 @@ services:
       - 3000:8080
     volumes:
       - ./keycloak/realms:/opt/keycloak/data/import
-
-# Export data:
-# /opt/keycloak/bin/kc.sh export \
-#     --dir /opt/keycloak/data/realms \
-#     --users same_file
