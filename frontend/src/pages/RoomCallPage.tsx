@@ -8,20 +8,20 @@ import User from "../models/User";
 import { useUser } from "../helpers/UserProvider";
 import { useParams } from "react-router-dom";
 import dataService from "../services/data";
-import Peer from "peerjs";
 function RoomCallPage() {
     const localRef = useRef<HTMLVideoElement>(null);
-    const [peer, _setPeer] = useState<Peer>(new Peer({host: "/", port: 8000}));
-    const [peerId, setPeerId] = useState("");
+    //const peerConfig = useSelector((state: RootState) => state.peer);
+    //const {userId: peerId, peer} = peerConfig;
     const [localStream, setLocalStream] = useState<MediaStream | null>(null);
     const friends: User[] = useSelector((state: RootState) => state.friends);
     const {socket, userId, user} = useUser();
+    socket?.on("userConnected", (newPeerId) => {
+        console.log("[NEW USER]: ", newPeerId);
+    });
     const params = useParams();
     const roomId = params.roomId;
-    peer.on("open", (peerId) => {
-        setPeerId(peerId);
-    });
-    const getStream = async () => {
+    
+    const prepareWebRTC = async () => {
         const stream = await fetchUserMedia();
         setLocalStream(stream);
         localRef.current!.srcObject = stream;
@@ -41,7 +41,7 @@ function RoomCallPage() {
         socket?.emit("newRoom", {roomId, from: userId, to: friendId, userName: myFullName});
     }
     useEffect(() => {
-        getStream();
+        prepareWebRTC();
     }, []);
     return (
         <>

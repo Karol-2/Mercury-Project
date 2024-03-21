@@ -144,6 +144,7 @@ io.on("connection", async (socket: Socket) => {
   });
 
   socket.on("newRoom", async ({roomId, from, to, userName}) => {
+    await socket.join(roomId);
     const session = driver.session();
     const userSockets = await getAllSockets(session, to);
     userSockets.forEach(userSocket => {
@@ -156,6 +157,12 @@ io.on("connection", async (socket: Socket) => {
       });
     });
     await session.close();
+  });
+
+  socket.on("joinRoom", async ({roomId, peerId}: any) => {
+    await socket.join(roomId);
+    socket.to(roomId).emit("userConnected", peerId);
+    console.log("[JOIN-ROOM]: sent ", peerId);
   });
 
   socket.on("disconnect", async (_reason) => {

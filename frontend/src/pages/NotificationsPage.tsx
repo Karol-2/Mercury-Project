@@ -11,9 +11,12 @@ function NotificationsPage() {
     const {socket} = useUser();
     const dispatch = useDispatch();
     const roomNotifications: RoomNotification[] = useSelector((state: RootState) => state.notifications);
+    const peerConfig = useSelector((state: RootState) => state.peer);
+    const {peerId} = peerConfig;
+    console.log("PEER CONFIG", peerConfig);
     const handleRoomInvite = async (roomId: string) => {
-        const res = await dataService.fetchData(`/room/${roomId}`, "DELETE", {});
-        console.log(res);
+        await dataService.fetchData(`/room/${roomId}`, "DELETE", {});
+        socket?.emit("joinRoom", {roomId, peerId});
     } 
     useEffect(() => {
         socket?.on("newRoom", (notification: RoomNotification) => {
