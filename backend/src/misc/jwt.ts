@@ -2,19 +2,75 @@ import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 import { AuthResponse, CustomResponse } from "../models/Response.js";
 import DecodedData from "../models/DecodedData.js";
+import Issuer from "../models/Issuer.js";
+import TokenPayload from "../models/TokenPayload.js";
 
 export interface JWTRequest extends Request {
-  token?: jwt.Jwt;
+  token?: TokenPayload;
+  tokenStr?: string;
 }
 
+const issuers: Record<Issuer, string> = {
+  mercury: "http://localhost:3000/realms/mercury",
+  rest: "http://localhost:5000",
+};
+
 export function generateAccessToken(userId: string) {
-  return jwt.sign({ userId }, process.env.TOKEN_SECRET!, { expiresIn: 900 });
+  return jwt.sign({ iss: issuers["rest"], userId }, process.env.TOKEN_SECRET!, { expiresIn: 900 });
 }
 
 export function generateRefreshToken(userId: string) {
-  return jwt.sign({ userId }, process.env.TOKEN_SECRET!, {
+  return jwt.sign({ iss: issuers["rest"], userId }, process.env.TOKEN_SECRET!, {
     expiresIn: 1209600,
   });
+}
+
+function tokenIssuerToName(issuer: string): Issuer | "unknown" {
+  return (
+    (Object.keys(issuers) as Issuer[]).find((i) => issuers[i] == issuer) ||
+    "unknown"
+  );
+}
+
+export async function verifyKeycloakToken(tokenStr: string): Promise<boolean> {
+  const response = await fetch(
+    "http://localhost:3000/realms/mercury/protocol/openid-connect/userinfo",
+    {
+      method: "GET",
+      headers: {
+        "Authorization": `Bearer ${tokenStr}`,
+      },
+    },
+  );
+
+  return response.status == 200;
+}
+
+export async function checkToken(
+  tokenStr: string,
+): Promise<TokenPayload | null> {
+  const tokenDecoded = jwt.decode(tokenStr) as TokenPayload;
+
+  const issuer = tokenIssuerToName(tokenDecoded.iss || "");
+
+  if (issuer == "mercury") {
+    const valid = await verifyKeycloakToken(tokenStr);
+    if (valid) {
+      return tokenDecoded;
+    }
+    return null;
+  }
+
+  if (issuer == "rest") {
+    try {
+      const verifiedToken = jwt.verify(tokenStr, process.env.TOKEN_SECRET!);
+      return verifiedToken as TokenPayload;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  return null;
 }
 
 export async function authenticateToken(
@@ -28,11 +84,11 @@ export async function authenticateToken(
     return res.status(401).send({ status: "unauthorized" });
   }
 
-  try {
-    const verifiedToken = jwt.verify(token, process.env.TOKEN_SECRET!);
-    req.token = verifiedToken as jwt.Jwt;
+  const verifiedToken = await checkToken(token);
+  if (verifiedToken) {
+    req.token = verifiedToken as TokenPayload;
     next();
-  } catch (e) {
+  } else {
     return res.status(403).json({ status: "forbidden" });
   }
 }
@@ -43,20 +99,18 @@ export async function getToken(
   next: NextFunction,
 ) {
   const authHeader = req.headers["authorization"];
-  const token = authHeader && authHeader.split(" ")[1];
 
-  try {
-    if (token) {
-      const verifiedToken = jwt.verify(token, process.env.TOKEN_SECRET!);
+  const token = authHeader && authHeader.split(" ")[1];
+  if (token != null) {
+    const verifiedToken = await checkToken(token);
+    if (verifiedToken) {
       req.token = verifiedToken as jwt.Jwt;
     } else {
-      req.token = undefined;
+      return res.status(403).json({ status: "forbidden" });
     }
-
-    next();
-  } catch (e) {
-    return res.status(403).json({ status: "forbidden" });
   }
+
+  next();
 }
 
 export function decodeSocketData(
