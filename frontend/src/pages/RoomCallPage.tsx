@@ -8,13 +8,19 @@ import User from "../models/User";
 import { useUser } from "../helpers/UserProvider";
 import { useParams } from "react-router-dom";
 import dataService from "../services/data";
+import Peer from "peerjs";
 function RoomCallPage() {
     const localRef = useRef<HTMLVideoElement>(null);
+    const [peer, _setPeer] = useState<Peer>(new Peer({host: "/", port: 8000}));
+    const [peerId, setPeerId] = useState("");
     const [localStream, setLocalStream] = useState<MediaStream | null>(null);
     const friends: User[] = useSelector((state: RootState) => state.friends);
     const {socket, userId, user} = useUser();
     const params = useParams();
     const roomId = params.roomId;
+    peer.on("open", (peerId) => {
+        setPeerId(peerId);
+    });
     const getStream = async () => {
         const stream = await fetchUserMedia();
         setLocalStream(stream);
