@@ -117,6 +117,13 @@ io.on("connection", async (socket: Socket) => {
     }
   });
 
+  socket.on("name", (name) => {
+    const meetingRoom = getMeetingRoom();
+    if (meetingRoom) {
+      socket.to(meetingRoom).emit("name", name);
+    }
+  });
+
   socket.on("message", async (message) => {
     const { toUserId } = message;
     await addMessageToDb(message);

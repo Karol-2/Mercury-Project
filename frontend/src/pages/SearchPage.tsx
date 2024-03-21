@@ -7,10 +7,10 @@ import { useUser } from "../helpers/UserContext";
 import User from "../models/User";
 import { faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { useNavigate } from "react-router-dom";
 import editDistance from "../misc/editDistance";
 import Transition from "../components/Transition";
 import { useProtected } from "../helpers/Protected";
+import Paginator from "../components/Paginator";
 
 function SearchPage() {
   const [searchState, setSearchState] = useState("");
@@ -132,20 +132,20 @@ function SearchPage() {
                 </button>
               </form>
             </div>
-            <div>
-              {usersFound && usersFound.length > 0 ? (
-                usersFound.map((foundUser, index) => (
+            {usersFound && (
+              <Paginator
+                users={usersFound.map((match: [User, number]) => match[0])}
+                itemsPerPage={5}
+                renderItem={(user) => (
                   <FoundUser
-                    user={foundUser[0]}
-                    key={String(index)}
-                    currentId={user!.id}
-                    isFriend={isFriend(usersFriends, foundUser[0])}
+                    user={user}
+                    key={String(0)}
+                    currentId={user.id}
+                    isFriend={isFriend(usersFriends, user)}
                   />
-                ))
-              ) : (
-                <></>
-              )}
-            </div>
+                )}
+              />
+            )}
           </section>
           <Footer />
         </>

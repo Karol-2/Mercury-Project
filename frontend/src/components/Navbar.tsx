@@ -97,12 +97,17 @@ function Navbar(props: NavbarProps) {
             </div>
             {isOpen && (
               <div
+                data-testid="Dropdown-menu"
                 id="dropdown-menu"
                 className={`${menuPosition} ${menuColor} w-28 p-2 flex flex-col rounded-lg`}
                 onMouseEnter={handleDropdownEnter}
                 onMouseLeave={handleDropdownLeave}
               >
-                <button onClick={handleLogout} className={linkStyle}>
+                <button
+                  data-testid="Logout"
+                  onClick={handleLogout}
+                  className={linkStyle}
+                >
                   <FontAwesomeIcon icon={faRightFromBracket}></FontAwesomeIcon>
                   <span className=" ml-2 font-semibold">Logout</span>
                 </button>

@@ -48,6 +48,7 @@ export default function WelcomeMessage() {
                 id="buttons-section"
               >
                 <button
+                  data-testid="WelcomeLogin"
                   className="btn primary w-64 m-5 fade-in"
                   id="login-button"
                   onClick={() => redirectToLogin()}
@@ -56,6 +57,7 @@ export default function WelcomeMessage() {
                 </button>
                 <Link to="/register">
                   <button
+                    data-testid="WelcomeRegister"
                     className="btn secondary w-64 m-5 text-my-light fade-in"
                     id="register-button"
                     onClick={scrollToTop}

@@ -1,4 +1,5 @@
 import { Router, Request, Response } from "express";
+import bcrypt from "bcrypt";
 import driver from "../driver/driver.js";
 import { JWTRequest, authenticateToken } from "../misc/jwt.js";
 import {
@@ -19,8 +20,11 @@ import {
   deleteUser,
   UserCreateResult,
   registerUser,
+  getDbUser,
+  changePassword,
 } from "../users.js";
 import DbUser from "../models/DbUser.js";
+import { ChangePasswordReq } from "../models/ChangePasswordReq.js";
 
 const usersRouter = Router();
 
@@ -190,6 +194,70 @@ usersRouter.put("/:userId", async (req: Request, res: OkErrorResponse) => {
     session.close();
   }
 });
+
+usersRouter.post(
+  "/:userId/change-password",
+  async (req: Request, res: OkErrorResponse) => {
+    const userId = req.params.userId;
+
+    const passwords: ChangePasswordReq = req.body;
+    const { old_password, new_password, repeat_password } = passwords;
+
+    const errors: Record<string, string> = {};
+
+    console.log("ASLD", req.body)
+    if (!old_password) {
+      errors["old_password"] = "is empty";
+    }
+
+    if (!new_password) {
+      errors["new_password"] = "is empty";
+    }
+
+    if (!repeat_password) {
+      errors["repeat_password"] = "is empty";
+    }
+
+    for (const _ in errors) {
+      return res.status(400).json({ status: "error", errors });
+    }
+
+    const session = driver.session();
+    try {
+      const user = await getDbUser(session, { id: userId });
+
+      if (!user) {
+        return userNotFoundRes(res);
+      }
+
+      const changeStatus = await changePassword(
+        session,
+        user,
+        old_password,
+        new_password,
+        repeat_password,
+      );
+
+      if (changeStatus == "verify") {
+        return res
+          .status(400)
+          .json({ status: "error", errors: { "old_password": "incorrect" } });
+      } else if (changeStatus == "repeat") {
+        return res.status(400).json({
+          status: "error",
+          errors: { "repeat_password": "passwords don't match" },
+        });
+      }
+
+      return res.json({ status: "ok" });
+    } catch (err) {
+      console.log("Error:", err);
+      return res.status(404).json({ status: "error", errors: err as object });
+    } finally {
+      session.close();
+    }
+  },
+);
 
 usersRouter.delete("/:userId", async (req: Request, res: OkErrorResponse) => {
   const userId = req.params.userId;

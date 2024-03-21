@@ -20,12 +20,15 @@ import { store } from "./redux/store.ts";
 import MeetingProvider from "./helpers/MeetingProvider.tsx";
 import Protected from "./helpers/Protected.tsx";
 import KeycloakUserProvider from "./helpers/KeycloakUserProvider.tsx";
+import EditDataPage from "./pages/EditDataPage.tsx";
+import RestUserProvider from "./helpers/RestUserProvider.tsx";
 
 const body = document.getElementsByTagName("body")[0]!;
 body.className = "bg-my-darker text-my-light";
 
 const protectedRoutes = [
   { path: "/profile", element: <ProfilePage /> },
+  { path: "/edit", element: <EditDataPage /> },
   { path: "/messages/:friendId", element: <MessagingPage /> },
   { path: "/friends", element: <FriendsPage /> },
   { path: "/search", element: <SearchPage /> },
@@ -36,7 +39,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
   <Provider store={store}>
     <AnimatePresence mode="wait">
       <Router>
-        <KeycloakUserProvider>
+        <RestUserProvider>
           <MeetingProvider>
             <Routes location={location} key={location.pathname}>
               <Route path="/" element={<HomePage />} />
@@ -52,7 +55,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
               <Route path="/*" element={<PageNotFound />} />
             </Routes>
           </MeetingProvider>
-        </KeycloakUserProvider>
+        </RestUserProvider>
       </Router>
     </AnimatePresence>
   </Provider>,

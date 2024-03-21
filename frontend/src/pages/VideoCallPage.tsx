@@ -7,20 +7,37 @@ import { Socket } from "socket.io-client";
 import stunServers from "../stun/stunServers";
 import Meeting from "../models/Meeting";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPhoneSlash} from "@fortawesome/free-solid-svg-icons";
+import {
+  faPhoneSlash,
+  faMicrophone,
+  faMicrophoneSlash,
+  faVideo,
+  faVideoSlash,
+} from "@fortawesome/free-solid-svg-icons";
 import { useMeeting } from "../helpers/MeetingProvider";
+import { useProtected } from "../helpers/Protected";
 
 function VideoCallPage() {
+  const { user } = useProtected();
   const { socket } = useUser();
   const { meeting, leaveMeeting } = useMeeting();
-  const firstRefresh = useRef<boolean>(true);
   const navigate = useNavigate();
+
+  const firstRefresh = useRef<boolean>(true);
+
+  const [stream, setStream] = useState<MediaStream | null>(null);
   const localStream = useRef<HTMLVideoElement>(null);
   const remoteStream = useRef<HTMLVideoElement>(null);
-  const [makingOffer, setMakingOffer] = useState(false);
-  const peerConnectionRef = useRef<RTCPeerConnection | null>(null);
 
+  const [makingOffer, setMakingOffer] = useState(false);
+
+  const [audio, setAudio] = useState(true);
+  const [video, setVideo] = useState(true);
+
+  const peerConnectionRef = useRef<RTCPeerConnection | null>(null);
   const getPeerConnection = () => peerConnectionRef.current;
+
+  const [yourParticipant, setYourParticipant] = useState("");
 
   useEffect(() => {
     if (!meeting) {
@@ -38,6 +55,31 @@ function VideoCallPage() {
     }
   }, []);
 
+  async function startStopAudio() {
+    if (stream) {
+      const tracks = stream.getAudioTracks();
+      if (audio) {
+        setAudio(false);
+        tracks.forEach((track) => (track.enabled = false));
+      } else {
+        setAudio(true);
+        tracks.forEach((track) => (track.enabled = true));
+      }
+    }
+  }
+  async function startStopVideo() {
+    if (stream) {
+      const tracks = stream.getVideoTracks();
+      if (video) {
+        setVideo(false);
+        tracks.forEach((track) => (track.enabled = false));
+      } else {
+        setVideo(true);
+        tracks.forEach((track) => (track.enabled = true));
+      }
+    }
+  }
+
   async function prepareWebRTC(
     socket: Socket,
     meeting: Meeting,
@@ -50,6 +92,7 @@ function VideoCallPage() {
         audio: true,
         video: true,
       });
+      setStream(stream);
       stream.getTracks().forEach((track) => {
         peerConnection.addTrack(track, stream);
       });
@@ -85,7 +128,6 @@ function VideoCallPage() {
       const peerConnection = getPeerConnection();
       if (!peerConnection) return;
 
-      console.log("SOCKET: description");
       const offerCollision =
         description.type === "offer" &&
         (makingOffer || peerConnection.signalingState !== "stable");
@@ -99,18 +141,22 @@ function VideoCallPage() {
         await peerConnection.setLocalDescription();
         socket.emit("description", peerConnection.localDescription!);
       }
+      socket.emit("name", `${user?.first_name} ${user?.last_name}`);
     });
 
     socket.on("iceCandidate", async (candidate) => {
       const peerConnection = getPeerConnection();
       if (!peerConnection) return;
 
-      console.log("SOCKET: iceCandidate");
       try {
         await peerConnection.addIceCandidate(candidate);
       } catch (err) {
         console.error(err);
       }
+    });
+
+    socket.on("name", (name) => {
+      setYourParticipant(name);
     });
   }
 
@@ -166,12 +212,40 @@ function VideoCallPage() {
             playsInline
           ></video>
         </div>
+        <div className="flex">
+          <span className="flex-1 text-center">
+            {user?.first_name + " " + user?.last_name}
+          </span>
+          <span className="flex-1 text-center">{yourParticipant}</span>
+        </div>
       </div>
-      <div className=" flex justify-center">
-        <button onClick={() => handleLeaveMeeting()} className="btn bg-my-red p-6">
-          <FontAwesomeIcon icon={faPhoneSlash}></FontAwesomeIcon>
-          <span className="ml-2">Leave</span>
-        </button>
+      <div className="flex px-10">
+        <div className="flex-1"></div>
+        <div className="flex flex-1 justify-center">
+          <button className="btn p-6" onClick={startStopAudio}>
+            {audio ? (
+              <FontAwesomeIcon icon={faMicrophone} />
+            ) : (
+              <FontAwesomeIcon icon={faMicrophoneSlash} />
+            )}
+          </button>
+          <button className="btn p-6" onClick={startStopVideo}>
+            {video ? (
+              <FontAwesomeIcon icon={faVideo} />
+            ) : (
+              <FontAwesomeIcon icon={faVideoSlash} />
+            )}
+          </button>
+        </div>
+        <div className="flex flex-1 justify-end">
+          <button
+            onClick={() => handleLeaveMeeting()}
+            className="btn bg-my-red p-6"
+          >
+            <FontAwesomeIcon icon={faPhoneSlash}></FontAwesomeIcon>
+            <span className="ml-2">Leave</span>
+          </button>
+        </div>
       </div>
       <Footer />
     </>

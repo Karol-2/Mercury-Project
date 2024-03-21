@@ -256,6 +256,57 @@ export async function updateUser(
   return true;
 }
 
+export type ChangePasswordSuccess = "success";
+export type ChangePasswordError = "verify" | "repeat";
+export type ChangePasswordResult = ChangePasswordSuccess | ChangePasswordError;
+
+export async function changePassword(
+  session: Session,
+  user: DbUser,
+  oldPassword: string,
+  newPassword: string,
+  repeatPassword: string,
+): Promise<ChangePasswordResult> {
+  if (!("password" in user)) {
+    if (user.issuer == "mercury") {
+      const keycloakUser = await kcAdminClient.users.findOne({
+        id: user.issuer_id,
+      });
+
+      const requiredActions = keycloakUser?.requiredActions || [];
+      requiredActions.push("UPDATE_PASSWORD");
+
+      await kcAdminClient.users.update(
+        { id: user.issuer_id },
+        {
+          requiredActions,
+        },
+      );
+      return "success";
+    } else {
+      throw new Error("not implemented");
+    }
+  }
+
+  const match: boolean = await bcrypt.compare(oldPassword, user.password);
+  if (!match) {
+    return "verify";
+  }
+
+  if (newPassword != repeatPassword) {
+    return "repeat";
+  }
+
+  const passwordHashed = await bcrypt.hash(newPassword, 10);
+  const updatedUser = { ...user, password: passwordHashed };
+
+  await session.run(`MATCH (u:User {id: $userId}) SET u=$user`, {
+    userId: user.id,
+    user: updatedUser,
+  });
+  return "success";
+}
+
 export async function deleteUser(
   session: Session,
   userId: string,
