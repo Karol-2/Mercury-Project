@@ -203,31 +203,32 @@ usersRouter.post(
     const passwords: ChangePasswordReq = req.body;
     const { old_password, new_password, repeat_password } = passwords;
 
-    const errors: Record<string, string> = {};
-
-    console.log("ASLD", req.body)
-    if (!old_password) {
-      errors["old_password"] = "is empty";
-    }
-
-    if (!new_password) {
-      errors["new_password"] = "is empty";
-    }
-
-    if (!repeat_password) {
-      errors["repeat_password"] = "is empty";
-    }
-
-    for (const _ in errors) {
-      return res.status(400).json({ status: "error", errors });
-    }
-
     const session = driver.session();
     try {
       const user = await getDbUser(session, { id: userId });
 
       if (!user) {
         return userNotFoundRes(res);
+      }
+
+      if ("password" in user) {
+        const errors: Record<string, string> = {};
+
+        if (!old_password) {
+          errors["old_password"] = "is empty";
+        }
+
+        if (!new_password) {
+          errors["new_password"] = "is empty";
+        }
+
+        if (!repeat_password) {
+          errors["repeat_password"] = "is empty";
+        }
+
+        for (const _ in errors) {
+          return res.status(400).json({ status: "error", errors });
+        }
       }
 
       const changeStatus = await changePassword(
