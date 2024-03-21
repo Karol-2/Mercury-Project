@@ -10,9 +10,13 @@ import { useNavigate } from "react-router-dom";
 
 function RestUserProvider({ children }: { children: React.ReactNode }) {
   const navigate = useNavigate();
-  
+  const provider = "rest";
+
   const [userState, setUserState] = useState<UserState>({ status: "loading" });
-  const user = useMemo(() => userState.status == "logged_in" ? userState.user : null, [userState])
+  const user = useMemo(
+    () => (userState.status == "logged_in" ? userState.user : null),
+    [userState],
+  );
   const [token, setToken] = useState<object | null>(null);
   const [socket, setSocket] = useState<Socket | null>(null);
 
@@ -76,7 +80,7 @@ function RestUserProvider({ children }: { children: React.ReactNode }) {
 
   const redirectToLogin = () => {
     navigate("/login");
-  }
+  };
 
   const login = async (mail: string, password: string) => {
     if (userState.status == "logged_in") return;
@@ -144,7 +148,7 @@ function RestUserProvider({ children }: { children: React.ReactNode }) {
   const updateUser = async (updateUser: Partial<User>) => {
     if (userState.status != "logged_in") return false;
 
-    const user = {...userState.user, ...updateUser};
+    const user = { ...userState.user, ...updateUser };
     const response = await dataService.fetchData(`/users/${user.id}`, "PUT", {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(user),
@@ -194,6 +198,7 @@ function RestUserProvider({ children }: { children: React.ReactNode }) {
   return (
     <UserContext.Provider
       value={{
+        provider,
         user,
         userState,
         socket,

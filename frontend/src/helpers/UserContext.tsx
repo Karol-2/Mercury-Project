@@ -4,6 +4,7 @@ import User, { FrontendUser } from "../models/User";
 import UserState from "../models/UserState";
 
 export interface UserContextValue {
+  provider: string;
   user: User | null;
   userState: UserState;
   socket: Socket | null;

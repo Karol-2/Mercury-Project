@@ -9,6 +9,7 @@ import { useNavigate } from "react-router-dom";
 
 function KeycloakUserProvider({ children }: { children: React.ReactNode }) {
   const navigate = useNavigate();
+  const provider = "keycloak";
   const [userState, setUserState] = useState<UserState>({ status: "loading" });
   const user = useMemo(
     () => (userState.status == "logged_in" ? userState.user : null),
@@ -184,6 +185,7 @@ function KeycloakUserProvider({ children }: { children: React.ReactNode }) {
   return (
     <UserContext.Provider
       value={{
+        provider,
         user,
         userState,
         socket,
