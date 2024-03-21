@@ -65,10 +65,27 @@ export async function createUser(
   session: Session,
   userData: CreateUser,
 ): Promise<UserCreateResult> {
-  const existsUser = await getUser(session, { mail: userData.mail });
+  if ("password" in userData) {
+    const existsUser = await getDbUser(session, { mail: userData.mail });
 
-  if (existsUser) {
-    return { errors: { id: "already exists" } };
+    if (existsUser) {
+      return { errors: { id: "already exists" } };
+    }
+  } else {
+    const existsUser = (await getDbUser(session, {
+      mail: userData.mail,
+      issuer: userData.issuer,
+    })) as (DbUser & ExternalUser) | null;
+
+    if (existsUser) {
+      if (existsUser.issuer_id != userData.issuer_id) {
+        await updateUser(session, existsUser.id, {
+          issuer_id: userData.issuer_id,
+        });
+      }
+
+      return { errors: { id: "already exists" } };
+    }
   }
 
   const firstNameEmbedding = wordToVec(userData.first_name);
@@ -148,7 +165,7 @@ export async function getUser(
 
 export async function getDbUser(
   session: Session,
-  props: Partial<User>,
+  props: Partial<DbUser>,
 ): Promise<DbUser | null> {
   const propsStr = Object.keys(props)
     .map((k) => `${k}: $${k}`)
@@ -207,7 +224,7 @@ export async function searchUser(
 export async function updateUser(
   session: Session,
   userId: string,
-  newUserProps: Partial<User>,
+  newUserProps: Partial<DbUser>,
 ): Promise<boolean> {
   const user = await getDbUser(session, { id: userId });
   if (!user) {
@@ -215,10 +232,19 @@ export async function updateUser(
   }
 
   if (!("password" in user) && user.issuer == "mercury") {
-    await kcAdminClient.users.update({ id: user.issuer_id }, {
-      firstName: newUserProps.first_name,
-      lastName: newUserProps.last_name
+    const keycloakUser = await kcAdminClient.users.findOne({
+      id: user.issuer_id,
     });
+
+    if (keycloakUser) {
+      await kcAdminClient.users.update(
+        { id: user.issuer_id },
+        {
+          firstName: newUserProps.first_name,
+          lastName: newUserProps.last_name,
+        },
+      );
+    }
   }
 
   const newUser = { ...user, ...newUserProps };
