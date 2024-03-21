@@ -8,24 +8,41 @@ import User from "../models/User";
 import { useUser } from "../helpers/UserProvider";
 import { useParams } from "react-router-dom";
 import dataService from "../services/data";
+import RoomPeerVideo from "../components/RoomPeerVideo";
 function RoomCallPage() {
     const localRef = useRef<HTMLVideoElement>(null);
-    //const peerConfig = useSelector((state: RootState) => state.peer);
-    //const {userId: peerId, peer} = peerConfig;
+    const peerConfig = useSelector((state: RootState) => state.peer);
+    const {peer} = peerConfig;
     const [localStream, setLocalStream] = useState<MediaStream | null>(null);
+    const [remoteStreams, setRemoteStreams] = useState<Set<MediaStream>>(new Set());
     const friends: User[] = useSelector((state: RootState) => state.friends);
     const {socket, userId, user} = useUser();
-    socket?.on("userConnected", (newPeerId) => {
-        console.log("[NEW USER]: ", newPeerId);
-    });
     const params = useParams();
     const roomId = params.roomId;
-    
+    peer.on("call", async (call) => {
+        if (localStream) {
+            call.answer(localStream);
+        } else {
+            const stream = await fetchUserMedia();
+            setLocalStream(stream);
+            call.answer(stream);
+        }
+        call.on("stream", (remoteStream: MediaStream) => {
+            setRemoteStreams(prev => new Set([...prev, remoteStream]));
+        });
+    });
+    const connectToNewUser = (newPeerId: string, stream: MediaStream) => {
+        const call = peer.call(newPeerId, stream);
+        call.on("stream", (remoteStream: MediaStream) => {
+            setRemoteStreams(prev => new Set([...prev, remoteStream]));
+        });
+    }
     const prepareWebRTC = async () => {
         const stream = await fetchUserMedia();
         setLocalStream(stream);
-        localRef.current!.srcObject = stream;
-        localRef.current!.play();
+        socket?.on("userConnected", (newPeerId) => {
+            connectToNewUser(newPeerId, stream);
+        });
     }
     const inviteFriendToRoom = async (friendId: string) => {
         const myFullName = `${user?.first_name} ${user?.last_name}`;
@@ -43,6 +60,12 @@ function RoomCallPage() {
     useEffect(() => {
         prepareWebRTC();
     }, []);
+    useEffect(() => {
+        if (localRef.current && localStream) {
+            localRef.current.srcObject = localStream;
+            localRef.current.play();
+        }
+    }, [localRef.current, localStream]);
     return (
         <>
             <Navbar />
@@ -53,6 +76,7 @@ function RoomCallPage() {
                             ref={localRef}
                         ></video>
                     </div>
+                    {Array.from(remoteStreams).map((remoteStream,idx) => <RoomPeerVideo key={idx} remoteStream={remoteStream} />)}
                 </section>
                 <section>
                     <h3><strong>Invite</strong></h3>
