@@ -1,10 +1,4 @@
-import {
-  ChangeEvent,
-  FormEvent,
-  FormEventHandler,
-  ReactEventHandler,
-  useState,
-} from "react";
+import { ChangeEvent, FormEvent, useState } from "react";
 import User from "../models/User";
 import { changePasswordSchema } from "../models/RegisterUserSchema";
 import { useNavigate } from "react-router-dom";
@@ -21,7 +15,7 @@ export interface EditDetails {
 
 function EditPassword(props: EditDetails) {
   const { provider, user, redirectToLogin, logout } = props;
-  console.log(redirectToLogin)
+  console.log(redirectToLogin);
   const navigate = useNavigate();
 
   const { register, handleSubmit, formState } = useForm<PasswordForm>({

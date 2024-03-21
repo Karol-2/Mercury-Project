@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import User, { FrontendUser } from "../models/User";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { userEditDetails } from "../models/RegisterUserSchema";
-import { ChangeEvent, Dispatch, SetStateAction, useState } from "react";
+import { ChangeEvent, useState } from "react";
 import countriesData from "../assets/countries.json";
 import Select from "react-select";
 

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useContext, useMemo } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 import { isExpired, decodeToken } from "react-jwt";
 import Cookies from "js-cookie";
 import dataService from "../services/data";

@@ -1,11 +1,10 @@
 import { useNavigate } from "react-router-dom";
 import User from "../models/User";
-import { Dispatch, SetStateAction, useState } from "react";
+import { useState } from "react";
 
 export interface EditDetails {
   user: User;
   updateUser: (updateUser: Partial<User>) => Promise<boolean>;
-  setUser: Dispatch<SetStateAction<User | null | undefined>>;
 }
 
 function EditPhoto(props: EditDetails) {

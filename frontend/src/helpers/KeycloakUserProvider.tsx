@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useContext, useMemo } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 import dataService from "../services/data";
 import User, { FrontendUser } from "../models/User";
 import { Socket, io } from "socket.io-client";
@@ -167,7 +167,6 @@ function KeycloakUserProvider({ children }: { children: React.ReactNode }) {
       setUserAnonymous();
 
       if (keycloakRef.current) {
-        const keycloak = keycloakRef.current;
         navigate("/");
       }
 

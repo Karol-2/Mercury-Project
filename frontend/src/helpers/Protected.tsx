@@ -1,7 +1,6 @@
 import { createContext, useContext, useEffect } from "react";
 import { useUser } from "./UserContext";
 import User from "../models/User";
-import { useNavigate } from "react-router-dom";
 
 export interface ProtectedContextValue {
   user: User;
