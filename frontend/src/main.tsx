@@ -21,7 +21,6 @@ import MeetingProvider from "./helpers/MeetingProvider.tsx";
 import Protected from "./helpers/Protected.tsx";
 import KeycloakUserProvider from "./helpers/KeycloakUserProvider.tsx";
 import EditDataPage from "./pages/EditDataPage.tsx";
-import RestUserProvider from "./helpers/RestUserProvider.tsx";
 
 const body = document.getElementsByTagName("body")[0]!;
 body.className = "bg-my-darker text-my-light";
@@ -39,7 +38,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
   <Provider store={store}>
     <AnimatePresence mode="wait">
       <Router>
-        <RestUserProvider>
+        <KeycloakUserProvider>
           <MeetingProvider>
             <Routes location={location} key={location.pathname}>
               <Route path="/" element={<HomePage />} />
@@ -55,7 +54,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
               <Route path="/*" element={<PageNotFound />} />
             </Routes>
           </MeetingProvider>
-        </RestUserProvider>
+        </KeycloakUserProvider>
       </Router>
     </AnimatePresence>
   </Provider>,

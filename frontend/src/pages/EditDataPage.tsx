@@ -8,7 +8,7 @@ import EditPassword from "../components/EditPassword";
 import { useUser } from "../helpers/UserContext";
 
 function EditDataPage() {
-  const { user, updateUser, setUser, logout } = useUser();
+  const { provider, user, updateUser, redirectToLogin, logout } = useUser();
   const [showAnimation, setShowAnim] = useState(false);
   const [showContent, setShowContent] = useState(false);
 
@@ -32,10 +32,9 @@ function EditDataPage() {
             <EditDetails
               user={user}
               updateUser={updateUser}
-              setUser={setUser}
             />
-            <EditPhoto user={user} updateUser={updateUser} setUser={setUser} />
-            <EditPassword user={user} logout={logout} />
+            <EditPhoto user={user} updateUser={updateUser} />
+            <EditPassword provider={provider} user={user} redirectToLogin={redirectToLogin} logout={logout} />
           </div>
         </>
       ) : (
