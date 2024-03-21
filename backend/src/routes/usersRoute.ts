@@ -1,8 +1,9 @@
 import { Router, Request, Response } from "express";
 import bcrypt from "bcrypt";
 import driver from "../driver/driver.js";
-import { JWTRequest, authenticateToken } from "../misc/jwt.js";
+import { JWTRequest, authenticateToken, getToken, checkToken } from "../misc/jwt.js";
 import {
+    AuthOkErrorResponse,
   FriendsErrorResponse,
   OkErrorResponse,
   UserErrorResponse,
@@ -25,6 +26,7 @@ import {
 } from "../users.js";
 import DbUser from "../models/DbUser.js";
 import { ChangePasswordReq } from "../models/ChangePasswordReq.js";
+import kcAdminClient from "../kcAdminClient.js";
 
 const usersRouter = Router();
 
@@ -197,7 +199,8 @@ usersRouter.put("/:userId", async (req: Request, res: OkErrorResponse) => {
 
 usersRouter.post(
   "/:userId/change-password",
-  async (req: Request, res: OkErrorResponse) => {
+  getToken,
+  async (req: JWTRequest, res: AuthOkErrorResponse) => {
     const userId = req.params.userId;
 
     const passwords: ChangePasswordReq = req.body;
@@ -228,6 +231,10 @@ usersRouter.post(
 
         for (const _ in errors) {
           return res.status(400).json({ status: "error", errors });
+        }
+      } else {
+        if (!req.token) {
+          return res.status(403).json({ status: "forbidden" });
         }
       }
 
