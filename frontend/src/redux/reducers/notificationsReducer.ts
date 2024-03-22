@@ -1,8 +1,15 @@
+const doesNotificationRepeat = (notification: any, notificationArray: any[]) => {
+  const doesExist = notificationArray.find(n => n.roomId === notification.roomId);
+  return !!doesExist;
+}
 export default (state = [], action: any) => {
     if (action.type === "SET_NOTIFICATIONS") {
-      return action.payload.notifications;
+      return action.payload.notifications.reduce((acum: any,item: any) => {
+        return doesNotificationRepeat(item, acum) ? acum : [...acum, item];
+      }, []);
     } else if (action.type === "ADD_NOTIFICATION") {
-      return [...state, action.payload.notification];
+      return doesNotificationRepeat(action.payload.notification, state) 
+      ? state : [...state, action.payload.notification];
     } else {
       return state;
     }
