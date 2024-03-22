@@ -7,6 +7,7 @@ export interface UserContextValue {
   provider: string;
   user: User | null;
   userState: UserState;
+  token?: string;
   socket: Socket | null;
   login: (mail: string, password: string) => Promise<void>;
   redirectToLogin: () => void;

@@ -18,6 +18,7 @@ function KeycloakUserProvider({ children }: { children: React.ReactNode }) {
   const [socket, setSocket] = useState<Socket | null>(null);
 
   const keycloakRef = useRef<Keycloak | null>(null);
+  const [token, setToken] = useState<string | undefined>()
 
   const updateUserData = async () => {
     const keycloak = keycloakRef.current!;
@@ -48,7 +49,10 @@ function KeycloakUserProvider({ children }: { children: React.ReactNode }) {
       realm: "mercury",
       clientId: "mercury-client",
     });
-    keycloak.onAuthSuccess = () => updateUserData();
+    keycloak.onAuthSuccess = () => {
+      updateUserData();
+      setToken(keycloak.token)
+    }
 
     keycloakRef.current = keycloak;
   });
@@ -188,6 +192,7 @@ function KeycloakUserProvider({ children }: { children: React.ReactNode }) {
         provider,
         user,
         userState,
+        token,
         socket,
         login,
         redirectToLogin,
