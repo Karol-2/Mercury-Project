@@ -16,6 +16,7 @@ import FoundUser from "../components/FoundUser";
 import Friend from "../components/Friend";
 import Paginator from "../components/Paginator";
 import { RootState } from "../redux/store";
+import { v4 } from "uuid";
 
 function FriendsPage() {
   const navigate = useNavigate();
@@ -101,6 +102,11 @@ function FriendsPage() {
     }
   };
 
+  const createRoom = () => {
+    const roomId = v4();
+    navigate(`/room/${roomId}`);
+  }
+
   useEffect(() => {
     if (meeting?.id) {
       navigate("/meeting");
@@ -123,7 +129,7 @@ function FriendsPage() {
                   <FontAwesomeIcon icon={faPlus}></FontAwesomeIcon>
                   <span className="ml-2">Create a room</span>
                 </button>
-                <button onClick={() => navigate(`/room/abcd`)}>Test room</button>
+                <button onClick={() => createRoom()}>Test room</button>
                 <h1 className="text-3xl font-bold">Friends:</h1>
                 <hr className="text-my-orange"></hr>
                 <ul className="">
