@@ -17,7 +17,9 @@ const issuers: Record<Issuer, string> = {
 };
 
 export function generateAccessToken(userId: string) {
-  return jwt.sign({ iss: issuers["rest"], userId }, process.env.TOKEN_SECRET!, { expiresIn: 900 });
+  return jwt.sign({ iss: issuers["rest"], userId }, process.env.TOKEN_SECRET!, {
+    expiresIn: 900,
+  });
 }
 
 export function generateRefreshToken(userId: string) {
@@ -50,7 +52,10 @@ export async function verifyKeycloakToken(tokenStr: string): Promise<boolean> {
 export async function checkToken(
   tokenStr: string,
 ): Promise<TokenPayload | null> {
-  const tokenDecoded = jwt.decode(tokenStr) as TokenPayload;
+  const tokenDecoded = jwt.decode(tokenStr) as TokenPayload | null;
+  if (!tokenDecoded) {
+    return null;
+  }
 
   const issuer = tokenIssuerToName(tokenDecoded.iss || "");
 
