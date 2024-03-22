@@ -4,6 +4,7 @@ import { AuthResponse, CustomResponse } from "../models/Response.js";
 import DecodedData from "../models/DecodedData.js";
 import Issuer from "../models/Issuer.js";
 import TokenPayload from "../models/TokenPayload.js";
+import { keycloakUri } from "../kcAdminClient.js";
 
 export interface JWTRequest extends Request {
   token?: TokenPayload;
@@ -11,7 +12,7 @@ export interface JWTRequest extends Request {
 }
 
 const issuers: Record<Issuer, string> = {
-  mercury: "http://localhost:3000/realms/mercury",
+  mercury: `${keycloakUri}/realms/mercury`,
   rest: "http://localhost:5000",
 };
 
@@ -34,7 +35,7 @@ function tokenIssuerToName(issuer: string): Issuer | "unknown" {
 
 export async function verifyKeycloakToken(tokenStr: string): Promise<boolean> {
   const response = await fetch(
-    "http://localhost:3000/realms/mercury/protocol/openid-connect/userinfo",
+    `${keycloakUri}/realms/mercury/protocol/openid-connect/userinfo`,
     {
       method: "GET",
       headers: {

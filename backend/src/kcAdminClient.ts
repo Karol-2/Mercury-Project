@@ -1,7 +1,9 @@
 import KeycloakAdminClient from "@keycloak/keycloak-admin-client";
 
+export const keycloakUri = process.env.KEYCLOAK_URI || "http://localhost:3000"
+
 const kcAdminClient = new KeycloakAdminClient({
-  baseUrl: "http://localhost:3000",
+  baseUrl: keycloakUri,
   realmName: "mercury",
 });
 

@@ -44,7 +44,7 @@ function KeycloakUserProvider({ children }: { children: React.ReactNode }) {
     }
 
     const keycloak = new Keycloak({
-      url: "http://localhost:3000",
+      url: import.meta.env.VITE_KEYCLOAK_URI,
       realm: "mercury",
       clientId: "mercury-client",
     });
