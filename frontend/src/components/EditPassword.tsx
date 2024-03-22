@@ -104,9 +104,9 @@ function EditPassword(props: EditDetails) {
     if (provider == "rest") {
       return handleSubmit(submit);
     } else if (provider == "keycloak") {
-      return (e: FormEvent) => {
+      return async (e: FormEvent) => {
         e.preventDefault();
-        editPassword();
+        await editPassword();
         redirectToLogin();
       };
     } else {
@@ -166,7 +166,7 @@ function EditPassword(props: EditDetails) {
           className="btn small bg-my-orange disabled:bg-my-dark"
           value="Change"
         />
-        <p>WARNING: You will be logged out!</p>
+        {provider == "rest" && <p>WARNING: You will be logged out!</p>}
       </form>
     </div>
   );
