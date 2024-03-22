@@ -53,7 +53,7 @@ authRouter.post("/login", async (req: Request, res: TokenErrorResponse) => {
     console.log("Error:", err);
     return res.status(404).json({ status: "error", errors: err as object });
   } finally {
-    session.close();
+    await session.close();
   }
 });
 

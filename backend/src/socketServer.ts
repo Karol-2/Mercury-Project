@@ -45,7 +45,7 @@ io.on("connection", async (socket: Socket) => {
 
   const session = driver.session();
   await connectToSocket(session, userId, socket.id);
-  session.close();
+  await session.close();
 
   console.log("Client connected");
 
@@ -65,7 +65,7 @@ io.on("connection", async (socket: Socket) => {
     }
 
     socket.emit("createdMeeting", getMeeting());
-    session.close();
+    await session.close();
   });
 
   socket.on("joinMeeting", async (message) => {
@@ -90,13 +90,13 @@ io.on("connection", async (socket: Socket) => {
     }
 
     socket.emit("joinedMeeting", getMeeting());
-    session.close();
+    await session.close();
   });
 
   socket.on("leaveMeeting", async () => {
     const session = driver.session();
     await leaveMeeting(session, userId);
-    session.close();
+    await session.close();
 
     setMeeting(null);
     console.log(`User ${userId} left the meeting`);
@@ -131,7 +131,7 @@ io.on("connection", async (socket: Socket) => {
     const session = driver.session();
     const sendSockets = await getAllSockets(session, userId);
     const receiveSockets = await getAllSockets(session, toUserId);
-    session.close();
+    await session.close();
 
     sendSockets.forEach((userSocket) => {
       socket.to(userSocket.id).emit("message", message);
@@ -147,7 +147,7 @@ io.on("connection", async (socket: Socket) => {
     const session = driver.session();
     await leaveMeeting(session, userId);
     await disconnectFromSocket(session, userId, socket.id);
-    session.close();
+    await session.close();
     setMeeting(null);
     console.log("Client disconnected");
   });

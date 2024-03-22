@@ -147,7 +147,7 @@ export async function registerUser(
       throw e;
     }
   } finally {
-    session.close();
+    await session.close();
   }
 }
 

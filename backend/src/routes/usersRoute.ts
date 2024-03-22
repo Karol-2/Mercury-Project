@@ -46,7 +46,7 @@ usersRouter.get("/", async (_req: Request, res: UsersErrorResponse) => {
     console.log("Error:", err);
     return res.status(404).json({ status: "error", errors: err as object });
   } finally {
-    session.close();
+    await session.close();
   }
 });
 
@@ -90,7 +90,7 @@ usersRouter.get(
       console.log("Error:", err);
       return res.status(404).json({ status: "error", errors: err as object });
     } finally {
-      session.close();
+      await session.close();
     }
   },
 );
@@ -123,7 +123,7 @@ usersRouter.get("/:userId", async (req: Request, res: UserErrorResponse) => {
     console.log("Error:", err);
     return res.status(404).json({ status: "error", errors: err as object });
   } finally {
-    session.close();
+    await session.close();
   }
 });
 
@@ -144,7 +144,7 @@ usersRouter.get(
       console.log("Error:", err);
       return res.status(404).json({ status: "error", errors: err as object });
     } finally {
-      session.close();
+      await session.close();
     }
   },
 );
@@ -172,7 +172,7 @@ usersRouter.post("/", async (req: Request, res: UserErrorResponse) => {
     console.log("Error:", err);
     return res.status(404).json({ status: "error", errors: err as object });
   } finally {
-    session.close();
+    await session.close();
   }
 });
 
@@ -193,7 +193,7 @@ usersRouter.put("/:userId", async (req: Request, res: OkErrorResponse) => {
     console.log("Error:", err);
     return res.status(404).json({ status: "error", errors: err as object });
   } finally {
-    session.close();
+    await session.close();
   }
 });
 
@@ -262,7 +262,7 @@ usersRouter.post(
       console.log("Error:", err);
       return res.status(404).json({ status: "error", errors: err as object });
     } finally {
-      session.close();
+      await session.close();
     }
   },
 );
@@ -282,7 +282,7 @@ usersRouter.delete("/:userId", async (req: Request, res: OkErrorResponse) => {
     console.log("Error:", err);
     return res.status(404).json({ status: "error", errors: err as object });
   } finally {
-    session.close();
+    await session.close();
   }
 });
 

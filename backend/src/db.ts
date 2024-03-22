@@ -15,7 +15,7 @@ export async function isDatabaseEmpty() {
     console.error("Error while loading database:", error);
     return false;
   } finally {
-    session.close();
+    await session.close();
   }
 }
 
@@ -88,7 +88,7 @@ export async function importInitialData() {
   } catch (error) {
     return "Error importing data";
   } finally {
-    session.close();
+    await session.close();
   }
 }
 
@@ -96,5 +96,5 @@ export async function cleanUpData() {
   const session = driver.session();
   await session.run(`MATCH (m:Meeting) DETACH DELETE m`);
   await session.run(`MATCH (s:Socket) DETACH DELETE s`);
-  session.close();
+  await session.close();
 }
