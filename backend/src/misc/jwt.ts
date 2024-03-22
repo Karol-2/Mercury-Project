@@ -4,7 +4,7 @@ import { AuthResponse, CustomResponse } from "../models/Response.js";
 import DecodedData from "../models/DecodedData.js";
 import Issuer from "../models/Issuer.js";
 import TokenPayload from "../models/TokenPayload.js";
-import { keycloakUri } from "../kcAdminClient.js";
+import { keycloakIssuer, keycloakUri } from "../kcAdminClient.js";
 
 export interface JWTRequest extends Request {
   token?: TokenPayload;
@@ -12,7 +12,7 @@ export interface JWTRequest extends Request {
 }
 
 const issuers: Record<Issuer, string> = {
-  mercury: `${keycloakUri}/realms/mercury`,
+  mercury: `${keycloakIssuer}/realms/mercury`,
   rest: "http://localhost:5000",
 };
 
