@@ -9,13 +9,13 @@ import { PasswordForm } from "../models/PasswordForm";
 export interface EditDetails {
   provider: string;
   user: User;
+  token?: string;
   redirectToLogin: () => void;
   logout: () => Promise<boolean>;
 }
 
 function EditPassword(props: EditDetails) {
-  const { provider, user, redirectToLogin, logout } = props;
-  console.log(redirectToLogin);
+  const { provider, user, token, redirectToLogin, logout } = props;
   const navigate = useNavigate();
 
   const { register, handleSubmit, formState } = useForm<PasswordForm>({
@@ -56,6 +56,10 @@ function EditPassword(props: EditDetails) {
   };
 
   const editPassword = async (passwords?: PasswordForm): Promise<void> => {
+    if (!token) {
+      throw new Error("Token is undefined");
+    }
+
     if (user) {
       const response = await fetch(
         `http://localhost:5000/users/${user.id}/change-password`,
@@ -63,6 +67,7 @@ function EditPassword(props: EditDetails) {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`,
           },
           body: JSON.stringify(passwords || {}),
         },
