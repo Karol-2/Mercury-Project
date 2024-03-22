@@ -22,8 +22,8 @@ services:
     ports:
       - 5173:80
 
-  peer:
-    build: ./peer
+  peer-server:
+    build: ./peer-server
     ports:
       - 8000:8000
 
