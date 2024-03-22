@@ -150,6 +150,7 @@ function KeycloakUserProvider({ children }: { children: React.ReactNode }) {
     });
 
     if (response.status === "ok") {
+      setUserLoggedIn(user);
       return true;
     }
 
