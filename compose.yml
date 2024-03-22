@@ -42,7 +42,7 @@ services:
       WAIT_AFTER_HOSTS: 3
 
   keycloak:
-    image: quay.io/keycloak/keycloak:24.0
+    image: keycloak/keycloak:24.0
     command: start-dev --import-realm
     environment:
       KEYCLOAK_ADMIN: admin
