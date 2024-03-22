@@ -20,6 +20,8 @@ export async function isDatabaseEmpty() {
 }
 
 export async function importInitialData() {
+  const isEmpty = await isDatabaseEmpty();
+
   const testUser = await registerUser({
       first_name: "John",
       last_name: "Smith",
@@ -35,7 +37,6 @@ export async function importInitialData() {
     console.log("Test user created: ", testUser)
   }
 
-  const isEmpty = await isDatabaseEmpty();
   if (!isEmpty) {
     return "Database is not empty";
   }
