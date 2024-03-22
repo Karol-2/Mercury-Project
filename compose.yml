@@ -33,19 +33,19 @@ services:
       - chats
     command: sh -c "/wait && npm run prod"
     environment:
-      - NEO4J_URI=neo4j://db:7687
-      - MONGODB_URI=mongodb://chats:27017
-      - KEYCLOAK_URI=http://keycloak:8080
-      - WAIT_HOSTS=db:7474, keycloak:8080
-      - WAIT_BEFORE_HOSTS=80
-      - WAIT_AFTER_HOSTS=3
+      NEO4J_URI: neo4j://db:7687
+      MONGODB_URI: mongodb://chats:27017
+      KEYCLOAK_URI: http://keycloak:8080
+      WAIT_HOSTS: db:7474, keycloak:8080
+      WAIT_BEFORE_HOSTS: 80
+      WAIT_AFTER_HOSTS: 3
 
   keycloak:
     image: quay.io/keycloak/keycloak:24.0
     command: start-dev --import-realm
     environment:
-      - KEYCLOAK_ADMIN=admin
-      - KEYCLOAK_ADMIN_PASSWORD=admin
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
     ports:
       - 3000:8080
     volumes:
