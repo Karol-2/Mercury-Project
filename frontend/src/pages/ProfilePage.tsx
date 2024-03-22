@@ -9,11 +9,12 @@ import dataService from "../services/data";
 import { useDispatch } from "react-redux";
 import setNotifications from "../redux/actions/setNotifications";
 import setUserFriends from "../redux/actions/setUserFriends";
+import addNotification from "../redux/actions/addNotification";
 
 function ProfilePage() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { user, userId, meeting, deleteUser } = useUser();
+  const { user, userId, meeting, deleteUser, socket } = useUser();
 
   const [showAnimation, setShowAnim] = useState(false);
   const [showContent, setShowContent] = useState(false);
@@ -59,6 +60,12 @@ function ProfilePage() {
 
   useEffect(() => {
     fetchNotifications();
+  }, []);
+
+  useEffect(() => {
+    socket!.on("newRoom", (notification) => {
+      dispatch(addNotification(notification));
+    });
   }, []);
 
   return (

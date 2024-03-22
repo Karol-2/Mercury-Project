@@ -1,31 +1,23 @@
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
-import { useEffect } from "react";
 import { useUser } from "../helpers/UserProvider";
 import RoomNotification from "../models/RoomNotification";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { RootState } from "../redux/store";
-import addNotification from "../redux/actions/addNotification";
 import dataService from "../services/data";
 import { useNavigate } from "react-router-dom";
 function NotificationsPage() {
     const {socket} = useUser();
-    const dispatch = useDispatch();
     const navigate = useNavigate();
     const roomNotifications: RoomNotification[] = useSelector((state: RootState) => state.notifications);
     const peerConfig = useSelector((state: RootState) => state.peer);
     const {peerId} = peerConfig;
-    console.log("PEER CONFIG", peerConfig);
     const handleRoomInvite = async (roomId: string) => {
         await dataService.fetchData(`/room/${roomId}`, "DELETE", {});
         socket?.emit("joinRoom", {roomId, peerId});
         navigate(`/room/${roomId}`);
     } 
-    useEffect(() => {
-        socket?.on("newRoom", (notification: RoomNotification) => {
-            dispatch(addNotification(notification));
-        });
-    }, []);
+    
     return (
         <>
             <Navbar />
