@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
 import { useUser } from "../helpers/UserProvider";
 
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
@@ -10,19 +10,18 @@ import Footer from "../components/Footer";
 import FriendRequest from "../components/FriendRequest";
 import Navbar from "../components/Navbar";
 import User from "../models/User";
-import setUserFriends from "../redux/actions/setUserFriends";
 import dataService from "../services/data";
 import Transition from "../components/Transition";
 import FoundUser from "../components/FoundUser";
 import Friend from "../components/Friend";
 import Paginator from "../components/Paginator";
+import { RootState } from "../redux/store";
 
 function FriendsPage() {
   const navigate = useNavigate();
-  const dispatch = useDispatch();
   const { user, meeting, createMeeting, joinMeeting } = useUser();
 
-  const [friends, setFriends] = useState([]);
+  const friends = useSelector((state: RootState) => state.friends);
   const [friendsRequests, setFriendsRequests] = useState([]);
   const [refresh, setRefresh] = useState(false);
 
@@ -68,21 +67,6 @@ function FriendsPage() {
       }
     };
     fetchFriendRequests();
-  }, [refresh]);
-
-  useEffect(() => {
-    const fetchFriends = async () => {
-      if (user) {
-        const friendsResponse = await dataService.fetchData(
-          `/users/${user.id}/friends`,
-          "GET",
-          {},
-        );
-        setFriends(friendsResponse.friends);
-        dispatch(setUserFriends(friendsResponse.friends));
-      }
-    };
-    fetchFriends();
   }, [refresh]);
 
   const handleDeclineRequest = async (friend: User) => {
