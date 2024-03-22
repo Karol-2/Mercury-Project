@@ -29,7 +29,7 @@ function Protected({ loadingElement, children }: ProtectedProps) {
     if (userState.status == "anonymous") {
       redirectToLogin();
     }
-  }, [userState])
+  }, [userState]);
 
   if (userState.status != "logged_in") {
     return loadingElement;

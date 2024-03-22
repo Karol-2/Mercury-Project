@@ -42,7 +42,7 @@ function EditPhoto(props: EditDetails) {
   };
 
   const editPhoto = async (): Promise<void> => {
-    const changes = {profile_picture: profilePictureBase64}
+    const changes = { profile_picture: profilePictureBase64 };
 
     updateUser(changes).then((updated) => {
       if (updated) console.log("Updated");

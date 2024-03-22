@@ -22,7 +22,7 @@ function FriendsPage() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { user } = useProtected();
-  const { meeting, createMeeting, joinMeeting} = useMeeting();
+  const { meeting, createMeeting, joinMeeting } = useMeeting();
 
   const [friends, setFriends] = useState([]);
   const [friendsRequests, setFriendsRequests] = useState([]);

@@ -79,7 +79,7 @@ function MeetingProvider({ children }: { children: React.ReactNode }) {
         meeting,
         createMeeting,
         joinMeeting,
-        leaveMeeting
+        leaveMeeting,
       }}
     >
       {children}
