@@ -78,44 +78,69 @@ usersRouter.post(
 usersRouter.get(
   "/search",
   async (req: Request, res: UsersSearchErrorResponse) => {
-    const searchTerm = req.query.q;
+    const searchTerm: string = req.query.q as string;
+    const country: string = req.query.country as string;
 
-    if (typeof searchTerm != "string") {
+    if (!searchTerm && !country) {
       return res.status(404).json({
         status: "error",
         errors: { searchTerm: "not provided" },
       });
     }
 
-    if (searchTerm.length == 0) {
-      return res
-        .status(404)
-        .json({ status: "error", errors: { searchTerm: "is empty" } });
-    }
-
     try {
       const session = driver.session();
-      const wordVec = wordToVec(searchTerm);
+      let users: [User, number][] = [];
 
-      if (wordVec.length == 0) {
-        return res
-          .status(400)
-          .json({ status: "error", errors: { searchTerm: "incorrect" } });
+      if (country && searchTerm) {
+        const wordVec = wordToVec(searchTerm);
+        const userRequest = await session.run(
+          `MATCH (u:User {country: $country})
+          CALL db.index.vector.queryNodes('user-names', 10, $wordVec)
+          YIELD node AS similarUser, score
+          RETURN similarUser, score`,
+          { country, wordVec },
+        );
+
+        users = userRequest.records.map((r) => {
+          return [
+            filterUser(r.get("similarUser").properties),
+            Number(r.get("score")),
+          ] as [User, number];
+        });
+      } else if (country) {
+        const query = `
+          MATCH (u:User {country: $country})
+          RETURN u
+        `;
+
+        const result = await session.run(query, { country });
+
+        users = result.records.map((record) => {
+          return [record.get("u").properties as User, 1] as [User, number];
+        });
+
+        return res.json({ status: "ok", users });
+      } else if (searchTerm) {
+        const wordVec = wordToVec(searchTerm);
+
+        const userRequest = await session.run(
+          `CALL db.index.vector.queryNodes('user-names', 10, $wordVec)
+          YIELD node AS similarUser, score
+          RETURN similarUser, score`,
+          { wordVec },
+        );
+
+        users = userRequest.records.map((r) => {
+          return [
+            filterUser(r.get("similarUser").properties),
+            Number(r.get("score")),
+          ] as [User, number];
+        });
       }
 
-      const userRequest = await session.run(
-        `CALL db.index.vector.queryNodes('user-names', 10, $wordVec)
-      YIELD node AS similarUser, score
-      RETURN similarUser, score`,
-        { wordVec },
-      );
-      const users = userRequest.records.map((r) => {
-        return [
-          filterUser(r.get("similarUser").properties),
-          Number(r.get("score")),
-        ] as [User, number];
-      });
       await session.close();
+
       return res.json({ status: "ok", users });
     } catch (err) {
       console.log("Error:", err);
