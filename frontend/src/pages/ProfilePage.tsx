@@ -10,6 +10,7 @@ import { useDispatch } from "react-redux";
 import setNotifications from "../redux/actions/setNotifications";
 import setUserFriends from "../redux/actions/setUserFriends";
 import addNotification from "../redux/actions/addNotification";
+import initPeer from "../redux/actions/initPeer";
 
 function ProfilePage() {
   const navigate = useNavigate();
@@ -60,6 +61,10 @@ function ProfilePage() {
 
   useEffect(() => {
     fetchNotifications();
+  }, []);
+
+  useEffect(() => {
+    dispatch(initPeer(userId!));
   }, []);
 
   useEffect(() => {

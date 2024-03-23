@@ -15,7 +15,6 @@ function RoomCallPage() {
     const {peer, peerId} = peerConfig;
     const [localStream, setLocalStream] = useState<MediaStream | null>(null);
     const [remoteStreams, setRemoteStreams] = useState<Set<MediaStream>>(new Set());
-    const [roomMembers, setRoomMembers] = useState<any[]>([]);
     const friends: User[] = useSelector((state: RootState) => state.friends);
     const {socket, userId, user} = useUser();
     const params = useParams();
@@ -47,7 +46,6 @@ function RoomCallPage() {
         setLocalStream(stream);
         socket?.on("userConnected", ({peerId, userId, fullName, socketId}) => {
             connectToNewUser(peerId, stream);
-            setRoomMembers(prev => [...prev, {peerId, userId, fullName}]);
             sendCredentialsToIncomingUser(socketId);
         });
     }
@@ -64,11 +62,11 @@ function RoomCallPage() {
         }),});
         socket?.emit("newRoom", {roomId, from: userId, to: friendId, userName: myFullName});
     }
-    useEffect(() => {
+    /*useEffect(() => {
         socket?.on("alreadyInRoom", ({userId, fullName, peerId}) => {
-            setRoomMembers(prev => [...prev, {peerId, userId, fullName}]);
+            
         });
-    }, []);
+    }, []);*/
     useEffect(() => {
         prepareWebRTC();
     }, []);
