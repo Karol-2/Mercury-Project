@@ -12,9 +12,10 @@ import RoomPeerVideo from "../components/RoomPeerVideo";
 function RoomCallPage() {
     const localRef = useRef<HTMLVideoElement>(null);
     const peerConfig = useSelector((state: RootState) => state.peer);
-    const {peer} = peerConfig;
+    const {peer, peerId} = peerConfig;
     const [localStream, setLocalStream] = useState<MediaStream | null>(null);
     const [remoteStreams, setRemoteStreams] = useState<Set<MediaStream>>(new Set());
+    const [roomMembers, setRoomMembers] = useState<any[]>([]);
     const friends: User[] = useSelector((state: RootState) => state.friends);
     const {socket, userId, user} = useUser();
     const params = useParams();
@@ -37,11 +38,17 @@ function RoomCallPage() {
             setRemoteStreams(prev => new Set([...prev, remoteStream]));
         });
     }
+    const sendCredentialsToIncomingUser = (socketId: string) => {
+        const fullName = `${user?.first_name} ${user?.last_name}`;
+        socket?.emit("alreadyInRoom", {socketId, peerId, userId, fullName});
+    }
     const prepareWebRTC = async () => {
         const stream = await fetchUserMedia();
         setLocalStream(stream);
-        socket?.on("userConnected", (newPeerId) => {
-            connectToNewUser(newPeerId, stream);
+        socket?.on("userConnected", ({peerId, userId, fullName, socketId}) => {
+            connectToNewUser(peerId, stream);
+            setRoomMembers(prev => [...prev, {peerId, userId, fullName}]);
+            sendCredentialsToIncomingUser(socketId);
         });
     }
     const inviteFriendToRoom = async (friendId: string) => {
@@ -57,6 +64,11 @@ function RoomCallPage() {
         }),});
         socket?.emit("newRoom", {roomId, from: userId, to: friendId, userName: myFullName});
     }
+    useEffect(() => {
+        socket?.on("alreadyInRoom", ({userId, fullName, peerId}) => {
+            setRoomMembers(prev => [...prev, {peerId, userId, fullName}]);
+        });
+    }, []);
     useEffect(() => {
         prepareWebRTC();
     }, []);

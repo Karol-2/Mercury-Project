@@ -7,14 +7,15 @@ import { RootState } from "../redux/store";
 import dataService from "../services/data";
 import { useNavigate } from "react-router-dom";
 function NotificationsPage() {
-    const {socket} = useUser();
+    const {socket, userId, user} = useUser();
     const navigate = useNavigate();
     const roomNotifications: RoomNotification[] = useSelector((state: RootState) => state.notifications);
     const peerConfig = useSelector((state: RootState) => state.peer);
     const {peerId} = peerConfig;
     const handleRoomInvite = async (roomId: string) => {
         await dataService.fetchData(`/room/${roomId}`, "DELETE", {});
-        socket?.emit("joinRoom", {roomId, peerId});
+        const fullName = `${user?.first_name} ${user?.last_name}`;
+        socket?.emit("joinRoom", {roomId, peerId, userId, fullName});
         navigate(`/room/${roomId}`);
     } 
     

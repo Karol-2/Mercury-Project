@@ -159,10 +159,13 @@ io.on("connection", async (socket: Socket) => {
     await session.close();
   });
 
-  socket.on("joinRoom", async ({roomId, peerId}: any) => {
+  socket.on("joinRoom", async ({roomId, peerId, userId, fullName}: any) => {
     await socket.join(roomId);
-    socket.to(roomId).emit("userConnected", peerId);
-    console.log("[JOIN-ROOM]: sent ", peerId);
+    socket.to(roomId).emit("userConnected", {peerId, userId, fullName, socketId: socket.id});
+  });
+
+  socket.on("alreadyInRoom", ({socketId, peerId, userId, fullName}) => {
+    socket.to(socketId).emit("alreadyInRoom", {peerId, userId, fullName});
   });
 
   socket.on("disconnect", async (_reason) => {
