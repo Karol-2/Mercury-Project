@@ -94,20 +94,23 @@ usersRouter.get(
 
       if (country && searchTerm) {
         const wordVec = wordToVec(searchTerm);
-        const userRequest = await session.run(
-          `MATCH (u:User {country: $country})
-          CALL db.index.vector.queryNodes('user-names', 10, $wordVec)
+        const searchRequest = await session.run(
+          `CALL db.index.vector.queryNodes('user-names', 10, $wordVec)
           YIELD node AS similarUser, score
           RETURN similarUser, score`,
-          { country, wordVec },
+          { wordVec },
         );
 
-        users = userRequest.records.map((r) => {
-          return [
-            filterUser(r.get("similarUser").properties),
-            Number(r.get("score")),
-          ] as [User, number];
-        });
+        const users = searchRequest.records
+          .map((r) => {
+            return [
+              filterUser(r.get("similarUser").properties),
+              Number(r.get("score")),
+            ] as [User, number];
+          })
+          .filter(([user, _]) => user.country === country);
+
+        return res.json({ status: "ok", users });
       } else if (country) {
         const query = `
           MATCH (u:User {country: $country})
