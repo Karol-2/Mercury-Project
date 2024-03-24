@@ -89,19 +89,21 @@ usersRouter.get(
     }
 
     try {
+      const page: number = parseInt(req.query.page as string);
+      const maxUsersOnPage: number = parseInt(req.query.maxUsers as string);
       const session = driver.session();
-      let users: [User, number][] = [];
+      let allUsers: [User, number][] = [];
 
       if (country && searchTerm) {
         const wordVec = wordToVec(searchTerm);
         const searchRequest = await session.run(
-          `CALL db.index.vector.queryNodes('user-names', 10, $wordVec)
+          `CALL db.index.vector.queryNodes('user-names', 100, $wordVec)
           YIELD node AS similarUser, score
           RETURN similarUser, score`,
           { wordVec },
         );
 
-        const users = searchRequest.records
+        allUsers = searchRequest.records
           .map((r) => {
             return [
               filterUser(r.get("similarUser").properties),
@@ -109,8 +111,6 @@ usersRouter.get(
             ] as [User, number];
           })
           .filter(([user, _]) => user.country === country);
-
-        return res.json({ status: "ok", users });
       } else if (country) {
         const query = `
           MATCH (u:User {country: $country})
@@ -119,22 +119,20 @@ usersRouter.get(
 
         const result = await session.run(query, { country });
 
-        users = result.records.map((record) => {
+        allUsers = result.records.map((record) => {
           return [record.get("u").properties as User, 1] as [User, number];
         });
-
-        return res.json({ status: "ok", users });
       } else if (searchTerm) {
         const wordVec = wordToVec(searchTerm);
 
         const userRequest = await session.run(
-          `CALL db.index.vector.queryNodes('user-names', 10, $wordVec)
+          `CALL db.index.vector.queryNodes('user-names', 100, $wordVec)
           YIELD node AS similarUser, score
           RETURN similarUser, score`,
           { wordVec },
         );
 
-        users = userRequest.records.map((r) => {
+        allUsers = userRequest.records.map((r) => {
           return [
             filterUser(r.get("similarUser").properties),
             Number(r.get("score")),
@@ -144,7 +142,40 @@ usersRouter.get(
 
       await session.close();
 
-      return res.json({ status: "ok", users });
+      if (!page && !maxUsersOnPage) {
+        if (allUsers.length === 0) {
+          return res.status(404).json({
+            status: "error",
+            errors: { users: "No users found" },
+          });
+        }
+        return res.status(200).json({
+          status: "ok",
+          users: allUsers,
+        });
+      } else if (!page || !maxUsersOnPage) {
+        return res.status(400).json({
+          status: "error",
+          errors: { params: "Missing or incorrect query params" },
+        });
+      }
+
+      const users = allUsers.slice(
+        (page - 1) * maxUsersOnPage,
+        page * maxUsersOnPage,
+      );
+
+      if (users.length === 0) {
+        return res.status(404).json({
+          status: "error",
+          errors: { users: "No users found with given queries" },
+        });
+      }
+
+      return res.status(200).json({
+        status: "ok",
+        users,
+      });
     } catch (err) {
       console.log("Error:", err);
       return res.status(404).json({ status: "error", errors: err as object });
