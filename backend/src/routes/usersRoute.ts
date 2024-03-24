@@ -205,6 +205,30 @@ usersRouter.get("/meetings/:userId", async (req: Request, res) => {
   }
 });
 
+usersRouter.get("/:userId/name", async (req, res) => {
+  try {
+    const userId = req.params.userId;
+    const session = driver.session();
+    const user = await userExists(session, { id: userId });
+    if (!user) {
+      return userNotFoundRes(res);
+    }
+    const userNameRequest = await session.run(
+      `MATCH (u:User {id: $userId}) return u`,
+      { userId },
+    );
+    await session.close();
+    const userData: User = userNameRequest.records.map((u) =>
+      filterUser(u.get("u").properties),
+    )[0];
+    const fullName = `${userData.first_name} ${userData.last_name}`;
+    return res.json({ status: "ok", fullName });
+  } catch (err) {
+    console.log("Error:", err);
+    return res.status(404).json({ status: "error", errors: err as object });
+  }
+});
+
 usersRouter.put("/meetings/:meetingId", async (req: Request, res) => {
   try {
     const session = driver.session();
