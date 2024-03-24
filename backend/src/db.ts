@@ -22,21 +22,6 @@ export async function isDatabaseEmpty() {
 export async function importInitialData() {
   const isEmpty = await isDatabaseEmpty();
 
-  const testUser = await registerUser({
-      first_name: "John",
-      last_name: "Smith",
-      country: "PL",
-      profile_picture: "",
-      mail: "jsmith@example.com",
-      password: "password",
-    })
-
-  if ("errors" in testUser) {
-    console.log("Couldn't register test user: ", testUser.errors)
-  } else {
-    console.log("Test user created: ", testUser)
-  }
-
   if (!isEmpty) {
     return "Database is not empty";
   }
@@ -46,7 +31,7 @@ export async function importInitialData() {
     const userIds: string[] = [];
 
     for (const user of userData) {
-      const newUser = await createUser(session, user);
+      const newUser = await registerUser(user);
       if (!("errors" in newUser)) {
         userIds.push(newUser.id);
       }
