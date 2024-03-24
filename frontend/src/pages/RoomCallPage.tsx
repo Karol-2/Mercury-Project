@@ -10,12 +10,11 @@ import { useParams } from "react-router-dom";
 import dataService from "../services/data";
 import RoomPeerVideo from "../components/RoomPeerVideo";
 import Peer from "peerjs";
-import RoomPeer from "../models/RoomPeer";
 function RoomCallPage() {
     const localRef = useRef<HTMLVideoElement>(null);
     const peer: Peer = useSelector((state: RootState) => state.peer);
     const [localStream, setLocalStream] = useState<MediaStream | null>(null);
-    const [remotePeers, setRemotePeers] = useState<RoomPeer[]>([]);
+    const [remoteStreams, setRemoteStreams] = useState<Set<MediaStream>>(new Set());
     const friends: User[] = useSelector((state: RootState) => state.friends);
     const {socket, userId, user} = useUser();
     const params = useParams();
@@ -29,15 +28,13 @@ function RoomCallPage() {
             call.answer(stream);
         }
         call.on("stream", (remoteStream: MediaStream) => {
-            console.log("[STREAM IN CALL]")
-            setRemotePeers(prev => [...prev, {peerId: call.peer, stream: remoteStream}]);   
+            setRemoteStreams(prev => new Set([...prev, remoteStream]));
         });
     });
     const connectToNewUser = (newPeerId: string, fullName: string, stream: MediaStream) => {
         const call = peer.call(newPeerId, stream);
         call.on("stream", (remoteStream: MediaStream) => {
-            console.log("[STREAM IN CONNECT TO NEW USER]");
-            setRemotePeers(prev => [...prev, {peerId: newPeerId, stream: remoteStream, fullName}]);
+            setRemoteStreams(prev => new Set([...prev, remoteStream]));
         });
     }
     const prepareWebRTC = async () => {
@@ -70,9 +67,6 @@ function RoomCallPage() {
             localRef.current.play();
         }
     }, [localRef.current, localStream]);
-    useEffect(() => {
-        console.log("[REMOTE-PEERS]: ", remotePeers);
-    }, [remotePeers]);
     return (
         <>
             <Navbar />
@@ -83,7 +77,7 @@ function RoomCallPage() {
                             ref={localRef}
                         ></video>
                     </div>
-                    {remotePeers.map((remotePeer) => <RoomPeerVideo key={remotePeer.peerId} remotePeer={remotePeer} />)}
+                    {Array.from(remoteStreams).map((remoteStream,idx) => <RoomPeerVideo key={idx} remoteStream={remoteStream} />)}
                 </section>
                 <section>
                     <h3><strong>Invite</strong></h3>

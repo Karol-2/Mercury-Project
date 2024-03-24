@@ -2,14 +2,13 @@ import { useEffect, useRef } from "react";
 import RoomPeer from "../models/RoomPeer";
 
 interface RoomPeerVideoProps {
-    remotePeer: RoomPeer;
+    remoteStream: MediaStream;
 }
-function RoomPeerVideo({remotePeer}: RoomPeerVideoProps) {
+function RoomPeerVideo({remoteStream}: RoomPeerVideoProps) {
     const remoteRef = useRef<HTMLVideoElement>(null);
-    const {stream} = remotePeer;
     useEffect(() => {
-        if (stream) {
-            remoteRef.current!.srcObject = stream;
+        if (remoteStream) {
+            remoteRef.current!.srcObject = remoteStream;
             remoteRef.current!.play();
         }
     }, []);
