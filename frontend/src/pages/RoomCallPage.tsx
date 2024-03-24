@@ -35,7 +35,7 @@ function RoomCallPage() {
             setRoomPeers(prev => ({...prev, ...newPeerObj}));
         });
     });
-    const connectToNewUser = (newPeerId: string, fullName: string, stream: MediaStream) => {
+    const connectToNewUser = (newPeerId: string, stream: MediaStream) => {
         const call = peer.call(newPeerId, stream);
         call.on("stream", (remoteStream: MediaStream) => {
             const peerId = newPeerId;
@@ -47,8 +47,8 @@ function RoomCallPage() {
     const prepareWebRTC = async () => {
         const stream = await fetchUserMedia();
         setLocalStream(stream);
-        socket?.on("userConnected", ({peerId, userId, fullName, socketId}): any => {
-            connectToNewUser(peerId, fullName, stream);
+        socket?.on("userConnected", ({peerId}): any => {
+            connectToNewUser(peerId, stream);
         });
     }
     const inviteFriendToRoom = async (friendId: string) => {
@@ -84,7 +84,10 @@ function RoomCallPage() {
                             ref={localRef}
                         ></video>
                     </div>
-                    {Object.entries(roomPeers).map((roomPeer) => <RoomPeerVideo key={roomPeer[0]} remoteStream={roomPeer[1].stream} />)}
+                    {Object.entries(roomPeers).map((roomPeer) => {
+                        const [id, peer] = roomPeer;
+                        return <RoomPeerVideo key={id} remoteStream={peer.stream} peerId={id}  />
+                    })}
                 </section>
                 <section>
                     <h3><strong>Invite</strong></h3>
