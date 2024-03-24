@@ -164,10 +164,6 @@ io.on("connection", async (socket: Socket) => {
     socket.to(roomId).emit("userConnected", {peerId, userId, fullName, socketId: socket.id});
   });
 
-  socket.on("alreadyInRoom", ({socketId, peerId, userId, fullName}) => {
-    socket.to(socketId).emit("alreadyInRoom", {peerId, userId, fullName});
-  });
-
   socket.on("disconnect", async (_reason) => {
     const session = driver.session();
     await leaveMeeting(session, userId);

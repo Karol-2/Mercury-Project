@@ -37,16 +37,11 @@ function RoomCallPage() {
             setRemoteStreams(prev => new Set([...prev, remoteStream]));
         });
     }
-    const sendCredentialsToIncomingUser = (socketId: string) => {
-        const fullName = `${user?.first_name} ${user?.last_name}`;
-        socket?.emit("alreadyInRoom", {socketId, peerId, userId, fullName});
-    }
     const prepareWebRTC = async () => {
         const stream = await fetchUserMedia();
         setLocalStream(stream);
         socket?.on("userConnected", ({peerId, userId, fullName, socketId}) => {
             connectToNewUser(peerId, stream);
-            sendCredentialsToIncomingUser(socketId);
         });
     }
     const inviteFriendToRoom = async (friendId: string) => {
