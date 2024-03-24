@@ -15,7 +15,7 @@ function SearchPage() {
   const navigate = useNavigate();
 
   // Logic
-  const [usersFound, setUsersFound] = useState<[[User, number]]>();
+  const [usersFound, setUsersFound] = useState<[[User, number]] | null>(null);
   const [usersFriends, setUsersFriends] = useState([]);
 
   // Animation
@@ -59,10 +59,8 @@ function SearchPage() {
     }, false);
   };
 
-  const handler = (test: [[User, number]])=>{
-    setUsersFound(test)
-    console.log(test);
-    
+  const foundUsersHandler = (users: [[User, number]] | null)=>{
+    setUsersFound(users)
   }
 
 
@@ -73,7 +71,7 @@ function SearchPage() {
       {showContent ? (
         <>
           <section className=" min-h-screen mx-50 lg:mx-72 ">
-            <Search handler={handler} />
+            <Search handler={foundUsersHandler} />
             {usersFound && (
               <Paginator
                 users={usersFound.map((match: [User, number]) => match[0])}

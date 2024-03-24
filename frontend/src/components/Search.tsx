@@ -1,16 +1,16 @@
-import { faMagnifyingGlass, faFilter } from "@fortawesome/free-solid-svg-icons";
+import { faFilter, faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import Select from "react-select";
+import countriesData from "../assets/countries.json";
 import { useUser } from "../helpers/UserProvider";
 import editDistance from "../misc/editDistance";
 import User from "../models/User";
 import dataService from "../services/data";
-import Select from "react-select";
-import countriesData from "../assets/countries.json";
 
 interface searchProps {
-  handler: (test: [[User, number]]) => void;
+  handler: (test: [[User, number]] | null) => void;
 }
 
 const Search = (props: searchProps) => {
@@ -26,10 +26,13 @@ const Search = (props: searchProps) => {
   const { user, userId } = useUser();
 
   useEffect(() => {
-    const optionsWithEmpty = [{ Country: "-", Code: "-" }, ...countryList];
+    const emptyElementExists = countryList.some(country => country.Code === '-');
 
-    setCountryList(optionsWithEmpty);
-  }, []);
+    if (!emptyElementExists) {
+      const optionsWithEmpty = [{ Country: "-", Code: "-" }, ...countryList];
+      setCountryList(optionsWithEmpty);
+    }
+  }, [countryList]);
 
   const countryOptions = countryList.map((country) => ({
     value: country.Country,
@@ -71,6 +74,7 @@ const Search = (props: searchProps) => {
       setUsersFound(usersSorted);
     } catch {
       setError("No users found");
+      setUsersFound(null)
     }
   };
 
@@ -117,10 +121,9 @@ const Search = (props: searchProps) => {
 
       <div className="flex flex-col md:flex-row gap-5 max-w-3xl w-full mt-5 text-sm">
         <div>
-            <div className="flex gap-3 items-center">
+          <div className="flex gap-3 items-center">
             <FontAwesomeIcon icon={faFilter} />
             <span className=" text-lg font-bold">Filters</span>
-           
           </div>
           <div>
             Country <span className=" font-thin"> (not required)</span>
