@@ -13,7 +13,7 @@
     "prod": "node build/index.js"
   },
   "type": "module",
-  "exports": "src/index.ts",
+  "exports": "./src/index.ts",
   "dependencies": {
     "@keycloak/keycloak-admin-client": "^24.0.1",
     "@types/jsonwebtoken": "^9.0.5",
