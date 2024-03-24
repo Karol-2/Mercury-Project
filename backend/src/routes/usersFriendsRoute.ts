@@ -111,16 +111,35 @@ friendshipRouter.get(
         { userId },
       );
 
-      const allUsers: User[] = friendSuggestionsQuery.records
-        .map((record) => record.get("suggested").properties)
-        .slice(0, 15);
+      const allUsers: User[] = friendSuggestionsQuery.records.map(
+        (record) => record.get("suggested").properties,
+      );
+
+      await session.close();
+
+      if (!page && !maxUsersOnPage) {
+        if (allUsers.length === 0) {
+          return res.status(404).json({
+            status: "not found",
+            message: "No users found",
+          });
+        }
+        return res.status(200).json({
+          status: "ok",
+          size: allUsers.length,
+          users: allUsers,
+        });
+      } else if (!page || !maxUsersOnPage) {
+        return res.status(400).json({
+          status: "bad request",
+          message: "Missing or incorrect query params",
+        });
+      }
 
       const users = allUsers.slice(
         (page - 1) * maxUsersOnPage,
         page * maxUsersOnPage,
       );
-
-      await session.close();
 
       if (users.length === 0) {
         return res.status(404).json({
@@ -129,7 +148,7 @@ friendshipRouter.get(
         });
       }
 
-      return res.json({
+      return res.status(200).json({
         status: "ok",
         size: allUsers.length,
         users,
