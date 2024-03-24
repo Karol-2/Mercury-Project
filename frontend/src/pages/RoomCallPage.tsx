@@ -9,10 +9,10 @@ import { useUser } from "../helpers/UserProvider";
 import { useParams } from "react-router-dom";
 import dataService from "../services/data";
 import RoomPeerVideo from "../components/RoomPeerVideo";
+import Peer from "peerjs";
 function RoomCallPage() {
     const localRef = useRef<HTMLVideoElement>(null);
-    const peerConfig = useSelector((state: RootState) => state.peer);
-    const {peer, peerId} = peerConfig;
+    const peer: Peer = useSelector((state: RootState) => state.peer);
     const [localStream, setLocalStream] = useState<MediaStream | null>(null);
     const [remoteStreams, setRemoteStreams] = useState<Set<MediaStream>>(new Set());
     const friends: User[] = useSelector((state: RootState) => state.friends);
@@ -62,11 +62,7 @@ function RoomCallPage() {
         }),});
         socket?.emit("newRoom", {roomId, from: userId, to: friendId, userName: myFullName});
     }
-    /*useEffect(() => {
-        socket?.on("alreadyInRoom", ({userId, fullName, peerId}) => {
-            
-        });
-    }, []);*/
+
     useEffect(() => {
         prepareWebRTC();
     }, []);

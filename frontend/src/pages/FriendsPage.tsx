@@ -20,6 +20,7 @@ import { v4 } from "uuid";
 
 function FriendsPage() {
   const navigate = useNavigate();
+  
   const { user, meeting, createMeeting, joinMeeting } = useUser();
 
   const friends = useSelector((state: RootState) => state.friends);
