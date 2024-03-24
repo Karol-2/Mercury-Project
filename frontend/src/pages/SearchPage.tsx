@@ -5,20 +5,20 @@ import { useEffect, useState } from "react";
 import FoundUser from "../components/FoundUser";
 import { useUser } from "../helpers/UserProvider";
 import User from "../models/User";
-import { faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useNavigate } from "react-router-dom";
-import editDistance from "../misc/editDistance";
+
 import Transition from "../components/Transition";
 import Paginator from "../components/Paginator";
+import Search from "../components/Search";
 
 function SearchPage() {
   const navigate = useNavigate();
 
-  const [searchState, setSearchState] = useState("");
+  // Logic
   const [usersFound, setUsersFound] = useState<[[User, number]]>();
   const [usersFriends, setUsersFriends] = useState([]);
 
+  // Animation
   const [showAnimation, setShowAnim] = useState(false);
   const [showContent, setShowContent] = useState(false);
 
@@ -51,31 +51,7 @@ function SearchPage() {
     fetchFriends();
   }, [user]);
 
-  const handleSearch = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-
-    if (userId === null) navigate("/login");
-
-    if (searchState.trim() === "") {
-      return;
-    }
-
-    const response = await dataService.fetchData(
-      `/users/search?q=${searchState}`,
-      "GET",
-    );
-
-    const responseWithoutCurrUser = response.users.filter(
-      (respArr: [User, number]) => respArr[0].id !== user!.id,
-    );
-
-    const usersSorted = sortUsersByDistance(
-      searchState,
-      responseWithoutCurrUser,
-    );
-
-    setUsersFound(usersSorted);
-  };
+ 
 
   const isFriend = (friendArr: string[], user: User): boolean => {
     return friendArr.reduce((prev: boolean, curr: string) => {
@@ -83,20 +59,12 @@ function SearchPage() {
     }, false);
   };
 
-  const sortUsersByDistance = (searchTerm: string, users: [[User, number]]) => {
-    const userScores = users.map((respArr: [User, number]) => {
-      const user = respArr[0];
-      const score = editDistance(user.first_name + user.last_name, searchTerm);
-      return [user, score];
-    });
+  const handler = (test: [[User, number]])=>{
+    setUsersFound(test)
+    console.log(test);
+    
+  }
 
-    return userScores.sort((a: any, b: any) => {
-      const [_userA, scoreA] = a;
-      const [_userB, scoreB] = b;
-
-      return scoreA - scoreB;
-    }) as [[User, number]];
-  };
 
   return (
     <>
@@ -105,34 +73,7 @@ function SearchPage() {
       {showContent ? (
         <>
           <section className=" min-h-screen mx-50 lg:mx-72 ">
-            <div className="mx-50 my-20 flex justify-center">
-              <form
-                className="flex flex-col md:flex-row gap-5 max-w-3xl w-full mt-5"
-                onSubmit={handleSearch}
-              >
-                <div className=" w-full">
-                  <input
-                    type="text"
-                    placeholder="John Doe"
-                    className="form-input text-my-darker"
-                    onChange={(e) => setSearchState(e.target.value)}
-                  ></input>
-                  <p className="text-lg">
-                    Enter your friend's name in the field above.
-                  </p>
-                </div>
-
-                <button
-                  type="submit"
-                  className="btn bg-my-purple text-xs px-7 py-5"
-                >
-                  <div className="flex gap-3 items-center text-cente justify-center">
-                    <span className=" text-center">Search</span>
-                    <FontAwesomeIcon icon={faMagnifyingGlass} />
-                  </div>
-                </button>
-              </form>
-            </div>
+            <Search handler={handler} />
             {usersFound && (
               <Paginator
                 users={usersFound.map((match: [User, number]) => match[0])}
