@@ -16,6 +16,7 @@ import Transition from "../components/Transition";
 import FoundUser from "../components/FoundUser";
 import Friend from "../components/Friend";
 import Paginator from "../components/Paginator";
+import PaginatorV2 from "../components/PaginatorV2";
 
 function FriendsPage() {
   const navigate = useNavigate();
@@ -142,9 +143,9 @@ function FriendsPage() {
                 <h1 className="text-3xl font-bold">Friends:</h1>
                 <hr className="text-my-orange"></hr>
                 <ul className="">
-                  {friends && friends.length > 0 ? (
-                    <Paginator
-                      users={friends}
+                  {friends && user&& friends.length > 0 ? (
+                    <PaginatorV2
+                      endpoint={`/users/${user.id}/friends`}
                       itemsPerPage={5}
                       renderItem={(user) => (
                         <Friend

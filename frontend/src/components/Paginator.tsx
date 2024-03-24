@@ -37,7 +37,7 @@ function Paginator(props: PaginatorProps) {
     <div id="paginator">
       <ul>
         {currentItems.map((user) => (
-          <li key={user.id}>{props.renderItem(user)}</li>
+          <div key={user.id}>{props.renderItem(user)}</div>
         ))}
       </ul>
 

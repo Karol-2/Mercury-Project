@@ -66,7 +66,7 @@ const Search = (props: searchProps) => {
         (respArr: [User, number]) => respArr[0].id !== user!.id,
       );
 
-      const usersSorted = sortUsersByDistance(
+      const usersSorted = sortUsersByDistance( //TODO: przenieść sortowanie na backend
         searchQuery,
         responseWithoutCurrUser,
       );

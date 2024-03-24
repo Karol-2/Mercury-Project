@@ -1,6 +1,6 @@
-import { faArrowRight, faArrowLeft } from "@fortawesome/free-solid-svg-icons";
+import { faArrowLeft, faArrowRight } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import User from "../models/User";
 import dataService from "../services/data";
 
@@ -11,44 +11,56 @@ interface PaginatorProps {
 }
 
 function PaginatorV2(props: PaginatorProps) {
-  const [currentPageNum, setCurrentPageNum] = useState<number>(1);
+  const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(2137);
+  const [error, setError] = useState<string>("");
 
   const [users, setUsers] = useState<User[]>([]);
 
-  useEffect(()=>{
-    const handleRequest = async () =>{
-        const url = props.endpoint + `&page=${currentPageNum}&maxUsers=${props.itemsPerPage}`
-        const response = await dataService.fetchData(url, "GET");
-        console.log(response);
-        // setUsers(response.users)
-        // setTotalPages(response.totalPages)
-        
-    }
+  useEffect(() => {
+    const handleRequest = async () => {
+      const url =
+        props.endpoint + `?page=${currentPage}&maxUsers=${props.itemsPerPage}`;
+      await dataService
+        .fetchData(url, "GET")
+        .then((response) => {
+          console.log(response);
+          setUsers(response.friends);
+        })
+        .catch((err) => {
+          console.error(err);
+          // TODO: logika do błędu
+        });
 
-    handleRequest()
-   
-  },[currentPageNum])
+      // TODO: ZMIEŃ W SEARCH ABY NIE ZWRACAŁO NUMERU,
+      //TODO: ORAZ ŻEBY ZAWSZE ZWRACAŁO USERS A NIE FRIENDS lub cokolwiek innego
+      //TODO: dodać totalPages żeby można było: setTotalPages(response.totalPages)
+    };
 
+    handleRequest();
+  }, [currentPage]);
 
   const nextPage = () => {
-    if (currentPageNum + 1 <= totalPages) {
-      setCurrentPageNum(currentPageNum + 1);
+    if (currentPage + 1 <= totalPages) {
+      setCurrentPage(currentPage + 1);
     }
   };
 
   const previousPage = () => {
-    if (currentPageNum - 1 > 0) {
-      setCurrentPageNum(currentPageNum - 1);
+    if (currentPage - 1 > 0) {
+      setCurrentPage(currentPage - 1);
     }
   };
 
   return (
     <div id="paginator">
+      {error && <div> error </div>}
       <ul>
-        {users.map((user) => (
-          <li key={user.id}>{props.renderItem(user)}</li>
-        ))}
+        {!error &&
+          users &&
+          users.map((user) => (
+            <div key={user.id}>{props.renderItem(user)}</div>
+          ))}
       </ul>
 
       <div
@@ -64,7 +76,7 @@ function PaginatorV2(props: PaginatorProps) {
 
         <div className=" flex flex-col justify-center">
           <p>
-            Page {currentPageNum} of {totalPages}
+            Page {currentPage} of {totalPages}
           </p>
         </div>
 
