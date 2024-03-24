@@ -1,4 +1,4 @@
-import { faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
+import { faMagnifyingGlass, faFilter } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -9,13 +9,13 @@ import dataService from "../services/data";
 import Select from "react-select";
 import countriesData from "../assets/countries.json";
 
-interface searchProps{
-    handler: (test: [[User, number]])=>void
+interface searchProps {
+  handler: (test: [[User, number]]) => void;
 }
 
 const Search = (props: searchProps) => {
   const navigate = useNavigate();
-  const setUsersFound = props.handler
+  const setUsersFound = props.handler;
 
   // Logic
   const [searchQuery, setSearchQuery] = useState("");
@@ -23,14 +23,13 @@ const Search = (props: searchProps) => {
   const [countryList, setCountryList] = useState(countriesData);
   const [error, setError] = useState("");
 
-;
   const { user, userId } = useUser();
 
-  useEffect(()=>{
-    const optionsWithEmpty = [{ Country: '-', Code: '-' }, ...countryList];
+  useEffect(() => {
+    const optionsWithEmpty = [{ Country: "-", Code: "-" }, ...countryList];
 
     setCountryList(optionsWithEmpty);
-  },[])
+  }, []);
 
   const countryOptions = countryList.map((country) => ({
     value: country.Country,
@@ -56,24 +55,23 @@ const Search = (props: searchProps) => {
     if (searchQuery.trim() === "") {
       return;
     }
-    try{
-        setError("")
-        const response = await dataService.fetchData(url, "GET");
+    try {
+      setError("");
+      const response = await dataService.fetchData(url, "GET");
 
-        const responseWithoutCurrUser = response.users.filter(
-          (respArr: [User, number]) => respArr[0].id !== user!.id,
-        );
-    
-        const usersSorted = sortUsersByDistance(
-          searchQuery,
-          responseWithoutCurrUser,
-        );
-    
-        setUsersFound(usersSorted);
-    } catch{
-        setError("No users found")
+      const responseWithoutCurrUser = response.users.filter(
+        (respArr: [User, number]) => respArr[0].id !== user!.id,
+      );
+
+      const usersSorted = sortUsersByDistance(
+        searchQuery,
+        responseWithoutCurrUser,
+      );
+
+      setUsersFound(usersSorted);
+    } catch {
+      setError("No users found");
     }
-
   };
 
   const sortUsersByDistance = (searchTerm: string, users: [[User, number]]) => {
@@ -96,39 +94,46 @@ const Search = (props: searchProps) => {
 
   return (
     <div id="search-wrapper" className="mx-50 my-20 flex items-center flex-col">
-     
-        <form
-          className="flex flex-col md:flex-row gap-5 max-w-3xl w-full mt-5"
-          onSubmit={handleSearch}
-        >
-          <div className=" w-full">
-            <input
-              type="text"
-              placeholder="Enter your friend's name"
-              className="form-input text-my-darker"
-              onChange={(e) => setSearchQuery(e.target.value)}
-            ></input>
-          </div>
+      <form
+        className="flex flex-col md:flex-row gap-5 max-w-3xl w-full mt-5"
+        onSubmit={handleSearch}
+      >
+        <div className=" w-full">
+          <input
+            type="text"
+            placeholder="Enter your friend's name"
+            className="form-input text-my-darker"
+            onChange={(e) => setSearchQuery(e.target.value)}
+          ></input>
+        </div>
 
-          <button type="submit" className="btn bg-my-purple text-xs px-7 py-5">
-            <div className="flex gap-3 items-center text-cente justify-center">
-              <span className=" text-center">Search</span>
-              <FontAwesomeIcon icon={faMagnifyingGlass} />
-            </div>
-          </button>
-        </form>
-        
-          <div className=" p-5 bg-my-orange rounded-md w-80 mt-5 self-start text-sm">
-            <div>Country<span className=" font-thin"> (not required)</span></div>
-            <Select
-              options={countryOptions}
-              onChange={handleCountryChange}
-              className="text-my-dark w-full text-sm "
-            />
+        <button type="submit" className="btn bg-my-purple text-xs px-7 py-5">
+          <div className="flex gap-3 items-center text-cente justify-center">
+            <span className=" text-center">Search</span>
+            <FontAwesomeIcon icon={faMagnifyingGlass} />
           </div>
-       <div>{error}</div>
+        </button>
+      </form>
+
+      <div className="flex flex-col md:flex-row gap-5 max-w-3xl w-full mt-5 text-sm">
+        <div>
+            <div className="flex gap-3 items-center">
+            <FontAwesomeIcon icon={faFilter} />
+            <span className=" text-lg font-bold">Filters</span>
+           
+          </div>
+          <div>
+            Country <span className=" font-thin"> (not required)</span>
+          </div>
+          <Select
+            options={countryOptions}
+            onChange={handleCountryChange}
+            className="text-my-dark w-full "
+          />
+        </div>
       </div>
-  
+      <div>{error}</div>
+    </div>
   );
 };
 
