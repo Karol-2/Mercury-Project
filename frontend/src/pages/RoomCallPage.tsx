@@ -10,11 +10,12 @@ import { useParams } from "react-router-dom";
 import dataService from "../services/data";
 import RoomPeerVideo from "../components/RoomPeerVideo";
 import Peer from "peerjs";
+import RoomPeer from "../models/RoomPeer";
 function RoomCallPage() {
     const localRef = useRef<HTMLVideoElement>(null);
     const peer: Peer = useSelector((state: RootState) => state.peer);
     const [localStream, setLocalStream] = useState<MediaStream | null>(null);
-    const [remoteStreams, setRemoteStreams] = useState<Set<MediaStream>>(new Set());
+    const [roomPeers, setRoomPeers] = useState<{[key: string]: RoomPeer}>({});
     const friends: User[] = useSelector((state: RootState) => state.friends);
     const {socket, userId, user} = useUser();
     const params = useParams();
@@ -28,13 +29,19 @@ function RoomCallPage() {
             call.answer(stream);
         }
         call.on("stream", (remoteStream: MediaStream) => {
-            setRemoteStreams(prev => new Set([...prev, remoteStream]));
+            const peerId = call.peer;
+            const newPeerObj: {[key: string]: RoomPeer} = {};
+            newPeerObj[peerId] = {stream: remoteStream}
+            setRoomPeers(prev => ({...prev, ...newPeerObj}));
         });
     });
     const connectToNewUser = (newPeerId: string, fullName: string, stream: MediaStream) => {
         const call = peer.call(newPeerId, stream);
         call.on("stream", (remoteStream: MediaStream) => {
-            setRemoteStreams(prev => new Set([...prev, remoteStream]));
+            const peerId = newPeerId;
+            const newPeerObj: {[key: string]: RoomPeer} = {};
+            newPeerObj[peerId] = {stream: remoteStream};
+            setRoomPeers(prev => ({...prev, ...newPeerObj}));
         });
     }
     const prepareWebRTC = async () => {
@@ -77,7 +84,7 @@ function RoomCallPage() {
                             ref={localRef}
                         ></video>
                     </div>
-                    {Array.from(remoteStreams).map((remoteStream,idx) => <RoomPeerVideo key={idx} remoteStream={remoteStream} />)}
+                    {Object.entries(roomPeers).map((roomPeer) => <RoomPeerVideo key={roomPeer[0]} remoteStream={roomPeer[1].stream} />)}
                 </section>
                 <section>
                     <h3><strong>Invite</strong></h3>

@@ -1,5 +1,5 @@
 interface RoomPeer {
-    peerId: string;
+    peerId?: string;
     stream: MediaStream;
     fullName?: string;
 }
