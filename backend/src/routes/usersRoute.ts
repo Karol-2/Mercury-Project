@@ -202,36 +202,6 @@ usersRouter.get("/:userId", async (req: Request, res: UserErrorResponse) => {
   }
 });
 
-usersRouter.get(
-  "/:userId/friends",
-  async (req: Request, res: FriendsErrorResponse) => {
-    try {
-      const userId = req.params.userId;
-
-      const session = driver.session();
-      const user = await userExists(session, { id: userId });
-
-      if (!user) {
-        return userNotFoundRes(res);
-      }
-
-      const friendRequest = await session.run(
-        `MATCH (u:User {id: $userId})-[:IS_FRIENDS_WITH]-(f:User) RETURN f`,
-        { userId },
-      );
-      await session.close();
-
-      const friends = friendRequest.records.map((f) =>
-        filterUser(f.get("f").properties),
-      );
-      return res.json({ status: "ok", friends });
-    } catch (err) {
-      console.log("Error:", err);
-      return res.status(404).json({ status: "error", errors: err as object });
-    }
-  },
-);
-
 usersRouter.get("/meetings/:userId", async (req: Request, res) => {
   try {
     const session = driver.session();

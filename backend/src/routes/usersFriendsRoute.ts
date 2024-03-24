@@ -35,6 +35,8 @@ friendshipRouter.get(
     try {
       const session = driver.session();
       const userId = req.params.userId;
+      const page: number = parseInt(req.query.page as string);
+      const maxUsersOnPage: number = parseInt(req.query.maxUsers as string);
 
       const user = await userExists(session, res, userId);
       if ("json" in user) {
@@ -50,8 +52,42 @@ friendshipRouter.get(
       );
       await session.close();
 
-      const friends = friendQuery.records.map((f) => f.get("f").properties);
-      return res.json({ status: "ok", friends });
+      const allFriends = friendQuery.records.map((f) => f.get("f").properties);
+
+      if (!page && !maxUsersOnPage) {
+        if (allFriends.length === 0) {
+          return res.status(404).json({
+            status: "error",
+            errors: { friends: "No friends found" },
+          });
+        }
+        return res.status(200).json({
+          status: "ok",
+          friends: allFriends,
+        });
+      } else if (!page || !maxUsersOnPage) {
+        return res.status(400).json({
+          status: "error",
+          errors: { params: "Missing or incorrect query params" },
+        });
+      }
+
+      const friends = allFriends.slice(
+        (page - 1) * maxUsersOnPage,
+        page * maxUsersOnPage,
+      );
+
+      if (friends.length === 0) {
+        return res.status(404).json({
+          status: "error",
+          errors: { friends: "No friends found with given queries" },
+        });
+      }
+
+      return res.status(200).json({
+        status: "ok",
+        friends,
+      });
     } catch (err) {
       console.log("Error:", err);
       return res.status(404).json({ status: "error", errors: err as object });
