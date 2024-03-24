@@ -1,6 +1,8 @@
 {
   "id" : "c613758c-7b5c-4def-bd86-beea4dfaae01",
   "realm" : "mercury",
+  "displayName" : "Mercury",
+  "displayNameHtml" : "",
   "notBefore" : 0,
   "defaultSignatureAlgorithm" : "RS256",
   "revokeRefreshToken" : false,
@@ -539,9 +541,10 @@
     "protocol" : "openid-connect",
     "attributes" : {
       "oidc.ciba.grant.enabled" : "false",
-      "oauth2.device.authorization.grant.enabled" : "false",
       "client.secret.creation.time" : "1710663416",
       "backchannel.logout.session.required" : "true",
+      "post.logout.redirect.uris" : "+",
+      "oauth2.device.authorization.grant.enabled" : "false",
       "backchannel.logout.revoke.offline.tokens" : "false"
     },
     "authenticationFlowBindingOverrides" : { },
@@ -556,6 +559,7 @@
       "config" : {
         "user.session.note" : "clientAddress",
         "introspection.token.claim" : "true",
+        "userinfo.token.claim" : "true",
         "id.token.claim" : "true",
         "access.token.claim" : "true",
         "claim.name" : "clientAddress",
@@ -570,6 +574,7 @@
       "config" : {
         "user.session.note" : "clientHost",
         "introspection.token.claim" : "true",
+        "userinfo.token.claim" : "true",
         "id.token.claim" : "true",
         "access.token.claim" : "true",
         "claim.name" : "clientHost",
@@ -584,6 +589,7 @@
       "config" : {
         "user.session.note" : "client_id",
         "introspection.token.claim" : "true",
+        "userinfo.token.claim" : "true",
         "id.token.claim" : "true",
         "access.token.claim" : "true",
         "claim.name" : "client_id",
@@ -1210,8 +1216,10 @@
     "strictTransportSecurity" : "max-age=31536000; includeSubDomains"
   },
   "smtpServer" : { },
-  "displayName" : "Mercury",
-  "displayNameHtml" : "",
+  "loginTheme" : "mercury",
+  "accountTheme" : "",
+  "adminTheme" : "",
+  "emailTheme" : "",
   "eventsEnabled" : false,
   "eventsListeners" : [ "jboss-logging" ],
   "enabledEventTypes" : [ ],
@@ -1262,7 +1270,7 @@
       "subType" : "anonymous",
       "subComponents" : { },
       "config" : {
-        "allowed-protocol-mapper-types" : [ "oidc-usermodel-property-mapper", "oidc-usermodel-attribute-mapper", "oidc-sha256-pairwise-sub-mapper", "oidc-full-name-mapper", "saml-role-list-mapper", "saml-user-property-mapper", "oidc-address-mapper", "saml-user-attribute-mapper" ]
+        "allowed-protocol-mapper-types" : [ "oidc-usermodel-property-mapper", "saml-user-attribute-mapper", "oidc-full-name-mapper", "oidc-address-mapper", "oidc-sha256-pairwise-sub-mapper", "oidc-usermodel-attribute-mapper", "saml-user-property-mapper", "saml-role-list-mapper" ]
       }
     }, {
       "id" : "834344b9-0e3e-44ab-afc6-b3eca79046ab",
@@ -1280,7 +1288,7 @@
       "subType" : "authenticated",
       "subComponents" : { },
       "config" : {
-        "allowed-protocol-mapper-types" : [ "oidc-address-mapper", "saml-user-attribute-mapper", "oidc-sha256-pairwise-sub-mapper", "saml-user-property-mapper", "saml-role-list-mapper", "oidc-usermodel-attribute-mapper", "oidc-usermodel-property-mapper", "oidc-full-name-mapper" ]
+        "allowed-protocol-mapper-types" : [ "oidc-sha256-pairwise-sub-mapper", "saml-user-attribute-mapper", "oidc-address-mapper", "saml-user-property-mapper", "saml-role-list-mapper", "oidc-full-name-mapper", "oidc-usermodel-attribute-mapper", "oidc-usermodel-property-mapper" ]
       }
     }, {
       "id" : "04ac11e0-5350-4fec-9643-542ac4707b6b",

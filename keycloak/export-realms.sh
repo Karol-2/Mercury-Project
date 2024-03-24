@@ -8,7 +8,7 @@ docker compose exec keycloak sh -c "
       --users same_file
 "
 
-realm_dir="$script_dir/realms"
+realm_dir="$script_dir/import"
 
 # Remove ignored master realm files
 if ls "$realm_dir" | grep -q master-realm.json; then
