@@ -92,7 +92,7 @@ function SearchPage() {
                         isFriend={isFriend(usersFriends, user)}
                       />
                     );
-                  }
+                  } else return<></>
                 }}
               />
             
