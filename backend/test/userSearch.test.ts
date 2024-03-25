@@ -14,7 +14,7 @@ test("Search all users", async () => {
   expect(status).toBe("ok");
   expect(users.length).toBe(27);
 
-  userId = users[0][0].id;
+  userId = users[0].id;
 });
 
 test("Search all users from Poland", async () => {
@@ -30,6 +30,28 @@ test("Search all users from Poland", async () => {
   expect(users.length).toBe(3);
 });
 
+test("Missing page", async () => {
+  const response = await fetch(
+    `http://localhost:5000/users/search?q=a&maxUsers=${maxUsers}`,
+  );
+
+  const responseData = await response.json();
+  const status = responseData.status;
+
+  expect(status).toBe("error");
+});
+
+test("Missing maxUsers", async () => {
+  const response = await fetch(
+    `http://localhost:5000/users/search?q=a&page=${page}`,
+  );
+
+  const responseData = await response.json();
+  const status = responseData.status;
+
+  expect(status).toBe("error");
+});
+
 test("First user from Lithuania", async () => {
   const response = await fetch(
     `http://localhost:5000/users/search?country=Lithuania&page=${page}&maxUsers=${maxUsers}`,
@@ -41,7 +63,7 @@ test("First user from Lithuania", async () => {
 
   expect(status).toBe("ok");
   expect(users.length).toBe(1);
-  expect(users[0][0].country).toBe("Lithuania");
+  expect(users[0].country).toBe("Lithuania");
 });
 
 test("Not found user", async () => {

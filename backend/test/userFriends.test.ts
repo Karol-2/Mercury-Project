@@ -13,18 +13,18 @@ test("Search user", async () => {
 
   expect(status).toBe("ok");
 
-  userId = users[0][0].id;
+  userId = users[0].id;
 });
 
 test("Get friends", async () => {
   const response = await fetch(`http://localhost:5000/users/${userId}/friends`);
 
   const responseData = await response.json();
-  const friends = responseData.friends;
+  const users = responseData.users;
   const status = responseData.status;
 
   expect(status).toBe("ok");
-  expect(friends.length).toBe(6);
+  expect(users.length).toBe(6);
 });
 
 test("Missing page", async () => {
@@ -58,7 +58,7 @@ test("First user", async () => {
 
   const responseData = await response.json();
   const status = responseData.status;
-  const users = responseData.friends;
+  const users = responseData.users;
 
   expect(status).toBe("ok");
   expect(users.length).toBe(1);
@@ -72,7 +72,7 @@ test("Not found users", async () => {
   );
   const responseData = await response.json();
   const status = responseData.status;
-  const message = responseData.errors.friends;
+  const message = responseData.errors.users;
 
   expect(status).toBe("error");
   expect(message).toBe("No friends found with given queries");

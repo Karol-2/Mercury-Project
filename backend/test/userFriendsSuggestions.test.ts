@@ -13,7 +13,7 @@ test("Search user", async () => {
 
   expect(status).toBe("ok");
 
-  userId = users[0][0].id;
+  userId = users[0].id;
 });
 
 test("Get friend suggestions", async () => {
@@ -22,11 +22,15 @@ test("Get friend suggestions", async () => {
   );
 
   const responseData = await response.json();
-  const size = responseData.size;
   const status = responseData.status;
+  const allUsersSize = responseData.allUsersSize;
+  const totalPage = responseData.totalPage;
+  const usersLength = responseData.users.length;
 
   expect(status).toBe("ok");
-  expect(size).toBe(15);
+  expect(allUsersSize).toBe(15);
+  expect(totalPage).toBe(3);
+  expect(usersLength).toBe(5);
 });
 
 test("Missing page", async () => {
