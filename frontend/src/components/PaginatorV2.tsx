@@ -38,8 +38,7 @@ function PaginatorV2(props: PaginatorProps) {
         .fetchData(url, "GET")
         .then((response) => {
           if (response.users && response.totalPage) {
-            
-            setError("")
+            setError("");
             setUsers(response.users);
             setTotalPages(response.totalPage);
           } else {
@@ -84,30 +83,32 @@ function PaginatorV2(props: PaginatorProps) {
               ))}
           </ul>
           {/* // paginator shows only when there is more than 1 page */}
-          {totalPages !== 1&&<div
-            id="pagin-buttons"
-            className=" bg-my-orange rounded-md flex flex-row justify-evenly text-lg p-2 align-middle"
-          >
-            <button
-              onClick={previousPage}
-              className=" rounded-lg bg-my-dark text-my-light p-2 transition duration-250 ease-in-out hover:bg-my-darker active:translate-y-1"
+          {totalPages !== 1 && (
+            <div
+              id="pagin-buttons"
+              className=" bg-my-orange rounded-md flex flex-row justify-evenly text-lg p-2 align-middle"
             >
-              <FontAwesomeIcon icon={faArrowLeft} />
-            </button>
+              <button
+                onClick={previousPage}
+                className=" rounded-lg bg-my-dark text-my-light p-2 transition duration-250 ease-in-out hover:bg-my-darker active:translate-y-1"
+              >
+                <FontAwesomeIcon icon={faArrowLeft} />
+              </button>
 
-            <div className=" flex flex-col justify-center">
-              <p>
-                Page {currentPage} of {totalPages}
-              </p>
+              <div className=" flex flex-col justify-center">
+                <p>
+                  Page {currentPage} of {totalPages}
+                </p>
+              </div>
+
+              <button
+                onClick={nextPage}
+                className=" rounded-lg bg-my-dark text-my-light p-2 transition duration-250 ease-in-out hover:bg-my-darker active:translate-y-1"
+              >
+                <FontAwesomeIcon icon={faArrowRight} />
+              </button>
             </div>
-
-            <button
-              onClick={nextPage}
-              className=" rounded-lg bg-my-dark text-my-light p-2 transition duration-250 ease-in-out hover:bg-my-darker active:translate-y-1"
-            >
-              <FontAwesomeIcon icon={faArrowRight} />
-            </button>
-          </div>}
+          )}
         </>
       )}
     </div>

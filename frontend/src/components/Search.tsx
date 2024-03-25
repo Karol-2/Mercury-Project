@@ -21,7 +21,9 @@ const Search = (props: searchProps) => {
   const { userId } = useUser();
 
   useEffect(() => {
-    const emptyElementExists = countryList.some(country => country.Code === '-');
+    const emptyElementExists = countryList.some(
+      (country) => country.Code === "-",
+    );
 
     if (!emptyElementExists) {
       const optionsWithEmpty = [{ Country: "-", Code: "-" }, ...countryList];
@@ -53,11 +55,9 @@ const Search = (props: searchProps) => {
     if (searchQuery.trim() === "") {
       return;
     }
-    
-    props.handler(url)
-  };
 
-  
+    props.handler(url);
+  };
 
   return (
     <div id="search-wrapper" className="mx-50 my-20 flex items-center flex-col">
