@@ -8,6 +8,8 @@ interface PaginatorProps {
   endpoint: string;
   itemsPerPage: number;
   renderItem: (user: User) => React.ReactNode;
+  refresh: boolean;
+  isSearch: boolean
 }
 
 function PaginatorV2(props: PaginatorProps) {
@@ -18,24 +20,46 @@ function PaginatorV2(props: PaginatorProps) {
   const [users, setUsers] = useState<User[]>([]);
 
   useEffect(() => {
-    const handleRequest = async () => {
-      const url =
-        props.endpoint + `?page=${currentPage}&maxUsers=${props.itemsPerPage}`;
+    const handleRequest = async () => {  
+      if(props.endpoint.slice(-1) === "0" || props.endpoint === ""){
+        return
+      }
+
+      let queryChar = "?"
+      if(props.isSearch){
+        queryChar="&"
+      }
+
+      const url = props.endpoint + `${queryChar}page=${currentPage}&maxUsers=${props.itemsPerPage}`;
+      
       await dataService
         .fetchData(url, "GET")
         .then((response) => {
-          // console.log(response);
-          setUsers(response.users);
-          setTotalPages(response.totalPage)
+          
+          if(response.users && response.totalPage){
+          
+            
+            setUsers(response.users);
+            setTotalPages(response.totalPage)
+          } else {
+            previousPage()
+            if(currentPage === 1){
+              setError("No user found")
+            }
+           
+          }
+     
         })
         .catch((err) => {
-          console.error(err);
-          setError("No user found")
+          console.log(err);
+          
+          setError("No users found")
         });
     };
 
     handleRequest();
-  }, [currentPage]);
+
+  }, [currentPage, props.refresh]);
 
   const nextPage = () => {
     if (currentPage + 1 <= totalPages) {
@@ -51,11 +75,12 @@ function PaginatorV2(props: PaginatorProps) {
 
   return (
     <div id="paginator">
-      {error && <div> {error} </div>}
-      <ul>
-        {!error &&
-          users &&
-          users.map((user) => (
+      {error ? 
+      <div>  </div>
+      :
+      <>
+         <ul>
+        {users && users.map((user) => (
             <div key={user.id}>{props.renderItem(user)}</div>
           ))}
       </ul>
@@ -84,6 +109,9 @@ function PaginatorV2(props: PaginatorProps) {
           <FontAwesomeIcon icon={faArrowRight} />
         </button>
       </div>
+      </>
+      }
+   
     </div>
   );
 }

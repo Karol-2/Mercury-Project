@@ -8,8 +8,8 @@ import User from "../models/User";
 import { useNavigate } from "react-router-dom";
 
 import Transition from "../components/Transition";
-import Paginator from "../components/Paginator";
 import Search from "../components/Search";
+import PaginatorV2 from "../components/PaginatorV2";
 
 function SearchPage() {
   const navigate = useNavigate();
@@ -17,6 +17,8 @@ function SearchPage() {
   // Logic
   const [usersFound, setUsersFound] = useState<[[User, number]] | null>(null);
   const [usersFriends, setUsersFriends] = useState([]);
+  const [queryEndpoint, setQueryEndpoint] = useState<string>("");
+  const [isReadyToSearch, setIsReadyToSearch] = useState<boolean>(false)
 
   // Animation
   const [showAnimation, setShowAnim] = useState(false);
@@ -40,7 +42,9 @@ function SearchPage() {
         "GET",
         {},
       );
-      const friendsIds = friendsResponse.friends.reduce(
+      console.log(friendsResponse.users);
+      
+      const friendsIds = friendsResponse.users.reduce(
         (prev: string[], curr: User) => {
           return [...prev, curr.id];
         },
@@ -59,8 +63,11 @@ function SearchPage() {
     }, false);
   };
 
-  const foundUsersHandler = (users: [[User, number]] | null)=>{
-    setUsersFound(users)
+  const foundUsersHandler = (endpoint: string)=>{ 
+    console.log("hendler", endpoint);
+    
+    setQueryEndpoint(endpoint)
+    setIsReadyToSearch(!isReadyToSearch)
   }
 
 
@@ -72,9 +79,11 @@ function SearchPage() {
         <>
           <section className=" min-h-screen mx-50 lg:mx-72 ">
             <Search handler={foundUsersHandler} />
-            {usersFound && (
-              <Paginator
-                users={usersFound.map((match: [User, number]) => match[0])}
+            
+              <PaginatorV2
+                endpoint={queryEndpoint}
+                refresh={isReadyToSearch}
+                isSearch={true}
                 itemsPerPage={5}
                 renderItem={(user) => (
                   <FoundUser
@@ -85,7 +94,7 @@ function SearchPage() {
                   />
                 )}
               />
-            )}
+            
           </section>
           <Footer />
         </>

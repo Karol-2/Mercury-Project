@@ -15,7 +15,6 @@ import dataService from "../services/data";
 import Transition from "../components/Transition";
 import FoundUser from "../components/FoundUser";
 import Friend from "../components/Friend";
-import Paginator from "../components/Paginator";
 import PaginatorV2 from "../components/PaginatorV2";
 
 function FriendsPage() {
@@ -23,7 +22,7 @@ function FriendsPage() {
   const dispatch = useDispatch();
   const { user, meeting, createMeeting, joinMeeting } = useUser();
 
-  const [friends, setFriends] = useState([]);
+
   const [friendsRequests, setFriendsRequests] = useState([]);
   const [refresh, setRefresh] = useState(false);
 
@@ -71,20 +70,21 @@ function FriendsPage() {
     fetchFriendRequests();
   }, [refresh]);
 
-  useEffect(() => {
-    const fetchFriends = async () => {
-      if (user) {
-        const friendsResponse = await dataService.fetchData(
-          `/users/${user.id}/friends`,
-          "GET",
-          {},
-        );
-        setFriends(friendsResponse.users);
-        dispatch(setUserFriends(friendsResponse.users));
-      }
-    };
-    fetchFriends();
-  }, [refresh]);
+  // useEffect(() => {
+  //   const fetchFriends = async () => {
+  //     if (user) {
+  //       const friendsResponse = await dataService.fetchData(
+  //         `/users/${user.id}/friends`,
+  //         "GET",
+  //         {},
+  //       );
+  //       setFriends(friendsResponse.users);
+  //       dispatch(setUserFriends(friendsResponse.users));
+  //     }
+  //   };
+  //   fetchFriends();
+  // }, [refresh]);
+  //TODO: naprawienie usuwanie i przyjmowania req
 
   const handleDeclineRequest = async (friend: User) => {
     if (user) {
@@ -140,13 +140,15 @@ function FriendsPage() {
                   <FontAwesomeIcon icon={faPlus}></FontAwesomeIcon>
                   <span className="ml-2">Create a meeting</span>
                 </button>
-                <h1 className="text-3xl font-bold">Friends:</h1>
+                <h1 className="text-3xl font-bold">Friends</h1>
                 <hr className="text-my-orange"></hr>
                 <ul className="">
-                  {friends && user&& friends.length > 0 ? (
+                  {user && (
                     <PaginatorV2
                       endpoint={`/users/${user.id}/friends`}
-                      itemsPerPage={5}
+                      refresh={refresh}
+                      isSearch={false}
+                      itemsPerPage={2}
                       renderItem={(user) => (
                         <Friend
                           friend={user}
@@ -155,15 +157,13 @@ function FriendsPage() {
                         />
                       )}
                     />
-                  ) : (
-                    <p>You don't have any friends.</p>
                   )}
                 </ul>
               </div>
 
               <div id="friend-requests">
                 <div className="p-10 rounded-xl bg-my-dark">
-                  <h1 className="text-3xl font-bold">Friend requests:</h1>
+                  <h1 className="text-3xl font-bold">Friend requests</h1>
                   <hr className="text-my-orange"></hr>
                 </div>
                 <div>
@@ -186,11 +186,13 @@ function FriendsPage() {
             </section>
             <section id="suggestions" className=" mt-8">
               <div>
-                <h1 className="text-3xl font-bold">Friends Suggestions:</h1>
-                {user && friendSuggestions && friendSuggestions.length > 0 ? (
-                  <Paginator
-                    users={friendSuggestions}
+                <h1 className="text-3xl font-bold">Friends Suggestions</h1>
+                {user &&  (
+                  <PaginatorV2
+                    endpoint={`/users/${user.id}/friend-suggestions`}
                     itemsPerPage={3}
+                    refresh={refresh}
+                    isSearch={false}
                     renderItem={(user) => (
                       <FoundUser
                         user={user}
@@ -200,8 +202,6 @@ function FriendsPage() {
                       />
                     )}
                   />
-                ) : (
-                  "You need to add more friends to show valid suggestions."
                 )}
               </div>
             </section>

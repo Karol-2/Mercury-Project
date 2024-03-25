@@ -10,7 +10,7 @@ import User from "../models/User";
 import dataService from "../services/data";
 
 interface searchProps {
-  handler: (test: [[User, number]] | null) => void;
+  handler: (endpoint: string) => void;
 }
 
 const Search = (props: searchProps) => {
@@ -58,43 +58,12 @@ const Search = (props: searchProps) => {
     if (searchQuery.trim() === "") {
       return;
     }
-    try {
-      setError("");
-      const response = await dataService.fetchData(url, "GET");
-
-      const responseWithoutCurrUser = response.users.filter(
-        (respArr: [User, number]) => respArr[0].id !== user!.id,
-      );
-
-      const usersSorted = sortUsersByDistance( //TODO: przenieść sortowanie na backend
-        searchQuery,
-        responseWithoutCurrUser,
-      );
-
-      setUsersFound(usersSorted);
-    } catch {
-      setError("No users found");
-      setUsersFound(null)
-    }
+    console.log(url);
+    
+    props.handler(url)
   };
 
-  const sortUsersByDistance = (searchTerm: string, users: [[User, number]]) => {
-    const userScores = users.map((respArr: [User, number]) => {
-      const user = respArr[0];
-      const score = editDistance(user.first_name + user.last_name, searchTerm);
-      return [user, score];
-    });
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return userScores.sort((a: any, b: any) => {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const [_userA, scoreA] = a;
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const [_userB, scoreB] = b;
-
-      return scoreA - scoreB;
-    }) as [[User, number]];
-  };
+  
 
   return (
     <div id="search-wrapper" className="mx-50 my-20 flex items-center flex-col">
