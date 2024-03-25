@@ -90,8 +90,10 @@ usersRouter.get(
     }
 
     try {
-      const page: number = parseInt(req.query.page as string);
-      const maxUsersOnPage: number = parseInt(req.query.maxUsers as string);
+      const page: number = parseInt((req.query.page as string) || "");
+      const maxUsersOnPage: number = parseInt(
+        (req.query.maxUsers as string) || "",
+      );
       const session = driver.session();
       let allUsers: User[] = [];
 

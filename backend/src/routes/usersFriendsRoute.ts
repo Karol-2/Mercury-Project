@@ -39,8 +39,10 @@ friendshipRouter.get(
     try {
       const session = driver.session();
       const userId = req.params.userId;
-      const page: number = parseInt(req.query.page as string);
-      const maxUsersOnPage: number = parseInt(req.query.maxUsers as string);
+      const page: number = parseInt((req.query.page as string) || "");
+      const maxUsersOnPage: number = parseInt(
+        (req.query.maxUsers as string) || "",
+      );
 
       const user = await userExists(session, res, userId);
       if ("json" in user) {
@@ -142,9 +144,10 @@ friendshipRouter.get(
     try {
       const session: Session = driver.session();
       const userId: string = req.params.userId;
-      const page: number = parseInt(req.query.page as string);
-      const maxUsersOnPage: number = parseInt(req.query.maxUsers as string);
-
+      const page: number = parseInt((req.query.page as string) || "");
+      const maxUsersOnPage: number = parseInt(
+        (req.query.maxUsers as string) || "",
+      );
       const user = await userExists(session, res, userId);
       if ("json" in user) {
         await session.close();
