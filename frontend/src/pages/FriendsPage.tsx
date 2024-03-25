@@ -36,7 +36,6 @@ function FriendsPage() {
     }, 100);
   }, []);
 
-
   useEffect(() => {
     const fetchFriendRequests = async () => {
       if (user) {
@@ -142,7 +141,7 @@ function FriendsPage() {
             <section id="suggestions" className=" mt-8">
               <div>
                 <h1 className="text-3xl font-bold">Friends Suggestions</h1>
-                {user &&  (
+                {user && (
                   <PaginatorV2
                     endpoint={`/users/${user.id}/friend-suggestions`}
                     itemsPerPage={3}
