@@ -3,6 +3,7 @@ import { Session } from "neo4j-driver";
 import driver from "../driver/driver";
 import User from "../models/User";
 import removeKeys from "../misc/removeKeys";
+import roundToInt from "../misc/roundToInt";
 import {
   OkErrorResponse,
   FriendsErrorResponse,
@@ -66,7 +67,7 @@ friendshipRouter.get(
             errors: { users: "No friends found" },
           });
         }
-        const totalPage: number = Math.floor(allFriends.length / 5) + 1;
+        const totalPage: number = roundToInt(allFriends.length / 5);
         return res.status(200).json({
           status: "ok",
           allUsersSize: allFriends.length,
@@ -91,7 +92,7 @@ friendshipRouter.get(
           errors: { users: "No friends found with given queries" },
         });
       }
-      const totalPage: number = Math.floor(friends.length / maxUsersOnPage) + 1;
+      const totalPage: number = roundToInt(friends.length / maxUsersOnPage);
       return res.status(200).json({
         status: "ok",
         allUsersSize: allFriends.length,
@@ -170,7 +171,7 @@ friendshipRouter.get(
             message: "No users found",
           });
         }
-        const totalPage: number = Math.floor(allUsers.length / 5) + 1;
+        const totalPage: number = roundToInt(allUsers.length / 5);
         return res.status(200).json({
           status: "ok",
           allUsersSize: allUsers.length,
@@ -196,7 +197,7 @@ friendshipRouter.get(
         });
       }
 
-      const totalPage: number = Math.floor(users.length / maxUsersOnPage) + 1;
+      const totalPage: number = roundToInt(users.length / maxUsersOnPage);
       return res.status(200).json({
         status: "ok",
         allUsersSize: allUsers.length,

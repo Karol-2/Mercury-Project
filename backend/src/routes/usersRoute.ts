@@ -16,6 +16,7 @@ import {
 import usersFriendsRoute from "./usersFriendsRoute";
 
 import removeKeys from "../misc/removeKeys";
+import roundToInt from "../misc/roundToInt";
 import { ChangePasswordReq } from "../models/ChangePasswordReq";
 import { log } from "console";
 
@@ -141,7 +142,7 @@ usersRouter.get(
             errors: { users: "No users found" },
           });
         }
-        const totalPage: number = Math.floor(allUsers.length / 10) + 1;
+        const totalPage: number = roundToInt(allUsers.length / 10);
         return res.status(200).json({
           status: "ok",
           allUsersSize: allUsers.length,
@@ -166,7 +167,7 @@ usersRouter.get(
           errors: { users: "No users found with given queries" },
         });
       }
-      const totalPage: number = Math.floor(users.length / maxUsersOnPage) + 1;
+      const totalPage: number = roundToInt(users.length / 5);
       return res.status(200).json({
         status: "ok",
         allUsersSize: allUsers.length,
