@@ -24,17 +24,14 @@ function PaginatorV2(props: PaginatorProps) {
       await dataService
         .fetchData(url, "GET")
         .then((response) => {
-          console.log(response);
-          setUsers(response.friends);
+          // console.log(response);
+          setUsers(response.users);
+          setTotalPages(response.totalPage)
         })
         .catch((err) => {
           console.error(err);
-          // TODO: logika do błędu
+          setError("No user found")
         });
-
-      // TODO: ZMIEŃ W SEARCH ABY NIE ZWRACAŁO NUMERU,
-      //TODO: ORAZ ŻEBY ZAWSZE ZWRACAŁO USERS A NIE FRIENDS lub cokolwiek innego
-      //TODO: dodać totalPages żeby można było: setTotalPages(response.totalPages)
     };
 
     handleRequest();
@@ -54,7 +51,7 @@ function PaginatorV2(props: PaginatorProps) {
 
   return (
     <div id="paginator">
-      {error && <div> error </div>}
+      {error && <div> {error} </div>}
       <ul>
         {!error &&
           users &&

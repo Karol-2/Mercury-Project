@@ -79,8 +79,8 @@ function FriendsPage() {
           "GET",
           {},
         );
-        setFriends(friendsResponse.friends);
-        dispatch(setUserFriends(friendsResponse.friends));
+        setFriends(friendsResponse.users);
+        dispatch(setUserFriends(friendsResponse.users));
       }
     };
     fetchFriends();
