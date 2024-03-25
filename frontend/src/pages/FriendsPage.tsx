@@ -148,9 +148,9 @@ function FriendsPage() {
                     itemsPerPage={3}
                     refresh={refresh}
                     isSearch={false}
-                    renderItem={(user) => (
+                    renderItem={(resultUser) => (
                       <FoundUser
-                        user={user}
+                        user={resultUser}
                         key={String(1)}
                         currentId={user.id}
                         isFriend={false}
