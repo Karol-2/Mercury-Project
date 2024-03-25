@@ -35,7 +35,9 @@ export interface FriendsResponse {
 
 export interface UsersSearchResponse {
   status: "ok";
-  users: [User, number][];
+  allUsersSize: number;
+  totalPage: number;
+  users: User[];
 }
 
 export interface JWTResponse extends OkResponse {

@@ -92,7 +92,7 @@ usersRouter.get(
       const page: number = parseInt(req.query.page as string);
       const maxUsersOnPage: number = parseInt(req.query.maxUsers as string);
       const session = driver.session();
-      let allUsers: [User, number][] = [];
+      let allUsers: User[] = [];
 
       if (country && searchTerm) {
         const wordVec = wordToVec(searchTerm);
@@ -105,38 +105,30 @@ usersRouter.get(
 
         allUsers = searchRequest.records
           .map((r) => {
-            return [
-              filterUser(r.get("similarUser").properties),
-              Number(r.get("score")),
-            ] as [User, number];
+            return filterUser(r.get("similarUser").properties);
           })
-          .filter(([user, _]) => user.country === country);
+          .filter((user) => user.country === country);
       } else if (country) {
-        const query = `
-          MATCH (u:User {country: $country})
-          RETURN u
-        `;
+        const searchRequest = await session.run(
+          `MATCH (similarUser:User {country: $country})
+          RETURN similarUser`,
+          { country },
+        );
 
-        const result = await session.run(query, { country });
-
-        allUsers = result.records.map((record) => {
-          return [record.get("u").properties as User, 1] as [User, number];
+        allUsers = searchRequest.records.map((r) => {
+          return filterUser(r.get("similarUser").properties);
         });
       } else if (searchTerm) {
         const wordVec = wordToVec(searchTerm);
-
-        const userRequest = await session.run(
+        const searchRequest = await session.run(
           `CALL db.index.vector.queryNodes('user-names', 100, $wordVec)
           YIELD node AS similarUser, score
           RETURN similarUser, score`,
           { wordVec },
         );
 
-        allUsers = userRequest.records.map((r) => {
-          return [
-            filterUser(r.get("similarUser").properties),
-            Number(r.get("score")),
-          ] as [User, number];
+        allUsers = searchRequest.records.map((r) => {
+          return filterUser(r.get("similarUser").properties);
         });
       }
 
@@ -149,8 +141,11 @@ usersRouter.get(
             errors: { users: "No users found" },
           });
         }
+        const totalPage: number = Math.floor(allUsers.length / 10) + 1;
         return res.status(200).json({
           status: "ok",
+          allUsersSize: allUsers.length,
+          totalPage: totalPage,
           users: allUsers,
         });
       } else if (!page || !maxUsersOnPage) {
@@ -171,9 +166,11 @@ usersRouter.get(
           errors: { users: "No users found with given queries" },
         });
       }
-
+      const totalPage: number = Math.floor(users.length / maxUsersOnPage) + 1;
       return res.status(200).json({
         status: "ok",
+        allUsersSize: allUsers.length,
+        totalPage: totalPage,
         users,
       });
     } catch (err) {
