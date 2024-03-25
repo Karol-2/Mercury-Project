@@ -2,11 +2,14 @@ import { Router, Request, Response } from "express";
 import { Session } from "neo4j-driver";
 import driver from "../driver/driver";
 import User from "../models/User";
+import removeKeys from "../misc/removeKeys";
 import {
   OkErrorResponse,
   FriendsErrorResponse,
   UsersErrorResponse,
 } from "../types/userResponse";
+
+const filterUser = (user: User) => removeKeys({ ...user }, ["name_embedding"]);
 
 const friendshipRouter = Router();
 
@@ -31,7 +34,7 @@ async function userExists(
 
 friendshipRouter.get(
   "/:userId/friends",
-  async (req: Request, res: FriendsErrorResponse) => {
+  async (req: Request, res: Response) => {
     try {
       const session = driver.session();
       const userId = req.params.userId;
@@ -44,7 +47,7 @@ friendshipRouter.get(
         return res;
       }
 
-      const friendQuery = await session.run(
+      const searchRequest = await session.run(
         `MATCH (u:User {id: $userId})-[:IS_FRIENDS_WITH]->(f:User)-[:IS_FRIENDS_WITH]->(u)
           WITH f ORDER BY f.last_name, f.first_name
           RETURN DISTINCT f`,
@@ -52,18 +55,23 @@ friendshipRouter.get(
       );
       await session.close();
 
-      const allFriends = friendQuery.records.map((f) => f.get("f").properties);
+      const allFriends = searchRequest.records.map((f) => {
+        return filterUser(f.get("f").properties);
+      });
 
       if (!page && !maxUsersOnPage) {
         if (allFriends.length === 0) {
           return res.status(404).json({
             status: "error",
-            errors: { friends: "No friends found" },
+            errors: { users: "No friends found" },
           });
         }
+        const totalPage: number = Math.floor(allFriends.length / 5) + 1;
         return res.status(200).json({
           status: "ok",
-          friends: allFriends,
+          allUsersSize: allFriends.length,
+          totalPage: totalPage,
+          users: allFriends,
         });
       } else if (!page || !maxUsersOnPage) {
         return res.status(400).json({
@@ -80,13 +88,15 @@ friendshipRouter.get(
       if (friends.length === 0) {
         return res.status(404).json({
           status: "error",
-          errors: { friends: "No friends found with given queries" },
+          errors: { users: "No friends found with given queries" },
         });
       }
-
+      const totalPage: number = Math.floor(friends.length / maxUsersOnPage) + 1;
       return res.status(200).json({
         status: "ok",
-        friends,
+        allUsersSize: allFriends.length,
+        totalPage: totalPage,
+        users: friends,
       });
     } catch (err) {
       console.log("Error:", err);
@@ -147,9 +157,9 @@ friendshipRouter.get(
         { userId },
       );
 
-      const allUsers: User[] = friendSuggestionsQuery.records.map(
-        (record) => record.get("suggested").properties,
-      );
+      const allUsers: User[] = friendSuggestionsQuery.records.map((r) => {
+        return filterUser(r.get("suggested").properties);
+      });
 
       await session.close();
 
@@ -160,9 +170,11 @@ friendshipRouter.get(
             message: "No users found",
           });
         }
+        const totalPage: number = Math.floor(allUsers.length / 5) + 1;
         return res.status(200).json({
           status: "ok",
-          size: allUsers.length,
+          allUsersSize: allUsers.length,
+          totalPage: totalPage,
           users: allUsers,
         });
       } else if (!page || !maxUsersOnPage) {
@@ -184,10 +196,12 @@ friendshipRouter.get(
         });
       }
 
+      const totalPage: number = Math.floor(users.length / maxUsersOnPage) + 1;
       return res.status(200).json({
         status: "ok",
-        size: allUsers.length,
-        users,
+        allUsersSize: allUsers.length,
+        totalPage: totalPage,
+        users: users,
       });
     } catch (err) {
       console.error("Error:", err);
