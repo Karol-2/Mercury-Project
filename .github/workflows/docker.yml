@@ -24,7 +24,7 @@ jobs:
 
       - name: Wait for containers to start
         run: |
-          sleep 80
+          sleep 100
           docker run \
             --rm \
             --network mercury-project_default \
