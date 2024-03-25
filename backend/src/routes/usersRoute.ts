@@ -1,9 +1,14 @@
 import { Router, Request, Response } from "express";
 import bcrypt from "bcrypt";
 import driver from "../driver/driver.js";
-import { JWTRequest, authenticateToken, getToken, checkToken } from "../misc/jwt.js";
 import {
-    AuthOkErrorResponse,
+  JWTRequest,
+  authenticateToken,
+  getToken,
+  checkToken,
+} from "../misc/jwt.js";
+import {
+  AuthOkErrorResponse,
   FriendsErrorResponse,
   OkErrorResponse,
   UserErrorResponse,

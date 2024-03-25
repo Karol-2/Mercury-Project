@@ -1,1 +1,1 @@
-export type Either<T, U> = Exclude<T, U> | Exclude<U, T>
+export type Either<T, U> = Exclude<T, U> | Exclude<U, T>;

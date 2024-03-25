@@ -18,7 +18,7 @@ function KeycloakUserProvider({ children }: { children: React.ReactNode }) {
   const [socket, setSocket] = useState<Socket | null>(null);
 
   const keycloakRef = useRef<Keycloak | null>(null);
-  const [token, setToken] = useState<string | undefined>()
+  const [token, setToken] = useState<string | undefined>();
 
   const updateUserData = async () => {
     const keycloak = keycloakRef.current!;
@@ -51,8 +51,8 @@ function KeycloakUserProvider({ children }: { children: React.ReactNode }) {
     });
     keycloak.onAuthSuccess = () => {
       updateUserData();
-      setToken(keycloak.token)
-    }
+      setToken(keycloak.token);
+    };
 
     keycloakRef.current = keycloak;
   });
