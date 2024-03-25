@@ -5,9 +5,6 @@ import { useNavigate } from "react-router-dom";
 import Select from "react-select";
 import countriesData from "../assets/countries.json";
 import { useUser } from "../helpers/UserProvider";
-import editDistance from "../misc/editDistance";
-import User from "../models/User";
-import dataService from "../services/data";
 
 interface searchProps {
   handler: (endpoint: string) => void;
@@ -15,15 +12,13 @@ interface searchProps {
 
 const Search = (props: searchProps) => {
   const navigate = useNavigate();
-  const setUsersFound = props.handler;
-
+  //TODO: IF YOU HAVE EMPTY SEARCH, THEN YOU CANT SEARCH ANYTHING
   // Logic
   const [searchQuery, setSearchQuery] = useState("");
   const [country, setCountry] = useState("");
   const [countryList, setCountryList] = useState(countriesData);
-  const [error, setError] = useState("");
 
-  const { user, userId } = useUser();
+  const { userId } = useUser();
 
   useEffect(() => {
     const emptyElementExists = countryList.some(country => country.Code === '-');
@@ -58,7 +53,6 @@ const Search = (props: searchProps) => {
     if (searchQuery.trim() === "") {
       return;
     }
-    console.log(url);
     
     props.handler(url)
   };
@@ -104,7 +98,6 @@ const Search = (props: searchProps) => {
           />
         </div>
       </div>
-      <div>{error}</div>
     </div>
   );
 };

@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
 import { useUser } from "../helpers/UserProvider";
 
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
@@ -10,7 +9,6 @@ import Footer from "../components/Footer";
 import FriendRequest from "../components/FriendRequest";
 import Navbar from "../components/Navbar";
 import User from "../models/User";
-import setUserFriends from "../redux/actions/setUserFriends";
 import dataService from "../services/data";
 import Transition from "../components/Transition";
 import FoundUser from "../components/FoundUser";
@@ -19,14 +17,10 @@ import PaginatorV2 from "../components/PaginatorV2";
 
 function FriendsPage() {
   const navigate = useNavigate();
-  const dispatch = useDispatch();
   const { user, meeting, createMeeting, joinMeeting } = useUser();
-
 
   const [friendsRequests, setFriendsRequests] = useState([]);
   const [refresh, setRefresh] = useState(false);
-
-  const [friendSuggestions, setFriendSuggestions] = useState([]);
 
   const [showAnimation, setShowAnim] = useState(false);
   const [showContent, setShowContent] = useState(false);
@@ -42,19 +36,6 @@ function FriendsPage() {
     }, 100);
   }, []);
 
-  useEffect(() => {
-    const fetchFriendSuggestions = async () => {
-      if (user) {
-        const friendsRequestsResponse = await dataService.fetchData(
-          `/users/${user.id}/friend-suggestions`,
-          "GET",
-          {},
-        );
-        setFriendSuggestions(friendsRequestsResponse.users);
-      }
-    };
-    fetchFriendSuggestions();
-  }, []);
 
   useEffect(() => {
     const fetchFriendRequests = async () => {
@@ -70,32 +51,11 @@ function FriendsPage() {
     fetchFriendRequests();
   }, [refresh]);
 
-  // useEffect(() => {
-  //   const fetchFriends = async () => {
-  //     if (user) {
-  //       const friendsResponse = await dataService.fetchData(
-  //         `/users/${user.id}/friends`,
-  //         "GET",
-  //         {},
-  //       );
-  //       setFriends(friendsResponse.users);
-  //       dispatch(setUserFriends(friendsResponse.users));
-  //     }
-  //   };
-  //   fetchFriends();
-  // }, [refresh]);
-  //TODO: naprawienie usuwanie i przyjmowania req
-
   const handleDeclineRequest = async (friend: User) => {
     if (user) {
       await dataService.fetchData(
         `/users/${user.id}/remove/${friend.id}`,
         "DELETE",
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        },
       );
 
       setRefresh(() => !refresh);
@@ -107,11 +67,6 @@ function FriendsPage() {
       await dataService.fetchData(
         `/users/${user.id}/accept/${currentId}`,
         "POST",
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        },
       );
 
       setRefresh(() => !refresh);

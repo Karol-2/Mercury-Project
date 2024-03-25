@@ -15,7 +15,6 @@ function SearchPage() {
   const navigate = useNavigate();
 
   // Logic
-  const [usersFound, setUsersFound] = useState<[[User, number]] | null>(null);
   const [usersFriends, setUsersFriends] = useState([]);
   const [queryEndpoint, setQueryEndpoint] = useState<string>("");
   const [isReadyToSearch, setIsReadyToSearch] = useState<boolean>(false)
@@ -42,7 +41,6 @@ function SearchPage() {
         "GET",
         {},
       );
-      console.log(friendsResponse.users);
       
       const friendsIds = friendsResponse.users.reduce(
         (prev: string[], curr: User) => {
@@ -64,8 +62,6 @@ function SearchPage() {
   };
 
   const foundUsersHandler = (endpoint: string)=>{ 
-    console.log("hendler", endpoint);
-    
     setQueryEndpoint(endpoint)
     setIsReadyToSearch(!isReadyToSearch)
   }
@@ -85,14 +81,18 @@ function SearchPage() {
                 refresh={isReadyToSearch}
                 isSearch={true}
                 itemsPerPage={5}
-                renderItem={(user) => (
-                  <FoundUser
-                    user={user}
-                    key={String(0)}
-                    currentId={userId}
-                    isFriend={isFriend(usersFriends, user)}
-                  />
-                )}
+                renderItem={(user) => {
+                  if (user.id !== userId) {
+                    return (
+                      <FoundUser
+                        user={user}
+                        key={String(0)}
+                        currentId={userId}
+                        isFriend={isFriend(usersFriends, user)}
+                      />
+                    );
+                  }
+                }}
               />
             
           </section>
