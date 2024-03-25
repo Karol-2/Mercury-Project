@@ -12,7 +12,7 @@ body {
   width: 100vw;
   height: 100vh;
   margin: 0;
-  
+
   display: flex;
   justify-content: center;
   align-items: center;
@@ -53,10 +53,11 @@ body > div > div {
   border-radius: 0.75rem;
 }
 
-input, button {
-	border-radius: 0.5rem;
-	padding: 1rem;
-	border: solid 1px black;
+input,
+button {
+  border-radius: 0.5rem;
+  padding: 1rem;
+  border: solid 1px black;
   font-size: 0.9rem;
 }
 
