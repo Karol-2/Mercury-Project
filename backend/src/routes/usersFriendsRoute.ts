@@ -92,7 +92,7 @@ friendshipRouter.get(
           errors: { users: "No friends found with given queries" },
         });
       }
-      const totalPage: number = roundToInt(friends.length / maxUsersOnPage);
+      const totalPage: number = roundToInt(allFriends.length / maxUsersOnPage);
       return res.status(200).json({
         status: "ok",
         allUsersSize: allFriends.length,
@@ -197,7 +197,7 @@ friendshipRouter.get(
         });
       }
 
-      const totalPage: number = roundToInt(users.length / maxUsersOnPage);
+      const totalPage: number = roundToInt(allUsers.length / maxUsersOnPage);
       return res.status(200).json({
         status: "ok",
         allUsersSize: allUsers.length,

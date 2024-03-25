@@ -167,7 +167,7 @@ usersRouter.get(
           errors: { users: "No users found with given queries" },
         });
       }
-      const totalPage: number = roundToInt(users.length / 5);
+      const totalPage: number = roundToInt(allUsers.length / maxUsersOnPage);
       return res.status(200).json({
         status: "ok",
         allUsersSize: allUsers.length,
