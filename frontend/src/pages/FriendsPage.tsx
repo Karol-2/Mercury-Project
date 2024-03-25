@@ -130,6 +130,13 @@ function FriendsPage() {
                   <FontAwesomeIcon icon={faPlus}></FontAwesomeIcon>
                   <span className="ml-2">Create a room</span>
                 </button>
+                <button
+                  onClick={createRoom}
+                  className="btn primary w-full mb-4"
+                >
+                  <FontAwesomeIcon icon={faPlus}></FontAwesomeIcon>
+                  <span className="ml-2">Create a team meeting</span>
+                </button>
                 <button onClick={() => createRoom()}>Test room</button>
                 <h1 className="text-3xl font-bold">Friends:</h1>
                 <hr className="text-my-orange"></hr>
