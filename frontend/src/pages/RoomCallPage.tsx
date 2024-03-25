@@ -172,7 +172,7 @@ function RoomCallPage() {
                 <section>
                     <h3><strong>Invite</strong></h3>
                     <ul>
-                        {friends.map(friend => 
+                        {friends.filter(friend => !(friend.id in roomPeers)).map(friend => 
                             <li key={friend.id}>
                                 <span>{`${friend.first_name} ${friend.last_name}`} </span>
                                 <button onClick={() => inviteFriendToRoom(friend.id)}>click</button>
