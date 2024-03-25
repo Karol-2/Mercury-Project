@@ -6,13 +6,14 @@ import { useSelector } from "react-redux";
 import { RootState } from "../redux/store";
 import User from "../models/User";
 import { useUser } from "../helpers/UserProvider";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import dataService from "../services/data";
 import RoomPeerVideo from "../components/RoomPeerVideo";
 import Peer from "peerjs";
 import RoomPeer from "../models/RoomPeer";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
+    faPhoneSlash,
     faMicrophone,
     faMicrophoneSlash,
     faVideo,
@@ -28,6 +29,7 @@ function RoomCallPage() {
     const friends: User[] = useSelector((state: RootState) => state.friends);
     const {socket, userId, user} = useUser();
     const params = useParams();
+    const navigate = useNavigate();
     const roomId = params.roomId;
     peer.on("call", async (call) => {
         if (localStream) {
@@ -53,27 +55,23 @@ function RoomCallPage() {
             setRoomPeers(prev => ({...prev, ...newPeerObj}));
         });
     }
+    
     const prepareWebRTC = async () => {
         const stream = await fetchUserMedia();
         setLocalStream(stream);
         socket?.on("userConnected", ({peerId}): any => {
             connectToNewUser(peerId, stream);
         });
+        socket?.on("leftRoom", (id) => {
+            setRoomPeers(prev => Object.fromEntries(
+                Object.entries(prev).filter(elem => {
+                    const [peerId, _peer] = elem;
+                    return peerId !== id;
+                })
+            ));
+        });
     }
-    /*
-    async function startStopAudio() {
-    if (stream) {
-      const tracks = stream.getAudioTracks();
-      if (audio) {
-        setAudio(false);
-        tracks.forEach((track) => (track.enabled = false));
-      } else {
-        setAudio(true);
-        tracks.forEach((track) => (track.enabled = true));
-      }
-    }
-  }
-    */
+    
     const startStopAudio = async () => {
         if (localStream) {
             const tracks = localStream.getAudioTracks();
@@ -100,6 +98,17 @@ function RoomCallPage() {
         }
     } 
 
+    const handleLeaveMeeting = () => {
+        if (localRef.current) {
+            (localRef.current.srcObject as MediaStream)
+            .getTracks().forEach((track) => {
+                track.stop();
+            });
+            socket?.emit("leftRoom", {roomId, userId});
+            navigate("/friends");
+        }
+    }
+
     const inviteFriendToRoom = async (friendId: string) => {
         const myFullName = `${user?.first_name} ${user?.last_name}`;
         await dataService.fetchData("/room", "POST", {headers: {
@@ -123,6 +132,7 @@ function RoomCallPage() {
             localRef.current.play();
         }
     }, [localRef.current, localStream]);
+    
     return (
         <>
             <Navbar />
@@ -146,6 +156,12 @@ function RoomCallPage() {
                             ) : (
                                 <FontAwesomeIcon icon={faVideoSlash} />
                             )}
+                        </button>
+                        <button
+                            onClick={() => handleLeaveMeeting()}
+                            className="btn bg-my-red p-6"
+                        >
+                            <FontAwesomeIcon icon={faPhoneSlash}></FontAwesomeIcon>
                         </button>
                     </div>
                     {Object.entries(roomPeers).map((roomPeer) => {
