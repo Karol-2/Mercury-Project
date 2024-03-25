@@ -1,0 +1,108 @@
+:root {
+  --color-dark: rgb(33, 38, 45);
+  --color-darker: rgb(18, 21, 25);
+  --color-orange: rgb(255, 128, 0);
+  --color-error: #f88;
+}
+
+body {
+  background-color: var(--color-darker);
+  color: #fff;
+  font-family: sans-serif;
+  width: 100vw;
+  height: 100vh;
+  margin: 0;
+  
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#kc-header {
+  display: none;
+}
+
+header {
+  display: inline-block;
+}
+
+h1 {
+  font-weight: normal;
+}
+
+body > div {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: min-content;
+}
+
+body > div > div {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+#kc-form-login {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  background-color: var(--color-dark);
+  width: 15rem;
+  padding: 2.5rem 5rem;
+  border-radius: 0.75rem;
+}
+
+input, button {
+	border-radius: 0.5rem;
+	padding: 1rem;
+	border: solid 1px black;
+  font-size: 0.9rem;
+}
+
+#kc-form-login > div {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+label[for="password"] + div {
+  display: flex;
+}
+
+#password {
+  width: calc(100% - 3.5rem);
+}
+
+#password + button {
+  width: 3.5rem;
+  background: none;
+  padding: 0;
+  border: none;
+  cursor: pointer;
+}
+
+#password + button::before {
+  content: "";
+  position: relative;
+  left: 0.7rem;
+  display: block;
+  background-image: url("https://www.svgrepo.com/download/26260/eye.svg");
+  background-size: 1.5rem;
+  background-repeat: no-repeat;
+  background-position: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  filter: invert();
+}
+
+#kc-login {
+  background-color: var(--color-orange);
+  color: #fff;
+  border-radius: 2em;
+  font-size: 1.2rem;
+}
+
+#input-error {
+  color: var(--color-error);
+}
