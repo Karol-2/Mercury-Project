@@ -62,8 +62,9 @@ function SearchPage() {
   };
 
   const foundUsersHandler = (endpoint: string)=>{ 
+    
     setQueryEndpoint(endpoint)
-    setIsReadyToSearch(!isReadyToSearch)
+    setIsReadyToSearch(() => !isReadyToSearch)
   }
 
 

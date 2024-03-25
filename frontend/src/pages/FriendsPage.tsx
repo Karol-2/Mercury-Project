@@ -103,7 +103,7 @@ function FriendsPage() {
                       endpoint={`/users/${user.id}/friends`}
                       refresh={refresh}
                       isSearch={false}
-                      itemsPerPage={2}
+                      itemsPerPage={5}
                       renderItem={(user) => (
                         <Friend
                           friend={user}

@@ -38,6 +38,8 @@ function PaginatorV2(props: PaginatorProps) {
         .fetchData(url, "GET")
         .then((response) => {
           if (response.users && response.totalPage) {
+            
+            setError("")
             setUsers(response.users);
             setTotalPages(response.totalPage);
           } else {
@@ -72,7 +74,7 @@ function PaginatorV2(props: PaginatorProps) {
   return (
     <div id="paginator">
       {error ? (
-        <></>
+        <>{error}</>
       ) : (
         <>
           <ul>
