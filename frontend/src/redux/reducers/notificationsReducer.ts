@@ -10,6 +10,8 @@ export default (state = [], action: any) => {
     } else if (action.type === "ADD_NOTIFICATION") {
       return doesNotificationRepeat(action.payload.notification, state) 
       ? state : [...state, action.payload.notification];
+    } else if (action.type === "DELETE_NOTIFICATION") {
+      return state.filter((notification:any) => notification.roomId !== action.payload.id);
     } else {
       return state;
     }
