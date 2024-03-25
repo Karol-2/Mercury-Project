@@ -11,11 +11,20 @@ import dataService from "../services/data";
 import RoomPeerVideo from "../components/RoomPeerVideo";
 import Peer from "peerjs";
 import RoomPeer from "../models/RoomPeer";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+    faMicrophone,
+    faMicrophoneSlash,
+    faVideo,
+    faVideoSlash,
+  } from "@fortawesome/free-solid-svg-icons";
 function RoomCallPage() {
     const localRef = useRef<HTMLVideoElement>(null);
     const peer: Peer = useSelector((state: RootState) => state.peer);
     const [localStream, setLocalStream] = useState<MediaStream | null>(null);
     const [roomPeers, setRoomPeers] = useState<{[key: string]: RoomPeer}>({});
+    const [isAudio, setIsAudio] = useState(true);
+    const [isVideo, setIsVideo] = useState(true);
     const friends: User[] = useSelector((state: RootState) => state.friends);
     const {socket, userId, user} = useUser();
     const params = useParams();
@@ -51,6 +60,46 @@ function RoomCallPage() {
             connectToNewUser(peerId, stream);
         });
     }
+    /*
+    async function startStopAudio() {
+    if (stream) {
+      const tracks = stream.getAudioTracks();
+      if (audio) {
+        setAudio(false);
+        tracks.forEach((track) => (track.enabled = false));
+      } else {
+        setAudio(true);
+        tracks.forEach((track) => (track.enabled = true));
+      }
+    }
+  }
+    */
+    const startStopAudio = async () => {
+        if (localStream) {
+            const tracks = localStream.getAudioTracks();
+            if (isAudio) {
+                setIsAudio(false);
+                tracks.forEach((track) => (track.enabled = false));
+            } else {
+                setIsAudio(true);
+                tracks.forEach((track) => (track.enabled = true));
+            }
+        }
+    } 
+
+    const startStopVideo = async () => {
+        if (localStream) {
+            const tracks = localStream.getVideoTracks();
+            if (isVideo) {
+                setIsVideo(false);
+                tracks.forEach((track) => (track.enabled = false));
+            } else {
+                setIsVideo(true);
+                tracks.forEach((track) => (track.enabled = true));
+            }
+        }
+    } 
+
     const inviteFriendToRoom = async (friendId: string) => {
         const myFullName = `${user?.first_name} ${user?.last_name}`;
         await dataService.fetchData("/room", "POST", {headers: {
@@ -84,6 +133,20 @@ function RoomCallPage() {
                             ref={localRef}
                         ></video>
                         <span>{`${user?.first_name} ${user?.last_name}`}</span>
+                        <button className="btn p-6" onClick={() => startStopAudio()}>
+                            {isAudio ? (
+                                <FontAwesomeIcon icon={faMicrophone} />
+                            ) : (
+                                <FontAwesomeIcon icon={faMicrophoneSlash} />
+                            )}
+                        </button>
+                        <button className="btn p-6" onClick={() => startStopVideo()}>
+                            {isVideo ? (
+                                <FontAwesomeIcon icon={faVideo} />
+                            ) : (
+                                <FontAwesomeIcon icon={faVideoSlash} />
+                            )}
+                        </button>
                     </div>
                     {Object.entries(roomPeers).map((roomPeer) => {
                         const [id, peer] = roomPeer;
