@@ -137,19 +137,14 @@ function RoomCallPage() {
         <>
             <Navbar />
             {localStream ? <main>
-                <section>
-                    <div>
-                        <video 
-                            ref={localRef}
-                        ></video>
-                        <span>{`${user?.first_name} ${user?.last_name}`}</span>
-                        <button className="btn p-6" onClick={() => startStopAudio()}>
-                            {isAudio ? (
-                                <FontAwesomeIcon icon={faMicrophone} />
-                            ) : (
-                                <FontAwesomeIcon icon={faMicrophoneSlash} />
-                            )}
-                        </button>
+                <div className="flex justify-center p-1">
+                    <button className="btn p-6" onClick={() => startStopAudio()}>
+                        {isAudio ? (
+                            <FontAwesomeIcon icon={faMicrophone} />
+                        ) : (
+                            <FontAwesomeIcon icon={faMicrophoneSlash} />
+                        )}
+                    </button>
                         <button className="btn p-6" onClick={() => startStopVideo()}>
                             {isVideo ? (
                                 <FontAwesomeIcon icon={faVideo} />
@@ -163,6 +158,14 @@ function RoomCallPage() {
                         >
                             <FontAwesomeIcon icon={faPhoneSlash}></FontAwesomeIcon>
                         </button>
+                </div> 
+                <section className="grid p-3 grid-cols-3 gap-2">
+                    <div>
+                        <video 
+                            className="h-full w-full rounded-lg"
+                            ref={localRef}
+                        ></video>
+                        <div>{`${user?.first_name} ${user?.last_name}`}</div>
                     </div>
                     {Object.entries(roomPeers).map((roomPeer) => {
                         const [id, peer] = roomPeer;

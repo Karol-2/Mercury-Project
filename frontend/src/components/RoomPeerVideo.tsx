@@ -20,9 +20,13 @@ function RoomPeerVideo({remoteStream, peerId}: RoomPeerVideoProps) {
         fetchFullName();
     }, []);
     return (
-        <div><video
-            ref={remoteRef}
-        ></video><span>{name}</span></div>
+        <div>
+            <video
+                className="h-full w-full rounded-lg"
+                ref={remoteRef}
+            ></video>
+            <div>{name}</div>
+        </div>
     )
 }
 
