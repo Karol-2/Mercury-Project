@@ -1,17 +1,15 @@
 import { useNavigate } from "react-router-dom";
 import User from "../models/User";
-import { Dispatch, SetStateAction, useState } from "react";
+import { useState } from "react";
 
 export interface EditDetails {
   user: User;
-  updateUser: () => Promise<boolean>;
-  setUser: Dispatch<SetStateAction<User | null | undefined>>;
+  updateUser: (updateUser: Partial<User>) => Promise<boolean>;
 }
 
 function EditPhoto(props: EditDetails) {
   const user: User = props.user;
   const updateUser = props.updateUser;
-  const setUser = props.setUser;
 
   const navigate = useNavigate();
 
@@ -25,8 +23,6 @@ function EditPhoto(props: EditDetails) {
       const reader = new FileReader();
       reader.onloadend = () => {
         const base64 = reader.result as string;
-        // console.log(base64.slice(0,40));
-
         setProfilePictureBase64(base64);
         resolve(base64);
       };
@@ -46,11 +42,9 @@ function EditPhoto(props: EditDetails) {
   };
 
   const editPhoto = async (): Promise<void> => {
-    user.profile_picture = profilePictureBase64;
-    // console.log(user);
-    setUser(user);
+    const changes = { profile_picture: profilePictureBase64 };
 
-    updateUser().then((updated) => {
+    updateUser(changes).then((updated) => {
       if (updated) console.log("Updated");
       else throw new Error("Error while updating user");
     });

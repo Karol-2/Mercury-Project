@@ -2,21 +2,19 @@ import { Router, Request } from "express";
 
 import bcrypt from "bcrypt";
 
-import driver from "../driver/driver";
+import driver from "../driver/driver.js";
 import {
   JWTRequest,
   authenticateToken,
   generateAccessToken,
   generateRefreshToken,
-} from "../misc/jwt";
+} from "../misc/jwt.js";
 
 import jwt, { JwtPayload } from "jsonwebtoken";
-import { TokenErrorResponse } from "../types/authResponse";
-import { CustomResponse, OkResponse } from "../models/Response";
-import { OkErrorResponse } from "../types/userResponse";
-import User from "../models/User";
-import { leaveMeeting } from "../meetings";
-import { disconnectFromSocket } from "../sockets";
+import { TokenErrorResponse } from "../types/authResponse.js";
+import { OkErrorResponse } from "../types/userResponse.js";
+import { leaveMeeting } from "../meetings.js";
+import { getDbUser } from "../users.js";
 
 const authRouter = Router();
 
@@ -36,20 +34,13 @@ function generateTokens(res: TokenErrorResponse, userId: string) {
 authRouter.post("/login", async (req: Request, res: TokenErrorResponse) => {
   const { mail, password } = req.body;
 
+  const session = driver.session();
   try {
-    const session = driver.session();
+    const user = await getDbUser(session, { mail });
 
-    const userRequest = await session.run(
-      `MATCH (u:User {mail: $mail}) RETURN u`,
-      { mail },
-    );
-
-    if (userRequest.records.length == 0) {
+    if (!user || !("password" in user)) {
       return res.status(401).json({ status: "unauthorized" });
     }
-
-    const user = userRequest.records[0].get("u").properties;
-    await session.close();
 
     const passwordCorrect = await bcrypt.compare(password, user.password);
     if (!passwordCorrect) {
@@ -61,6 +52,8 @@ authRouter.post("/login", async (req: Request, res: TokenErrorResponse) => {
   } catch (err) {
     console.log("Error:", err);
     return res.status(404).json({ status: "error", errors: err as object });
+  } finally {
+    await session.close();
   }
 });
 

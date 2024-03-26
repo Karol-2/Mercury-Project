@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
-import { useUser } from "../helpers/UserProvider";
+import { useMeeting } from "../helpers/MeetingProvider";
 
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -13,6 +13,7 @@ import User from "../models/User";
 import setUserFriends from "../redux/actions/setUserFriends";
 import dataService from "../services/data";
 import Transition from "../components/Transition";
+import { useProtected } from "../helpers/Protected";
 import FoundUser from "../components/FoundUser";
 import Friend from "../components/Friend";
 import Paginator from "../components/Paginator";
@@ -20,7 +21,8 @@ import Paginator from "../components/Paginator";
 function FriendsPage() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { user, meeting, createMeeting, joinMeeting } = useUser();
+  const { user } = useProtected();
+  const { meeting, createMeeting, joinMeeting } = useMeeting();
 
   const [friends, setFriends] = useState([]);
   const [friendsRequests, setFriendsRequests] = useState([]);
@@ -30,10 +32,6 @@ function FriendsPage() {
 
   const [showAnimation, setShowAnim] = useState(false);
   const [showContent, setShowContent] = useState(false);
-
-  useEffect(() => {
-    if (user === null) navigate("/login");
-  }, [user]);
 
   useEffect(() => {
     setShowAnim(true);

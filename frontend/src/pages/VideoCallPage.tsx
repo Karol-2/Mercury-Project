@@ -1,6 +1,6 @@
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
-import { useUser } from "../helpers/UserProvider";
+import { useUser } from "../helpers/UserContext";
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Socket } from "socket.io-client";
@@ -14,23 +14,30 @@ import {
   faVideo,
   faVideoSlash,
 } from "@fortawesome/free-solid-svg-icons";
+import { useMeeting } from "../helpers/MeetingProvider";
+import { useProtected } from "../helpers/Protected";
 
 function VideoCallPage() {
-  const { user, userId, socket, meeting, leaveMeeting } = useUser();
-  const [stream, setStream] = useState<MediaStream | null>(null);
-  const firstRefresh = useRef<boolean>(true);
+  const { user } = useProtected();
+  const { socket } = useUser();
+  const { meeting, leaveMeeting } = useMeeting();
   const navigate = useNavigate();
+
+  const firstRefresh = useRef<boolean>(true);
+
+  const [stream, setStream] = useState<MediaStream | null>(null);
   const localStream = useRef<HTMLVideoElement>(null);
   const remoteStream = useRef<HTMLVideoElement>(null);
+
   const [makingOffer, setMakingOffer] = useState(false);
+
   const [audio, setAudio] = useState(true);
   const [video, setVideo] = useState(true);
+
   const peerConnectionRef = useRef<RTCPeerConnection | null>(null);
   const getPeerConnection = () => peerConnectionRef.current;
+
   const [yourParticipant, setYourParticipant] = useState("");
-  useEffect(() => {
-    if (userId === null) navigate("/login");
-  }, [userId]);
 
   useEffect(() => {
     if (!meeting) {

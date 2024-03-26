@@ -1,6 +1,6 @@
 import { Router } from "express";
-import Message from "../models/Message";
-import MessageModel from "../mongoDB/MessageModel";
+import Message from "../models/Message.js";
+import MessageModel from "../mongoDB/MessageModel.js";
 
 const chatRouter = Router();
 

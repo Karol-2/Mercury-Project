@@ -3,18 +3,16 @@ import Footer from "../components/Footer";
 import dataService from "../services/data";
 import { useEffect, useState } from "react";
 import FoundUser from "../components/FoundUser";
-import { useUser } from "../helpers/UserProvider";
+import { useUser } from "../helpers/UserContext";
 import User from "../models/User";
 import { faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { useNavigate } from "react-router-dom";
 import editDistance from "../misc/editDistance";
 import Transition from "../components/Transition";
+import { useProtected } from "../helpers/Protected";
 import Paginator from "../components/Paginator";
 
 function SearchPage() {
-  const navigate = useNavigate();
-
   const [searchState, setSearchState] = useState("");
   const [usersFound, setUsersFound] = useState<[[User, number]]>();
   const [usersFriends, setUsersFriends] = useState([]);
@@ -22,7 +20,8 @@ function SearchPage() {
   const [showAnimation, setShowAnim] = useState(false);
   const [showContent, setShowContent] = useState(false);
 
-  const { user, userId } = useUser();
+  const { userState } = useUser();
+  const { user } = useProtected();
 
   useEffect(() => {
     setShowAnim(true);
@@ -32,11 +31,11 @@ function SearchPage() {
   }, []);
 
   useEffect(() => {
-    if (userId === null) navigate("/login");
+    if (userState.status == "loading") return;
 
     const fetchFriends = async () => {
       const friendsResponse = await dataService.fetchData(
-        `/users/${userId}/friends`,
+        `/users/${user.id}/friends`,
         "GET",
         {},
       );
@@ -54,7 +53,7 @@ function SearchPage() {
   const handleSearch = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    if (userId === null) navigate("/login");
+    if (userState.status != "logged_in") return;
 
     if (searchState.trim() === "") {
       return;
@@ -141,7 +140,7 @@ function SearchPage() {
                   <FoundUser
                     user={user}
                     key={String(0)}
-                    currentId={userId}
+                    currentId={user.id}
                     isFriend={isFriend(usersFriends, user)}
                   />
                 )}

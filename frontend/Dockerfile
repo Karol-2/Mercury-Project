@@ -1,6 +1,6 @@
 FROM node:18-alpine as base
 WORKDIR /home/node/app
-COPY *.html *.js *.ts *.json .
+COPY *.html *.js *.ts *.json .env.production .
 COPY ./src ./src
 COPY ./public ./public
 RUN npm i && npm run build

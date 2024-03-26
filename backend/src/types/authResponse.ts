@@ -3,7 +3,7 @@ import {
   JWTResponse,
   AuthResponse,
   ErrorResponse,
-} from "../models/Response";
+} from "../models/Response.js";
 
 export type TokenErrorResponse = CustomResponse<
   JWTResponse | AuthResponse | ErrorResponse

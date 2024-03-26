@@ -1,12 +1,12 @@
 import { Router, Request, Response } from "express";
 import { Session } from "neo4j-driver";
-import driver from "../driver/driver";
-import User from "../models/User";
+import driver from "../driver/driver.js";
+import User from "../models/User.js";
 import {
   OkErrorResponse,
   FriendsErrorResponse,
   UsersErrorResponse,
-} from "../types/userResponse";
+} from "../types/userResponse.js";
 
 const friendshipRouter = Router();
 
