@@ -25,7 +25,7 @@ function RoomPeerVideo({remoteStream, peerId}: RoomPeerVideoProps) {
                 className="h-full w-full rounded-lg"
                 ref={remoteRef}
             ></video>
-            <div>{name}</div>
+            <div className="text-center">{name}</div>
         </div>
     )
 }

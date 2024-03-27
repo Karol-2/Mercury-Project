@@ -165,7 +165,7 @@ function RoomCallPage() {
                             className="h-full w-full rounded-lg"
                             ref={localRef}
                         ></video>
-                        <div>{`${user?.first_name} ${user?.last_name}`}</div>
+                        <div className="text-center">{`${user?.first_name} ${user?.last_name}`}</div>
                     </div>
                     {Object.entries(roomPeers).map((roomPeer) => {
                         const [id, peer] = roomPeer;
