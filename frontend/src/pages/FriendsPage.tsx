@@ -20,7 +20,7 @@ import { v4 } from "uuid";
 
 function FriendsPage() {
   const navigate = useNavigate();
-  
+
   const { user, meeting, createMeeting, joinMeeting } = useUser();
 
   const friends: User[] = useSelector((state: RootState) => state.friends);
@@ -106,7 +106,7 @@ function FriendsPage() {
   const createRoom = () => {
     const roomId = v4();
     navigate(`/room/${roomId}`);
-  }
+  };
 
   useEffect(() => {
     if (meeting?.id) {

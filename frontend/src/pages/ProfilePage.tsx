@@ -24,9 +24,13 @@ function ProfilePage() {
     navigate("/edit");
   };
   const fetchNotifications = async () => {
-    const roomNotificationsRequest = await dataService.fetchData(`/room/${userId}`, "GET", {});
+    const roomNotificationsRequest = await dataService.fetchData(
+      `/room/${userId}`,
+      "GET",
+      {},
+    );
     dispatch(setNotifications(roomNotificationsRequest.rooms));
-  }
+  };
 
   useEffect(() => {
     setShowAnim(true);

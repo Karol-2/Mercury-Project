@@ -6,7 +6,7 @@ import peerReducer from "./reducers/peerReducer";
 const rootReducer = combineReducers({
   friends: friendsReducer,
   notifications: notificationsReducer,
-  peer: peerReducer
+  peer: peerReducer,
 });
 
 export const store = createStore(rootReducer);
