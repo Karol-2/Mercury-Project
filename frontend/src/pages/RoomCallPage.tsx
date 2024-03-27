@@ -11,6 +11,7 @@ import dataService from "../services/data";
 import RoomPeerVideo from "../components/RoomPeerVideo";
 import Peer from "peerjs";
 import RoomPeer from "../models/RoomPeer";
+import PeerInvite from "../components/PeerInvite";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
     faPhoneSlash,
@@ -137,7 +138,7 @@ function RoomCallPage() {
         <>
             <Navbar />
             {localStream ? <main>
-                <div className="flex justify-center p-1">
+                <div className="flex justify-center p-2">
                     <button className="btn p-6" onClick={() => startStopAudio()}>
                         {isAudio ? (
                             <FontAwesomeIcon icon={faMicrophone} />
@@ -159,30 +160,28 @@ function RoomCallPage() {
                             <FontAwesomeIcon icon={faPhoneSlash}></FontAwesomeIcon>
                         </button>
                 </div> 
-                <section className="grid p-3 grid-cols-3 gap-2">
-                    <div>
-                        <video 
-                            className="h-full w-full rounded-lg"
-                            ref={localRef}
-                        ></video>
-                        <div className="text-center">{`${user?.first_name} ${user?.last_name}`}</div>
-                    </div>
-                    {Object.entries(roomPeers).map((roomPeer) => {
-                        const [id, peer] = roomPeer;
-                        return <RoomPeerVideo key={id} remoteStream={peer.stream} peerId={id}  />
-                    })}
-                </section>
-                <section>
-                    <h3><strong>Invite</strong></h3>
-                    <ul>
-                        {friends.filter(friend => !(friend.id in roomPeers)).map(friend => 
-                            <li key={friend.id}>
-                                <span>{`${friend.first_name} ${friend.last_name}`} </span>
-                                <button onClick={() => inviteFriendToRoom(friend.id)}>click</button>
-                            </li>
-                        )}
-                    </ul>
-                </section>
+                <div className="flex p-5">
+                    <section className="flex-3 grid p-3 grid-cols-3 gap-2">
+                        <div className="flex flex-col items-center gap-4">
+                            <video 
+                                ref={localRef}
+                            ></video>
+                            <div>{`${user?.first_name} ${user?.last_name}`}</div>
+                        </div>
+                        {Object.entries(roomPeers).map((roomPeer) => {
+                            const [id, peer] = roomPeer;
+                            return <RoomPeerVideo key={id} remoteStream={peer.stream} peerId={id}  />
+                        })}
+                    </section>
+                    <section className="flex-1 flex flex-col p-10 gap-10 rounded-xl bg-my-dark">
+                        <h1 className="text-center text-3xl font-bold">Invite</h1>
+                        <ul className="flex flex-col gap-5">
+                            {friends.filter(friend => !(friend.id in roomPeers)).map(friend => 
+                               <PeerInvite key={friend.id} friend={friend} inviteFriendToRoom={inviteFriendToRoom} />
+                            )}
+                        </ul>
+                    </section>
+                </div>
             </main> : null}
             <Footer />
         </>
