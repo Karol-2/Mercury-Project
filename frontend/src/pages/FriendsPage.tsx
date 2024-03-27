@@ -23,7 +23,7 @@ function FriendsPage() {
   
   const { user, meeting, createMeeting, joinMeeting } = useUser();
 
-  const friends = useSelector((state: RootState) => state.friends);
+  const friends: User[] = useSelector((state: RootState) => state.friends);
   const [friendsRequests, setFriendsRequests] = useState([]);
   const [refresh, setRefresh] = useState(false);
 

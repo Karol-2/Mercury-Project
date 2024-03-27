@@ -60,7 +60,7 @@ function RoomCallPage() {
     const prepareWebRTC = async () => {
         const stream = await fetchUserMedia();
         setLocalStream(stream);
-        socket?.on("userConnected", ({peerId}): any => {
+        socket?.on("userConnected", ({peerId}) => {
             connectToNewUser(peerId, stream);
         });
         socket?.on("leftRoom", (id) => {

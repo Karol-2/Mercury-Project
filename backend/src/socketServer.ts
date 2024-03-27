@@ -159,7 +159,7 @@ io.on("connection", async (socket: Socket) => {
     await session.close();
   });
 
-  socket.on("joinRoom", async ({roomId, peerId, userId, fullName}: any) => {
+  socket.on("joinRoom", async ({roomId, peerId, userId, fullName}) => {
     await socket.join(roomId);
     socket.to(roomId).emit("userConnected", {peerId, userId, fullName, socketId: socket.id});
   });
