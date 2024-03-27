@@ -16,6 +16,7 @@ import {
 import usersFriendsRoute from "./usersFriendsRoute";
 
 import removeKeys from "../misc/removeKeys";
+import roundToInt from "../misc/roundToInt";
 import { ChangePasswordReq } from "../models/ChangePasswordReq";
 import { log } from "console";
 
@@ -78,45 +79,103 @@ usersRouter.post(
 usersRouter.get(
   "/search",
   async (req: Request, res: UsersSearchErrorResponse) => {
-    const searchTerm = req.query.q;
+    const searchTerm: string = req.query.q as string;
+    const country: string = req.query.country as string;
 
-    if (typeof searchTerm != "string") {
+    if (!searchTerm && !country) {
       return res.status(404).json({
         status: "error",
         errors: { searchTerm: "not provided" },
       });
     }
 
-    if (searchTerm.length == 0) {
-      return res
-        .status(404)
-        .json({ status: "error", errors: { searchTerm: "is empty" } });
-    }
-
     try {
+      const page: number = parseInt((req.query.page as string) || "");
+      const maxUsersOnPage: number = parseInt(
+        (req.query.maxUsers as string) || "",
+      );
       const session = driver.session();
-      const wordVec = wordToVec(searchTerm);
+      let allUsers: User[] = [];
 
-      if (wordVec.length == 0) {
-        return res
-          .status(400)
-          .json({ status: "error", errors: { searchTerm: "incorrect" } });
+      if (country && searchTerm) {
+        const wordVec = wordToVec(searchTerm);
+        const searchRequest = await session.run(
+          `CALL db.index.vector.queryNodes('user-names', 100, $wordVec)
+          YIELD node AS similarUser, score
+          RETURN similarUser, score`,
+          { wordVec },
+        );
+
+        allUsers = searchRequest.records
+          .map((r) => {
+            return filterUser(r.get("similarUser").properties);
+          })
+          .filter((user) => user.country === country);
+      } else if (country) {
+        const searchRequest = await session.run(
+          `MATCH (similarUser:User {country: $country})
+          RETURN similarUser`,
+          { country },
+        );
+
+        allUsers = searchRequest.records.map((r) => {
+          return filterUser(r.get("similarUser").properties);
+        });
+      } else if (searchTerm) {
+        const wordVec = wordToVec(searchTerm);
+        const searchRequest = await session.run(
+          `CALL db.index.vector.queryNodes('user-names', 100, $wordVec)
+          YIELD node AS similarUser, score
+          RETURN similarUser, score`,
+          { wordVec },
+        );
+
+        allUsers = searchRequest.records.map((r) => {
+          return filterUser(r.get("similarUser").properties);
+        });
       }
 
-      const userRequest = await session.run(
-        `CALL db.index.vector.queryNodes('user-names', 10, $wordVec)
-      YIELD node AS similarUser, score
-      RETURN similarUser, score`,
-        { wordVec },
-      );
-      const users = userRequest.records.map((r) => {
-        return [
-          filterUser(r.get("similarUser").properties),
-          Number(r.get("score")),
-        ] as [User, number];
-      });
       await session.close();
-      return res.json({ status: "ok", users });
+
+      if (!page && !maxUsersOnPage) {
+        if (allUsers.length === 0) {
+          return res.status(404).json({
+            status: "error",
+            errors: { users: "No users found" },
+          });
+        }
+        const totalPage: number = roundToInt(allUsers.length / 10);
+        return res.status(200).json({
+          status: "ok",
+          allUsersSize: allUsers.length,
+          totalPage: totalPage,
+          users: allUsers,
+        });
+      } else if (!page || !maxUsersOnPage) {
+        return res.status(400).json({
+          status: "error",
+          errors: { params: "Missing or incorrect query params" },
+        });
+      }
+
+      const users = allUsers.slice(
+        (page - 1) * maxUsersOnPage,
+        page * maxUsersOnPage,
+      );
+
+      if (users.length === 0) {
+        return res.status(404).json({
+          status: "error",
+          errors: { users: "No users found with given queries" },
+        });
+      }
+      const totalPage: number = roundToInt(allUsers.length / maxUsersOnPage);
+      return res.status(200).json({
+        status: "ok",
+        allUsersSize: allUsers.length,
+        totalPage: totalPage,
+        users,
+      });
     } catch (err) {
       console.log("Error:", err);
       return res.status(404).json({ status: "error", errors: err as object });
@@ -142,36 +201,6 @@ usersRouter.get("/:userId", async (req: Request, res: UserErrorResponse) => {
     return res.status(404).json({ status: "error", errors: err as object });
   }
 });
-
-usersRouter.get(
-  "/:userId/friends",
-  async (req: Request, res: FriendsErrorResponse) => {
-    try {
-      const userId = req.params.userId;
-
-      const session = driver.session();
-      const user = await userExists(session, { id: userId });
-
-      if (!user) {
-        return userNotFoundRes(res);
-      }
-
-      const friendRequest = await session.run(
-        `MATCH (u:User {id: $userId})-[:IS_FRIENDS_WITH]-(f:User) RETURN f`,
-        { userId },
-      );
-      await session.close();
-
-      const friends = friendRequest.records.map((f) =>
-        filterUser(f.get("f").properties),
-      );
-      return res.json({ status: "ok", friends });
-    } catch (err) {
-      console.log("Error:", err);
-      return res.status(404).json({ status: "error", errors: err as object });
-    }
-  },
-);
 
 usersRouter.get("/meetings/:userId", async (req: Request, res) => {
   try {

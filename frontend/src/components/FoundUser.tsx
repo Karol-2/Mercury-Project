@@ -40,11 +40,6 @@ function FoundUser(props: FoundUserProps) {
       await dataService.fetchData(
         `/users/${props.currentId}/add/${props.user.id}`,
         "POST",
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        },
       );
       setRequestSent(true);
     } catch (error) {

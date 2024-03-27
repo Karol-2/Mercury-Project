@@ -1,4 +1,5 @@
 import { expect, test } from "vitest";
+import User from "../src/models/User";
 
 let userId: number;
 
@@ -110,10 +111,10 @@ test("Get user's friends", async () => {
 
   const response = await fetch(`http://localhost:5000/users/${zuckId}/friends`);
   const responseData = await response.json();
-  const { status, friends } = responseData;
+  const { status, users } = responseData;
 
   expect(status).toBe("ok");
-  expect(friends).toHaveLength(2);
+  expect(users).toHaveLength(2);
 });
 
 async function searchUsers(lastPart: string) {
@@ -146,7 +147,7 @@ test("Search users", async () => {
   expect(usersStatus).toBe("ok");
 
   const zuck = usersResponseData.users.find(
-    ([user, _score]: any) => user.mail == "reptilian@meta.com",
+    (user: User) => user.mail == "reptilian@meta.com",
   );
 
   expect(zuck).toBeDefined();

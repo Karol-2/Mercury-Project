@@ -5,7 +5,7 @@ import { useUser } from "../helpers/UserProvider";
 
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-
+import PaginatorV2 from "../components/PaginatorV2";
 import Footer from "../components/Footer";
 import FriendRequest from "../components/FriendRequest";
 import Navbar from "../components/Navbar";
@@ -24,10 +24,9 @@ function FriendsPage() {
   const { user, meeting, createMeeting, joinMeeting } = useUser();
 
   const friends: User[] = useSelector((state: RootState) => state.friends);
+
   const [friendsRequests, setFriendsRequests] = useState([]);
   const [refresh, setRefresh] = useState(false);
-
-  const [friendSuggestions, setFriendSuggestions] = useState([]);
 
   const [showAnimation, setShowAnim] = useState(false);
   const [showContent, setShowContent] = useState(false);
@@ -41,20 +40,6 @@ function FriendsPage() {
     setTimeout(() => {
       setShowContent(true);
     }, 100);
-  }, []);
-
-  useEffect(() => {
-    const fetchFriendSuggestions = async () => {
-      if (user) {
-        const friendsRequestsResponse = await dataService.fetchData(
-          `/users/${user.id}/friend-suggestions`,
-          "GET",
-          {},
-        );
-        setFriendSuggestions(friendsRequestsResponse.users);
-      }
-    };
-    fetchFriendSuggestions();
   }, []);
 
   useEffect(() => {
@@ -76,11 +61,6 @@ function FriendsPage() {
       await dataService.fetchData(
         `/users/${user.id}/remove/${friend.id}`,
         "DELETE",
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        },
       );
 
       setRefresh(() => !refresh);
@@ -92,11 +72,6 @@ function FriendsPage() {
       await dataService.fetchData(
         `/users/${user.id}/accept/${currentId}`,
         "POST",
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        },
       );
 
       setRefresh(() => !refresh);
@@ -137,13 +112,14 @@ function FriendsPage() {
                   <FontAwesomeIcon icon={faPlus}></FontAwesomeIcon>
                   <span className="ml-2">Create a team meeting</span>
                 </button>
-                <button onClick={() => createRoom()}>Test room</button>
-                <h1 className="text-3xl font-bold">Friends:</h1>
+                <h1 className="text-3xl font-bold">Friends</h1>
                 <hr className="text-my-orange"></hr>
                 <ul className="">
-                  {friends && friends.length > 0 ? (
-                    <Paginator
-                      users={friends}
+                  {user && (
+                    <PaginatorV2
+                      endpoint={`/users/${user.id}/friends`}
+                      refresh={refresh}
+                      isSearch={false}
                       itemsPerPage={5}
                       renderItem={(user) => (
                         <Friend
@@ -153,15 +129,13 @@ function FriendsPage() {
                         />
                       )}
                     />
-                  ) : (
-                    <p>You don't have any friends.</p>
                   )}
                 </ul>
               </div>
 
               <div id="friend-requests">
                 <div className="p-10 rounded-xl bg-my-dark">
-                  <h1 className="text-3xl font-bold">Friend requests:</h1>
+                  <h1 className="text-3xl font-bold">Friend requests</h1>
                   <hr className="text-my-orange"></hr>
                 </div>
                 <div>
@@ -184,22 +158,22 @@ function FriendsPage() {
             </section>
             <section id="suggestions" className=" mt-8">
               <div>
-                <h1 className="text-3xl font-bold">Friends Suggestions:</h1>
-                {user && friendSuggestions && friendSuggestions.length > 0 ? (
-                  <Paginator
-                    users={friendSuggestions}
+                <h1 className="text-3xl font-bold">Friends Suggestions</h1>
+                {user && (
+                  <PaginatorV2
+                    endpoint={`/users/${user.id}/friend-suggestions`}
                     itemsPerPage={3}
-                    renderItem={(user) => (
+                    refresh={refresh}
+                    isSearch={false}
+                    renderItem={(resultUser) => (
                       <FoundUser
-                        user={user}
+                        user={resultUser}
                         key={String(1)}
                         currentId={user.id}
                         isFriend={false}
                       />
                     )}
                   />
-                ) : (
-                  "You need to add more friends to show valid suggestions."
                 )}
               </div>
             </section>
