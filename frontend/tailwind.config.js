@@ -20,6 +20,7 @@ export default {
       "my-red": "#CA1A1A",
       "my-cancel": "#FF7976",
       "my-accept": "#10D019",
+      "my-light-dark": "#333B45",
       "my-dark": "#21262D",
       "my-darker": "#121519",
       "my-light": "#EDE9E9",

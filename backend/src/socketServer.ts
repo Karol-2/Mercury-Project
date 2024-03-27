@@ -143,6 +143,34 @@ io.on("connection", async (socket: Socket) => {
     });
   });
 
+  socket.on("newRoom", async ({ roomId, from, to, userName }) => {
+    await socket.join(roomId);
+    const session = driver.session();
+    const userSockets = await getAllSockets(session, to);
+    userSockets.forEach((userSocket) => {
+      socket.to(userSocket.id).emit("newRoom", {
+        from,
+        roomId,
+        title: "Join room",
+        to,
+        userName,
+      });
+    });
+    await session.close();
+  });
+
+  socket.on("joinRoom", async ({ roomId, peerId, userId, fullName }) => {
+    await socket.join(roomId);
+    socket
+      .to(roomId)
+      .emit("userConnected", { peerId, userId, fullName, socketId: socket.id });
+  });
+
+  socket.on("leftRoom", async ({ userId, roomId }) => {
+    await socket.join(roomId);
+    socket.to(roomId).emit("leftRoom", userId);
+  });
+
   socket.on("disconnect", async (_reason) => {
     const session = driver.session();
     await leaveMeeting(session, userId);

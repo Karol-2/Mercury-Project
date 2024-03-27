@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 import { useUser } from "../helpers/UserProvider";
 
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-
+import PaginatorV2 from "../components/PaginatorV2";
 import Footer from "../components/Footer";
 import FriendRequest from "../components/FriendRequest";
 import Navbar from "../components/Navbar";
@@ -13,11 +14,16 @@ import dataService from "../services/data";
 import Transition from "../components/Transition";
 import FoundUser from "../components/FoundUser";
 import Friend from "../components/Friend";
-import PaginatorV2 from "../components/PaginatorV2";
+import Paginator from "../components/Paginator";
+import { RootState } from "../redux/store";
+import { v4 } from "uuid";
 
 function FriendsPage() {
   const navigate = useNavigate();
+
   const { user, meeting, createMeeting, joinMeeting } = useUser();
+
+  const friends: User[] = useSelector((state: RootState) => state.friends);
 
   const [friendsRequests, setFriendsRequests] = useState([]);
   const [refresh, setRefresh] = useState(false);
@@ -72,6 +78,11 @@ function FriendsPage() {
     }
   };
 
+  const createRoom = () => {
+    const roomId = v4();
+    navigate(`/room/${roomId}`);
+  };
+
   useEffect(() => {
     if (meeting?.id) {
       navigate("/meeting");
@@ -92,7 +103,14 @@ function FriendsPage() {
                   className="btn primary w-full mb-4"
                 >
                   <FontAwesomeIcon icon={faPlus}></FontAwesomeIcon>
-                  <span className="ml-2">Create a meeting</span>
+                  <span className="ml-2">Create a room</span>
+                </button>
+                <button
+                  onClick={createRoom}
+                  className="btn primary w-full mb-4"
+                >
+                  <FontAwesomeIcon icon={faPlus}></FontAwesomeIcon>
+                  <span className="ml-2">Create a team meeting</span>
                 </button>
                 <h1 className="text-3xl font-bold">Friends</h1>
                 <hr className="text-my-orange"></hr>

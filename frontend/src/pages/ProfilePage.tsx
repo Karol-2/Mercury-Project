@@ -5,10 +5,17 @@ import Navbar from "../components/Navbar";
 import { useUser } from "../helpers/UserProvider";
 import Profile from "../components/Profile";
 import Transition from "../components/Transition";
+import dataService from "../services/data";
+import { useDispatch } from "react-redux";
+import setNotifications from "../redux/actions/setNotifications";
+import setUserFriends from "../redux/actions/setUserFriends";
+import addNotification from "../redux/actions/addNotification";
+import initPeer from "../redux/actions/initPeer";
 
 function ProfilePage() {
   const navigate = useNavigate();
-  const { user, userId, meeting, deleteUser } = useUser();
+  const dispatch = useDispatch();
+  const { user, userId, meeting, deleteUser, socket } = useUser();
 
   const [showAnimation, setShowAnim] = useState(false);
   const [showContent, setShowContent] = useState(false);
@@ -16,12 +23,34 @@ function ProfilePage() {
   const handleEditClick = () => {
     navigate("/edit");
   };
+  const fetchNotifications = async () => {
+    const roomNotificationsRequest = await dataService.fetchData(
+      `/room/${userId}`,
+      "GET",
+      {},
+    );
+    dispatch(setNotifications(roomNotificationsRequest.rooms));
+  };
 
   useEffect(() => {
     setShowAnim(true);
     setTimeout(() => {
       setShowContent(true);
     }, 100);
+  }, []);
+
+  useEffect(() => {
+    const fetchFriends = async () => {
+      if (user) {
+        const friendsResponse = await dataService.fetchData(
+          `/users/${user.id}/friends`,
+          "GET",
+          {},
+        );
+        dispatch(setUserFriends(friendsResponse.friends));
+      }
+    };
+    fetchFriends();
   }, []);
 
   useEffect(() => {
@@ -33,6 +62,20 @@ function ProfilePage() {
   useEffect(() => {
     if (userId === null) navigate("/login");
   }, [userId]);
+
+  useEffect(() => {
+    fetchNotifications();
+  }, []);
+
+  useEffect(() => {
+    dispatch(initPeer(userId!));
+  }, []);
+
+  useEffect(() => {
+    socket!.on("newRoom", (notification) => {
+      dispatch(addNotification(notification));
+    });
+  }, []);
 
   return (
     <>
