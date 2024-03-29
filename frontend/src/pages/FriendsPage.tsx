@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useSelector } from "react-redux";
 import { useUser } from "../helpers/UserProvider";
 
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
@@ -14,8 +13,6 @@ import dataService from "../services/data";
 import Transition from "../components/Transition";
 import FoundUser from "../components/FoundUser";
 import Friend from "../components/Friend";
-import Paginator from "../components/Paginator";
-import { RootState } from "../redux/store";
 import { v4 } from "uuid";
 
 function FriendsPage() {
@@ -23,7 +20,6 @@ function FriendsPage() {
 
   const { user, meeting, createMeeting, joinMeeting } = useUser();
 
-  const friends: User[] = useSelector((state: RootState) => state.friends);
 
   const [friendsRequests, setFriendsRequests] = useState([]);
   const [refresh, setRefresh] = useState(false);
