@@ -20,7 +20,6 @@ function FriendsPage() {
 
   const { user, meeting, createMeeting, joinMeeting } = useUser();
 
-
   const [friendsRequests, setFriendsRequests] = useState([]);
   const [refresh, setRefresh] = useState(false);
 
