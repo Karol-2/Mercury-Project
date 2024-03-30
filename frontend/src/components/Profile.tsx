@@ -33,7 +33,11 @@ function Profile(props: ProfilePageFormProps) {
           <p>E-mail: {user.mail || ""}</p>
         </div>
         <div className="my-5 grid grid-cols-1 md:grid-cols-2">
-          <button onClick={handleEditClick} className="btn primary w-full">
+          <button
+            data-testid="Edit"
+            onClick={handleEditClick}
+            className="btn primary w-full"
+          >
             Edit
           </button>
 
