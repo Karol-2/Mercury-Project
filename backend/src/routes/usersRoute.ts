@@ -28,16 +28,20 @@ import {
   registerUser,
   getDbUser,
   changePassword,
+  getUsersCount,
 } from "../users.js";
 import DbUser from "../models/DbUser.js";
 import { ChangePasswordReq } from "../models/ChangePasswordReq.js";
 import kcAdminClient from "../kcAdminClient.js";
 
+import removeKeys from "../misc/removeKeys.js";
+import roundToInt from "../misc/roundToInt.js";
+
 const usersRouter = Router();
 
 usersRouter.use("/", usersFriendsRoute);
 
-function userNotFoundRes(res: Response) {
+export function userNotFoundRes(res: Response) {
   const json = { status: "error", errors: { id: "not found" } } as const;
   return res.status(404).json(json);
 }
@@ -66,9 +70,13 @@ usersRouter.post(
 usersRouter.get(
   "/search",
   async (req: Request, res: UsersSearchErrorResponse) => {
-    const searchTerm = req.query.q;
+    const searchTerm = req.query.q as string;
+    const country = req.query.country as string;
+    const page = Number(req.query.page as string) - 1;
+    const maxUsers = Number(req.query.maxUsers as string);
+    const maxUsersBig = BigInt(maxUsers)
 
-    if (typeof searchTerm != "string") {
+    if (!searchTerm && !country) {
       return res.status(404).json({
         status: "error",
         errors: { searchTerm: "not provided" },
@@ -83,14 +91,18 @@ usersRouter.get(
 
     const session = driver.session();
     try {
-      const users = await searchUsers(session, searchTerm);
-      if (users === null) {
+      const userScores = await searchUsers(session, searchTerm, page, Number(maxUsers));
+      if (userScores === null) {
         return res
           .status(400)
           .json({ status: "error", errors: { searchTerm: "incorrect" } });
       }
 
-      return res.json({ status: "ok", users });
+      const usersCount = await getUsersCount(session)
+      const pageCount = Number((usersCount.toBigInt() + maxUsersBig - 1n) / maxUsersBig)
+      const users = userScores.map((userScore) => userScore[0])
+
+      return res.json({ status: "ok", pageCount, users });
     } catch (err) {
       console.log("Error:", err);
       return res.status(404).json({ status: "error", errors: err as object });
@@ -132,27 +144,54 @@ usersRouter.get("/:userId", async (req: Request, res: UserErrorResponse) => {
   }
 });
 
-usersRouter.get(
-  "/:userId/friends",
-  async (req: Request, res: FriendsErrorResponse) => {
+usersRouter.get("/meetings/:userId", async (req: Request, res) => {
+  try {
+    const session = driver.session();
     const userId = req.params.userId;
 
-    const session = driver.session();
-    try {
-      const friends = await getFriends(session, userId);
-      if (friends === null) {
-        return userNotFoundRes(res);
-      }
-
-      return res.json({ status: "ok", friends });
-    } catch (err) {
-      console.log("Error:", err);
-      return res.status(404).json({ status: "error", errors: err as object });
-    } finally {
+    const user = await getDbUser(session, { id: userId });
+    if (!user) {
       await session.close();
+      return res;
     }
-  },
-);
+
+    const meetingsRequest = await session.run(
+      `MATCH (u1:User {id: $userId})-[m:MEETING]-(u2:User) RETURN m, u2`,
+      { userId },
+    );
+    await session.close();
+    try {
+      const meetings = meetingsRequest.records.map((meeting) => {
+        const { meetingId, waiting } = meeting.get(0).properties;
+        const { id, first_name, last_name } = meeting.get(1).properties;
+        return { meetingId, id, first_name, last_name, waiting };
+      });
+      return res.json({ status: "ok", meetings });
+    } catch (_err) {
+      return res.json({ status: "ok", meetings: [] });
+    }
+  } catch (err) {
+    console.log("Error:", err);
+    return res.status(404).json({ status: "error", errors: err as object });
+  }
+});
+
+usersRouter.put("/meetings/:meetingId", async (req: Request, res) => {
+  try {
+    const session = driver.session();
+    const meetingId = req.params.meetingId;
+
+    await session.run(
+      `MATCH (u1:User)-[m:MEETING]-(u2:User) WHERE m.meetingId=$meetingId SET m.waiting = true`,
+      { meetingId },
+    );
+    await session.close();
+    return res.json({ status: "ok" });
+  } catch (err) {
+    console.log("Error:", err);
+    return res.status(404).json({ status: "error", errors: err as object });
+  }
+});
 
 usersRouter.post("/", async (req: Request, res: UserErrorResponse) => {
   // TODO: verify user fields

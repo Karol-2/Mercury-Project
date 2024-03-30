@@ -1,7 +1,7 @@
+import { UserScore } from "../users.js";
 import User from "./User.js";
 
 import { Response } from "express";
-import { Jwt } from "jsonwebtoken";
 
 type Send<J, T = Response> = (body?: J) => T;
 
@@ -33,9 +33,16 @@ export interface FriendsResponse {
   friends: User[];
 }
 
+export interface FriendsPageResponse {
+  status: "ok";
+  pageCount: number;
+  friends: User[];
+}
+
 export interface UsersSearchResponse {
   status: "ok";
-  users: [User, number][];
+  pageCount: number;
+  users: User[];
 }
 
 export interface JWTResponse extends OkResponse {

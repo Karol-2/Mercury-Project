@@ -1,4 +1,4 @@
-import { Session } from "neo4j-driver";
+import neo4j, { Session } from "neo4j-driver";
 import { v4 as uuidv4 } from "uuid";
 import bcrypt from "bcrypt";
 import User from "./models/User.js";
@@ -192,11 +192,13 @@ export async function getAllUsers(session: Session) {
   return users;
 }
 
-type UserScore = [User, number];
+export type UserScore = [User, number];
 
 export async function searchUser(
   session: Session,
   searchTerm: string,
+  pageIndex: number,
+  pageSize: number,
 ): Promise<UserScore[] | null> {
   const wordVec = wordToVec(searchTerm);
 
@@ -204,11 +206,17 @@ export async function searchUser(
     return null;
   }
 
+  const querySkip = neo4j.int(pageIndex * pageSize);
+  const queryLimit = neo4j.int(pageSize);
+  console.log(querySkip, queryLimit)
+
   const userRequest = await session.run(
     `CALL db.index.vector.queryNodes('user-names', 10, $wordVec)
-  YIELD node AS similarUser, score
-  RETURN similarUser, score`,
-    { wordVec },
+     YIELD node AS similarUser, score
+     RETURN similarUser, score
+     SKIP $querySkip
+     LIMIT $queryLimit`,
+    { wordVec, querySkip, queryLimit },
   );
 
   const users = userRequest.records.map((r) => {
@@ -219,6 +227,14 @@ export async function searchUser(
   });
 
   return users;
+}
+
+export async function getUsersCount(session: Session): Promise<neo4j.Integer> {
+  const usersCount = await session.run(
+    `MATCH (u:User) RETURN count(u)`,
+  );
+
+  return usersCount.records[0].get(0)
 }
 
 export async function updateUser(
@@ -331,15 +347,23 @@ export async function deleteUser(
 export async function getFriends(
   session: Session,
   userId: string,
+  pageIndex: number,
+  pageSize: number,
 ): Promise<User[] | null> {
   const user = await getUser(session, { id: userId });
   if (!user) {
     return null;
   }
 
+  const querySkip = neo4j.int(pageIndex * pageSize);
+  const queryLimit = neo4j.int(pageSize);
+
   const friendRequest = await session.run(
-    `MATCH (u:User {id: $userId})-[:IS_FRIENDS_WITH]-(f:User) RETURN f`,
-    { userId },
+    `MATCH (u:User {id: $userId})-[:IS_FRIENDS_WITH]-(f:User)
+     RETURN DISTINCT f
+     SKIP $querySkip
+     LIMIT $queryLimit`,
+    { userId, querySkip, queryLimit },
   );
 
   const friends = friendRequest.records.map((f) =>

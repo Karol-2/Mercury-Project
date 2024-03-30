@@ -5,18 +5,19 @@ import { useEffect, useState } from "react";
 import FoundUser from "../components/FoundUser";
 import { useUser } from "../helpers/UserContext";
 import User from "../models/User";
-import { faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import editDistance from "../misc/editDistance";
-import Transition from "../components/Transition";
 import { useProtected } from "../helpers/Protected";
-import Paginator from "../components/Paginator";
+
+import Transition from "../components/Transition";
+import Search from "../components/Search";
+import PaginatorV2 from "../components/PaginatorV2";
 
 function SearchPage() {
-  const [searchState, setSearchState] = useState("");
-  const [usersFound, setUsersFound] = useState<[[User, number]]>();
-  const [usersFriends, setUsersFriends] = useState([]);
+  // Logic
+  const [usersFriends, setUsersFriends] = useState<string[]>([]);
+  const [queryEndpoint, setQueryEndpoint] = useState<string>("");
+  const [isReadyToSearch, setIsReadyToSearch] = useState<boolean>(false);
 
+  // Animation
   const [showAnimation, setShowAnim] = useState(false);
   const [showContent, setShowContent] = useState(false);
 
@@ -39,42 +40,14 @@ function SearchPage() {
         "GET",
         {},
       );
-      const friendsIds = friendsResponse.friends.reduce(
-        (prev: string[], curr: User) => {
-          return [...prev, curr.id];
-        },
-        [],
-      );
+
+      const friends = friendsResponse.friends as User[];
+      const friendsIds = friends.map((friend) => friend.id);
+      console.log(friendsIds)
       setUsersFriends(friendsIds);
     };
     fetchFriends();
   }, [user]);
-
-  const handleSearch = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-
-    if (userState.status != "logged_in") return;
-
-    if (searchState.trim() === "") {
-      return;
-    }
-
-    const response = await dataService.fetchData(
-      `/users/search?q=${searchState}`,
-      "GET",
-    );
-
-    const responseWithoutCurrUser = response.users.filter(
-      (respArr: [User, number]) => respArr[0].id !== user!.id,
-    );
-
-    const usersSorted = sortUsersByDistance(
-      searchState,
-      responseWithoutCurrUser,
-    );
-
-    setUsersFound(usersSorted);
-  };
 
   const isFriend = (friendArr: string[], user: User): boolean => {
     return friendArr.reduce((prev: boolean, curr: string) => {
@@ -82,19 +55,9 @@ function SearchPage() {
     }, false);
   };
 
-  const sortUsersByDistance = (searchTerm: string, users: [[User, number]]) => {
-    const userScores = users.map((respArr: [User, number]) => {
-      const user = respArr[0];
-      const score = editDistance(user.first_name + user.last_name, searchTerm);
-      return [user, score];
-    });
-
-    return userScores.sort((a: any, b: any) => {
-      const [_userA, scoreA] = a;
-      const [_userB, scoreB] = b;
-
-      return scoreA - scoreB;
-    }) as [[User, number]];
+  const foundUsersHandler = (endpoint: string) => {
+    setQueryEndpoint(endpoint);
+    setIsReadyToSearch(() => !isReadyToSearch);
   };
 
   return (
@@ -104,48 +67,27 @@ function SearchPage() {
       {showContent ? (
         <>
           <section className=" min-h-screen mx-50 lg:mx-72 ">
-            <div className="mx-50 my-20 flex justify-center">
-              <form
-                className="flex flex-col md:flex-row gap-5 max-w-3xl w-full mt-5"
-                onSubmit={handleSearch}
-              >
-                <div className=" w-full">
-                  <input
-                    type="text"
-                    placeholder="John Doe"
-                    className="form-input text-my-darker"
-                    onChange={(e) => setSearchState(e.target.value)}
-                  ></input>
-                  <p className="text-lg">
-                    Enter your friend's name in the field above.
-                  </p>
-                </div>
+            <Search handler={foundUsersHandler} />
 
-                <button
-                  type="submit"
-                  className="btn bg-my-purple text-xs px-7 py-5"
-                >
-                  <div className="flex gap-3 items-center text-cente justify-center">
-                    <span className=" text-center">Search</span>
-                    <FontAwesomeIcon icon={faMagnifyingGlass} />
-                  </div>
-                </button>
-              </form>
-            </div>
-            {usersFound && (
-              <Paginator
-                users={usersFound.map((match: [User, number]) => match[0])}
-                itemsPerPage={5}
-                renderItem={(user) => (
-                  <FoundUser
-                    user={user}
-                    key={String(0)}
-                    currentId={user.id}
-                    isFriend={isFriend(usersFriends, user)}
-                  />
-                )}
-              />
-            )}
+            <PaginatorV2
+              endpoint={queryEndpoint}
+              refresh={isReadyToSearch}
+              isSearch={true}
+              itemsPerPage={5}
+              getItems={(response) => response.users}
+              renderItem={(renderUser) => {
+                if (renderUser.id !== user.id) {
+                  return (
+                    <FoundUser
+                      user={renderUser}
+                      key={String(0)}
+                      currentId={renderUser.id}
+                      isFriend={isFriend(usersFriends, user)}
+                    />
+                  );
+                } else return <></>;
+              }}
+            />
           </section>
           <Footer />
         </>

@@ -27,7 +27,8 @@
     "mongoose": "^8.2.3",
     "neo4j-driver": "^5.13.0",
     "socket.io": "^4.7.2",
-    "unidecode": "^0.1.8"
+    "unidecode": "^0.1.8",
+    "vite": "^5.2.6"
   },
   "devDependencies": {
     "@types/bcrypt": "^5.0.2",

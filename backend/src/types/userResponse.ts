@@ -7,6 +7,7 @@ import {
   FriendsResponse,
   UsersSearchResponse,
   AuthResponse,
+  FriendsPageResponse,
 } from "../models/Response.js";
 
 export type UsersErrorResponse = CustomResponse<UsersResponse | ErrorResponse>;
@@ -17,6 +18,9 @@ export type AuthOkErrorResponse = CustomResponse<
 >;
 export type FriendsErrorResponse = CustomResponse<
   FriendsResponse | ErrorResponse
+>;
+export type FriendsPageErrorResponse = CustomResponse<
+  FriendsPageResponse | ErrorResponse
 >;
 export type UsersSearchErrorResponse = CustomResponse<
   UsersSearchResponse | ErrorResponse
