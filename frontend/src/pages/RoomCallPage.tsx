@@ -4,7 +4,6 @@ import Navbar from "../components/Navbar";
 import fetchUserMedia from "../media/fetchUserMedia";
 import { useSelector } from "react-redux";
 import { RootState } from "../redux/store";
-import User from "../models/User";
 import { useUser } from "../helpers/UserProvider";
 import { useNavigate, useParams } from "react-router-dom";
 import dataService from "../services/data";
@@ -27,8 +26,7 @@ function RoomCallPage() {
   const [roomPeers, setRoomPeers] = useState<{ [key: string]: RoomPeer }>({});
   const [isAudio, setIsAudio] = useState(true);
   const [isVideo, setIsVideo] = useState(true);
-  const friends: User[] = useSelector((state: RootState) => state.friends);
-  const { socket, userId, user } = useUser();
+  const { friends, socket, userId, user } = useUser();
   const params = useParams();
   const navigate = useNavigate();
   const roomId = params.roomId;

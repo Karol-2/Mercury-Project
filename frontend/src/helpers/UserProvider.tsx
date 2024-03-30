@@ -17,6 +17,7 @@ export interface UserContextValue {
   user: User | null | undefined;
   socket: Socket | null;
   meeting: Meeting | null;
+  friends: User[];
   setUser: React.Dispatch<React.SetStateAction<User | null | undefined>>;
   login: (mail: string, password: string) => Promise<void>;
   logout: () => Promise<boolean>;
@@ -48,6 +49,7 @@ function UserProvider({ children }: { children: React.ReactNode }) {
   const [token, setToken] = useState<object | null>(null);
   const [socket, setSocket] = useState<Socket | null>(null);
   const [meeting, setMeeting] = useState<Meeting | null>(null);
+  const [friends, setFriends] = useState<User[]>([]);
 
   useEffect(() => {
     if (!user) {
@@ -170,6 +172,19 @@ function UserProvider({ children }: { children: React.ReactNode }) {
     return false;
   };
 
+  const fetchFriends = async () => {
+    if (!user) return false;
+
+    const response = await dataService.fetchData(`/users/${user.id}/friends`, "GET");
+
+    if (response.status === "ok") {
+      setFriends(response.users);
+    }
+
+    console.error("Error from the server", response.errors);
+    return false;
+  }
+
   const createMeeting = async () => {
     if (!socket) return;
 
@@ -229,6 +244,10 @@ function UserProvider({ children }: { children: React.ReactNode }) {
     }
   }, [token]);
 
+  useEffect(() => {
+    fetchFriends();
+  }, [userId]);
+
   if (firstRefresh.current) {
     firstRefresh.current = false;
     getAccessToken();
@@ -246,6 +265,7 @@ function UserProvider({ children }: { children: React.ReactNode }) {
         setUser,
         socket,
         meeting,
+        friends,
         login,
         logout,
         updateUser,
