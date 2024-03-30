@@ -1,4 +1,3 @@
-import { UserScore } from "../users.js";
 import User from "./User.js";
 
 import { Response } from "express";

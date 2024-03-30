@@ -1,15 +1,12 @@
 import { Router, Request, Response } from "express";
-import bcrypt from "bcrypt";
 import driver from "../driver/driver.js";
 import {
   JWTRequest,
   authenticateToken,
   getToken,
-  checkToken,
 } from "../misc/jwt.js";
 import {
   AuthOkErrorResponse,
-  FriendsErrorResponse,
   OkErrorResponse,
   UserErrorResponse,
   UsersErrorResponse,
@@ -20,7 +17,6 @@ import {
   getAllUsers,
   searchUser as searchUsers,
   getUser as getUser,
-  getFriends,
   createUser,
   updateUser,
   deleteUser,
@@ -32,10 +28,6 @@ import {
 } from "../users.js";
 import DbUser from "../models/DbUser.js";
 import { ChangePasswordReq } from "../models/ChangePasswordReq.js";
-import kcAdminClient from "../kcAdminClient.js";
-
-import removeKeys from "../misc/removeKeys.js";
-import roundToInt from "../misc/roundToInt.js";
 
 const usersRouter = Router();
 

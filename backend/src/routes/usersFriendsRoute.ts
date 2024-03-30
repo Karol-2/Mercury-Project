@@ -6,7 +6,6 @@ import roundToInt from "../misc/roundToInt.js";
 import {
   OkErrorResponse,
   FriendsErrorResponse,
-  UsersErrorResponse,
   FriendsPageErrorResponse,
 } from "../types/userResponse.js";
 import { filterUser, getFriends } from "../users.js";
