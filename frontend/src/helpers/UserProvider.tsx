@@ -182,6 +182,7 @@ function UserProvider({ children }: { children: React.ReactNode }) {
 
     if (response.status === "ok") {
       setFriends(response.users);
+      return true;
     }
 
     console.error("Error from the server", response.errors);
