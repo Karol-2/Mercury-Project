@@ -10,20 +10,18 @@ describe("template spec", () => {
     cy.visit("http://localhost:5173");
 
     cy.get('[data-testid="WelcomeLogin"]').click();
-    cy.get('input[name="email"]')
-      .type("ltruman5@hc360.com")
-      .should("have.value", "ltruman5@hc360.com");
 
-    cy.get('input[name="password"]')
-      .type("full-range")
-      .should("have.value", "full-range");
+    cy.origin("http://localhost:3000", () => {
+      cy.get("#username").type("ltruman5@hc360.com");
+      cy.get("#password").type("full-range");
+      cy.get("#kc-login").should("exist").click();
+    });
 
-    cy.get('[data-testid="Login"]').click();
+    cy.get('[data-testid="RemoveAccount"]').should("exist");
   });
 
   it("Register", () => {
     cy.visit("http://localhost:5173");
-
     cy.get('[data-testid="WelcomeRegister"]').click();
 
     cy.get('input[name="first_name"]')
@@ -48,17 +46,45 @@ describe("template spec", () => {
 
     cy.get('[data-testid="Register"]').click();
 
-    cy.get('input[name="email"]')
-      .type("johnsmith@mail.com")
-      .should("have.value", "johnsmith@mail.com");
+    cy.wait(2000);
 
-    cy.get('input[name="password"]')
-      .type("password")
-      .should("have.value", "password");
-
-    cy.get('[data-testid="Login"]').click();
+    cy.origin("http://localhost:3000", () => {
+      cy.get("#username").type("johnsmith@mail.com");
+      cy.get("#password").type("password");
+      cy.get("#kc-login").should("exist").click();
+    });
 
     cy.get('[data-testid="RemoveAccount"]').should("exist").click();
     cy.get('[data-testid="Yes"]').should("exist").click();
+  });
+
+  it("Change password", () => {
+    cy.visit("http://localhost:5173");
+
+    cy.get('[data-testid="WelcomeLogin"]').click();
+
+    cy.origin("http://localhost:3000", () => {
+      cy.get("#username").type("ltruman5@hc360.com");
+      cy.get("#password").type("full-range");
+      cy.get("#kc-login").should("exist").click();
+    });
+
+    cy.wait(4000);
+
+    cy.get('[data-testid="Edit"]').should("exist").click();
+
+    cy.wait(4000);
+
+    cy.get('[data-testid="Change"]').should("exist").click();
+
+    cy.wait(4000);
+
+    cy.origin("http://localhost:3000", () => {
+      cy.get("#password-new").type("password2");
+      cy.get("#password-confirm").type("password2");
+      cy.get('input[type="submit"]').should("exist").click();
+    });
+
+    cy.get('[data-testid="RemoveAccount"]').should("exist");
   });
 });
