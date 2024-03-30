@@ -175,7 +175,10 @@ function UserProvider({ children }: { children: React.ReactNode }) {
   const fetchFriends = async () => {
     if (!user) return false;
 
-    const response = await dataService.fetchData(`/users/${user.id}/friends`, "GET");
+    const response = await dataService.fetchData(
+      `/users/${user.id}/friends`,
+      "GET",
+    );
 
     if (response.status === "ok") {
       setFriends(response.users);
@@ -183,7 +186,7 @@ function UserProvider({ children }: { children: React.ReactNode }) {
 
     console.error("Error from the server", response.errors);
     return false;
-  }
+  };
 
   const createMeeting = async () => {
     if (!socket) return;
