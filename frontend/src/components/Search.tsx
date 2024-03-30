@@ -18,7 +18,7 @@ const Search = (props: searchProps) => {
   const [country, setCountry] = useState("");
   const [countryList, setCountryList] = useState(countriesData);
 
-  const { userId } = useUser();
+  const { userState } = useUser();
 
   useEffect(() => {
     const emptyElementExists = countryList.some(
@@ -50,7 +50,7 @@ const Search = (props: searchProps) => {
       url = url + "&country=" + country;
     }
 
-    if (userId === null) navigate("/login");
+    if (userState.status === "anonymous") navigate("/login");
 
     if (searchQuery.trim() === "") {
       return;
