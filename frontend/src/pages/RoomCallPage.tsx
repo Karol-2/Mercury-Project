@@ -30,7 +30,7 @@ function RoomCallPage() {
   const params = useParams();
   const navigate = useNavigate();
   const roomId = params.roomId;
-  peer.on("call", async (call) => {
+  peer?.on("call", async (call) => {
     if (localStream) {
       call.answer(localStream);
     } else {
@@ -145,7 +145,7 @@ function RoomCallPage() {
   return (
     <>
       <Navbar />
-      {localStream ? (
+      {localStream && peer ? (
         <main>
           <div className="flex justify-center p-2">
             <button className="btn p-6" onClick={() => startStopAudio()}>
