@@ -57,10 +57,12 @@ function ProfilePage() {
   }, []);
 
   useEffect(() => {
-    socket!.on("newRoom", (notification) => {
-      dispatch(addNotification(notification));
-    });
-  }, []);
+    if (socket !== null) {
+      socket.on("newRoom", (notification) => {
+        dispatch(addNotification(notification));
+      });
+    }
+  }, [socket]);
 
   return (
     <>
