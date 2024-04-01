@@ -133,6 +133,10 @@ function RoomCallPage() {
   };
 
   useEffect(() => {
+    if (!user || !peer) {
+      navigate("/");
+      return;
+    }
     prepareWebRTC();
   }, []);
   useEffect(() => {
