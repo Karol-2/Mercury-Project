@@ -5,30 +5,16 @@ import Navbar from "../components/Navbar";
 import { useUser } from "../helpers/UserProvider";
 import Profile from "../components/Profile";
 import Transition from "../components/Transition";
-import dataService from "../services/data";
-import { useDispatch } from "react-redux";
-import setNotifications from "../redux/actions/setNotifications";
-import addNotification from "../redux/actions/addNotification";
-import initPeer from "../redux/actions/initPeer";
 
 function ProfilePage() {
   const navigate = useNavigate();
-  const dispatch = useDispatch();
-  const { user, userId, meeting, deleteUser, socket } = useUser();
+  const { addNotification, user, userId, meeting, deleteUser, socket } = useUser();
 
   const [showAnimation, setShowAnim] = useState(false);
   const [showContent, setShowContent] = useState(false);
 
   const handleEditClick = () => {
     navigate("/edit");
-  };
-  const fetchNotifications = async () => {
-    const roomNotificationsRequest = await dataService.fetchData(
-      `/room/${userId}`,
-      "GET",
-      {},
-    );
-    dispatch(setNotifications(roomNotificationsRequest.rooms));
   };
 
   useEffect(() => {
@@ -49,17 +35,9 @@ function ProfilePage() {
   }, [userId]);
 
   useEffect(() => {
-    fetchNotifications();
-  }, []);
-
-  useEffect(() => {
-    dispatch(initPeer(userId!));
-  }, []);
-
-  useEffect(() => {
     if (socket !== null) {
       socket.on("newRoom", (notification) => {
-        dispatch(addNotification(notification));
+        addNotification(notification);
       });
     }
   }, [socket]);

@@ -11,13 +11,19 @@ import dataService from "../services/data";
 import User from "../models/User";
 import { Socket, io } from "socket.io-client";
 import Meeting from "../models/Meeting";
+import RoomNotification from "../models/RoomNotification";
+import Peer from "peerjs";
 
 export interface UserContextValue {
   userId: string | null | undefined;
   user: User | null | undefined;
   socket: Socket | null;
   meeting: Meeting | null;
+  peer: Peer | null;
   friends: User[];
+  notifications: RoomNotification[];
+  addNotification: (notification: RoomNotification) => void;
+  deleteNotification: (notificationId: string) => void;
   setUser: React.Dispatch<React.SetStateAction<User | null | undefined>>;
   login: (mail: string, password: string) => Promise<void>;
   logout: () => Promise<boolean>;
@@ -50,6 +56,8 @@ function UserProvider({ children }: { children: React.ReactNode }) {
   const [socket, setSocket] = useState<Socket | null>(null);
   const [meeting, setMeeting] = useState<Meeting | null>(null);
   const [friends, setFriends] = useState<User[]>([]);
+  const [notifications, setNotifications] = useState<RoomNotification[]>([]);
+  const [peer, setPeer] = useState<Peer | null>(null);
 
   useEffect(() => {
     if (!user) {
@@ -59,6 +67,15 @@ function UserProvider({ children }: { children: React.ReactNode }) {
     if (socket && socket.connected) return;
     setSocket(io("http://localhost:5000", { auth: { userId } }));
   }, [user]);
+
+  useEffect(() => {
+    if (userId) {
+      setPeer(new Peer(userId, {
+        host: "/",
+        port: 8000,
+      }));
+    }
+  }, [userId, peer]);
 
   const firstRefresh = useRef(true);
 
@@ -189,6 +206,29 @@ function UserProvider({ children }: { children: React.ReactNode }) {
     return false;
   };
 
+  const fetchNotifications = async () => {
+    if (!userId) return false;
+    const roomNotificationsRequest = await dataService.fetchData(
+      `/room/${userId}`,
+      "GET",
+      {},
+    );
+    if (roomNotificationsRequest.status === "ok") {
+      setNotifications(roomNotificationsRequest.rooms);
+      return true;
+    }
+    console.error("Error from the server", roomNotificationsRequest.errors);
+    return false;
+  }
+
+  const addNotification = (notification: RoomNotification) => {
+    setNotifications(prev => [...prev, notification]);
+  }
+
+  const deleteNotification = (notificationId: string) => {
+    setNotifications(prev => prev.filter(notification => notification.roomId !== notificationId));
+  }
+
   const createMeeting = async () => {
     if (!socket) return;
 
@@ -252,6 +292,10 @@ function UserProvider({ children }: { children: React.ReactNode }) {
     fetchFriends();
   }, [userId]);
 
+  useEffect(() => {
+    fetchNotifications();
+  }, [userId]);
+
   if (firstRefresh.current) {
     firstRefresh.current = false;
     getAccessToken();
@@ -268,8 +312,12 @@ function UserProvider({ children }: { children: React.ReactNode }) {
         user,
         setUser,
         socket,
+        peer,
         meeting,
         friends,
+        notifications,
+        addNotification,
+        deleteNotification,
         login,
         logout,
         updateUser,
