@@ -70,10 +70,12 @@ function UserProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (userId) {
-      setPeer(new Peer(userId, {
-        host: "/",
-        port: 8000,
-      }));
+      setPeer(
+        new Peer(userId, {
+          host: "/",
+          port: 8000,
+        }),
+      );
     }
   }, [userId, peer]);
 
@@ -219,15 +221,17 @@ function UserProvider({ children }: { children: React.ReactNode }) {
     }
     console.error("Error from the server", roomNotificationsRequest.errors);
     return false;
-  }
+  };
 
   const addNotification = (notification: RoomNotification) => {
-    setNotifications(prev => [...prev, notification]);
-  }
+    setNotifications((prev) => [...prev, notification]);
+  };
 
   const deleteNotification = (notificationId: string) => {
-    setNotifications(prev => prev.filter(notification => notification.roomId !== notificationId));
-  }
+    setNotifications((prev) =>
+      prev.filter((notification) => notification.roomId !== notificationId),
+    );
+  };
 
   const createMeeting = async () => {
     if (!socket) return;

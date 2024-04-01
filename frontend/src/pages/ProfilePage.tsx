@@ -8,7 +8,8 @@ import Transition from "../components/Transition";
 
 function ProfilePage() {
   const navigate = useNavigate();
-  const { addNotification, user, userId, meeting, deleteUser, socket } = useUser();
+  const { addNotification, user, userId, meeting, deleteUser, socket } =
+    useUser();
 
   const [showAnimation, setShowAnim] = useState(false);
   const [showContent, setShowContent] = useState(false);
