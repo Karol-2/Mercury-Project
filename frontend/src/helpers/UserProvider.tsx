@@ -72,8 +72,8 @@ function UserProvider({ children }: { children: React.ReactNode }) {
     if (userId) {
       setPeer(
         new Peer(userId, {
-          host: "/",
-          port: 8000,
+          host: "/peer",
+          port: 5000,
         }),
       );
     }

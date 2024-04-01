@@ -7,6 +7,7 @@ import { connect } from "mongoose";
 import cookieParser from "cookie-parser";
 import ServerToClientEvents from "./events/ServerToClientEvents";
 import ClientToServerEvents from "./events/ClientToServerEvents";
+import { ExpressPeerServer } from "peer";
 
 dotenv.config();
 
@@ -28,6 +29,9 @@ app.use(cookieParser());
 app.use(express.json({ limit: "10mb" }));
 
 const expressServer = createServer(app);
+
+const peerServer = ExpressPeerServer(expressServer, {});
+app.use("/peer", peerServer);
 
 const io = new SocketServer<ClientToServerEvents, ServerToClientEvents>(
   expressServer,
