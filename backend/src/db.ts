@@ -1,10 +1,7 @@
-import { v4 as uuidv4 } from "uuid";
+import driver from "./driver/driver.js";
 
-import driver from "./driver/driver";
-import bcrypt from "bcrypt";
-
-import userData from "./data/users";
-import wordToVec from "./misc/wordToVec";
+import userData from "./data/users.js";
+import { registerUser } from "./users.js";
 
 export async function isDatabaseEmpty() {
   const session = driver.session();
@@ -18,12 +15,13 @@ export async function isDatabaseEmpty() {
     console.error("Error while loading database:", error);
     return false;
   } finally {
-    session.close();
+    await session.close();
   }
 }
 
 export async function importInitialData() {
   const isEmpty = await isDatabaseEmpty();
+
   if (!isEmpty) {
     return "Database is not empty";
   }
@@ -32,28 +30,11 @@ export async function importInitialData() {
   try {
     const userIds: string[] = [];
 
-    // Create users
-    const createUserQuery = `
-      CREATE (u:User $user)
-    `;
-
     for (const user of userData) {
-      const userId = uuidv4();
-      userIds.push(userId);
-
-      const userClean: any = Object.assign({}, user);
-      delete userClean.friend_ids;
-      delete userClean.chats;
-
-      userClean.id = userId;
-      userClean.name_embedding = wordToVec(
-        userClean.first_name + userClean.last_name,
-      );
-      const { password } = userClean;
-      const passwordHashed = await bcrypt.hash(password, 10);
-      userClean.password = passwordHashed;
-
-      await session.run(createUserQuery, { user: userClean });
+      const newUser = await registerUser(user);
+      if (!("errors" in newUser)) {
+        userIds.push(newUser.id);
+      }
     }
 
     // Create relationships
@@ -93,7 +74,7 @@ export async function importInitialData() {
   } catch (error) {
     return "Error importing data";
   } finally {
-    session.close();
+    await session.close();
   }
 }
 
@@ -101,5 +82,5 @@ export async function cleanUpData() {
   const session = driver.session();
   await session.run(`MATCH (m:Meeting) DETACH DELETE m`);
   await session.run(`MATCH (s:Socket) DETACH DELETE s`);
-  session.close();
+  await session.close();
 }

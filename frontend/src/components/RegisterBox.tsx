@@ -1,15 +1,15 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { userRegisterSchema } from "../models/RegisterUserSchema";
 import { FrontendUser } from "../models/User";
 import * as userPlaceholder from "../assets/user-placeholder.jpg";
+import { useUser } from "../helpers/UserContext";
 import Select from "react-select";
 import countriesData from "../assets/countries.json";
 
 function RegisterBox() {
-  const navigate = useNavigate();
   const {
     register,
     handleSubmit,
@@ -17,6 +17,8 @@ function RegisterBox() {
   } = useForm<FrontendUser>({
     resolver: zodResolver(userRegisterSchema),
   });
+
+  const { registerUser, redirectToLogin } = useUser();
 
   const [submitError, setSubmitError] = useState<string>("");
   const [profilePictureBase64, setProfilePictureBase64] = useState<string>("");
@@ -35,28 +37,8 @@ function RegisterBox() {
     label: country.Country,
   }));
 
-  const registerUser = async (user: FrontendUser): Promise<FrontendUser> => {
-    const response = await fetch("http://localhost:5000/users", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(user),
-    });
-
-    if (!response.ok) {
-      throw response;
-    }
-
-    const userJson = await response.json();
-    // console.log("Register " + JSON.stringify(userJson));
-
-    return userJson.user;
-  };
-
   const [country, setCountry] = useState(countriesData[0].Country);
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleCountryChange = (e: any) => {
     const selectedCountry = e ? e.value : "";
     setCountry(selectedCountry);
@@ -128,8 +110,7 @@ function RegisterBox() {
       user.country = country;
       await registerUser(user);
 
-      // console.log(registered);
-      navigate("/login");
+      redirectToLogin();
     } catch (e) {
       if (e instanceof Error) {
         setSubmitError("Can't connect to the server");

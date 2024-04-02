@@ -7,6 +7,7 @@ import dataService from "../services/data";
 interface PaginatorProps {
   endpoint: string;
   itemsPerPage: number;
+  getItems: (response: any) => User[];
   renderItem: (user: User) => React.ReactNode;
   refresh: boolean;
   isSearch: boolean;
@@ -34,13 +35,17 @@ function PaginatorV2(props: PaginatorProps) {
         props.endpoint +
         `${queryChar}page=${currentPage}&maxUsers=${props.itemsPerPage}`;
 
+      console.log(url);
+
       await dataService
         .fetchData(url, "GET")
         .then((response) => {
-          if (response.users && response.totalPage) {
+          const users = props.getItems(response);
+
+          if (users && response.pageCount) {
             setError("");
-            setUsers(response.users);
-            setTotalPages(response.totalPage);
+            setUsers(users);
+            setTotalPages(response.pageCount);
           } else {
             previousPage();
             if (currentPage === 1) {

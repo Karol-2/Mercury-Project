@@ -17,12 +17,12 @@ function FoundUser(props: FoundUserProps) {
     const fetchData = async () => {
       try {
         const friendsRequestsResponse = await dataService.fetchData(
-          `/users/${props.user.id}/friend-requests`,
+          `/users/${props.user.id}/friend-requests?page=1&maxUsers=100`,
           "GET",
           {},
         );
 
-        const isRequestSent = friendsRequestsResponse.friends.some(
+        const isRequestSent = friendsRequestsResponse.friendRequests.some(
           (friend: User) => String(friend.id) === props.currentId,
         );
 

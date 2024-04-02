@@ -15,32 +15,46 @@ import VideoCallPage from "./pages/VideoCallPage.tsx";
 
 import "./styles/styles.scss";
 
-import UserProvider from "./helpers/UserProvider.tsx";
 import { store } from "./redux/store.ts";
+import MeetingProvider from "./helpers/MeetingProvider.tsx";
+import Protected from "./helpers/Protected.tsx";
+import KeycloakUserProvider from "./helpers/KeycloakUserProvider.tsx";
 import EditDataPage from "./pages/EditDataPage.tsx";
 
 const body = document.getElementsByTagName("body")[0]!;
 body.className = "bg-my-darker text-my-light";
 
+const protectedRoutes = [
+  { path: "/profile", element: <ProfilePage /> },
+  { path: "/edit", element: <EditDataPage /> },
+  { path: "/messages/:friendId", element: <MessagingPage /> },
+  { path: "/friends", element: <FriendsPage /> },
+  { path: "/search", element: <SearchPage /> },
+  { path: "/meeting", element: <VideoCallPage /> },
+];
+
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <Provider store={store}>
     <AnimatePresence mode="wait">
-      <UserProvider>
-        <Router>
-          <Routes location={location} key={location.pathname}>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/register" element={<RegisterPage />} />
-            <Route path="/profile" element={<ProfilePage />} />
-            <Route path="/edit" element={<EditDataPage />} />
-            <Route path="/messages/:friendId" element={<MessagingPage />} />
-            <Route path="/friends" element={<FriendsPage />} />
-            <Route path="/search" element={<SearchPage />} />
-            <Route path="/meeting" element={<VideoCallPage />} />
-            <Route path="/*" element={<PageNotFound />} />
-          </Routes>
-        </Router>
-      </UserProvider>
+      <Router>
+        <KeycloakUserProvider>
+          <MeetingProvider>
+            <Routes location={location} key={location.pathname}>
+              <Route path="/" element={<HomePage />} />
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="/register" element={<RegisterPage />} />
+              {protectedRoutes.map((props, i) => (
+                <Route
+                  key={i}
+                  path={props.path}
+                  element={<Protected>{props.element}</Protected>}
+                />
+              ))}
+              <Route path="/*" element={<PageNotFound />} />
+            </Routes>
+          </MeetingProvider>
+        </KeycloakUserProvider>
+      </Router>
     </AnimatePresence>
   </Provider>,
 );

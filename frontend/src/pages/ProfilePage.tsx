@@ -2,13 +2,17 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Footer from "../components/Footer";
 import Navbar from "../components/Navbar";
-import { useUser } from "../helpers/UserProvider";
+import { useUser } from "../helpers/UserContext";
 import Profile from "../components/Profile";
 import Transition from "../components/Transition";
+import { useMeeting } from "../helpers/MeetingProvider";
+import { useProtected } from "../helpers/Protected";
 
 function ProfilePage() {
   const navigate = useNavigate();
-  const { user, userId, meeting, deleteUser } = useUser();
+  const { deleteUser } = useUser();
+  const { user } = useProtected();
+  const { meeting } = useMeeting();
 
   const [showAnimation, setShowAnim] = useState(false);
   const [showContent, setShowContent] = useState(false);
@@ -29,10 +33,6 @@ function ProfilePage() {
       navigate("/meeting");
     }
   }, [meeting]);
-
-  useEffect(() => {
-    if (userId === null) navigate("/login");
-  }, [userId]);
 
   return (
     <>

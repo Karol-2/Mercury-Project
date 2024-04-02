@@ -3,20 +3,18 @@ import { useNavigate } from "react-router-dom";
 import User, { FrontendUser } from "../models/User";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { userEditDetails } from "../models/RegisterUserSchema";
-import { ChangeEvent, Dispatch, SetStateAction, useState } from "react";
+import { ChangeEvent, useState } from "react";
 import countriesData from "../assets/countries.json";
 import Select from "react-select";
 
 export interface EditDetails {
   user: User;
-  updateUser: () => Promise<boolean>;
-  setUser: Dispatch<SetStateAction<User | null | undefined>>;
+  updateUser: (updateUser: Partial<User>) => Promise<boolean>;
 }
 
 function EditDetails(props: EditDetails) {
   const user: User = props.user;
   const updateUser = props.updateUser;
-  const setUser = props.setUser;
   const navigate = useNavigate();
 
   const {
@@ -70,16 +68,14 @@ function EditDetails(props: EditDetails) {
   }));
 
   const editUser = async (newUser: FrontendUser): Promise<void> => {
-    const userToSave: User = {
-      ...user,
+    const changes: Partial<User> = {
       first_name: newUser.first_name,
       last_name: newUser.last_name,
       country: country,
       mail: newUser.mail,
     };
-    setUser(userToSave);
 
-    updateUser().then((updated) => {
+    updateUser(changes).then((updated) => {
       if (updated) console.log("Updated");
       else throw new Error("Error while updating user");
     });

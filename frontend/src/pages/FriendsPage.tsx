@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useUser } from "../helpers/UserProvider";
+import { useMeeting } from "../helpers/MeetingProvider";
 
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -11,23 +11,21 @@ import Navbar from "../components/Navbar";
 import User from "../models/User";
 import dataService from "../services/data";
 import Transition from "../components/Transition";
+import { useProtected } from "../helpers/Protected";
 import FoundUser from "../components/FoundUser";
 import Friend from "../components/Friend";
 import PaginatorV2 from "../components/PaginatorV2";
 
 function FriendsPage() {
   const navigate = useNavigate();
-  const { user, meeting, createMeeting, joinMeeting } = useUser();
+  const { user } = useProtected();
+  const { meeting, createMeeting, joinMeeting } = useMeeting();
 
   const [friendsRequests, setFriendsRequests] = useState([]);
   const [refresh, setRefresh] = useState(false);
 
   const [showAnimation, setShowAnim] = useState(false);
   const [showContent, setShowContent] = useState(false);
-
-  useEffect(() => {
-    if (user === null) navigate("/login");
-  }, [user]);
 
   useEffect(() => {
     setShowAnim(true);
@@ -40,7 +38,7 @@ function FriendsPage() {
     const fetchFriendRequests = async () => {
       if (user) {
         const friendsRequestsResponse = await dataService.fetchData(
-          `/users/${user.id}/friend-requests`,
+          `/users/${user.id}/friend-requests?page=1&maxUsers=100`,
           "GET",
           {},
         );
@@ -103,6 +101,7 @@ function FriendsPage() {
                       refresh={refresh}
                       isSearch={false}
                       itemsPerPage={5}
+                      getItems={(response) => response.friends}
                       renderItem={(user) => (
                         <Friend
                           friend={user}
@@ -147,6 +146,7 @@ function FriendsPage() {
                     itemsPerPage={3}
                     refresh={refresh}
                     isSearch={false}
+                    getItems={(response) => response.friendSuggestions}
                     renderItem={(resultUser) => (
                       <FoundUser
                         user={resultUser}

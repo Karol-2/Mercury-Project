@@ -3,19 +3,17 @@ import Footer from "../components/Footer";
 import dataService from "../services/data";
 import { useEffect, useState } from "react";
 import FoundUser from "../components/FoundUser";
-import { useUser } from "../helpers/UserProvider";
+import { useUser } from "../helpers/UserContext";
 import User from "../models/User";
-import { useNavigate } from "react-router-dom";
+import { useProtected } from "../helpers/Protected";
 
 import Transition from "../components/Transition";
 import Search from "../components/Search";
 import PaginatorV2 from "../components/PaginatorV2";
 
 function SearchPage() {
-  const navigate = useNavigate();
-
   // Logic
-  const [usersFriends, setUsersFriends] = useState([]);
+  const [usersFriends, setUsersFriends] = useState<string[]>([]);
   const [queryEndpoint, setQueryEndpoint] = useState<string>("");
   const [isReadyToSearch, setIsReadyToSearch] = useState<boolean>(false);
 
@@ -23,7 +21,8 @@ function SearchPage() {
   const [showAnimation, setShowAnim] = useState(false);
   const [showContent, setShowContent] = useState(false);
 
-  const { user, userId } = useUser();
+  const { userState } = useUser();
+  const { user } = useProtected();
 
   useEffect(() => {
     setShowAnim(true);
@@ -33,21 +32,18 @@ function SearchPage() {
   }, []);
 
   useEffect(() => {
-    if (userId === null) navigate("/login");
+    if (userState.status == "loading") return;
 
     const fetchFriends = async () => {
       const friendsResponse = await dataService.fetchData(
-        `/users/${userId}/friends`,
+        `/users/${user.id}/friends?page=1&maxUsers=100`,
         "GET",
         {},
       );
 
-      const friendsIds = friendsResponse.users.reduce(
-        (prev: string[], curr: User) => {
-          return [...prev, curr.id];
-        },
-        [],
-      );
+      const friends = friendsResponse.friends as User[];
+      const friendsIds = friends.map((friend) => friend.id);
+      console.log(friendsIds);
       setUsersFriends(friendsIds);
     };
     fetchFriends();
@@ -78,13 +74,14 @@ function SearchPage() {
               refresh={isReadyToSearch}
               isSearch={true}
               itemsPerPage={5}
-              renderItem={(user) => {
-                if (user.id !== userId) {
+              getItems={(response) => response.users}
+              renderItem={(renderUser) => {
+                if (renderUser.id !== user.id) {
                   return (
                     <FoundUser
-                      user={user}
+                      user={renderUser}
                       key={String(0)}
-                      currentId={userId}
+                      currentId={renderUser.id}
                       isFriend={isFriend(usersFriends, user)}
                     />
                   );

@@ -1,4 +1,4 @@
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent, FormEvent, useState } from "react";
 import User from "../models/User";
 import { changePasswordSchema } from "../models/RegisterUserSchema";
 import { useNavigate } from "react-router-dom";
@@ -7,21 +7,22 @@ import { useForm } from "react-hook-form";
 import { PasswordForm } from "../models/PasswordForm";
 
 export interface EditDetails {
+  provider: string;
   user: User;
+  token?: string;
+  redirectToLogin: () => void;
   logout: () => Promise<boolean>;
 }
 
 function EditPassword(props: EditDetails) {
-  const { user, logout } = props;
+  const { provider, user, token, redirectToLogin, logout } = props;
   const navigate = useNavigate();
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, isSubmitting },
-  } = useForm<PasswordForm>({
+  const { register, handleSubmit, formState } = useForm<PasswordForm>({
     resolver: zodResolver(changePasswordSchema),
   });
+
+  const { errors, isSubmitting } = formState;
 
   const [submitError, setSubmitError] = useState<string>("");
   const [formData, setFormData] = useState({
@@ -54,7 +55,11 @@ function EditPassword(props: EditDetails) {
     className: "text-my-dark form-input",
   };
 
-  const editPassword = async (passwords: PasswordForm): Promise<void> => {
+  const editPassword = async (passwords?: PasswordForm): Promise<void> => {
+    if (!token) {
+      throw new Error("Token is undefined");
+    }
+
     if (user) {
       const response = await fetch(
         `http://localhost:5000/users/${user.id}/change-password`,
@@ -62,8 +67,9 @@ function EditPassword(props: EditDetails) {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`,
           },
-          body: JSON.stringify(passwords),
+          body: JSON.stringify(passwords || {}),
         },
       );
 
@@ -94,6 +100,20 @@ function EditPassword(props: EditDetails) {
     }
   };
 
+  const formSubmit = () => {
+    if (provider == "rest") {
+      return handleSubmit(submit);
+    } else if (provider == "keycloak") {
+      return async (e: FormEvent) => {
+        e.preventDefault();
+        await editPassword();
+        redirectToLogin();
+      };
+    } else {
+      throw new Error("not implemented");
+    }
+  };
+
   return (
     <div className=" flex flex-col gap-2 bg-my-dark p-10 xl:px-44 rounded-xl">
       <h1 className="text-3xl font-bold text-my-orange">Change Password</h1>
@@ -101,48 +121,52 @@ function EditPassword(props: EditDetails) {
       <form
         id="password-box"
         className=" flex flex-col gap-2 bg-my-dark sm:p-10 lg:px-44 rounded-xl"
-        onSubmit={handleSubmit(submit)}
+        onSubmit={formSubmit()}
       >
-        <div>Current password</div>
-        <input
-          {...inputProps}
-          {...register("old_password")}
-          value={formData.old_password}
-          onChange={handleChange}
-          type="password"
-        />
-        <div {...errorProps}>{errors.old_password?.message}</div>
+        {provider == "rest" && (
+          <>
+            <div>Current password</div>
+            <input
+              {...inputProps}
+              {...register("old_password")}
+              value={formData.old_password}
+              onChange={handleChange}
+              type="password"
+            />
+            <div {...errorProps}>{errors.old_password?.message}</div>
 
-        <div>New password</div>
-        <input
-          {...inputProps}
-          {...register("new_password")}
-          value={formData.new_password}
-          onChange={handleChange}
-          type="password"
-        />
-        <div {...errorProps}>{errors.new_password?.message}</div>
+            <div>New password</div>
+            <input
+              {...inputProps}
+              {...register("new_password")}
+              value={formData.new_password}
+              onChange={handleChange}
+              type="password"
+            />
+            <div {...errorProps}>{errors.new_password?.message}</div>
 
-        <div>Repeat new password</div>
-        <input
-          {...inputProps}
-          {...register("repeat_password")}
-          type="password"
-          value={formData.repeat_password}
-          onChange={handleChange}
-        />
-        <div {...errorProps}>{errors.repeat_password?.message}</div>
+            <div>Repeat new password</div>
+            <input
+              {...inputProps}
+              {...register("repeat_password")}
+              type="password"
+              value={formData.repeat_password}
+              onChange={handleChange}
+            />
+            <div {...errorProps}>{errors.repeat_password?.message}</div>
 
-        <div className="pb-4 text-[#f88]">{submitError}</div>
+            <div className="pb-4 text-[#f88]">{submitError}</div>
+          </>
+        )}
 
         <input
           disabled={isSubmitting}
-          data-testid="Register"
+          data-testid="Change"
           type="submit"
           className="btn small bg-my-orange disabled:bg-my-dark"
           value="Change"
         />
-        <p>WARNING: You will be logged out!</p>
+        {provider == "rest" && <p>WARNING: You will be logged out!</p>}
       </form>
     </div>
   );

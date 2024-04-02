@@ -1,73 +1,56 @@
-import React, {
-  useState,
-  useEffect,
-  useRef,
-  createContext,
-  useContext,
-} from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 import { isExpired, decodeToken } from "react-jwt";
 import Cookies from "js-cookie";
 import dataService from "../services/data";
-import User from "../models/User";
+import User, { FrontendUser } from "../models/User";
 import { Socket, io } from "socket.io-client";
-import Meeting from "../models/Meeting";
+import UserContext from "./UserContext";
+import UserState from "../models/UserState";
+import { useNavigate } from "react-router-dom";
 
-export interface UserContextValue {
-  userId: string | null | undefined;
-  user: User | null | undefined;
-  socket: Socket | null;
-  meeting: Meeting | null;
-  setUser: React.Dispatch<React.SetStateAction<User | null | undefined>>;
-  login: (mail: string, password: string) => Promise<void>;
-  logout: () => Promise<boolean>;
-  updateUser: () => Promise<boolean>;
-  deleteUser: () => Promise<boolean>;
-  createMeeting: () => Promise<string | void>;
-  leaveMeeting: () => Promise<void>;
-  joinMeeting: (friendId: string) => Promise<string | void>;
-}
+function RestUserProvider({ children }: { children: React.ReactNode }) {
+  const navigate = useNavigate();
+  const provider = "rest";
 
-const UserContext = createContext<UserContextValue | null>(null);
-
-function useUser() {
-  const context = useContext(UserContext);
-  if (!context) {
-    throw new Error("useUser must be used within a UserProvider");
-  }
-
-  return context;
-}
-
-function UserProvider({ children }: { children: React.ReactNode }) {
-  // userId:
-  // undefined -> user state is loading
-  // null -> user not logged in
-  // string -> user logged in, userID correct
-  const [userId, setUserId] = useState<string | null | undefined>(undefined);
-  const [user, setUser] = useState<User | null | undefined>(undefined);
+  const [userState, setUserState] = useState<UserState>({ status: "loading" });
+  const user = useMemo(
+    () => (userState.status == "logged_in" ? userState.user : null),
+    [userState],
+  );
   const [token, setToken] = useState<object | null>(null);
   const [socket, setSocket] = useState<Socket | null>(null);
-  const [meeting, setMeeting] = useState<Meeting | null>(null);
+
+  const setUserAnonymous = () => {
+    setUserState({ status: "anonymous" });
+  };
+
+  const setUserLoggedIn = (user: User) => {
+    setUserState({ status: "logged_in", user });
+  };
 
   useEffect(() => {
-    if (!user) {
+    if (userState.status != "logged_in") {
       setSocket(null);
       return;
     }
     if (socket && socket.connected) return;
+
+    const userId = userState.user.id;
     setSocket(io("http://localhost:5000", { auth: { userId } }));
-  }, [user]);
+  }, [userState]);
 
   const firstRefresh = useRef(true);
 
   const trySetToken = (tokenStr: string | null): boolean => {
     if (tokenStr) {
       const decodedToken = decodeToken(tokenStr);
+
       if (decodedToken && !isExpired(tokenStr)) {
         setToken(decodedToken);
         return true;
       }
     }
+
     return false;
   };
 
@@ -92,11 +75,15 @@ function UserProvider({ children }: { children: React.ReactNode }) {
       }
     }
 
-    setUserId(null);
+    setUserAnonymous();
+  };
+
+  const redirectToLogin = () => {
+    navigate("/login");
   };
 
   const login = async (mail: string, password: string) => {
-    if (userId) return;
+    if (userState.status == "logged_in") return;
 
     const response = await dataService.fetchData("/auth/login", "POST", {
       headers: {
@@ -109,7 +96,7 @@ function UserProvider({ children }: { children: React.ReactNode }) {
     });
 
     if (response.status != "ok") {
-      setUserId(null);
+      setUserAnonymous();
       return;
     }
 
@@ -118,7 +105,7 @@ function UserProvider({ children }: { children: React.ReactNode }) {
   };
 
   const logout = async () => {
-    if (!userId) return true;
+    if (userState.status == "anonymous") return true;
 
     const tokenStr = sessionStorage.getItem("token");
 
@@ -130,8 +117,7 @@ function UserProvider({ children }: { children: React.ReactNode }) {
     });
 
     if (data.status == "ok") {
-      setUserId(null);
-      setUser(null);
+      setUserAnonymous();
       sessionStorage.removeItem("token");
       socket?.disconnect();
       return true;
@@ -140,9 +126,29 @@ function UserProvider({ children }: { children: React.ReactNode }) {
     return false;
   };
 
-  const updateUser = async () => {
-    if (!user) return false;
+  const registerUser = async (user: FrontendUser): Promise<FrontendUser> => {
+    const response = await fetch("http://localhost:5000/users", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(user),
+    });
 
+    if (!response.ok) {
+      throw response;
+    }
+
+    const userJson = await response.json();
+    console.log("Register " + JSON.stringify(userJson));
+
+    return userJson.user;
+  };
+
+  const updateUser = async (updateUser: Partial<User>) => {
+    if (userState.status != "logged_in") return false;
+
+    const user = { ...userState.user, ...updateUser };
     const response = await dataService.fetchData(`/users/${user.id}`, "PUT", {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(user),
@@ -157,12 +163,13 @@ function UserProvider({ children }: { children: React.ReactNode }) {
   };
 
   const deleteUser = async () => {
-    if (!user) return true;
+    if (userState.status != "logged_in") return true;
 
+    const user = userState.user!;
     const response = await dataService.fetchData(`/users/${user.id}`, "DELETE");
+
     if (response.status === "ok") {
-      setUserId(null);
-      setUser(null);
+      setUserAnonymous();
       return true;
     }
 
@@ -170,61 +177,11 @@ function UserProvider({ children }: { children: React.ReactNode }) {
     return false;
   };
 
-  const createMeeting = async () => {
-    if (!socket) return;
-
-    const waitForMeeting = new Promise<string>((resolve) => {
-      socket.once("createdMeeting", (meeting) => {
-        const meetingId = (meeting?.id || "") as string;
-        return resolve(meetingId);
-      });
-    });
-
-    socket.emit("createMeeting");
-
-    const meetingId = await waitForMeeting;
-    setMeeting({ id: meetingId, state: "created" });
-    return meetingId;
-  };
-
-  const joinMeeting = async (friendId: string) => {
-    if (!socket) return;
-
-    const waitForMeeting = new Promise<string>((resolve) => {
-      socket.once("joinedMeeting", (meeting) => {
-        const meetingId = (meeting?.id || "") as string;
-        return resolve(meetingId);
-      });
-    });
-
-    socket.emit("joinMeeting", [friendId]);
-
-    const meetingId = await waitForMeeting;
-    setMeeting({ id: meetingId, state: "joined" });
-    return meetingId;
-  };
-
-  const leaveMeeting = async () => {
-    if (!socket) return;
-
-    const waitForLeaveMeeting = new Promise<void>((resolve) => {
-      socket.once("leftMeeting", () => {
-        return resolve();
-      });
-    });
-
-    socket.emit("leaveMeeting");
-
-    await waitForLeaveMeeting;
-    setMeeting(null);
-  };
-
   useEffect(() => {
     if (token) {
       const newUserId = (token as any).userId;
       dataService.fetchData(`/users/${newUserId}`, "GET").then((response) => {
-        setUserId(newUserId);
-        setUser(response.user as any);
+        setUserLoggedIn(response.user);
       });
     }
   }, [token]);
@@ -235,24 +192,22 @@ function UserProvider({ children }: { children: React.ReactNode }) {
   }
 
   useEffect(() => {
-    console.log(userId);
-  }, [userId]);
+    console.log(userState);
+  }, [userState]);
 
   return (
     <UserContext.Provider
       value={{
-        userId,
+        provider,
         user,
-        setUser,
+        userState,
         socket,
-        meeting,
+        redirectToLogin,
         login,
         logout,
+        registerUser,
         updateUser,
         deleteUser,
-        createMeeting,
-        joinMeeting,
-        leaveMeeting,
       }}
     >
       {children}
@@ -260,5 +215,4 @@ function UserProvider({ children }: { children: React.ReactNode }) {
   );
 }
 
-export { useUser };
-export default UserProvider;
+export default RestUserProvider;

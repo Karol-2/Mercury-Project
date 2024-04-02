@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Select from "react-select";
 import countriesData from "../assets/countries.json";
-import { useUser } from "../helpers/UserProvider";
+import { useUser } from "../helpers/UserContext";
 
 interface searchProps {
   handler: (endpoint: string) => void;
@@ -12,13 +12,13 @@ interface searchProps {
 
 const Search = (props: searchProps) => {
   const navigate = useNavigate();
-  //TODO: IF YOU HAVE EMPTY SEARCH, THEN YOU CANT SEARCH ANYTHING
+
   // Logic
   const [searchQuery, setSearchQuery] = useState("");
   const [country, setCountry] = useState("");
   const [countryList, setCountryList] = useState(countriesData);
 
-  const { userId } = useUser();
+  const { userState } = useUser();
 
   useEffect(() => {
     const emptyElementExists = countryList.some(
@@ -45,18 +45,16 @@ const Search = (props: searchProps) => {
   const handleSearch = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    let url: string = `/users/search?q=${searchQuery}`;
-    if (country !== "" && country !== "-") {
-      url = url + "&country=" + country;
-    }
+    if (userState.status === "anonymous") navigate("/login");
 
-    if (userId === null) navigate("/login");
+    const countryQuery = country != "-" ? country : "";
 
-    if (searchQuery.trim() === "") {
-      return;
-    }
+    const urlSearchParams = new URLSearchParams({
+      q: searchQuery,
+      country: countryQuery,
+    });
 
-    props.handler(url);
+    props.handler(`/users/search?${urlSearchParams}`);
   };
 
   return (

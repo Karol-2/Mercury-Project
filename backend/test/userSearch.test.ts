@@ -1,11 +1,12 @@
 import { expect, test } from "vitest";
 
-let userId: number;
 let page: number = 1;
 let maxUsers: number = 1;
 
 test("Search all users", async () => {
-  const response = await fetch("http://localhost:5000/users/search?q=a");
+  const response = await fetch(
+    "http://localhost:5000/users/search?q=a&page=1&maxUsers=100",
+  );
 
   const responseData = await response.json();
   const users = responseData.users;
@@ -13,13 +14,11 @@ test("Search all users", async () => {
 
   expect(status).toBe("ok");
   expect(users.length).toBe(27);
-
-  userId = users[0].id;
 });
 
 test("Search all users from Poland", async () => {
   const response = await fetch(
-    "http://localhost:5000/users/search?country=Poland",
+    "http://localhost:5000/users/search?page=1&maxUsers=10&country=Poland",
   );
 
   const responseData = await response.json();

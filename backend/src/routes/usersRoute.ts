@@ -1,70 +1,50 @@
 import { Router, Request, Response } from "express";
-import { v4 as uuidv4 } from "uuid";
-import { Session } from "neo4j-driver";
-import driver from "../driver/driver";
-import bcrypt from "bcrypt";
-import wordToVec from "../misc/wordToVec";
-import User from "../models/User";
-import { JWTRequest, authenticateToken } from "../misc/jwt";
+import driver from "../driver/driver.js";
+import { JWTRequest, authenticateToken, getToken } from "../misc/jwt.js";
 import {
-  FriendsErrorResponse,
+  AuthOkErrorResponse,
   OkErrorResponse,
   UserErrorResponse,
   UsersErrorResponse,
   UsersSearchErrorResponse,
-} from "../types/userResponse";
-import usersFriendsRoute from "./usersFriendsRoute";
-
-import removeKeys from "../misc/removeKeys";
-import roundToInt from "../misc/roundToInt";
-import { ChangePasswordReq } from "../models/ChangePasswordReq";
-import { log } from "console";
-
-const filterUser = (user: User) => removeKeys({ ...user }, ["name_embedding"]);
+} from "../types/userResponse.js";
+import usersFriendsRoute from "./usersFriendsRoute.js";
+import {
+  getAllUsers,
+  searchUser as searchUsers,
+  getUser as getUser,
+  createUser,
+  updateUser,
+  deleteUser,
+  UserCreateResult,
+  registerUser,
+  getDbUser,
+  changePassword,
+  getUsersCount,
+} from "../users.js";
+import DbUser from "../models/DbUser.js";
+import { ChangePasswordReq } from "../models/ChangePasswordReq.js";
+import { verifySearchQuery } from "../misc/verifyRequest.js";
 
 const usersRouter = Router();
 
 usersRouter.use("/", usersFriendsRoute);
 
-export async function userExists(
-  session: Session,
-  props: Partial<User>,
-): Promise<User | null> {
-  const propsStr = Object.keys(props)
-    .map((k) => `${k}: $${k}`)
-    .join(", ");
-
-  const userExistsResult = await session.run(
-    `MATCH (u:User {${propsStr}}) RETURN u`,
-    props,
-  );
-
-  if (userExistsResult.records.length === 0) {
-    return null;
-  }
-
-  const user = userExistsResult.records[0].get("u").properties as User;
-  return filterUser(user);
-}
-
-function userNotFoundRes(res: Response) {
+export function userNotFoundRes(res: Response) {
   const json = { status: "error", errors: { id: "not found" } } as const;
   return res.status(404).json(json);
 }
 
 usersRouter.get("/", async (_req: Request, res: UsersErrorResponse) => {
+  const session = driver.session();
   try {
-    const session = driver.session();
-    const usersRequest = await session.run(`MATCH (u:User) RETURN u`);
-    const users = usersRequest.records.map((r) =>
-      filterUser(r.get("u").properties),
-    );
-
-    await session.close();
+    const users = await getAllUsers(session);
     return res.json({ status: "ok", users });
   } catch (err) {
     console.log("Error:", err);
     return res.status(404).json({ status: "error", errors: err as object });
+  } finally {
+    await session.close();
   }
 });
 
@@ -79,118 +59,64 @@ usersRouter.post(
 usersRouter.get(
   "/search",
   async (req: Request, res: UsersSearchErrorResponse) => {
-    const searchTerm: string = req.query.q as string;
-    const country: string = req.query.country as string;
-
-    if (!searchTerm && !country) {
-      return res.status(404).json({
-        status: "error",
-        errors: { searchTerm: "not provided" },
-      });
+    const verify = verifySearchQuery(req.query as any);
+    if (!verify.valid) {
+      return res.status(400).json({ status: "error", errors: verify.errors });
     }
 
+    const { page, maxUsers, q: searchTerm, country } = verify.verified;
+    const maxUsersBig = BigInt(maxUsers);
+
+    const session = driver.session();
     try {
-      const page: number = parseInt((req.query.page as string) || "");
-      const maxUsersOnPage: number = parseInt(
-        (req.query.maxUsers as string) || "",
+      const userScores = await searchUsers(
+        session,
+        searchTerm,
+        country,
+        page - 1,
+        maxUsers,
       );
-      const session = driver.session();
-      let allUsers: User[] = [];
-
-      if (country && searchTerm) {
-        const wordVec = wordToVec(searchTerm);
-        const searchRequest = await session.run(
-          `CALL db.index.vector.queryNodes('user-names', 100, $wordVec)
-          YIELD node AS similarUser, score
-          RETURN similarUser, score`,
-          { wordVec },
-        );
-
-        allUsers = searchRequest.records
-          .map((r) => {
-            return filterUser(r.get("similarUser").properties);
-          })
-          .filter((user) => user.country === country);
-      } else if (country) {
-        const searchRequest = await session.run(
-          `MATCH (similarUser:User {country: $country})
-          RETURN similarUser`,
-          { country },
-        );
-
-        allUsers = searchRequest.records.map((r) => {
-          return filterUser(r.get("similarUser").properties);
-        });
-      } else if (searchTerm) {
-        const wordVec = wordToVec(searchTerm);
-        const searchRequest = await session.run(
-          `CALL db.index.vector.queryNodes('user-names', 100, $wordVec)
-          YIELD node AS similarUser, score
-          RETURN similarUser, score`,
-          { wordVec },
-        );
-
-        allUsers = searchRequest.records.map((r) => {
-          return filterUser(r.get("similarUser").properties);
-        });
+      if (userScores === null) {
+        return res
+          .status(400)
+          .json({ status: "error", errors: { searchTerm: "incorrect" } });
       }
 
-      await session.close();
-
-      if (!page && !maxUsersOnPage) {
-        if (allUsers.length === 0) {
-          return res.status(404).json({
-            status: "error",
-            errors: { users: "No users found" },
-          });
-        }
-        const totalPage: number = roundToInt(allUsers.length / 10);
-        return res.status(200).json({
-          status: "ok",
-          allUsersSize: allUsers.length,
-          totalPage: totalPage,
-          users: allUsers,
-        });
-      } else if (!page || !maxUsersOnPage) {
-        return res.status(400).json({
-          status: "error",
-          errors: { params: "Missing or incorrect query params" },
-        });
-      }
-
-      const users = allUsers.slice(
-        (page - 1) * maxUsersOnPage,
-        page * maxUsersOnPage,
+      const usersCount = await getUsersCount(session);
+      const pageCount = Number(
+        (usersCount.toBigInt() + maxUsersBig - 1n) / maxUsersBig,
       );
+      const users = userScores.map((userScore) => userScore[0]);
 
-      if (users.length === 0) {
-        return res.status(404).json({
-          status: "error",
-          errors: { users: "No users found with given queries" },
-        });
-      }
-      const totalPage: number = roundToInt(allUsers.length / maxUsersOnPage);
-      return res.status(200).json({
-        status: "ok",
-        allUsersSize: allUsers.length,
-        totalPage: totalPage,
-        users,
-      });
+      return res.json({ status: "ok", pageCount, users });
     } catch (err) {
       console.log("Error:", err);
       return res.status(404).json({ status: "error", errors: err as object });
+    } finally {
+      await session.close();
     }
   },
 );
 
 usersRouter.get("/:userId", async (req: Request, res: UserErrorResponse) => {
+  const userId = req.params.userId;
+  const issuer = req.query.issuer as string;
+
+  let props: Partial<DbUser>;
+  if (issuer) {
+    props = {
+      issuer: issuer,
+      issuer_id: userId,
+    };
+  } else {
+    props = {
+      id: userId,
+    };
+  }
+
+  const session = driver.session();
   try {
-    const userId = req.params.userId;
-
-    const session = driver.session();
-    const user = await userExists(session, { id: userId });
-    await session.close();
-
+    const user = await getUser(session, props);
     if (!user) {
       return userNotFoundRes(res);
     }
@@ -199,6 +125,8 @@ usersRouter.get("/:userId", async (req: Request, res: UserErrorResponse) => {
   } catch (err) {
     console.log("Error:", err);
     return res.status(404).json({ status: "error", errors: err as object });
+  } finally {
+    await session.close();
   }
 });
 
@@ -207,7 +135,7 @@ usersRouter.get("/meetings/:userId", async (req: Request, res) => {
     const session = driver.session();
     const userId = req.params.userId;
 
-    const user = await userExists(session, { id: userId });
+    const user = await getDbUser(session, { id: userId });
     if (!user) {
       await session.close();
       return res;
@@ -252,160 +180,139 @@ usersRouter.put("/meetings/:meetingId", async (req: Request, res) => {
 });
 
 usersRouter.post("/", async (req: Request, res: UserErrorResponse) => {
+  // TODO: verify user fields
+  const { issuer, ...newUserProps } = req.body;
+
+  const session = driver.session();
   try {
-    const newUserProps = req.body;
-    // TODO: verify user fields
-
-    const session = driver.session();
-    const existsUser = await userExists(session, { mail: newUserProps.mail });
-
-    if (existsUser) {
-      await session.close();
-      return res
-        .status(400)
-        .json({ status: "error", errors: { id: "already exists" } });
+    let user: UserCreateResult;
+    if (issuer) {
+      user = await registerUser(newUserProps);
+    } else {
+      user = await createUser(session, newUserProps);
     }
 
-    newUserProps.id = uuidv4();
-
-    const firstNameEmbedding = wordToVec(newUserProps.first_name);
-    const lastNameEmbedding = wordToVec(newUserProps.last_name);
-
-    const errors: Record<string, string> = {};
-
-    if (firstNameEmbedding.length == 0) {
-      errors["first_name"] = "incorrect";
-    }
-
-    if (lastNameEmbedding.length == 0) {
-      errors["last_name"] = "incorrect";
-    }
-
-    for (const _ in errors) {
+    if ("errors" in user) {
+      const errors = user["errors"];
       return res.status(400).json({ status: "error", errors });
     }
-
-    newUserProps.name_embedding = firstNameEmbedding.map((e1, i) => {
-      const e2 = lastNameEmbedding[i];
-      return (e1 + e2) / 2;
-    });
-
-    const { password } = newUserProps;
-    const passwordHashed = await bcrypt.hash(password, 10);
-    newUserProps.password = passwordHashed;
-
-    const newUserResult = await session.run(`CREATE (u:User $user) RETURN u`, {
-      user: newUserProps,
-    });
-
-    const user = filterUser(newUserResult.records[0].get("u").properties);
-    await session.close();
 
     return res.json({ status: "ok", user });
   } catch (err) {
     console.log("Error:", err);
     return res.status(404).json({ status: "error", errors: err as object });
+  } finally {
+    await session.close();
   }
 });
 
 usersRouter.put("/:userId", async (req: Request, res: OkErrorResponse) => {
+  // TODO: verify user fields
+  const userId = req.params.userId;
+  const newUserProps = req.body;
+
+  const session = driver.session();
   try {
-    const userId = req.params.userId;
-    const newUserProps = req.body;
-
-    // TODO: verify user fields
-    const session = driver.session();
-    const user = await userExists(session, { id: userId });
-
-    if (!user) {
+    const newUser = await updateUser(session, userId, newUserProps);
+    if (!newUser) {
       return userNotFoundRes(res);
     }
-
-    const newUser = { ...user, ...newUserProps };
-    await session.run(`MATCH (u:User {id: $userId}) SET u=$user`, {
-      userId,
-      user: newUser,
-    });
-    await session.close();
 
     return res.json({ status: "ok" });
   } catch (err) {
     console.log("Error:", err);
     return res.status(404).json({ status: "error", errors: err as object });
+  } finally {
+    await session.close();
   }
 });
 
 usersRouter.post(
   "/:userId/change-password",
-  async (req: Request, res: OkErrorResponse) => {
+  getToken,
+  async (req: JWTRequest, res: AuthOkErrorResponse) => {
+    const userId = req.params.userId;
+
+    const passwords: ChangePasswordReq = req.body;
+    const { old_password, new_password, repeat_password } = passwords;
+
+    const session = driver.session();
     try {
-      const userId = req.params.userId;
-      const passwords: ChangePasswordReq = req.body;
-
-      const { old_password, new_password, repeat_password } = passwords;
-
-      const session = driver.session();
-      const user = await userExists(session, { id: userId });
+      const user = await getDbUser(session, { id: userId });
 
       if (!user) {
         return userNotFoundRes(res);
       }
 
-      // check validation of the old password
+      if ("password" in user) {
+        const errors: Record<string, string> = {};
 
-      const match: boolean = await bcrypt.compare(old_password, user.password);
+        if (!old_password) {
+          errors["old_password"] = "is empty";
+        }
 
-      if (!match) {
+        if (!new_password) {
+          errors["new_password"] = "is empty";
+        }
+
+        if (!repeat_password) {
+          errors["repeat_password"] = "is empty";
+        }
+
+        for (const _ in errors) {
+          return res.status(400).json({ status: "error", errors });
+        }
+      } else {
+        if (!req.token) {
+          return res.status(403).json({ status: "forbidden" });
+        }
+      }
+
+      const changeStatus = await changePassword(
+        session,
+        user,
+        old_password,
+        new_password,
+        repeat_password,
+      );
+
+      if (changeStatus == "verify") {
         return res
           .status(400)
-          .json({ status: "error", errors: { "error": "" } });
-      }
-
-      // check if there are two same password
-      if (new_password !== repeat_password) {
+          .json({ status: "error", errors: { "old_password": "incorrect" } });
+      } else if (changeStatus == "repeat") {
         return res.status(400).json({
           status: "error",
-          errors: { "error": "Passwords don't match" },
+          errors: { "repeat_password": "passwords don't match" },
         });
       }
-
-      const passwordHashed = await bcrypt.hash(new_password, 10);
-
-      const updatedUser = { ...user, password: passwordHashed };
-      await session.run(`MATCH (u:User {id: $userId}) SET u=$user`, {
-        userId,
-        user: updatedUser,
-      });
-      await session.close();
 
       return res.json({ status: "ok" });
     } catch (err) {
       console.log("Error:", err);
       return res.status(404).json({ status: "error", errors: err as object });
+    } finally {
+      await session.close();
     }
   },
 );
 
 usersRouter.delete("/:userId", async (req: Request, res: OkErrorResponse) => {
+  const userId = req.params.userId;
+
+  const session = driver.session();
   try {
-    const userId = req.params.userId;
-
-    const session = driver.session();
-    const user = await userExists(session, { id: userId });
-
-    if (!user) {
+    const isDeleted = await deleteUser(session, userId);
+    if (!isDeleted) {
       return userNotFoundRes(res);
     }
-
-    await session.run(`MATCH (u:User {id: $userId}) DETACH DELETE u`, {
-      userId,
-    });
-    await session.close();
 
     return res.json({ status: "ok" });
   } catch (err) {
     console.log("Error:", err);
     return res.status(404).json({ status: "error", errors: err as object });
+  } finally {
+    await session.close();
   }
 });
 

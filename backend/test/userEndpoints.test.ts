@@ -1,5 +1,5 @@
-import { expect, test } from "vitest";
-import User from "../src/models/User";
+import { assert, expect, test } from "vitest";
+import User from "../src/models/User.js";
 
 let userId: number;
 
@@ -109,12 +109,15 @@ test("Get user's friends", async () => {
   );
   const zuckId = zuck.id;
 
-  const response = await fetch(`http://localhost:5000/users/${zuckId}/friends`);
+  const response = await fetch(
+    `http://localhost:5000/users/${zuckId}/friends?page=1&maxUsers=2`,
+  );
   const responseData = await response.json();
-  const { status, users } = responseData;
+  assert.containsAllKeys(responseData, ["status", "friends", "pageCount"]);
 
+  const { status, friends } = responseData;
   expect(status).toBe("ok");
-  expect(users).toHaveLength(2);
+  expect(friends).toHaveLength(2);
 });
 
 async function searchUsers(lastPart: string) {
@@ -141,7 +144,37 @@ test("Search users", async () => {
 
   expect(usersIncorrectStatus).toBe("error");
 
-  const usersResponseData = await searchUsers("?q=zuckerberg");
+  const usersNoPageResponseData = await searchUsers("?q=zuckerberg");
+  const usersNoPageStatus = usersNoPageResponseData.status;
+  const usersNoPageErrors = usersNoPageResponseData.errors;
+
+  expect(usersNoPageStatus).toBe("error");
+  expect(usersNoPageErrors["page"]).toBe("not provided");
+  expect(usersNoPageErrors["maxUsers"]).toBe("not provided");
+
+  const usersWrongPageResponseData = await searchUsers(
+    "?q=zuckerberg&page=🐈&maxUsers=🐕",
+  );
+  const usersWrongPageStatus = usersWrongPageResponseData.status;
+  const usersWrongPageErrors = usersWrongPageResponseData.errors;
+
+  expect(usersWrongPageStatus).toBe("error");
+  expect(usersWrongPageErrors["page"]).toBe("not a number");
+  expect(usersWrongPageErrors["maxUsers"]).toBe("not a number");
+
+  const usersMultiplePageResponseData = await searchUsers(
+    "?q=zuckerberg&page=1&page=1&maxUsers=1&maxUsers=1",
+  );
+  const usersMultiplePageStatus = usersMultiplePageResponseData.status;
+  const usersMultiplePageErrors = usersMultiplePageResponseData.errors;
+
+  expect(usersMultiplePageStatus).toBe("error");
+  expect(usersMultiplePageErrors["page"]).toBe("incorrect");
+  expect(usersMultiplePageErrors["maxUsers"]).toBe("incorrect");
+
+  const usersResponseData = await searchUsers(
+    "?q=zuckerberg&page=1&maxUsers=10",
+  );
   const usersStatus = usersResponseData.status;
 
   expect(usersStatus).toBe("ok");
