@@ -17,7 +17,7 @@ function FoundUser(props: FoundUserProps) {
     const fetchData = async () => {
       try {
         const friendsRequestsResponse = await dataService.fetchData(
-          `/users/${props.user.id}/friend-requests`,
+          `/users/${props.user.id}/friend-requests?page=1&maxUsers=100`,
           "GET",
           {},
         );

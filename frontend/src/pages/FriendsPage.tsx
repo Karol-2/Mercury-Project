@@ -38,7 +38,7 @@ function FriendsPage() {
     const fetchFriendRequests = async () => {
       if (user) {
         const friendsRequestsResponse = await dataService.fetchData(
-          `/users/${user.id}/friend-requests`,
+          `/users/${user.id}/friend-requests?page=1&maxUsers=100`,
           "GET",
           {},
         );
