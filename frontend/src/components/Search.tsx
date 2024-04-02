@@ -47,12 +47,12 @@ const Search = (props: searchProps) => {
 
     if (userState.status === "anonymous") navigate("/login");
 
-    const countryQuery = (country != "-") ? country : ""
+    const countryQuery = country != "-" ? country : "";
 
     const urlSearchParams = new URLSearchParams({
       q: searchQuery,
-      country: countryQuery
-    })
+      country: countryQuery,
+    });
 
     props.handler(`/users/search?${urlSearchParams}`);
   };

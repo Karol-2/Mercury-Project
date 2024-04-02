@@ -1,10 +1,6 @@
 import { Router, Request, Response } from "express";
 import driver from "../driver/driver.js";
-import {
-  JWTRequest,
-  authenticateToken,
-  getToken,
-} from "../misc/jwt.js";
+import { JWTRequest, authenticateToken, getToken } from "../misc/jwt.js";
 import {
   AuthOkErrorResponse,
   OkErrorResponse,
@@ -69,20 +65,28 @@ usersRouter.get(
     }
 
     const { page, maxUsers, q: searchTerm, country } = verify.verified;
-    const maxUsersBig = BigInt(maxUsers)
+    const maxUsersBig = BigInt(maxUsers);
 
     const session = driver.session();
     try {
-      const userScores = await searchUsers(session, searchTerm, country, page - 1, maxUsers);
+      const userScores = await searchUsers(
+        session,
+        searchTerm,
+        country,
+        page - 1,
+        maxUsers,
+      );
       if (userScores === null) {
         return res
           .status(400)
           .json({ status: "error", errors: { searchTerm: "incorrect" } });
       }
 
-      const usersCount = await getUsersCount(session)
-      const pageCount = Number((usersCount.toBigInt() + maxUsersBig - 1n) / maxUsersBig)
-      const users = userScores.map((userScore) => userScore[0])
+      const usersCount = await getUsersCount(session);
+      const pageCount = Number(
+        (usersCount.toBigInt() + maxUsersBig - 1n) / maxUsersBig,
+      );
+      const users = userScores.map((userScore) => userScore[0]);
 
       return res.json({ status: "ok", pageCount, users });
     } catch (err) {

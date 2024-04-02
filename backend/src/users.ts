@@ -201,12 +201,12 @@ export async function searchUser(
   pageIndex: number,
   pageSize: number,
 ): Promise<UserScore[] | null> {
-  const queryElems = neo4j.int((pageIndex + 1) * pageSize)
+  const queryElems = neo4j.int((pageIndex + 1) * pageSize);
   const querySkip = neo4j.int(pageIndex * pageSize);
   const queryLimit = neo4j.int(pageSize);
 
   let userRequest: neo4j.QueryResult;
-  
+
   if (!searchTerm) {
     userRequest = await session.run(
       `MATCH (u:User)
@@ -245,11 +245,9 @@ export async function searchUser(
 }
 
 export async function getUsersCount(session: Session): Promise<neo4j.Integer> {
-  const usersCount = await session.run(
-    `MATCH (u:User) RETURN count(u)`,
-  );
+  const usersCount = await session.run(`MATCH (u:User) RETURN count(u)`);
 
-  return usersCount.records[0].get(0)
+  return usersCount.records[0].get(0);
 }
 
 export async function updateUser(
@@ -465,4 +463,3 @@ export async function getFriendSuggestions(
   );
   return friends;
 }
-

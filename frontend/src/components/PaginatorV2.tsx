@@ -35,12 +35,12 @@ function PaginatorV2(props: PaginatorProps) {
         props.endpoint +
         `${queryChar}page=${currentPage}&maxUsers=${props.itemsPerPage}`;
 
-      console.log(url)
+      console.log(url);
 
       await dataService
         .fetchData(url, "GET")
         .then((response) => {
-          const users = props.getItems(response)
+          const users = props.getItems(response);
 
           if (users && response.pageCount) {
             setError("");

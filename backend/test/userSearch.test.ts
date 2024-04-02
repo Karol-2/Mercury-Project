@@ -4,7 +4,9 @@ let page: number = 1;
 let maxUsers: number = 1;
 
 test("Search all users", async () => {
-  const response = await fetch("http://localhost:5000/users/search?q=a&page=1&maxUsers=100");
+  const response = await fetch(
+    "http://localhost:5000/users/search?q=a&page=1&maxUsers=100",
+  );
 
   const responseData = await response.json();
   const users = responseData.users;

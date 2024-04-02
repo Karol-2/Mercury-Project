@@ -5,7 +5,9 @@ let page: number = 3;
 let maxUsers: number = 5;
 
 test("Search user", async () => {
-  const response = await fetch("http://localhost:5000/users/search?q=a&page=1&maxUsers=10");
+  const response = await fetch(
+    "http://localhost:5000/users/search?q=a&page=1&maxUsers=10",
+  );
 
   const responseData = await response.json();
   const users = responseData.users;
@@ -41,7 +43,7 @@ test("Missing page", async () => {
   const errors = responseData.errors;
 
   expect(status).toBe("error");
-  expect(errors["page"]).toBe("not provided")
+  expect(errors["page"]).toBe("not provided");
 });
 
 test("Missing maxUsers", async () => {
@@ -54,7 +56,7 @@ test("Missing maxUsers", async () => {
   const errors = responseData.errors;
 
   expect(status).toBe("error");
-  expect(errors["maxUsers"]).toBe("not provided")
+  expect(errors["maxUsers"]).toBe("not provided");
 });
 
 test("First user", async () => {

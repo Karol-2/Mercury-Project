@@ -43,7 +43,7 @@ function SearchPage() {
 
       const friends = friendsResponse.friends as User[];
       const friendsIds = friends.map((friend) => friend.id);
-      console.log(friendsIds)
+      console.log(friendsIds);
       setUsersFriends(friendsIds);
     };
     fetchFriends();

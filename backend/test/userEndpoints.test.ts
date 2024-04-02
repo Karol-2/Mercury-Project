@@ -109,9 +109,11 @@ test("Get user's friends", async () => {
   );
   const zuckId = zuck.id;
 
-  const response = await fetch(`http://localhost:5000/users/${zuckId}/friends?page=1&maxUsers=2`);
+  const response = await fetch(
+    `http://localhost:5000/users/${zuckId}/friends?page=1&maxUsers=2`,
+  );
   const responseData = await response.json();
-  assert.containsAllKeys(responseData, ["status", "friends", "pageCount"])
+  assert.containsAllKeys(responseData, ["status", "friends", "pageCount"]);
 
   const { status, friends } = responseData;
   expect(status).toBe("ok");
@@ -150,7 +152,9 @@ test("Search users", async () => {
   expect(usersNoPageErrors["page"]).toBe("not provided");
   expect(usersNoPageErrors["maxUsers"]).toBe("not provided");
 
-  const usersWrongPageResponseData = await searchUsers("?q=zuckerberg&page=🐈&maxUsers=🐕");
+  const usersWrongPageResponseData = await searchUsers(
+    "?q=zuckerberg&page=🐈&maxUsers=🐕",
+  );
   const usersWrongPageStatus = usersWrongPageResponseData.status;
   const usersWrongPageErrors = usersWrongPageResponseData.errors;
 
@@ -158,7 +162,9 @@ test("Search users", async () => {
   expect(usersWrongPageErrors["page"]).toBe("not a number");
   expect(usersWrongPageErrors["maxUsers"]).toBe("not a number");
 
-  const usersMultiplePageResponseData = await searchUsers("?q=zuckerberg&page=1&page=1&maxUsers=1&maxUsers=1");
+  const usersMultiplePageResponseData = await searchUsers(
+    "?q=zuckerberg&page=1&page=1&maxUsers=1&maxUsers=1",
+  );
   const usersMultiplePageStatus = usersMultiplePageResponseData.status;
   const usersMultiplePageErrors = usersMultiplePageResponseData.errors;
 
@@ -166,7 +172,9 @@ test("Search users", async () => {
   expect(usersMultiplePageErrors["page"]).toBe("incorrect");
   expect(usersMultiplePageErrors["maxUsers"]).toBe("incorrect");
 
-  const usersResponseData = await searchUsers("?q=zuckerberg&page=1&maxUsers=10");
+  const usersResponseData = await searchUsers(
+    "?q=zuckerberg&page=1&maxUsers=10",
+  );
   const usersStatus = usersResponseData.status;
 
   expect(usersStatus).toBe("ok");
