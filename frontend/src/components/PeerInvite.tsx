@@ -1,4 +1,3 @@
-import { useRef } from "react";
 import User from "../models/User";
 
 export interface PeerInviteProps {
@@ -7,11 +6,6 @@ export interface PeerInviteProps {
 }
 
 function PeerInvite({ friend, inviteFriendToRoom }: PeerInviteProps) {
-  const inviteButtonRef = useRef<HTMLButtonElement>(null);
-  const handleInviteFriendToRoom = (friendId: string) => {
-    inviteFriendToRoom(friendId);
-    inviteButtonRef.current!.disabled = true;
-  }
   return (
     <li className="flex flex-row justify-center gap-4">
       <img
@@ -27,9 +21,8 @@ function PeerInvite({ friend, inviteFriendToRoom }: PeerInviteProps) {
         </p>
         <div className="flex flex-col xl:flex-row">
           <button
-            ref={inviteButtonRef}
             className={`btn small bg-my-green text-xs`}
-            onClick={() => handleInviteFriendToRoom(friend.id)}
+            onClick={() => inviteFriendToRoom(friend.id)}
           >
             invite
           </button>
