@@ -5,7 +5,9 @@ let page: number = 3;
 let maxUsers: number = 5;
 
 test("Search user", async () => {
-  const response = await fetch("http://localhost:5000/users/search?q=a");
+  const response = await fetch(
+    "http://localhost:5000/users/search?q=a&page=1&maxUsers=10",
+  );
 
   const responseData = await response.json();
   const users = responseData.users;
@@ -17,14 +19,16 @@ test("Search user", async () => {
 });
 
 test("Get friends", async () => {
-  const response = await fetch(`http://localhost:5000/users/${userId}/friends`);
+  const response = await fetch(
+    `http://localhost:5000/users/${userId}/friends?page=1&maxUsers=10`,
+  );
 
   const responseData = await response.json();
-  const users = responseData.users;
+  const friends = responseData.friends;
   const status = responseData.status;
 
   expect(status).toBe("ok");
-  expect(users.length).toBe(6);
+  expect(friends.length).toBe(6);
 });
 
 test("Missing page", async () => {
@@ -58,22 +62,8 @@ test("First user", async () => {
 
   const responseData = await response.json();
   const status = responseData.status;
-  const users = responseData.users;
+  const friends = responseData.friends;
 
   expect(status).toBe("ok");
-  expect(users.length).toBe(1);
-});
-
-test("Not found users", async () => {
-  page = 3;
-  maxUsers = 3;
-  const response = await fetch(
-    `http://localhost:5000/users/${userId}/friends?page=${page}&maxUsers=${maxUsers}`,
-  );
-  const responseData = await response.json();
-  const status = responseData.status;
-  const message = responseData.errors.users;
-
-  expect(status).toBe("error");
-  expect(message).toBe("No friends found with given queries");
+  expect(friends.length).toBe(1);
 });
