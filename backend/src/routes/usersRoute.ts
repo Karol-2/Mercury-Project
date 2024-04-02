@@ -28,6 +28,7 @@ import {
 } from "../users.js";
 import DbUser from "../models/DbUser.js";
 import { ChangePasswordReq } from "../models/ChangePasswordReq.js";
+import { verifyPageQuery, verifySearchQuery } from "../misc/verifyRequest.js";
 
 const usersRouter = Router();
 
@@ -62,28 +63,17 @@ usersRouter.post(
 usersRouter.get(
   "/search",
   async (req: Request, res: UsersSearchErrorResponse) => {
-    const searchTerm = req.query.q as string;
-    const country = req.query.country as string;
-    const page = Number(req.query.page as string) - 1;
-    const maxUsers = Number(req.query.maxUsers as string);
+    const verify = verifySearchQuery(req.query as any);
+    if (!verify.valid) {
+      return res.status(400).json({ status: "error", errors: verify.errors });
+    }
+
+    const { page, maxUsers, q: searchTerm, country } = verify.verified;
     const maxUsersBig = BigInt(maxUsers)
-
-    if (!searchTerm && !country) {
-      return res.status(404).json({
-        status: "error",
-        errors: { searchTerm: "not provided" },
-      });
-    }
-
-    if (searchTerm.length == 0) {
-      return res
-        .status(404)
-        .json({ status: "error", errors: { searchTerm: "is empty" } });
-    }
 
     const session = driver.session();
     try {
-      const userScores = await searchUsers(session, searchTerm, page, Number(maxUsers));
+      const userScores = await searchUsers(session, searchTerm, country, page - 1, maxUsers);
       if (userScores === null) {
         return res
           .status(400)

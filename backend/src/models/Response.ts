@@ -40,6 +40,18 @@ export interface FriendsPageResponse {
   friends: User[];
 }
 
+export interface FriendRequestsPageResponse {
+  status: "ok";
+  pageCount: number;
+  friendRequests: User[];
+}
+
+export interface FriendSuggestionsPageResponse {
+  status: "ok";
+  pageCount: number;
+  friendSuggestions: User[];
+}
+
 export interface UsersSearchResponse {
   status: "ok";
   pageCount: number;

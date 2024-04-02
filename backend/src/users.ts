@@ -197,27 +197,42 @@ export type UserScore = [User, number];
 export async function searchUser(
   session: Session,
   searchTerm: string,
+  country: string,
   pageIndex: number,
   pageSize: number,
 ): Promise<UserScore[] | null> {
-  const wordVec = wordToVec(searchTerm);
-
-  if (wordVec.length == 0) {
-    return null;
-  }
-
+  const queryElems = neo4j.int((pageIndex + 1) * pageSize)
   const querySkip = neo4j.int(pageIndex * pageSize);
   const queryLimit = neo4j.int(pageSize);
-  console.log(querySkip, queryLimit)
 
-  const userRequest = await session.run(
-    `CALL db.index.vector.queryNodes('user-names', 10, $wordVec)
-     YIELD node AS similarUser, score
-     RETURN similarUser, score
-     SKIP $querySkip
-     LIMIT $queryLimit`,
-    { wordVec, querySkip, queryLimit },
-  );
+  let userRequest: neo4j.QueryResult;
+  
+  if (!searchTerm) {
+    userRequest = await session.run(
+      `MATCH (u:User)
+       WHERE $country = "" OR u.country = $country
+       RETURN u as similarUser, 1.0 as score
+       SKIP $querySkip
+       LIMIT $queryLimit`,
+      { queryElems, country, querySkip, queryLimit },
+    );
+  } else {
+    const wordVec = wordToVec(searchTerm);
+
+    if (wordVec.length == 0) {
+      return null;
+    }
+
+    userRequest = await session.run(
+      `CALL db.index.vector.queryNodes('user-names', $queryElems, $wordVec)
+       YIELD node AS similarUser, score
+       WHERE $country = "" OR similarUser.country = $country
+       RETURN similarUser, score
+       SKIP $querySkip
+       LIMIT $queryLimit`,
+      { wordVec, queryElems, country, querySkip, queryLimit },
+    );
+  }
 
   const users = userRequest.records.map((r) => {
     return [
@@ -392,3 +407,62 @@ export async function isFriend(
     return false;
   }
 }
+
+export async function getFriendRequests(
+  session: Session,
+  userId: string,
+  pageIndex: number,
+  pageSize: number,
+): Promise<User[] | null> {
+  const user = await getUser(session, { id: userId });
+  if (!user) {
+    return null;
+  }
+
+  const querySkip = neo4j.int(pageIndex * pageSize);
+  const queryLimit = neo4j.int(pageSize);
+
+  const friendRequestsRequest = await session.run(
+    `MATCH (u:User {id: $userId})<-[:SENT_INVITE_TO]-(f:User)
+     WITH f ORDER BY f.last_name, f.first_name
+     RETURN DISTINCT f
+     SKIP $querySkip
+     LIMIT $queryLimit`,
+    { userId, querySkip, queryLimit },
+  );
+
+  const friends = friendRequestsRequest.records.map((f) =>
+    filterUser(f.get("f").properties),
+  );
+  return friends;
+}
+
+export async function getFriendSuggestions(
+  session: Session,
+  userId: string,
+  pageIndex: number,
+  pageSize: number,
+): Promise<User[] | null> {
+  const user = await getUser(session, { id: userId });
+  if (!user) {
+    return null;
+  }
+
+  const querySkip = neo4j.int(pageIndex * pageSize);
+  const queryLimit = neo4j.int(pageSize);
+
+  const friendSuggestionsRequest = await session.run(
+    `MATCH (u:User {id: $userId})-[:IS_FRIENDS_WITH]-(f:User)-[:IS_FRIENDS_WITH]-(s:User)
+     WHERE NOT (u)-[:IS_FRIENDS_WITH]-(s) AND s.id <> $userId
+     RETURN DISTINCT s
+     SKIP $querySkip
+     LIMIT $queryLimit`,
+    { userId, querySkip, queryLimit },
+  );
+
+  const friends = friendSuggestionsRequest.records.map((s) =>
+    filterUser(s.get("s").properties),
+  );
+  return friends;
+}
+
