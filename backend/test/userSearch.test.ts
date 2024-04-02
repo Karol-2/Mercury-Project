@@ -1,6 +1,5 @@
 import { expect, test } from "vitest";
 
-let userId: number;
 let page: number = 1;
 let maxUsers: number = 1;
 
@@ -13,8 +12,6 @@ test("Search all users", async () => {
 
   expect(status).toBe("ok");
   expect(users.length).toBe(27);
-
-  userId = users[0].id;
 });
 
 test("Search all users from Poland", async () => {

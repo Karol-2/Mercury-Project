@@ -28,7 +28,7 @@ import {
 } from "../users.js";
 import DbUser from "../models/DbUser.js";
 import { ChangePasswordReq } from "../models/ChangePasswordReq.js";
-import { verifyPageQuery, verifySearchQuery } from "../misc/verifyRequest.js";
+import { verifySearchQuery } from "../misc/verifyRequest.js";
 
 const usersRouter = Router();
 
