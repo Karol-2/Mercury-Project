@@ -227,7 +227,8 @@ function UserProvider({ children }: { children: React.ReactNode }) {
     setNotifications((prev) => [...prev, notification]);
   };
 
-  const deleteNotification = (notificationId: string) => {
+  const deleteNotification = async (notificationId: string) => {
+    await dataService.fetchData(`/room/${notificationId}`, "DELETE", {})
     setNotifications((prev) =>
       prev.filter((notification) => notification.roomId !== notificationId),
     );
