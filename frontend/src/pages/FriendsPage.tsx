@@ -146,7 +146,7 @@ function FriendsPage() {
                     itemsPerPage={3}
                     refresh={refresh}
                     isSearch={false}
-                    getItems={(response) => response.friends}
+                    getItems={(response) => response.friendSuggestions}
                     renderItem={(resultUser) => (
                       <FoundUser
                         user={resultUser}

@@ -12,7 +12,7 @@ interface searchProps {
 
 const Search = (props: searchProps) => {
   const navigate = useNavigate();
-  //TODO: IF YOU HAVE EMPTY SEARCH, THEN YOU CANT SEARCH ANYTHING
+
   // Logic
   const [searchQuery, setSearchQuery] = useState("");
   const [country, setCountry] = useState("");
@@ -45,18 +45,16 @@ const Search = (props: searchProps) => {
   const handleSearch = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    let url: string = `/users/search?q=${searchQuery}`;
-    if (country !== "" && country !== "-") {
-      url = url + "&country=" + country;
-    }
-
     if (userState.status === "anonymous") navigate("/login");
 
-    if (searchQuery.trim() === "") {
-      return;
-    }
+    const countryQuery = (country != "-") ? country : ""
 
-    props.handler(url);
+    const urlSearchParams = new URLSearchParams({
+      q: searchQuery,
+      country: countryQuery
+    })
+
+    props.handler(`/users/search?${urlSearchParams}`);
   };
 
   return (

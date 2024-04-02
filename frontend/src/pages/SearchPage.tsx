@@ -36,7 +36,7 @@ function SearchPage() {
 
     const fetchFriends = async () => {
       const friendsResponse = await dataService.fetchData(
-        `/users/${user.id}/friends`,
+        `/users/${user.id}/friends?page=1&maxUsers=100`,
         "GET",
         {},
       );

@@ -22,7 +22,7 @@ function FoundUser(props: FoundUserProps) {
           {},
         );
 
-        const isRequestSent = friendsRequestsResponse.friends.some(
+        const isRequestSent = friendsRequestsResponse.friendRequests.some(
           (friend: User) => String(friend.id) === props.currentId,
         );
 
