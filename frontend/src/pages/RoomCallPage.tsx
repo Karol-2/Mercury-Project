@@ -2,13 +2,10 @@ import { useEffect, useRef, useState } from "react";
 import Footer from "../components/Footer";
 import Navbar from "../components/Navbar";
 import fetchUserMedia from "../media/fetchUserMedia";
-import { useSelector } from "react-redux";
-import { RootState } from "../redux/store";
 import { useUser } from "../helpers/UserProvider";
 import { useNavigate, useParams } from "react-router-dom";
 import dataService from "../services/data";
 import RoomPeerVideo from "../components/RoomPeerVideo";
-import Peer from "peerjs";
 import RoomPeer from "../models/RoomPeer";
 import PeerInvite from "../components/PeerInvite";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -21,12 +18,11 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 function RoomCallPage() {
   const localRef = useRef<HTMLVideoElement>(null);
-  const peer: Peer = useSelector((state: RootState) => state.peer);
   const [localStream, setLocalStream] = useState<MediaStream | null>(null);
   const [roomPeers, setRoomPeers] = useState<{ [key: string]: RoomPeer }>({});
   const [isAudio, setIsAudio] = useState(true);
   const [isVideo, setIsVideo] = useState(true);
-  const { friends, socket, userId, user } = useUser();
+  const { friends, socket, userId, user, peer } = useUser();
   const params = useParams();
   const navigate = useNavigate();
   const roomId = params.roomId;
@@ -46,8 +42,8 @@ function RoomCallPage() {
     });
   });
   const connectToNewUser = (newPeerId: string, stream: MediaStream) => {
-    const call = peer.call(newPeerId, stream);
-    call.on("stream", (remoteStream: MediaStream) => {
+    const call = peer?.call(newPeerId, stream);
+    call?.on("stream", (remoteStream: MediaStream) => {
       const peerId = newPeerId;
       const newPeerObj: { [key: string]: RoomPeer } = {};
       newPeerObj[peerId] = { stream: remoteStream };

@@ -72,12 +72,12 @@ function UserProvider({ children }: { children: React.ReactNode }) {
     if (userId) {
       setPeer(
         new Peer(userId, {
-          host: "/peer",
-          port: 5000,
+          host: "/",
+          port: 8000,
         }),
       );
     }
-  }, [userId, peer]);
+  }, [userId]);
 
   const firstRefresh = useRef(true);
 
