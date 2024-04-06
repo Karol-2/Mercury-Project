@@ -8,7 +8,7 @@ import Transition from "../components/Transition";
 
 function ProfilePage() {
   const navigate = useNavigate();
-  const { addNotification, user, userId, meeting, deleteUser, socket } =
+  const { user, userId, meeting, deleteUser } =
     useUser();
 
   const [showAnimation, setShowAnim] = useState(false);
@@ -34,14 +34,6 @@ function ProfilePage() {
   useEffect(() => {
     if (userId === null) navigate("/login");
   }, [userId]);
-
-  useEffect(() => {
-    if (socket !== null) {
-      socket.on("newRoom", (notification) => {
-        addNotification(notification);
-      });
-    }
-  }, [socket]);
 
   return (
     <>

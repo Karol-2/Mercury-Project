@@ -65,7 +65,11 @@ function UserProvider({ children }: { children: React.ReactNode }) {
       return;
     }
     if (socket && socket.connected) return;
-    setSocket(io("http://localhost:5000", { auth: { userId } }));
+    const newSocket = io("http://localhost:5000", { auth: { userId } })
+    newSocket.on("newRoom", (notification) => {
+      addNotification(notification);
+    });
+    setSocket(newSocket);
   }, [user]);
 
   useEffect(() => {
