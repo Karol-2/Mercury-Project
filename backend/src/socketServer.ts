@@ -148,6 +148,7 @@ io.on("connection", async (socket: Socket) => {
     const session = driver.session();
     const userSockets = await getAllSockets(session, to);
     userSockets.forEach((userSocket) => {
+      console.log("[user socket]: ", userSocket);
       socket.to(userSocket.id).emit("newRoom", {
         from,
         roomId,

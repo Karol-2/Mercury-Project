@@ -21,6 +21,7 @@ roomRouter.get("/:userId", async (req, res) => {
         ...record,
         title: "Join meeting",
       }));
+    console.log("[ROOMS]: ", rooms)
     return res.json({ status: "ok", rooms });
   } catch (err) {
     console.log("Error:", err);
@@ -40,12 +41,13 @@ roomRouter.post("/", async (req, res) => {
         .status(400)
         .json({ status: "error", errors: { id: "no friends" } });
     }
-    await session.run(`CREATE (r: Room $room)`, { room: newRoomProps });
+
+    // await session.run(`CREATE (r: Room $room)`, { room: newRoomProps });
     await session.run(
       `
             MATCH (u:User {id: $userId})
-            MATCH (r:Room {roomId: $roomId})
-            CREATE (r)-[:INVITED]->(u)
+            MERGE (r:Room {roomId: $roomId})
+            MERGE (r)-[:INVITED]->(u)
         `,
       { userId: to, roomId },
     );
