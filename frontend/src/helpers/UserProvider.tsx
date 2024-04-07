@@ -65,7 +65,7 @@ function UserProvider({ children }: { children: React.ReactNode }) {
       return;
     }
     if (socket && socket.connected) return;
-    const newSocket = io("http://localhost:5000", { auth: { userId } })
+    const newSocket = io("http://localhost:5000", { auth: { userId } });
     newSocket.on("newRoom", (notification) => {
       addNotification(notification);
     });
@@ -232,7 +232,7 @@ function UserProvider({ children }: { children: React.ReactNode }) {
   };
 
   const deleteNotification = async (notificationId: string) => {
-    await dataService.fetchData(`/room/${notificationId}`, "DELETE", {})
+    await dataService.fetchData(`/room/${notificationId}`, "DELETE", {});
     setNotifications((prev) =>
       prev.filter((notification) => notification.roomId !== notificationId),
     );

@@ -6,7 +6,8 @@ import { useNavigate } from "react-router-dom";
 import Notification from "../components/Notification";
 import { useEffect } from "react";
 function NotificationsPage() {
-  const { peer, deleteNotification, notifications, socket, userId, user } = useUser();
+  const { peer, deleteNotification, notifications, socket, userId, user } =
+    useUser();
   const navigate = useNavigate();
   const handleRoomInvite = async (roomId: string) => {
     if (peer) {

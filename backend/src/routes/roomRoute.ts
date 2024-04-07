@@ -21,7 +21,7 @@ roomRouter.get("/:userId", async (req, res) => {
         ...record,
         title: "Join meeting",
       }));
-    console.log("[ROOMS]: ", rooms)
+    console.log("[ROOMS]: ", rooms);
     return res.json({ status: "ok", rooms });
   } catch (err) {
     console.log("Error:", err);
