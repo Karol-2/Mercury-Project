@@ -101,5 +101,6 @@ export async function cleanUpData() {
   const session = driver.session();
   await session.run(`MATCH (m:Meeting) DETACH DELETE m`);
   await session.run(`MATCH (s:Socket) DETACH DELETE s`);
+  await session.run(`MATCH (r:Room) DETACH DELETE r`);
   session.close();
 }
