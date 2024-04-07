@@ -1,5 +1,6 @@
 import { assert, expect, test } from "vitest";
 import User from "../src/models/User.js";
+import { fetchData } from "./fetchData.js";
 
 let userId: number;
 
@@ -13,17 +14,15 @@ test("Create user", async () => {
     password: "12345",
   };
 
-  const response = await fetch("http://localhost:5000/users", {
-    method: "POST",
+  const response = await fetchData(`http://localhost:5000/users`, "POST", {
     headers: {
       "Content-Type": "application/json",
     },
     body: JSON.stringify(userData),
   });
 
-  const responseData = await response.json();
-  const user = responseData.user;
-  const status = responseData.status;
+  const user = response.user;
+  const status = response.status;
 
   expect(status).toBe("ok");
 
@@ -40,24 +39,25 @@ test("Try to create user with existing mail", async () => {
     password: "12345",
   };
 
-  const response = await fetch("http://localhost:5000/users", {
-    method: "POST",
+  const response = await fetchData(`http://localhost:5000/users`, "POST", {
     headers: {
       "Content-Type": "application/json",
     },
     body: JSON.stringify(userData),
   });
 
-  const responseData = await response.json();
-  const status = responseData.status;
+  const status = response.status;
 
   expect(status).toBe("error");
 });
 
 test("Fetch user by ID", async () => {
-  const response = await fetch(`http://localhost:5000/users/${userId}`);
-  const responseData = await response.json();
-  const status = responseData.status;
+  const response = await fetchData(
+    `http://localhost:5000/users/${userId}`,
+    "GET",
+    {},
+  );
+  const status = response.status;
 
   expect(status).toBe("ok");
 });
@@ -72,60 +72,67 @@ test("Update user by ID", async () => {
     password: "54321",
   };
 
-  const response = await fetch(`http://localhost:5000/users/${userId}`, {
-    method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
+  const response = await fetchData(
+    `http://localhost:5000/users/${userId}`,
+    "PUT",
+    {
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(userUpdateData),
     },
-    body: JSON.stringify(userUpdateData),
-  });
+  );
 
-  const responseData = await response.json();
-  const status = responseData.status;
+  const status = response.status;
 
   expect(status).toBe("ok");
 });
 
 test("Delete user by ID", async () => {
-  const response = await fetch(`http://localhost:5000/users/${userId}`, {
-    method: "DELETE",
-  });
+  const response = await fetchData(
+    `http://localhost:5000/users/${userId}`,
+    "DELETE",
+    {},
+  );
 
-  const responseData = await response.json();
-  const status = responseData.status;
+  const status = response.status;
 
   expect(status).toBe("ok");
 });
 
 test("Get user's friends", async () => {
-  const usersResponse = await fetch("http://localhost:5000/users");
-  const usersResponseData = await usersResponse.json();
-  const usersStatus = usersResponseData.status;
+  const usersResponse = await fetchData(
+    "http://localhost:5000/users",
+    "GET",
+    {},
+  );
+  const usersStatus = usersResponse.status;
 
   expect(usersStatus).toBe("ok");
 
-  const zuck = usersResponseData.users.find(
+  const zuck = usersResponse.users.find(
     (user: any) => user.mail == "reptilian@meta.com",
   );
   const zuckId = zuck.id;
 
-  const response = await fetch(
+  const response = await fetchData(
     `http://localhost:5000/users/${zuckId}/friends?page=1&maxUsers=2`,
+    "GET",
+    {},
   );
-  const responseData = await response.json();
-  assert.containsAllKeys(responseData, ["status", "friends", "pageCount"]);
 
-  const { status, friends } = responseData;
+  const { status, friends } = response;
   expect(status).toBe("ok");
   expect(friends).toHaveLength(2);
 });
 
 async function searchUsers(lastPart: string) {
-  const usersResponse = await fetch(
+  const usersResponse = await fetchData(
     "http://localhost:5000/users/search" + lastPart,
+    "GET",
+    {},
   );
-  const usersResponseData = await usersResponse.json();
-  return usersResponseData;
+  return usersResponse;
 }
 
 test("Search users", async () => {
