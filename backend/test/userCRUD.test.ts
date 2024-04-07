@@ -1,19 +1,26 @@
-import { assert, expect, test } from "vitest";
+import { expect, test } from "vitest";
 import User from "../src/models/User.js";
 import { fetchData } from "./fetchData.js";
 
 let userId: number;
+let userData = {
+  first_name: "John",
+  last_name: "Smith",
+  country: "USA",
+  profile_picture: "https://example.com/john_smith.jpg",
+  mail: "john_smith@example.com",
+  password: "12345678",
+};
+
+test("Get all users", async () => {
+  const response = await fetchData(`http://localhost:5000/users`, "GET", {});
+  const { status, users } = response;
+
+  expect(status).toBe("ok");
+  expect(users.length).toBe(27);
+});
 
 test("Create user", async () => {
-  const userData = {
-    first_name: "Tom",
-    last_name: "Hanks",
-    country: "USA",
-    profile_picture: "https://example.com/tommy.jpg",
-    mail: "tom.hanks@example.com",
-    password: "12345",
-  };
-
   const response = await fetchData(`http://localhost:5000/users`, "POST", {
     headers: {
       "Content-Type": "application/json",
@@ -21,23 +28,20 @@ test("Create user", async () => {
     body: JSON.stringify(userData),
   });
 
-  const user = response.user;
-  const status = response.status;
+  const { status, user } = response;
 
   expect(status).toBe("ok");
+  expect(user.first_name).toBe(userData.first_name);
+  expect(user.last_name).toBe(userData.last_name);
+  expect(user.country).toBe(userData.country);
+  expect(user.profile_picture).toBe(userData.profile_picture);
+  expect(user.mail).toBe(userData.mail);
 
   userId = user.id;
 });
 
-test("Try to create user with existing mail", async () => {
-  const userData = {
-    first_name: "Tom",
-    last_name: "Hanks",
-    country: "USA",
-    profile_picture: "https://example.com/tommy.jpg",
-    mail: "tom.hanks@example.com",
-    password: "12345",
-  };
+test("Create user with existing mail", async () => {
+  userData.mail = "shudghton1@geocities.com";
 
   const response = await fetchData(`http://localhost:5000/users`, "POST", {
     headers: {
@@ -46,31 +50,95 @@ test("Try to create user with existing mail", async () => {
     body: JSON.stringify(userData),
   });
 
-  const status = response.status;
+  const { status, errors } = response;
 
   expect(status).toBe("error");
+  expect(errors.id).toBe("already exists");
 });
 
-test("Fetch user by ID", async () => {
+test("Create user with short first name", async () => {
+  userData.first_name = "j";
+
+  console.log(userData.first_name);
+
+  const response = await fetchData(`http://localhost:5000/users`, "POST", {
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(userData),
+  });
+
+  const { status, errors } = response;
+
+  expect(status).toBe("error");
+  expect(errors.id).toBe("First name should be at least two characters long");
+});
+
+test("Create user with short last name", async () => {
+  userData.last_name = "s";
+
+  const response = await fetchData(`http://localhost:5000/users`, "POST", {
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(userData),
+  });
+
+  const { status, errors } = response;
+
+  expect(status).toBe("error");
+  expect(errors.id).toBe("Last name should be at least two characters long");
+});
+
+test("Create user with short password", async () => {
+  userData.password = "1234";
+
+  const response = await fetchData(`http://localhost:5000/users`, "POST", {
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(userData),
+  });
+
+  const { status, errors } = response;
+
+  expect(status).toBe("error");
+  expect(errors.id).toBe("Password should be at least eight characters long");
+});
+
+test("Get user by ID", async () => {
+  userData.mail = "john_smith@example.com";
+  userData.first_name = "John";
+  userData.last_name = "Smith";
+  userData.password = "12345678";
+
   const response = await fetchData(
     `http://localhost:5000/users/${userId}`,
     "GET",
     {},
   );
-  const status = response.status;
+  const { status, user } = response;
 
   expect(status).toBe("ok");
+  expect(user.id).toBe(userId);
+  expect(user.first_name).toBe(userData.first_name);
+  expect(user.last_name).toBe(userData.last_name);
+  expect(user.country).toBe(userData.country);
+  expect(user.profile_picture).toBe(userData.profile_picture);
+  expect(user.mail).toBe(userData.mail);
+});
+
+test("Get user with incorrect ID", async () => {
+  const response = await fetchData(`http://localhost:5000/users/🐈`, "GET", {});
+
+  const { status, errors } = response;
+
+  expect(status).toBe("error");
+  expect(errors.id).toBe("not found");
 });
 
 test("Update user by ID", async () => {
-  const userUpdateData = {
-    first_name: "Tommy",
-    last_name: "Hanks",
-    country: "Canada",
-    profile_picture: "https://example.com/tommy.jpg",
-    mail: "tommy.hanks@example.com",
-    password: "54321",
-  };
+  userData.profile_picture = "https://example.com/new_john_smith.jpg";
 
   const response = await fetchData(
     `http://localhost:5000/users/${userId}`,
@@ -79,11 +147,11 @@ test("Update user by ID", async () => {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(userUpdateData),
+      body: JSON.stringify(userData),
     },
   );
 
-  const status = response.status;
+  const { status } = response;
 
   expect(status).toBe("ok");
 });
@@ -95,9 +163,22 @@ test("Delete user by ID", async () => {
     {},
   );
 
-  const status = response.status;
+  const { status } = response;
 
   expect(status).toBe("ok");
+});
+
+test("Delete user with incorrect ID", async () => {
+  const response = await fetchData(
+    `http://localhost:5000/users/🐍`,
+    "DELETE",
+    {},
+  );
+
+  const { status, errors } = response;
+
+  expect(status).toBe("error");
+  expect(errors.id).toBe("not found");
 });
 
 test("Get user's friends", async () => {
