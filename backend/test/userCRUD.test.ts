@@ -156,6 +156,66 @@ test("Update user by ID", async () => {
   expect(status).toBe("ok");
 });
 
+test("Update user with short first name", async () => {
+  userData.first_name = "j";
+
+  const response = await fetchData(
+    `http://localhost:5000/users/${userId}`,
+    "PUT",
+    {
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(userData),
+    },
+  );
+
+  const { status, errors } = response;
+
+  expect(status).toBe("error");
+  expect(errors.id).toBe("First name should be at least two characters long");
+});
+
+test("Update user with short last name", async () => {
+  userData.last_name = "s";
+
+  const response = await fetchData(
+    `http://localhost:5000/users/${userId}`,
+    "PUT",
+    {
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(userData),
+    },
+  );
+
+  const { status, errors } = response;
+
+  expect(status).toBe("error");
+  expect(errors.id).toBe("Last name should be at least two characters long");
+});
+
+test("Update user with short password", async () => {
+  userData.password = "1234";
+
+  const response = await fetchData(
+    `http://localhost:5000/users/${userId}`,
+    "PUT",
+    {
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(userData),
+    },
+  );
+
+  const { status, errors } = response;
+
+  expect(status).toBe("error");
+  expect(errors.id).toBe("Password should be at least eight characters long");
+});
+
 test("Delete user by ID", async () => {
   const response = await fetchData(
     `http://localhost:5000/users/${userId}`,
