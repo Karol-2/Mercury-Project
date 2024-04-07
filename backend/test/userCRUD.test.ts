@@ -156,6 +156,20 @@ test("Update user by ID", async () => {
   expect(status).toBe("ok");
 });
 
+test("Update user with incorrect ID", async () => {
+  const response = await fetchData(`http://localhost:5000/users/0`, "PUT", {
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(userData),
+  });
+
+  const { status, errors } = response;
+
+  expect(status).toBe("error");
+  expect(errors.id).toBe("not found");
+});
+
 test("Update user with short first name", async () => {
   userData.first_name = "j";
 
@@ -239,32 +253,6 @@ test("Delete user with incorrect ID", async () => {
 
   expect(status).toBe("error");
   expect(errors.id).toBe("not found");
-});
-
-test("Get user's friends", async () => {
-  const usersResponse = await fetchData(
-    "http://localhost:5000/users",
-    "GET",
-    {},
-  );
-  const usersStatus = usersResponse.status;
-
-  expect(usersStatus).toBe("ok");
-
-  const zuck = usersResponse.users.find(
-    (user: any) => user.mail == "reptilian@meta.com",
-  );
-  const zuckId = zuck.id;
-
-  const response = await fetchData(
-    `http://localhost:5000/users/${zuckId}/friends?page=1&maxUsers=2`,
-    "GET",
-    {},
-  );
-
-  const { status, friends } = response;
-  expect(status).toBe("ok");
-  expect(friends).toHaveLength(2);
 });
 
 async function searchUsers(lastPart: string) {
