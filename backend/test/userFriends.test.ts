@@ -26,6 +26,20 @@ test("Get friends", async () => {
   expect(friends.length).toBe(6);
 });
 
+test("Get friends with incorrect ID", async () => {
+  const response = await fetchData(
+    `http://localhost:5000/users/0/friends?page=${page}&maxUsers=${maxUsers}`,
+    "GET",
+    {},
+  );
+
+  const { status, errors } = response;
+
+  expect(status).toBe("error");
+  expect(errors).toBeDefined();
+  expect(errors.id).toBe("not found");
+});
+
 test("Missing page", async () => {
   const response = await fetchData(
     `http://localhost:5000/users/${userId}/friends?maxUsers=${maxUsers}`,
