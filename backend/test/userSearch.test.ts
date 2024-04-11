@@ -62,6 +62,20 @@ test("Missing maxUsers", async () => {
   expect(errors.maxUsers).toBe("not provided");
 });
 
+test("Missing page and maxUsers", async () => {
+  const response = await fetchData(
+    `http://localhost:5000/users/search`,
+    "GET",
+    {},
+  );
+
+  const { status, errors } = response;
+
+  expect(status).toBe("error");
+  expect(errors.page).toBe("not provided");
+  expect(errors.maxUsers).toBe("not provided");
+});
+
 test("maxUsers as a text", async () => {
   const response = await fetchData(
     `http://localhost:5000/users/search?page=text?page=${page}&maxUsers=text`,
@@ -180,4 +194,17 @@ test("Repeated page and maxUsers", async () => {
   expect(errors).toBeDefined();
   expect(errors.page).toBe("incorrect");
   expect(errors.maxUsers).toBe("incorrect");
+});
+
+test("Empty query", async () => {
+  const response = await fetchData(
+    `http://localhost:5000/users/search?page=${page}&maxUsers=${maxUsers}&q=`,
+    "GET",
+    {},
+  );
+
+  const { status, users } = response;
+
+  expect(status).toBe("ok");
+  expect(users).toBeDefined();
 });
