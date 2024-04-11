@@ -59,8 +59,6 @@ test("Create user with existing mail", async () => {
 test("Create user with short first name", async () => {
   userData.first_name = "j";
 
-  console.log(userData.first_name);
-
   const response = await fetchData(`http://localhost:5000/users`, "POST", {
     headers: {
       "Content-Type": "application/json",
