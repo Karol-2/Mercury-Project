@@ -138,3 +138,46 @@ test("Search with polish characters", async () => {
   expect(errors).toBeDefined();
   expect(errors.q).toBe("not a valid string");
 });
+
+test("Repeated page", async () => {
+  const response = await fetchData(
+    `http://localhost:5000/users/search?page=${page}&maxUsers=${maxUsers}&page=${page}`,
+    "GET",
+    {},
+  );
+
+  const { status, errors } = response;
+
+  expect(status).toBe("error");
+  expect(errors).toBeDefined();
+  expect(errors.page).toBe("incorrect");
+});
+
+test("Repeated maxUsers", async () => {
+  const response = await fetchData(
+    `http://localhost:5000/users/search?page=${page}&maxUsers=${maxUsers}&maxUsers=${maxUsers}`,
+    "GET",
+    {},
+  );
+
+  const { status, errors } = response;
+
+  expect(status).toBe("error");
+  expect(errors).toBeDefined();
+  expect(errors.maxUsers).toBe("incorrect");
+});
+
+test("Repeated page and maxUsers", async () => {
+  const response = await fetchData(
+    `http://localhost:5000/users/search?page=${page}&maxUsers=${maxUsers}&page=${page}&maxUsers=${maxUsers}`,
+    "GET",
+    {},
+  );
+
+  const { status, errors } = response;
+
+  expect(status).toBe("error");
+  expect(errors).toBeDefined();
+  expect(errors.page).toBe("incorrect");
+  expect(errors.maxUsers).toBe("incorrect");
+});
