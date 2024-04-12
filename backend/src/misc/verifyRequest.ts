@@ -84,6 +84,27 @@ class Verifier<T> {
     return this.pass(key, value);
   }
 
+  verifyString<K extends keyof T>(
+    key: K & string,
+    allowEmpty: boolean = false,
+  ): string | null {
+    const value = this.obj[key];
+
+    if (!allowEmpty) {
+      if (!value) {
+        return this.fail(key, "not provided");
+      }
+    } else if (value === undefined) {
+      return this.pass(key, "");
+    }
+
+    if (typeof value !== "string") {
+      return this.fail(key, "incorrect");
+    }
+
+    return this.pass(key, value);
+  }
+
   verifyInteger<K extends keyof T>(key: K & string): number | null {
     const value = this.obj[key];
 
@@ -125,8 +146,8 @@ export function verifySearchQuery<T extends SearchQuery>(
   const verifier = new Verifier(query);
   verifier.verifyInteger("page");
   verifier.verifyInteger("maxUsers");
-  verifier.verifyAscii("q", true);
-  verifier.verifyAscii("country", true);
+  verifier.verifyString("q", true);
+  verifier.verifyString("country", true);
 
   const errors = verifier.getErrors();
 
