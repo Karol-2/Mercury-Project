@@ -19,7 +19,7 @@ import PaginatorV2 from "../components/PaginatorV2";
 function FriendsPage() {
   const navigate = useNavigate();
   const { user } = useProtected();
-  const { meeting, createMeeting, joinMeeting } = useMeeting();
+  const { meeting, createMeeting } = useMeeting();
 
   const [friendsRequests, setFriendsRequests] = useState([]);
   const [refresh, setRefresh] = useState(false);
@@ -106,7 +106,7 @@ function FriendsPage() {
                         <Friend
                           friend={user}
                           handleDeclineRequest={handleDeclineRequest}
-                          joinMeeting={joinMeeting}
+                          createMeeting={createMeeting}
                         />
                       )}
                     />
