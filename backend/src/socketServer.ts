@@ -143,8 +143,13 @@ io.on("connection", async (socket: Socket) => {
     });
   });
 
-  socket.on("notify", ({senderId, receiverId, type}) => {
-    console.log("[NOTIFY]: ", {senderId, receiverId, type})
+  socket.on("notify", async ({senderId, receiverId, type}) => {
+    const session = driver.session();
+    const receiverSockets = await getAllSockets(session, receiverId);
+    await session.close();
+    receiverSockets.forEach((receiverSocket) => {
+      socket.to(receiverSocket.id).emit("notify", {senderId, receiverId, type});
+    });
   });
 
   socket.on("disconnect", async (_reason) => {

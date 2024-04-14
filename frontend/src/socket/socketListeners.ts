@@ -1,8 +1,8 @@
 import { Socket } from "socket.io-client";
 
 function socketListeners(socket: Socket) {
-    socket.on("notify", (e) => {
-        console.log("notify");
+    socket.on("notify", (notification) => {
+        console.log(notification);
     });
 }
 
