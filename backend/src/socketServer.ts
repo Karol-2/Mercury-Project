@@ -143,6 +143,10 @@ io.on("connection", async (socket: Socket) => {
     });
   });
 
+  socket.on("notify", ({senderId, receiverId, type}) => {
+    console.log("[NOTIFY]: ", {senderId, receiverId, type})
+  });
+
   socket.on("disconnect", async (_reason) => {
     const session = driver.session();
     await leaveMeeting(session, userId);

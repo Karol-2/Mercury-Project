@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import User from "../models/User";
 import dataService from "../services/data";
 import { useProtected } from "../helpers/Protected";
+import { useUser } from "../helpers/UserContext";
 
 interface FoundUserProps {
   user: User;
@@ -11,6 +12,7 @@ interface FoundUserProps {
 
 function FoundUser(props: FoundUserProps) {
   const {user: myUserAccount} = useProtected();
+  const { socket } = useUser();
   const [requestSent, setRequestSent] = useState(false);
   const { user, isFriend } = props;
 
@@ -43,6 +45,11 @@ function FoundUser(props: FoundUserProps) {
         "POST",
       );
       setRequestSent(true);
+      socket?.emit("notify", {
+        senderId: myUserAccount.id,
+        receiverId: user.id,
+        type: "friend"
+      })
     } catch (error) {
       console.error("Error:", error);
     }

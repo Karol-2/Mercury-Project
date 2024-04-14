@@ -11,7 +11,7 @@ import Modal from "./Modal";
 
 export interface FriendProps {
   friend: User;
-  createMeeting: () => Promise<string | void>;
+  handleCreateMeeting: (friendId: string) => void;
   handleDeclineRequest: (friend: User) => Promise<void>;
 }
 
@@ -21,7 +21,7 @@ function Friend(props: FriendProps) {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   const friend: User = props.friend;
-  const createMeeting = props.createMeeting;
+  const handleCreateMeeting = props.handleCreateMeeting;
   const handleDeclineRequest = props.handleDeclineRequest;
 
   return (
@@ -48,7 +48,7 @@ function Friend(props: FriendProps) {
         <div className="flex flex-col xl:flex-row">
           <button
             className={`btn small bg-my-orange text-xs my-2`}
-            onClick={() => createMeeting()}
+            onClick={() => handleCreateMeeting(friend.id)}
           >
             <FontAwesomeIcon icon={faVideo} />
           </button>

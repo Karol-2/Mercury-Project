@@ -15,10 +15,12 @@ import { useProtected } from "../helpers/Protected";
 import FoundUser from "../components/FoundUser";
 import Friend from "../components/Friend";
 import PaginatorV2 from "../components/PaginatorV2";
+import { useUser } from "../helpers/UserContext";
 
 function FriendsPage() {
   const navigate = useNavigate();
   const { user } = useProtected();
+  const { socket } = useUser();
   const { meeting, createMeeting } = useMeeting();
 
   const [friendsRequests, setFriendsRequests] = useState([]);
@@ -58,6 +60,15 @@ function FriendsPage() {
       setRefresh(() => !refresh);
     }
   };
+
+  const handleCreateMeeting = (friendId: string) => {
+    createMeeting();
+    socket?.emit("notify", {
+      senderId: user.id,
+      receiverId: friendId,
+      type: "call"
+    })
+  }
 
   const handleAcceptRequest = async (currentId: string) => {
     if (user) {
@@ -106,7 +117,7 @@ function FriendsPage() {
                         <Friend
                           friend={user}
                           handleDeclineRequest={handleDeclineRequest}
-                          createMeeting={createMeeting}
+                          handleCreateMeeting={handleCreateMeeting}
                         />
                       )}
                     />

@@ -135,7 +135,11 @@ function ChatBox({ user, socket, friendId }: ChatBoxProps) {
       enterPressed.current = true;
       const text = e.currentTarget.value.trim();
       if (!text) return;
-
+      socket.emit("notify", {
+        senderId: user.id, 
+        receiverId: friendId,
+        type: "message"
+      })
       sendMessage(user.id, text);
       e.currentTarget.value = "";
     }
