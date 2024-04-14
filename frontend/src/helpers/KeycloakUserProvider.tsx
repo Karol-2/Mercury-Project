@@ -6,6 +6,7 @@ import UserContext from "./UserContext";
 import UserState from "../models/UserState";
 import Keycloak from "keycloak-js";
 import { useNavigate } from "react-router-dom";
+import socketListeners from "../socket/socketListeners";
 
 function KeycloakUserProvider({ children }: { children: React.ReactNode }) {
   const navigate = useNavigate();
@@ -99,6 +100,12 @@ function KeycloakUserProvider({ children }: { children: React.ReactNode }) {
     const userId = userState.user.id;
     setSocket(io("http://localhost:5000", { auth: { userId } }));
   }, [userState]);
+
+  useEffect(() => {
+    if (socket !== null) {
+      socketListeners(socket);
+    }
+  }, [socket]);
 
   const redirectToLogin = () => {
     if (!keycloakRef.current) {

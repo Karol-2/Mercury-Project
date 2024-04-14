@@ -7,6 +7,7 @@ import { Socket, io } from "socket.io-client";
 import UserContext from "./UserContext";
 import UserState from "../models/UserState";
 import { useNavigate } from "react-router-dom";
+import socketListeners from "../socket/socketListeners";
 
 function RestUserProvider({ children }: { children: React.ReactNode }) {
   const navigate = useNavigate();
@@ -38,6 +39,12 @@ function RestUserProvider({ children }: { children: React.ReactNode }) {
     const userId = userState.user.id;
     setSocket(io("http://localhost:5000", { auth: { userId } }));
   }, [userState]);
+
+  useEffect(() => {
+    if (socket !== null) {
+      socketListeners(socket);
+    }
+  }, [socket]);
 
   const firstRefresh = useRef(true);
 
