@@ -12,6 +12,7 @@ import ProfilePage from "./pages/ProfilePage.tsx";
 import RegisterPage from "./pages/RegisterPage.tsx";
 import SearchPage from "./pages/SearchPage.tsx";
 import VideoCallPage from "./pages/VideoCallPage.tsx";
+import NotificationPage from "./pages/NotificationPage.tsx";
 
 import "./styles/styles.scss";
 
@@ -31,6 +32,7 @@ const protectedRoutes = [
   { path: "/friends", element: <FriendsPage /> },
   { path: "/search", element: <SearchPage /> },
   { path: "/meeting", element: <VideoCallPage /> },
+  { path: "/notification", element: <NotificationPage /> }
 ];
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
