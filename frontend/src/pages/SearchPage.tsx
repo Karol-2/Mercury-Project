@@ -81,7 +81,6 @@ function SearchPage() {
                     <FoundUser
                       user={renderUser}
                       key={String(0)}
-                      currentId={renderUser.id}
                       isFriend={isFriend(usersFriends, user)}
                     />
                   );

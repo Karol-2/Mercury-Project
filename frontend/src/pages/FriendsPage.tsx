@@ -42,7 +42,7 @@ function FriendsPage() {
           "GET",
           {},
         );
-        setFriendsRequests(friendsRequestsResponse.friends);
+        setFriendsRequests(friendsRequestsResponse.friendRequests);
       }
     };
     fetchFriendRequests();
@@ -151,7 +151,6 @@ function FriendsPage() {
                       <FoundUser
                         user={resultUser}
                         key={String(1)}
-                        currentId={user.id}
                         isFriend={false}
                       />
                     )}
