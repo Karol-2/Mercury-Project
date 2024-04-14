@@ -7,10 +7,13 @@ import UserState from "../models/UserState";
 import Keycloak from "keycloak-js";
 import { useNavigate } from "react-router-dom";
 import socketListeners from "../socket/socketListeners";
+import useSound from "use-sound";
+import notificationSound from "../misc/notification.mp3";
 
 function KeycloakUserProvider({ children }: { children: React.ReactNode }) {
   const navigate = useNavigate();
   const provider = "keycloak";
+  const [play] = useSound(notificationSound);
   const [userState, setUserState] = useState<UserState>({ status: "loading" });
   const user = useMemo(
     () => (userState.status == "logged_in" ? userState.user : null),
@@ -103,7 +106,7 @@ function KeycloakUserProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (socket !== null) {
-      socketListeners(socket);
+      socketListeners(socket, play);
     }
   }, [socket]);
 

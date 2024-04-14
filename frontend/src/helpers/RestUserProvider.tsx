@@ -8,11 +8,13 @@ import UserContext from "./UserContext";
 import UserState from "../models/UserState";
 import { useNavigate } from "react-router-dom";
 import socketListeners from "../socket/socketListeners";
+import useSound from "use-sound";
+import notificationSound from "../misc/notification.mp3";
 
 function RestUserProvider({ children }: { children: React.ReactNode }) {
   const navigate = useNavigate();
   const provider = "rest";
-
+  const [play] = useSound(notificationSound);
   const [userState, setUserState] = useState<UserState>({ status: "loading" });
   const user = useMemo(
     () => (userState.status == "logged_in" ? userState.user : null),
@@ -42,7 +44,7 @@ function RestUserProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (socket !== null) {
-      socketListeners(socket);
+      socketListeners(socket, play);
     }
   }, [socket]);
 
