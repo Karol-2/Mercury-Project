@@ -16,6 +16,8 @@ function NotificationPage() {
     const invokeAction = (notification: any) => {
         if (notification.type === "call") {
             joinMeeting(notification.senderId)
+        } else if (notification.type === "message") {
+            navigate(`/messages/${notification.senderId}`)
         }
     }
     return (
