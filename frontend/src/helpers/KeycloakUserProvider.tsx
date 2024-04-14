@@ -15,6 +15,7 @@ function KeycloakUserProvider({ children }: { children: React.ReactNode }) {
   const provider = "keycloak";
   const [play] = useSound(notificationSound);
   const [userState, setUserState] = useState<UserState>({ status: "loading" });
+  const [notifications, setNotifications] = useState<any[]>([]);
   const user = useMemo(
     () => (userState.status == "logged_in" ? userState.user : null),
     [userState],
@@ -106,7 +107,7 @@ function KeycloakUserProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (socket !== null) {
-      socketListeners(socket, play);
+      socketListeners(socket, play, setNotifications);
     }
   }, [socket]);
 
@@ -204,6 +205,7 @@ function KeycloakUserProvider({ children }: { children: React.ReactNode }) {
         userState,
         token,
         socket,
+        notifications,
         login,
         redirectToLogin,
         logout,

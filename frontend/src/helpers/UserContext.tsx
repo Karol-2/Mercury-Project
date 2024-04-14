@@ -9,6 +9,7 @@ export interface UserContextValue {
   userState: UserState;
   token?: string;
   socket: Socket | null;
+  notifications: any[];
   login: (mail: string, password: string) => Promise<void>;
   redirectToLogin: () => void;
   logout: () => Promise<boolean>;

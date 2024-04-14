@@ -16,6 +16,7 @@ function RestUserProvider({ children }: { children: React.ReactNode }) {
   const provider = "rest";
   const [play] = useSound(notificationSound);
   const [userState, setUserState] = useState<UserState>({ status: "loading" });
+  const [notifications, setNotifications] = useState<any[]>([]);
   const user = useMemo(
     () => (userState.status == "logged_in" ? userState.user : null),
     [userState],
@@ -44,7 +45,7 @@ function RestUserProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (socket !== null) {
-      socketListeners(socket, play);
+      socketListeners(socket, play, setNotifications);
     }
   }, [socket]);
 
@@ -211,6 +212,7 @@ function RestUserProvider({ children }: { children: React.ReactNode }) {
         user,
         userState,
         socket,
+        notifications,
         redirectToLogin,
         login,
         logout,
