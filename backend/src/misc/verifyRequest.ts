@@ -1,4 +1,5 @@
 import { Errors } from "../models/Response.js";
+import { RegisterUser } from "../users.js";
 
 export interface PageQuery {
   page: string;
@@ -193,4 +194,23 @@ export function verifySearchQuery<T extends SearchQuery>(
   }
 
   return { valid: true, verified: verifier.verified };
+}
+
+export function verifyRegisterUser<T extends RegisterUser>(
+  user: T
+): VerifyResult<RegisterUser> {
+  // TODO: improve field validation
+  const verifier = new Verifier(user);
+  verifier.verifyLength("first_name", 2, null);
+  verifier.verifyLength("last_name", 2, null);
+  verifier.verifyMail("mail");
+  verifier.verifyLength("password", 2, null);
+
+  const errors = verifier.getErrors();
+
+  if (errors) {
+    return {valid: false, errors}
+  }
+
+  return {valid: true, verified: verifier.verified}
 }
