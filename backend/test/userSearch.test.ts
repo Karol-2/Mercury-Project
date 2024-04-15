@@ -1,5 +1,6 @@
 import { expect, test } from "vitest";
 import { fetchData } from "./fetchData.js";
+import User from "../src/models/User.js";
 
 let page: number = 1;
 let maxUsers: number = 100;
@@ -139,18 +140,24 @@ test("Not found users", async () => {
 });
 
 test("Search with polish characters", async () => {
-  query = "Adam Małysz";
+  query = "Małysz";
+  maxUsers = 5;
   const response = await fetchData(
     `http://localhost:5000/users/search?page=${page}&maxUsers=${maxUsers}&q=${query}`,
     "GET",
     {},
   );
 
-  const { status, errors } = response;
+  const { status, pageCount, users } = response;
 
-  expect(status).toBe("error");
-  expect(errors).toBeDefined();
-  expect(errors.q).toBe("not a valid string");
+  expect(status).toBe("ok");
+  expect(pageCount).toBe(6);
+  expect(users).toBeDefined();
+  expect(users.length).toBe(5);
+
+  const malysz = users.find((user: User) => user.mail == "adasko@malysz.pl");
+
+  expect(malysz).toBeDefined();
 });
 
 test("Repeated page", async () => {
