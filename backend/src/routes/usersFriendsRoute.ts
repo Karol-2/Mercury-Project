@@ -11,8 +11,11 @@ import {
 } from "../types/userResponse.js";
 import {
   getFriendRequests,
+  getFriendRequestsCount,
   getFriendSuggestions,
+  getFriendSuggestionsCount,
   getFriends,
+  getFriendsCount,
 } from "../users.js";
 import { userNotFoundRes } from "./usersRoute.js";
 import { verifyPageQuery } from "../misc/verifyRequest.js";
@@ -49,6 +52,7 @@ friendshipRouter.get(
     }
 
     const { page, maxUsers } = verify.verified;
+    const maxUsersBig = BigInt(maxUsers);
 
     const session = driver.session();
     try {
@@ -57,7 +61,14 @@ friendshipRouter.get(
         return userNotFoundRes(res);
       }
 
-      return res.json({ status: "ok", pageCount: 10, friends });
+      const friendsCount = await getFriendsCount(session, userId)
+      if (friendsCount === null) {
+        return userNotFoundRes(res);
+      }
+
+      const pageCount = Number((friendsCount.toBigInt() + maxUsersBig - 1n) / maxUsersBig)
+      console.log(pageCount)
+      return res.json({ status: "ok", pageCount, friends });
     } catch (err) {
       console.log("Error:", err);
       return res.status(404).json({ status: "error", errors: err as object });
@@ -78,6 +89,7 @@ friendshipRouter.get(
     }
 
     const { page, maxUsers } = verify.verified;
+    const maxUsersBig = BigInt(maxUsers);
 
     const session = driver.session();
     try {
@@ -91,7 +103,13 @@ friendshipRouter.get(
         return userNotFoundRes(res);
       }
 
-      return res.json({ status: "ok", pageCount: 10, friendRequests });
+      const friendRequestsCount = await getFriendRequestsCount(session, userId)
+      if (friendRequestsCount === null) {
+        return userNotFoundRes(res);
+      }
+
+      const pageCount = Number((friendRequestsCount.toBigInt() + maxUsersBig - 1n) / maxUsersBig)
+      return res.json({ status: "ok", pageCount, friendRequests });
     } catch (err) {
       console.log("Error:", err);
       return res.status(404).json({ status: "error", errors: err as object });
@@ -112,6 +130,7 @@ friendshipRouter.get(
     }
 
     const { page, maxUsers } = verify.verified;
+    const maxUsersBig = BigInt(maxUsers);
 
     const session = driver.session();
     try {
@@ -125,7 +144,13 @@ friendshipRouter.get(
         return userNotFoundRes(res);
       }
 
-      return res.json({ status: "ok", pageCount: 10, friendSuggestions });
+      const friendSuggestionsCount = await getFriendSuggestionsCount(session, userId)
+      if (friendSuggestionsCount === null) {
+        return userNotFoundRes(res);
+      }
+
+      const pageCount = Number((friendSuggestionsCount.toBigInt() + maxUsersBig - 1n) / maxUsersBig)
+      return res.json({ status: "ok", pageCount, friendSuggestions });
     } catch (err) {
       console.log("Error:", err);
       return res.status(404).json({ status: "error", errors: err as object });

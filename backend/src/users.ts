@@ -385,6 +385,25 @@ export async function getFriends(
   return friends;
 }
 
+export async function getFriendsCount(
+  session: Session,
+  userId: string
+): Promise<neo4j.Integer | null> {
+  const user = await getUser(session, { id: userId });
+  if (!user) {
+    return null;
+  }
+
+  const friendsCountRequest = await session.run(
+    `MATCH (u:User {id: $userId})-[:IS_FRIENDS_WITH]-(f:User)
+     RETURN count(DISTINCT f)`,
+    { userId },
+  );
+
+  const friendsCount = friendsCountRequest.records[0].get(0)
+  return friendsCount;
+}
+
 export async function isFriend(
   session: Session,
   firstUserId: string,
@@ -435,6 +454,25 @@ export async function getFriendRequests(
   return friends;
 }
 
+export async function getFriendRequestsCount(
+  session: Session,
+  userId: string
+): Promise<neo4j.Integer | null> {
+  const user = await getUser(session, { id: userId });
+  if (!user) {
+    return null;
+  }
+
+  const friendRequestsCountRequest = await session.run(
+    `MATCH (u:User {id: $userId})<-[:SENT_INVITE_TO]-(f:User)
+     RETURN count(DISTINCT f)`,
+    { userId },
+  );
+
+  const friendRequestsCount = friendRequestsCountRequest.records[0].get(0)
+  return friendRequestsCount;
+}
+
 export async function getFriendSuggestions(
   session: Session,
   userId: string,
@@ -462,4 +500,24 @@ export async function getFriendSuggestions(
     filterUser(s.get("s").properties),
   );
   return friends;
+}
+
+export async function getFriendSuggestionsCount(
+  session: Session,
+  userId: string
+): Promise<neo4j.Integer | null> {
+  const user = await getUser(session, { id: userId });
+  if (!user) {
+    return null;
+  }
+
+  const friendRequestsCountRequest = await session.run(
+    `MATCH (u:User {id: $userId})-[:IS_FRIENDS_WITH]-(f:User)-[:IS_FRIENDS_WITH]-(s:User)
+     WHERE NOT (u)-[:IS_FRIENDS_WITH]-(s) AND s.id <> $userId
+     RETURN count(DISTINCT s)`,
+    { userId },
+  );
+
+  const friendRequestsCount = friendRequestsCountRequest.records[0].get(0)
+  return friendRequestsCount;
 }
