@@ -122,6 +122,28 @@ class Verifier<T> {
 
     return this.pass(key, Number(value));
   }
+
+  verifyLength<K extends keyof T>(
+    key: K & string,
+    start: number | null,
+    end: number | null
+  ): string | null {
+    const value = this.obj[key];
+
+    if (typeof value !== "string") {
+      return this.fail(key, "incorrect")
+    }
+
+    if (start !== null && value.length < start) {
+      return this.fail(key, "too short")
+    }
+
+    if (end !== null && value.length > end) {
+      return this.fail(key, "too long")
+    }
+
+    return this.pass(key, value);
+  }
 }
 
 export function verifyPageQuery<T extends PageQuery>(
