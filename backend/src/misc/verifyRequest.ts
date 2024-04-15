@@ -105,6 +105,21 @@ class Verifier<T> {
     return this.pass(key, value);
   }
 
+  verifyMail<K extends keyof T>(key: K & string): string | null {
+    const value = this.obj[key]
+
+    if (typeof value !== "string") {
+      return this.fail(key, "incorrect");
+    }
+
+    const mailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!(mailRegex.test(value))) {
+      return this.fail(key, "incorrect")
+    }
+    
+    return this.pass(key, value)
+  }
+
   verifyInteger<K extends keyof T>(key: K & string): number | null {
     const value = this.obj[key];
 
