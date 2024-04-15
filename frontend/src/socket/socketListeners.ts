@@ -13,7 +13,7 @@ function socketListeners(socket: Socket, play: () => void, setNotifications: Dis
                 setNotifications((prev: any[]) => [...prev, notification]);
                 break;
             case "friend":
-                console.log(notification);
+                setNotifications((prev: any[]) => [...prev, notification]);
                 break;
             default:
                 break;
