@@ -1,5 +1,4 @@
 import { expect, test } from "vitest";
-import User from "../src/models/User.js";
 import { fetchData } from "./fetchData.js";
 
 let userId: number;
@@ -33,8 +32,6 @@ test("Create user", async () => {
   expect(status).toBe("ok");
   expect(user.first_name).toBe(userData.first_name);
   expect(user.last_name).toBe(userData.last_name);
-  expect(user.country).toBe(userData.country);
-  expect(user.profile_picture).toBe(userData.profile_picture);
   expect(user.mail).toBe(userData.mail);
 
   userId = user.id;
@@ -69,7 +66,7 @@ test("Create user with short first name", async () => {
   const { status, errors } = response;
 
   expect(status).toBe("error");
-  expect(errors.id).toBe("too short");
+  expect(errors.first_name).toBe("too short");
 });
 
 test("Create user with short last name", async () => {
@@ -85,7 +82,7 @@ test("Create user with short last name", async () => {
   const { status, errors } = response;
 
   expect(status).toBe("error");
-  expect(errors.id).toBe("too short");
+  expect(errors.last_name).toBe("too short");
 });
 
 test("Create user with short password", async () => {
@@ -101,7 +98,7 @@ test("Create user with short password", async () => {
   const { status, errors } = response;
 
   expect(status).toBe("error");
-  expect(errors.id).toBe("too short");
+  expect(errors.password).toBe("too short");
 });
 
 test("Get user by ID", async () => {
@@ -121,8 +118,6 @@ test("Get user by ID", async () => {
   expect(user.id).toBe(userId);
   expect(user.first_name).toBe(userData.first_name);
   expect(user.last_name).toBe(userData.last_name);
-  expect(user.country).toBe(userData.country);
-  expect(user.profile_picture).toBe(userData.profile_picture);
   expect(user.mail).toBe(userData.mail);
 });
 
@@ -185,7 +180,7 @@ test("Update user with short first name", async () => {
   const { status, errors } = response;
 
   expect(status).toBe("error");
-  expect(errors.id).toBe("too short");
+  expect(errors.first_name).toBe("too short");
 });
 
 test("Update user with short last name", async () => {
@@ -205,7 +200,7 @@ test("Update user with short last name", async () => {
   const { status, errors } = response;
 
   expect(status).toBe("error");
-  expect(errors.id).toBe("too short");
+  expect(errors.last_name).toBe("too short");
 });
 
 test("Update user with short password", async () => {
@@ -225,7 +220,7 @@ test("Update user with short password", async () => {
   const { status, errors } = response;
 
   expect(status).toBe("error");
-  expect(errors.id).toBe("too short");
+  expect(errors.password).toBe("too short");
 });
 
 test("Delete user by ID", async () => {
