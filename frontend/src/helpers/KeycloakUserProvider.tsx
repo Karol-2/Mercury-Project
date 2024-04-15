@@ -206,6 +206,7 @@ function KeycloakUserProvider({ children }: { children: React.ReactNode }) {
         token,
         socket,
         notifications,
+        setNotifications,
         login,
         redirectToLogin,
         logout,

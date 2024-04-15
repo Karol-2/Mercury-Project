@@ -5,8 +5,7 @@ function socketListeners(socket: Socket, play: () => void, setNotifications: Dis
     socket.on("notify", (notification) => {
         play();
         switch (notification.type) {
-            case "message":
-               
+            case "message":               
                 setNotifications((prev: any[]) => [...prev, notification]);
                 break;
             case "call":

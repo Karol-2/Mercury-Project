@@ -213,6 +213,7 @@ function RestUserProvider({ children }: { children: React.ReactNode }) {
         userState,
         socket,
         notifications,
+        setNotifications,
         redirectToLogin,
         login,
         logout,
