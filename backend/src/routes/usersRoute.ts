@@ -24,7 +24,7 @@ import {
 } from "../users.js";
 import DbUser from "../models/DbUser.js";
 import { ChangePasswordReq } from "../models/ChangePasswordReq.js";
-import { verifySearchQuery } from "../misc/verifyRequest.js";
+import { verifyRegisterUser, verifySearchQuery } from "../misc/verifyRequest.js";
 
 const usersRouter = Router();
 
@@ -180,16 +180,21 @@ usersRouter.put("/meetings/:meetingId", async (req: Request, res) => {
 });
 
 usersRouter.post("/", async (req: Request, res: UserErrorResponse) => {
-  // TODO: verify user fields
-  const { issuer, ...newUserProps } = req.body;
+  const verify = verifyRegisterUser(req.body);
+  if (!verify.valid) {
+    return res.status(400).json({ status: "error", errors: verify.errors });
+  }
+
+  const verifiedUser = verify.verified;
+  const { issuer } = req.body;
 
   const session = driver.session();
   try {
     let user: UserCreateResult;
     if (issuer) {
-      user = await registerUser(newUserProps);
+      user = await registerUser(verifiedUser);
     } else {
-      user = await createUser(session, newUserProps);
+      user = await createUser(session, verifiedUser);
     }
 
     if ("errors" in user) {

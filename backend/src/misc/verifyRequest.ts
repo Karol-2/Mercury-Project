@@ -1,4 +1,5 @@
 import { Errors } from "../models/Response.js";
+import { RegisterUser } from "../users.js";
 
 export interface PageQuery {
   page: string;
@@ -84,6 +85,42 @@ class Verifier<T> {
     return this.pass(key, value);
   }
 
+  verifyString<K extends keyof T>(
+    key: K & string,
+    allowEmpty: boolean = false,
+  ): string | null {
+    const value = this.obj[key];
+
+    if (!allowEmpty) {
+      if (!value) {
+        return this.fail(key, "not provided");
+      }
+    } else if (value === undefined) {
+      return this.pass(key, "");
+    }
+
+    if (typeof value !== "string") {
+      return this.fail(key, "incorrect");
+    }
+
+    return this.pass(key, value);
+  }
+
+  verifyMail<K extends keyof T>(key: K & string): string | null {
+    const value = this.obj[key]
+
+    if (typeof value !== "string") {
+      return this.fail(key, "incorrect");
+    }
+
+    const mailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!(mailRegex.test(value))) {
+      return this.fail(key, "incorrect")
+    }
+    
+    return this.pass(key, value)
+  }
+
   verifyInteger<K extends keyof T>(key: K & string): number | null {
     const value = this.obj[key];
 
@@ -100,6 +137,28 @@ class Verifier<T> {
     }
 
     return this.pass(key, Number(value));
+  }
+
+  verifyLength<K extends keyof T>(
+    key: K & string,
+    start: number | null,
+    end: number | null
+  ): string | null {
+    const value = this.obj[key];
+
+    if (typeof value !== "string") {
+      return this.fail(key, "incorrect")
+    }
+
+    if (start !== null && value.length < start) {
+      return this.fail(key, "too short")
+    }
+
+    if (end !== null && value.length > end) {
+      return this.fail(key, "too long")
+    }
+
+    return this.pass(key, value);
   }
 }
 
@@ -125,8 +184,8 @@ export function verifySearchQuery<T extends SearchQuery>(
   const verifier = new Verifier(query);
   verifier.verifyInteger("page");
   verifier.verifyInteger("maxUsers");
-  verifier.verifyAscii("q", true);
-  verifier.verifyAscii("country", true);
+  verifier.verifyString("q", true);
+  verifier.verifyString("country", true);
 
   const errors = verifier.getErrors();
 
@@ -135,4 +194,23 @@ export function verifySearchQuery<T extends SearchQuery>(
   }
 
   return { valid: true, verified: verifier.verified };
+}
+
+export function verifyRegisterUser<T extends RegisterUser>(
+  user: T
+): VerifyResult<RegisterUser> {
+  // TODO: improve field validation
+  const verifier = new Verifier(user);
+  verifier.verifyLength("first_name", 2, null);
+  verifier.verifyLength("last_name", 2, null);
+  verifier.verifyMail("mail");
+  verifier.verifyLength("password", 2, null);
+
+  const errors = verifier.getErrors();
+
+  if (errors) {
+    return {valid: false, errors}
+  }
+
+  return {valid: true, verified: verifier.verified}
 }

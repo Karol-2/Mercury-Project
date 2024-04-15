@@ -45,8 +45,8 @@ function getResponse(e: any): Response | null {
   return e.response;
 }
 
-type RegisterUser = Omit<User, "id"> & NativeUser;
-type CreateUser = Omit<User, "id"> & Either<NativeUser, ExternalUser>;
+export type RegisterUser = Omit<User, "id"> & NativeUser;
+export type CreateUser = Omit<User, "id"> & Either<NativeUser, ExternalUser>;
 export type UserCreateResult = User | { errors: Record<string, string> };
 
 async function createUserQuery(
