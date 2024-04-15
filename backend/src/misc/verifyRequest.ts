@@ -14,11 +14,13 @@ export interface Page {
 export interface SearchQuery extends PageQuery {
   q: string;
   country: string;
+  userId: string;
 }
 
 export interface SearchVerified extends Page {
   q: string;
   country: string;
+  userId: string;
 }
 
 export type VerifyResult<T> = ValidResult<T> | InvalidResult;
@@ -186,6 +188,7 @@ export function verifySearchQuery<T extends SearchQuery>(
   verifier.verifyInteger("maxUsers");
   verifier.verifyString("q", true);
   verifier.verifyString("country", true);
+  verifier.verifyString("userId", true);
 
   const errors = verifier.getErrors();
 

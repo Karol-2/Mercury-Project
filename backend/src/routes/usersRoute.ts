@@ -64,7 +64,7 @@ usersRouter.get(
       return res.status(400).json({ status: "error", errors: verify.errors });
     }
 
-    const { page, maxUsers, q: searchTerm, country } = verify.verified;
+    const { page, maxUsers, q: searchTerm, country, userId } = verify.verified;
     const maxUsersBig = BigInt(maxUsers);
 
     const session = driver.session();
@@ -75,6 +75,7 @@ usersRouter.get(
         country,
         page - 1,
         maxUsers,
+        userId
       );
       if (userScores === null) {
         return res
@@ -82,9 +83,9 @@ usersRouter.get(
           .json({ status: "error", errors: { searchTerm: "incorrect" } });
       }
 
-      const usersCount = await getUsersCount(session);
+      const usersCount = (await getUsersCount(session)).toBigInt() - 1n;
       const pageCount = Number(
-        (usersCount.toBigInt() + maxUsersBig - 1n) / maxUsersBig,
+        (usersCount + maxUsersBig - 1n) / maxUsersBig,
       );
       const users = userScores.map((userScore) => userScore[0]);
 

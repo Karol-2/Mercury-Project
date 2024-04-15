@@ -200,6 +200,7 @@ export async function searchUser(
   country: string,
   pageIndex: number,
   pageSize: number,
+  userId: string = ""
 ): Promise<UserScore[] | null> {
   const queryElems = neo4j.int((pageIndex + 1) * pageSize);
   const querySkip = neo4j.int(pageIndex * pageSize);
@@ -210,11 +211,11 @@ export async function searchUser(
   if (!searchTerm) {
     userRequest = await session.run(
       `MATCH (u:User)
-       WHERE $country = "" OR u.country = $country
+       WHERE ($country = "" OR u.country = $country) AND u.id <> $userId
        RETURN u as similarUser, 1.0 as score
        SKIP $querySkip
        LIMIT $queryLimit`,
-      { queryElems, country, querySkip, queryLimit },
+      { queryElems, country, userId, querySkip, queryLimit },
     );
   } else {
     const wordVec = wordToVec(searchTerm);
@@ -226,11 +227,11 @@ export async function searchUser(
     userRequest = await session.run(
       `CALL db.index.vector.queryNodes('user-names', $queryElems, $wordVec)
        YIELD node AS similarUser, score
-       WHERE $country = "" OR similarUser.country = $country
+       WHERE ($country = "" OR similarUser.country = $country) AND similarUser.id <> $userId
        RETURN similarUser, score
        SKIP $querySkip
        LIMIT $queryLimit`,
-      { wordVec, queryElems, country, querySkip, queryLimit },
+      { wordVec, queryElems, userId, country, querySkip, queryLimit },
     );
   }
 
