@@ -5,14 +5,13 @@ import { Socket, io } from "socket.io-client";
 import UserContext from "./UserContext";
 import UserState from "../models/UserState";
 import Keycloak from "keycloak-js";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import socketListeners from "../socket/socketListeners";
 import useSound from "use-sound";
 import notificationSound from "../misc/notification.mp3";
 
 function KeycloakUserProvider({ children }: { children: React.ReactNode }) {
   const navigate = useNavigate();
-  const params = useParams();
   const provider = "keycloak";
   const [play] = useSound(notificationSound);
   const [userState, setUserState] = useState<UserState>({ status: "loading" });
@@ -108,7 +107,7 @@ function KeycloakUserProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (socket !== null) {
-      socketListeners(socket, play, setNotifications, params);
+      socketListeners(socket, play, setNotifications);
     }
   }, [socket]);
 
