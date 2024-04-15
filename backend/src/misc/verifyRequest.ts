@@ -204,7 +204,7 @@ export function verifyRegisterUser<T extends RegisterUser>(
   verifier.verifyLength("first_name", 2, null);
   verifier.verifyLength("last_name", 2, null);
   verifier.verifyMail("mail");
-  verifier.verifyLength("password", 2, null);
+  verifier.verifyLength("password", 8, null);
 
   const errors = verifier.getErrors();
 
