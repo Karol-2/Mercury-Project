@@ -5,7 +5,6 @@ import { useNavigate } from "react-router-dom";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { PasswordForm } from "../models/PasswordForm";
-import Popup from "./Popup";
 
 export interface EditDetails {
   provider: string;
@@ -116,7 +115,7 @@ function EditPassword(props: EditDetails) {
   };
 
   return (
-    <div className=" flex flex-col gap-2 bg-my-dark p-10 xl:px-44 rounded-xl">
+    <div className=" flex flex-col gap-2 bg-my-dark p-10 rounded-xl">
       <h1 className="text-3xl font-bold text-my-orange">Change Password</h1>
       <hr className="text-my-orange"></hr>
       <form
@@ -169,7 +168,6 @@ function EditPassword(props: EditDetails) {
         />
         {provider == "rest" && <p>WARNING: You will be logged out!</p>}
       </form>
-      <Popup header="Success"/>
     </div>
   );
 }

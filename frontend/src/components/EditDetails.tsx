@@ -107,7 +107,7 @@ function EditDetails(props: EditDetails) {
   };
 
   return (
-    <div className=" flex flex-col gap-2 bg-my-dark p-10 xl:px-44 rounded-xl">
+    <div className=" flex flex-col gap-2 bg-my-dark p-10 rounded-xl">
       <h1 className="text-3xl font-bold text-my-orange">Edit Details</h1>
       <hr className="text-my-orange"></hr>
       <form
