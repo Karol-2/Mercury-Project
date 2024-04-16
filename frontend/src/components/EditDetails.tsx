@@ -16,7 +16,6 @@ export interface EditDetails {
 function EditDetails(props: EditDetails) {
   const user: User = props.user;
   const updateUser = props.updateUser;
-  const navigate = useNavigate();
 
   const {
     register,
@@ -47,7 +46,7 @@ function EditDetails(props: EditDetails) {
   };
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-    console.log(e);
+    // console.log(e);
 
     const { name, value } = e.target;
     setFormData((prevData) => ({
@@ -173,7 +172,7 @@ function EditDetails(props: EditDetails) {
         />
       </form>
       {showPopup && (
-        <Popup header="Success!" isVisibleHandler={popupHandler} isVisible={showPopup} />
+        <Popup header="Successful data change!" isVisibleHandler={popupHandler} isVisible={showPopup} />
       )}
     </div>
   );

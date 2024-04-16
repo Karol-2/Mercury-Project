@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import User from "../models/User";
 import { useState } from "react";
+import Popup from "./Popup";
 
 export interface EditDetails {
   user: User;
@@ -17,6 +18,11 @@ function EditPhoto(props: EditDetails) {
     user.profile_picture,
   );
   const [submitError, setSubmitError] = useState<string>("");
+  const [showPopup, setShowPopup] = useState<boolean>(false);
+
+  const popupHandler = ()=>{
+    setShowPopup(!showPopup)
+  }
 
   const encodePicture = async (file: File): Promise<string> => {
     return new Promise<string>((resolve) => {
@@ -52,10 +58,11 @@ function EditPhoto(props: EditDetails) {
 
   const submit = async () => {
     try {
+      setShowPopup(false)
       const changedUser = await editPhoto();
 
       console.log(changedUser);
-      navigate("/profile");
+      setShowPopup(true)
     } catch (e) {
       if (e instanceof Error) {
         setSubmitError("Can't connect to the server");
@@ -110,6 +117,9 @@ function EditPhoto(props: EditDetails) {
         </button>
         <div className="pb-4 text-[#f88]">{submitError}</div>
       </div>
+      {showPopup && (
+        <Popup header="Successful photo change!" isVisible={showPopup} isVisibleHandler={popupHandler} />
+      )}
     </div>
   );
 }
