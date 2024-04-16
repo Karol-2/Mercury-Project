@@ -18,8 +18,9 @@ import {
   getFriendsCount,
 } from "../users.js";
 import { userNotFoundRes } from "./usersRoute.js";
-import { verifyPageQuery } from "../misc/verifyRequest.js";
 import { Errors } from "../models/Response.js";
+import Page, { pageSchema } from "../models/Page.js";
+import { formatError } from "../misc/formatError.js";
 
 const friendshipRouter = Router();
 
@@ -47,12 +48,13 @@ friendshipRouter.get(
   async (req: Request, res: FriendsPageErrorResponse) => {
     const userId = req.params.userId;
 
-    const verify = verifyPageQuery(req.query as any);
-    if (!verify.valid) {
-      return res.status(400).json({ status: "error", errors: verify.errors });
+    const pageParse = pageSchema.safeParse(req.body);
+    if (!pageParse.success) {
+      const errors = formatError(pageParse.error);
+      return res.status(400).json({ status: "error", errors });
     }
 
-    const { page, maxUsers } = verify.verified;
+    const { page, maxUsers }: Page = pageParse.data;
     const maxUsersBig = BigInt(maxUsers);
 
     const session = driver.session();
@@ -62,13 +64,15 @@ friendshipRouter.get(
         return userNotFoundRes(res);
       }
 
-      const friendsCount = await getFriendsCount(session, userId)
+      const friendsCount = await getFriendsCount(session, userId);
       if (friendsCount === null) {
         return userNotFoundRes(res);
       }
 
-      const pageCount = Number((friendsCount.toBigInt() + maxUsersBig - 1n) / maxUsersBig)
-      console.log(pageCount)
+      const pageCount = Number(
+        (friendsCount.toBigInt() + maxUsersBig - 1n) / maxUsersBig,
+      );
+      console.log(pageCount);
       return res.json({ status: "ok", pageCount, friends });
     } catch (err) {
       console.log("Error:", err);
@@ -84,12 +88,13 @@ friendshipRouter.get(
   async (req: Request, res: FriendRequestsPageErrorResponse) => {
     const userId = req.params.userId;
 
-    const verify = verifyPageQuery(req.query as any);
-    if (!verify.valid) {
-      return res.status(400).json({ status: "error", errors: verify.errors });
+    const pageParse = pageSchema.safeParse(req.body);
+    if (!pageParse.success) {
+      const errors = formatError(pageParse.error);
+      return res.status(400).json({ status: "error", errors });
     }
 
-    const { page, maxUsers } = verify.verified;
+    const { page, maxUsers }: Page = pageParse.data;
     const maxUsersBig = BigInt(maxUsers);
 
     const session = driver.session();
@@ -104,12 +109,14 @@ friendshipRouter.get(
         return userNotFoundRes(res);
       }
 
-      const friendRequestsCount = await getFriendRequestsCount(session, userId)
+      const friendRequestsCount = await getFriendRequestsCount(session, userId);
       if (friendRequestsCount === null) {
         return userNotFoundRes(res);
       }
 
-      const pageCount = Number((friendRequestsCount.toBigInt() + maxUsersBig - 1n) / maxUsersBig)
+      const pageCount = Number(
+        (friendRequestsCount.toBigInt() + maxUsersBig - 1n) / maxUsersBig,
+      );
       return res.json({ status: "ok", pageCount, friendRequests });
     } catch (err) {
       console.log("Error:", err);
@@ -125,12 +132,13 @@ friendshipRouter.get(
   async (req: Request, res: FriendSuggestionsPageErrorResponse) => {
     const userId = req.params.userId;
 
-    const verify = verifyPageQuery(req.query as any);
-    if (!verify.valid) {
-      return res.status(400).json({ status: "error", errors: verify.errors });
+    const pageParse = pageSchema.safeParse(req.body);
+    if (!pageParse.success) {
+      const errors = formatError(pageParse.error);
+      return res.status(400).json({ status: "error", errors });
     }
 
-    const { page, maxUsers } = verify.verified;
+    const { page, maxUsers }: Page = pageParse.data;
     const maxUsersBig = BigInt(maxUsers);
 
     const session = driver.session();
@@ -145,12 +153,17 @@ friendshipRouter.get(
         return userNotFoundRes(res);
       }
 
-      const friendSuggestionsCount = await getFriendSuggestionsCount(session, userId)
+      const friendSuggestionsCount = await getFriendSuggestionsCount(
+        session,
+        userId,
+      );
       if (friendSuggestionsCount === null) {
         return userNotFoundRes(res);
       }
 
-      const pageCount = Number((friendSuggestionsCount.toBigInt() + maxUsersBig - 1n) / maxUsersBig)
+      const pageCount = Number(
+        (friendSuggestionsCount.toBigInt() + maxUsersBig - 1n) / maxUsersBig,
+      );
       return res.json({ status: "ok", pageCount, friendSuggestions });
     } catch (err) {
       console.log("Error:", err);

@@ -1,7 +1,7 @@
 import neo4j, { Session } from "neo4j-driver";
 import { v4 as uuidv4 } from "uuid";
 import bcrypt from "bcrypt";
-import User from "./models/User.js";
+import User, { userSchema } from "./models/User.js";
 import removeKeys from "./misc/removeKeys.js";
 import wordToVec from "./misc/wordToVec.js";
 import DbUser from "./models/DbUser.js";
@@ -9,8 +9,9 @@ import kcAdminClient from "./kcAdminClient.js";
 import UserRepresentation from "@keycloak/keycloak-admin-client/lib/defs/userRepresentation.js";
 import driver from "./driver/driver.js";
 import { Either } from "./misc/Either.js";
-import NativeUser from "./models/NativeUser.js";
+import NativeUser, { nativeUserSchema } from "./models/NativeUser.js";
 import ExternalUser from "./models/ExternalUser.js";
+import { ZodType } from "zod";
 
 export const filterUser = (user: DbUser): User => {
   if ("password" in user) {
@@ -47,7 +48,16 @@ function getResponse(e: any): Response | null {
 
 export type RegisterUser = Omit<User, "id"> & NativeUser;
 export type CreateUser = Omit<User, "id"> & Either<NativeUser, ExternalUser>;
+export type UpdateUser = Partial<Omit<User, "id">>;
 export type UserCreateResult = User | { errors: Record<string, string> };
+
+export const registerUserSchema = userSchema
+  .omit({ id: true })
+  .merge(nativeUserSchema) satisfies ZodType<RegisterUser>;
+
+export const updateUserSchema = userSchema.omit({
+  id: true,
+}).partial() satisfies ZodType<UpdateUser>;
 
 async function createUserQuery(
   session: Session,
