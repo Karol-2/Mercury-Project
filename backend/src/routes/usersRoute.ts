@@ -25,6 +25,7 @@ import {
 import DbUser from "../models/DbUser.js";
 import { ChangePasswordReq } from "../models/ChangePasswordReq.js";
 import { verifyRegisterUser, verifySearchQuery } from "../misc/verifyRequest.js";
+import { Errors } from "../models/Response.js";
 
 const usersRouter = Router();
 
@@ -42,7 +43,7 @@ usersRouter.get("/", async (_req: Request, res: UsersErrorResponse) => {
     return res.json({ status: "ok", users });
   } catch (err) {
     console.log("Error:", err);
-    return res.status(404).json({ status: "error", errors: err as object });
+    return res.status(404).json({ status: "error", errors: err as Errors });
   } finally {
     await session.close();
   }
@@ -92,7 +93,7 @@ usersRouter.get(
       return res.json({ status: "ok", pageCount, users });
     } catch (err) {
       console.log("Error:", err);
-      return res.status(404).json({ status: "error", errors: err as object });
+      return res.status(404).json({ status: "error", errors: err as Errors });
     } finally {
       await session.close();
     }
@@ -125,7 +126,7 @@ usersRouter.get("/:userId", async (req: Request, res: UserErrorResponse) => {
     return res.json({ status: "ok", user });
   } catch (err) {
     console.log("Error:", err);
-    return res.status(404).json({ status: "error", errors: err as object });
+    return res.status(404).json({ status: "error", errors: err as Errors });
   } finally {
     await session.close();
   }
@@ -206,7 +207,7 @@ usersRouter.post("/", async (req: Request, res: UserErrorResponse) => {
     return res.json({ status: "ok", user });
   } catch (err) {
     console.log("Error:", err);
-    return res.status(404).json({ status: "error", errors: err as object });
+    return res.status(404).json({ status: "error", errors: err as Errors });
   } finally {
     await session.close();
   }
@@ -227,7 +228,7 @@ usersRouter.put("/:userId", async (req: Request, res: OkErrorResponse) => {
     return res.json({ status: "ok" });
   } catch (err) {
     console.log("Error:", err);
-    return res.status(404).json({ status: "error", errors: err as object });
+    return res.status(404).json({ status: "error", errors: err as Errors });
   } finally {
     await session.close();
   }
@@ -296,7 +297,7 @@ usersRouter.post(
       return res.json({ status: "ok" });
     } catch (err) {
       console.log("Error:", err);
-      return res.status(404).json({ status: "error", errors: err as object });
+      return res.status(404).json({ status: "error", errors: err as Errors });
     } finally {
       await session.close();
     }
@@ -316,7 +317,7 @@ usersRouter.delete("/:userId", async (req: Request, res: OkErrorResponse) => {
     return res.json({ status: "ok" });
   } catch (err) {
     console.log("Error:", err);
-    return res.status(404).json({ status: "error", errors: err as object });
+    return res.status(404).json({ status: "error", errors: err as Errors });
   } finally {
     await session.close();
   }

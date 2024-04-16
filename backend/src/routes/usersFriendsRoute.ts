@@ -19,6 +19,7 @@ import {
 } from "../users.js";
 import { userNotFoundRes } from "./usersRoute.js";
 import { verifyPageQuery } from "../misc/verifyRequest.js";
+import { Errors } from "../models/Response.js";
 
 const friendshipRouter = Router();
 
@@ -71,7 +72,7 @@ friendshipRouter.get(
       return res.json({ status: "ok", pageCount, friends });
     } catch (err) {
       console.log("Error:", err);
-      return res.status(404).json({ status: "error", errors: err as object });
+      return res.status(404).json({ status: "error", errors: err as Errors });
     } finally {
       await session.close();
     }
@@ -112,7 +113,7 @@ friendshipRouter.get(
       return res.json({ status: "ok", pageCount, friendRequests });
     } catch (err) {
       console.log("Error:", err);
-      return res.status(404).json({ status: "error", errors: err as object });
+      return res.status(404).json({ status: "error", errors: err as Errors });
     } finally {
       await session.close();
     }
@@ -153,7 +154,7 @@ friendshipRouter.get(
       return res.json({ status: "ok", pageCount, friendSuggestions });
     } catch (err) {
       console.log("Error:", err);
-      return res.status(404).json({ status: "error", errors: err as object });
+      return res.status(404).json({ status: "error", errors: err as Errors });
     } finally {
       await session.close();
     }
@@ -191,7 +192,7 @@ friendshipRouter.delete(
       return res.json({ status: "ok" });
     } catch (err) {
       console.log("Error:", err);
-      return res.status(404).json({ status: "error", errors: err as object });
+      return res.status(404).json({ status: "error", errors: err as Errors });
     }
   },
 );
@@ -221,7 +222,7 @@ friendshipRouter.post(
       return res.json({ status: "ok", friends });
     } catch (err) {
       console.log("Error:", err);
-      return res.status(404).json({ status: "error", errors: err as object });
+      return res.status(404).json({ status: "error", errors: err as Errors });
     }
   },
 );
@@ -260,7 +261,7 @@ friendshipRouter.post(
       return res.json({ status: "ok" });
     } catch (err) {
       console.log("Error:", err);
-      return res.status(404).json({ status: "error", errors: err as object });
+      return res.status(404).json({ status: "error", errors: err as Errors });
     }
   },
 );
