@@ -30,7 +30,7 @@ import DbUser from "../models/DbUser.js";
 import { ChangePasswordReq } from "../models/ChangePasswordReq.js";
 import { formatError } from "../misc/formatError.js";
 import { Errors } from "../models/Response.js";
-import { searchSchema } from "../models/Search.js";
+import { searchSchema } from "../models/routes/Search.js";
 
 const usersRouter = Router();
 

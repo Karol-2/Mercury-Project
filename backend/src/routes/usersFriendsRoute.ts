@@ -19,7 +19,7 @@ import {
 } from "../users.js";
 import { userNotFoundRes } from "./usersRoute.js";
 import { Errors } from "../models/Response.js";
-import Page, { pageSchema } from "../models/Page.js";
+import Page, { pageSchema } from "../models/routes/Page.js";
 import { formatError } from "../misc/formatError.js";
 
 const friendshipRouter = Router();
