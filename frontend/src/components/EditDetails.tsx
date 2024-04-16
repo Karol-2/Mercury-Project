@@ -6,6 +6,7 @@ import { userEditDetails } from "../models/RegisterUserSchema";
 import { ChangeEvent, useState } from "react";
 import countriesData from "../assets/countries.json";
 import Select from "react-select";
+import Popup from "./Popup";
 
 export interface EditDetails {
   user: User;
@@ -26,6 +27,7 @@ function EditDetails(props: EditDetails) {
   });
 
   const [submitError, setSubmitError] = useState<string>("");
+  const [showPopup, setShowPopup] = useState<boolean>(false);
   const [country, setCountry] = useState<string>(user.country);
   const [formData, setFormData] = useState({
     first_name: user.first_name,
@@ -81,11 +83,16 @@ function EditDetails(props: EditDetails) {
     });
   };
 
+  const popupHandler = ()=>{
+    setShowPopup(!showPopup)
+  }
+
   const submit = async (user: FrontendUser) => {
+    setShowPopup(false)
     try {
       await editUser(user);
 
-      navigate("/profile");
+      setShowPopup(true);
     } catch (e) {
       if (e instanceof Error) {
         setSubmitError("Can't connect to the server");
@@ -165,6 +172,9 @@ function EditDetails(props: EditDetails) {
           value="Save"
         />
       </form>
+      {showPopup && (
+        <Popup header="Success!" isVisibleHandler={popupHandler} isVisible={showPopup} />
+      )}
     </div>
   );
 }
