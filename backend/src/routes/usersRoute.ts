@@ -65,7 +65,7 @@ usersRouter.post(
 usersRouter.get(
   "/search",
   async (req: Request, res: UsersSearchErrorResponse) => {
-    const searchParse = searchSchema.safeParse(req.body);
+    const searchParse = searchSchema.safeParse(req.query);
     if (!searchParse.success) {
       const errors = formatError(searchParse.error);
       return res.status(400).json({ status: "error", errors });
