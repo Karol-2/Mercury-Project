@@ -133,32 +133,38 @@ export async function createUser(
 }
 
 export async function registerUser(
+  session: Session,
   userData: RegisterUser,
 ): Promise<UserCreateResult> {
-  const session = driver.session();
+  let keycloakId: string = "";
+
   try {
-    const { id: keycloakId } = await kcAdminClient.users.create(
-      registerUserToKeycloakUser(userData),
-    );
-
-    const dbUserData: CreateUser = {
-      ...removeKeys(userData, ["password"]),
-      issuer: "mercury",
-      issuer_id: keycloakId,
-    };
-
-    const user = await createUser(session, dbUserData);
-    return user;
+    keycloakId = (
+      await kcAdminClient.users.create(registerUserToKeycloakUser(userData))
+    ).id;
   } catch (e) {
     const response = getResponse(e);
-    if (response != null && response.status == 409) {
-      return { errors: { id: "already exists" } };
-    } else {
+    if (response == null || response.status != 409) {
       throw e;
     }
-  } finally {
-    await session.close();
   }
+
+  if (!keycloakId) {
+    keycloakId = (
+      await kcAdminClient.users.find({ email: userData.mail, realm: "mercury" })
+    )[0].id!
+  }
+
+  const dbUserData: CreateUser = {
+    ...removeKeys(userData, ["password"]),
+    issuer: "mercury",
+    issuer_id: keycloakId,
+  };
+
+  await createUser(session, dbUserData);
+
+  const user = await getUser(session, {mail: userData.mail})
+  return user!;
 }
 
 export async function getUser(
