@@ -48,7 +48,7 @@ friendshipRouter.get(
   async (req: Request, res: FriendsPageErrorResponse) => {
     const userId = req.params.userId;
 
-    const pageParse = pageSchema.safeParse(req.body);
+    const pageParse = pageSchema.safeParse(req.query);
     if (!pageParse.success) {
       const errors = formatError(pageParse.error);
       return res.status(400).json({ status: "error", errors });
@@ -88,7 +88,7 @@ friendshipRouter.get(
   async (req: Request, res: FriendRequestsPageErrorResponse) => {
     const userId = req.params.userId;
 
-    const pageParse = pageSchema.safeParse(req.body);
+    const pageParse = pageSchema.safeParse(req.query);
     if (!pageParse.success) {
       const errors = formatError(pageParse.error);
       return res.status(400).json({ status: "error", errors });
@@ -132,7 +132,7 @@ friendshipRouter.get(
   async (req: Request, res: FriendSuggestionsPageErrorResponse) => {
     const userId = req.params.userId;
 
-    const pageParse = pageSchema.safeParse(req.body);
+    const pageParse = pageSchema.safeParse(req.query);
     if (!pageParse.success) {
       const errors = formatError(pageParse.error);
       return res.status(400).json({ status: "error", errors });
