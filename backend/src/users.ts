@@ -163,7 +163,10 @@ export async function registerUser(
 
   await createUser(session, dbUserData);
 
-  const user = await getDbUser(session, { mail: userData.mail, issuer: "mercury" });
+  const user = await getDbUser(session, {
+    mail: userData.mail,
+    issuer: "mercury",
+  });
   return filterUser(user!);
 }
 
@@ -624,9 +627,11 @@ export async function sendFriendRequest(
     userId1,
     userId2,
   );
+  const sameId = userId1 == userId2;
 
-  if (!firstUserExists || !secondUserExists || areFriends) {
-    return { success: false, firstUserExists, secondUserExists };
+  const success = firstUserExists && secondUserExists && areFriends && !sameId;
+  if (!success) {
+    return { success, firstUserExists, secondUserExists };
   }
 
   await session.run(
@@ -635,7 +640,7 @@ export async function sendFriendRequest(
     { userId1, userId2 },
   );
 
-  return { success: true, firstUserExists, secondUserExists };
+  return { success, firstUserExists, secondUserExists };
 }
 
 export type AcceptFriendRequestResult = {
