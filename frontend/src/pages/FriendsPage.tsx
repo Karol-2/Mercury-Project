@@ -37,33 +37,45 @@ function FriendsPage() {
   useEffect(() => {
     const fetchFriendRequests = async () => {
       if (user) {
+        // TODO: fix hardcoded max user count
         const friendsRequestsResponse = await dataService.fetchData(
-          `/users/${user.id}/friend-requests?page=1&maxUsers=100`,
+          `/users/${user.id}/friend-requests?page=1&maxUsers=32`,
           "GET",
           {},
         );
-        setFriendsRequests(friendsRequestsResponse.friends);
+        setFriendsRequests(friendsRequestsResponse.friendRequests);
       }
     };
     fetchFriendRequests();
   }, [refresh]);
 
-  const handleDeclineRequest = async (friend: User) => {
+  const handleAcceptRequest = async (currentId: string) => {
     if (user) {
       await dataService.fetchData(
-        `/users/${user.id}/remove/${friend.id}`,
-        "DELETE",
+        `/users/${user.id}/accept-friend-request/${currentId}`,
+        "POST",
       );
 
       setRefresh(() => !refresh);
     }
   };
 
-  const handleAcceptRequest = async (currentId: string) => {
+  const handleDeclineRequest = async (friend: User) => {
     if (user) {
       await dataService.fetchData(
-        `/users/${user.id}/accept/${currentId}`,
+        `/users/${user.id}/decline-friend-request/${friend.id}`,
         "POST",
+      );
+
+      setRefresh(() => !refresh);
+    }
+  };
+
+  const handleDeleteFriend = async (friend: User) => {
+    if (user) {
+      await dataService.fetchData(
+        `/users/${user.id}/delete-friend/${friend.id}`,
+        "DELETE",
       );
 
       setRefresh(() => !refresh);
@@ -105,7 +117,7 @@ function FriendsPage() {
                       renderItem={(user) => (
                         <Friend
                           friend={user}
-                          handleDeclineRequest={handleDeclineRequest}
+                          handleDeleteFriend={handleDeleteFriend}
                           joinMeeting={joinMeeting}
                         />
                       )}

@@ -1,19 +1,17 @@
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
-import dataService from "../services/data";
 import { useEffect, useState } from "react";
 import FoundUser from "../components/FoundUser";
 import { useUser } from "../helpers/UserContext";
 import User from "../models/User";
-import { useProtected } from "../helpers/Protected";
 
 import Transition from "../components/Transition";
 import Search from "../components/Search";
 import PaginatorV2 from "../components/PaginatorV2";
+import { useProtected } from "../helpers/Protected";
 
 function SearchPage() {
   // Logic
-  const [usersFriends, setUsersFriends] = useState<string[]>([]);
   const [queryEndpoint, setQueryEndpoint] = useState<string>("");
   const [isReadyToSearch, setIsReadyToSearch] = useState<boolean>(false);
 
@@ -21,8 +19,8 @@ function SearchPage() {
   const [showAnimation, setShowAnim] = useState(false);
   const [showContent, setShowContent] = useState(false);
 
-  const { userState } = useUser();
   const { user } = useProtected();
+  const { friends } = useUser();
 
   useEffect(() => {
     setShowAnim(true);
@@ -31,28 +29,8 @@ function SearchPage() {
     }, 100);
   }, []);
 
-  useEffect(() => {
-    if (userState.status == "loading") return;
-
-    const fetchFriends = async () => {
-      const friendsResponse = await dataService.fetchData(
-        `/users/${user.id}/friends?page=1&maxUsers=100`,
-        "GET",
-        {},
-      );
-
-      const friends = friendsResponse.friends as User[];
-      const friendsIds = friends.map((friend) => friend.id);
-      console.log(friendsIds);
-      setUsersFriends(friendsIds);
-    };
-    fetchFriends();
-  }, [user]);
-
-  const isFriend = (friendArr: string[], user: User): boolean => {
-    return friendArr.reduce((prev: boolean, curr: string) => {
-      return prev || curr === String(user.id);
-    }, false);
+  const isFriend = (user: User): boolean => {
+    return user.id in friends;
   };
 
   const foundUsersHandler = (endpoint: string) => {
@@ -64,7 +42,7 @@ function SearchPage() {
     <>
       <Navbar />
       {showAnimation && <Transition startAnimation={showAnimation} />}
-      {showContent ? (
+      {showContent && (
         <>
           <section className=" min-h-screen mx-50 lg:mx-72 ">
             <Search handler={foundUsersHandler} />
@@ -75,24 +53,18 @@ function SearchPage() {
               isSearch={true}
               itemsPerPage={5}
               getItems={(response) => response.users}
-              renderItem={(renderUser) => {
-                if (renderUser.id !== user.id) {
-                  return (
-                    <FoundUser
-                      user={renderUser}
-                      key={String(0)}
-                      currentId={renderUser.id}
-                      isFriend={isFriend(usersFriends, user)}
-                    />
-                  );
-                } else return <></>;
-              }}
+              renderItem={(renderUser) => (
+                <FoundUser
+                  user={renderUser}
+                  key={String(0)}
+                  currentId={user.id}
+                  isFriend={isFriend(renderUser)}
+                />
+              )}
             />
           </section>
           <Footer />
         </>
-      ) : (
-        ""
       )}
     </>
   );

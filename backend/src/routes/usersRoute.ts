@@ -199,7 +199,7 @@ usersRouter.post("/", async (req: Request, res: UserErrorResponse) => {
   try {
     let user: UserCreateResult;
     if (issuer) {
-      user = await registerUser(parsedUser);
+      user = await registerUser(session, parsedUser);
     } else {
       user = await createUser(session, parsedUser);
     }

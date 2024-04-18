@@ -15,6 +15,7 @@ export interface UserContextValue {
   registerUser: (user: FrontendUser) => Promise<FrontendUser>;
   updateUser: (updateUser: Partial<User>) => Promise<boolean>;
   deleteUser: () => Promise<boolean>;
+  friends: Record<string, User>;
 }
 
 const UserContext = createContext<UserContextValue | null>(null);
