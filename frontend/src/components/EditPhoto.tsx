@@ -1,4 +1,3 @@
-import { useNavigate } from "react-router-dom";
 import User from "../models/User";
 import { useState } from "react";
 import Popup from "./Popup";
@@ -11,8 +10,6 @@ export interface EditDetails {
 function EditPhoto(props: EditDetails) {
   const user: User = props.user;
   const updateUser = props.updateUser;
-
-  const navigate = useNavigate();
 
   const [profilePictureBase64, setProfilePictureBase64] = useState<string>(
     user.profile_picture,
