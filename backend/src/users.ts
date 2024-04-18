@@ -99,29 +99,28 @@ export async function createUser(
     }
   }
 
-  const firstNameEmbedding = wordToVec(userData.first_name);
-  const lastNameEmbedding = wordToVec(userData.last_name);
+  const nameEmbeddingResult = await generateNameEmbedding(
+    userData.first_name,
+    userData.last_name,
+  );
+  const { success, firstNameCorrect, lastNameCorrect, nameEmbedding } =
+    nameEmbeddingResult;
 
   const errors: Record<string, string> = {};
 
-  if (firstNameEmbedding.length == 0) {
-    errors["first_name"] = "incorrect";
-  }
+  if (!success) {
+    if (!firstNameCorrect) {
+      errors["first_name"] = "incorrect";
+    }
 
-  if (lastNameEmbedding.length == 0) {
-    errors["last_name"] = "incorrect";
-  }
+    if (!lastNameCorrect) {
+      errors["last_name"] = "incorrect";
+    }
 
-  for (const _ in errors) {
     return { errors };
   }
 
   const id = uuidv4();
-  const nameEmbedding = firstNameEmbedding.map((e1, i) => {
-    const e2 = lastNameEmbedding[i];
-    return (e1 + e2) / 2;
-  });
-
   let user = { ...userData, id, name_embedding: nameEmbedding } as DbUser;
 
   if ("password" in userData) {
@@ -268,6 +267,46 @@ export async function getUsersCount(session: Session): Promise<neo4j.Integer> {
   return usersCount.records[0].get(0);
 }
 
+export type GenerateNameEmbeddingResult = {
+  success: boolean;
+  firstNameCorrect: boolean;
+  lastNameCorrect: boolean;
+  nameEmbedding: number[];
+};
+
+export async function generateNameEmbedding(
+  firstName: string,
+  lastName: string,
+): Promise<GenerateNameEmbeddingResult> {
+  const firstNameEmbedding = wordToVec(firstName);
+  const lastNameEmbedding = wordToVec(lastName);
+
+  const firstNameCorrect = firstNameEmbedding.length > 0;
+  const lastNameCorrect = lastNameEmbedding.length > 0;
+  const success = firstNameCorrect && lastNameCorrect;
+
+  if (!success) {
+    return {
+      success,
+      firstNameCorrect,
+      lastNameCorrect,
+      nameEmbedding: [],
+    };
+  }
+
+  const nameEmbedding = firstNameEmbedding.map((e1, i) => {
+    const e2 = lastNameEmbedding[i];
+    return (e1 + e2) / 2;
+  });
+
+  return {
+    success,
+    firstNameCorrect,
+    lastNameCorrect,
+    nameEmbedding,
+  };
+}
+
 export async function updateUser(
   session: Session,
   userId: string,
@@ -294,7 +333,11 @@ export async function updateUser(
     }
   }
 
-  const newUser = { ...user, ...newUserProps };
+  const { nameEmbedding } = await generateNameEmbedding(
+    newUserProps.first_name || user.first_name,
+    newUserProps.last_name || user.last_name,
+  );
+  const newUser = { ...user, ...newUserProps, name_embedding: nameEmbedding };
   await session.run(`MATCH (u:User {id: $userId}) SET u=$user`, {
     userId,
     user: newUser,
