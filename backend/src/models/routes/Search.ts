@@ -10,7 +10,7 @@ interface Search extends Page {
 
 export const searchSchema = z.object({
   q: z.string().min(0).max(64),
-  country: userCountrySchema,
+  country: z.union([userCountrySchema, z.literal("")]),
   userId: z.string().uuid()
 }).merge(pageSchema) satisfies ZodType<Search>
 
