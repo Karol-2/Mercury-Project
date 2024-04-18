@@ -163,8 +163,8 @@ export async function registerUser(
 
   await createUser(session, dbUserData);
 
-  const user = await getUser(session, { mail: userData.mail });
-  return user!;
+  const user = await getDbUser(session, { mail: userData.mail, issuer: "mercury" });
+  return filterUser(user!);
 }
 
 export async function getUser(
