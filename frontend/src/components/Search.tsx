@@ -33,7 +33,7 @@ const Search = (props: searchProps) => {
   }, [countryList]);
 
   const countryOptions = countryList.map((country) => ({
-    value: country.Country,
+    value: country.Code,
     label: country.Country,
   }));
 

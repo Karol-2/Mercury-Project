@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import User from "../models/User";
 import dataService from "../services/data";
+import countriesData from "../assets/countries.json";
 
 interface FoundUserProps {
   user: User;
@@ -12,6 +13,8 @@ interface FoundUserProps {
 function FoundUser(props: FoundUserProps) {
   const [requestSent, setRequestSent] = useState(false);
   const { user, isFriend } = props;
+  const countryName = countriesData.find((v) => v.Code == user.country)
+    ?.Country;
 
   // TODO: get request sent status from backend, pass it in props
   // useEffect(() => {
@@ -72,7 +75,7 @@ function FoundUser(props: FoundUserProps) {
         <p className="font-semibold text-3xl">
           {user.first_name + " " + user.last_name}
         </p>
-        <p>{user.country}</p>
+        <p>{countryName || ""}</p>
         <button
           className={`btn small text-xs ${buttonColor}`}
           disabled={isFriend || requestSent}
