@@ -4,8 +4,9 @@ import { useEffect } from "react";
 
 interface ModalInterface {
   header: string,
-  isVisible: boolean,
-  isVisibleHandler: ()=> void
+  isVisibleState: boolean,
+  isVisibleHandler: ()=> void,
+  seconds: number
 }
 
 function Popup(props: ModalInterface) {
@@ -13,13 +14,13 @@ function Popup(props: ModalInterface) {
     useEffect(() => {
         const timer = setTimeout(() => {
           props.isVisibleHandler();
-        }, 3000);
+        }, 1000 * props.seconds);
     
         return () => clearTimeout(timer);
       }, []);
     
   return (
-    <> {props.isVisible && (
+    <> {props.isVisibleState && (
         <motion.div
           initial={{ x: '100%' }}
           animate={{ x: 0 }}
