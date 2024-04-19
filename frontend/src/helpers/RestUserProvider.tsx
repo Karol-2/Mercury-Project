@@ -20,6 +20,8 @@ function RestUserProvider({ children }: { children: React.ReactNode }) {
   const [token, setToken] = useState<object | null>(null);
   const [socket, setSocket] = useState<Socket | null>(null);
 
+  const [friends, setFriends] = useState<Record<string, User>>({});
+
   const setUserAnonymous = () => {
     setUserState({ status: "anonymous" });
   };
@@ -177,13 +179,69 @@ function RestUserProvider({ children }: { children: React.ReactNode }) {
     return false;
   };
 
-  useEffect(() => {
-    if (token) {
-      const newUserId = (token as any).userId;
-      dataService.fetchData(`/users/${newUserId}`, "GET").then((response) => {
-        setUserLoggedIn(response.user);
-      });
+  const fetchFriendsPage = async (
+    userId: number,
+    page: number,
+  ): Promise<User[] | null> => {
+    const searchParams = new URLSearchParams({
+      page: page.toString(),
+      maxUsers: "32",
+    });
+    const friendsResponse = await dataService.fetchData(
+      `/users/${userId}/friends?${searchParams}`,
+      "GET",
+    );
+    if (friendsResponse.status != "ok") {
+      console.error("Couldn't fetch friends: ", friendsResponse);
+      return null;
     }
+
+    return friendsResponse.friends;
+  };
+
+  const fetchFriends = async (userId: number): Promise<User[] | null> => {
+    let friends = [];
+    let pageEmpty = false;
+    let page = 1;
+
+    while (!pageEmpty) {
+      const friendsPage = await fetchFriendsPage(userId, page);
+      if (friendsPage === null) {
+        return null;
+      }
+
+      if (friendsPage.length > 0) {
+        friends.push(...friendsPage);
+        page += 1;
+      } else {
+        pageEmpty = true;
+      }
+    }
+
+    return friends;
+  };
+
+  const friendsToObject = (friends: User[]): Record<string, User> => {
+    return Object.fromEntries(friends.map((f) => [f.id, f]));
+  };
+
+  useEffect(() => {
+    const handleToken = async () => {
+      if (token) {
+        const newUserId = (token as any).userId;
+        const response = await dataService.fetchData(
+          `/users/${newUserId}`,
+          "GET",
+        );
+        const userId = response.user.id;
+        const newFriendsArray = (await fetchFriends(userId)) || [];
+        const newFriends = friendsToObject(newFriendsArray);
+        setFriends(newFriends);
+        setUserLoggedIn(response.user);
+      }
+    };
+
+    handleToken();
   }, [token]);
 
   if (firstRefresh.current) {
@@ -208,6 +266,7 @@ function RestUserProvider({ children }: { children: React.ReactNode }) {
         registerUser,
         updateUser,
         deleteUser,
+        friends,
       }}
     >
       {children}

@@ -13,32 +13,33 @@ function FoundUser(props: FoundUserProps) {
   const [requestSent, setRequestSent] = useState(false);
   const { user, isFriend } = props;
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const friendsRequestsResponse = await dataService.fetchData(
-          `/users/${props.user.id}/friend-requests?page=1&maxUsers=100`,
-          "GET",
-          {},
-        );
+  // TODO: get request sent status from backend, pass it in props
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     try {
+  //       const friendsRequestsResponse = await dataService.fetchData(
+  //         `/users/${props.user.id}/friend-requests?page=1&maxUsers=100`,
+  //         "GET",
+  //         {},
+  //       );
 
-        const isRequestSent = friendsRequestsResponse.friendRequests.some(
-          (friend: User) => String(friend.id) === props.currentId,
-        );
+  //       const isRequestSent = friendsRequestsResponse.friendRequests.some(
+  //         (friend: User) => String(friend.id) === props.currentId,
+  //       );
 
-        setRequestSent(isRequestSent);
-      } catch (error) {
-        console.error("Error:", error);
-      }
-    };
+  //       setRequestSent(isRequestSent);
+  //     } catch (error) {
+  //       console.error("Error:", error);
+  //     }
+  //   };
 
-    fetchData();
-  }, []);
+  //   fetchData();
+  // }, []);
 
   const handleAddFriend = async () => {
     try {
       await dataService.fetchData(
-        `/users/${props.currentId}/add/${props.user.id}`,
+        `/users/${props.currentId}/send-friend-request/${props.user.id}`,
         "POST",
       );
       setRequestSent(true);

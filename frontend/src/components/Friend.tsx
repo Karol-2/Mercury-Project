@@ -12,7 +12,7 @@ import Modal from "./Modal";
 export interface FriendProps {
   friend: User;
   joinMeeting: (friendId: string) => Promise<string | void>;
-  handleDeclineRequest: (friend: User) => Promise<void>;
+  handleDeleteFriend: (friend: User) => Promise<void>;
 }
 
 function Friend(props: FriendProps) {
@@ -22,7 +22,7 @@ function Friend(props: FriendProps) {
 
   const friend: User = props.friend;
   const joinMeeting = props.joinMeeting;
-  const handleDeclineRequest = props.handleDeclineRequest;
+  const { handleDeleteFriend } = props;
 
   return (
     <li key={friend.id} className="flex flex-row mt-5">
@@ -64,7 +64,7 @@ function Friend(props: FriendProps) {
         <Modal
           text={`Are you sure that you want remove ${friend.first_name} ${friend.last_name} from your friends ?`}
           handleYes={() => {
-            handleDeclineRequest(friend);
+            handleDeleteFriend(friend);
             setShowDeleteModal(false);
           }}
           handleNo={() => setShowDeleteModal(false)}

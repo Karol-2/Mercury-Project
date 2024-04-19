@@ -1,7 +1,7 @@
 import driver from "./driver/driver.js";
 
 import userData from "./data/users.js";
-import { registerUser } from "./users.js";
+import { addFriend, registerUser } from "./users.js";
 
 export async function isDatabaseEmpty() {
   const session = driver.session();
@@ -31,29 +31,17 @@ export async function importInitialData() {
     const userIds: string[] = [];
 
     for (const user of userData) {
-      const newUser = await registerUser(user);
-      if (!("errors" in newUser)) {
-        userIds.push(newUser.id);
-      }
+      const newUser = await registerUser(session, user);
+      userIds.push(newUser.id);
     }
 
-    // Create relationships
-    const createRelationshipQuery = `
-      MATCH (u1:User {id: $userId})
-      MATCH (u2:User {id: $friendId})
-      CREATE (u1)-[:IS_FRIENDS_WITH]->(u2)
-      CREATE (u2)-[:IS_FRIENDS_WITH]->(u1)
-    `;
-
+    console.log(userData)
     for (const [userIndex, user] of userData.entries()) {
       const userId = userIds[userIndex];
 
       for (const friendIndex of user.friend_ids) {
         const friendId = userIds[friendIndex];
-        await session.run(createRelationshipQuery, {
-          userId,
-          friendId,
-        });
+        await addFriend(session, userId, friendId);
       }
     }
 
@@ -72,7 +60,7 @@ export async function importInitialData() {
 
     return "Initial data has been imported into database.";
   } catch (error) {
-    return "Error importing data";
+    return "Error importing data:";
   } finally {
     await session.close();
   }

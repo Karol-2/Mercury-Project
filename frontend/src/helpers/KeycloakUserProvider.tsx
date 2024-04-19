@@ -19,16 +19,63 @@ function KeycloakUserProvider({ children }: { children: React.ReactNode }) {
 
   const keycloakRef = useRef<Keycloak | null>(null);
   const [token, setToken] = useState<string | undefined>();
+  const [friends, setFriends] = useState<Record<string, User>>({});
+
+  const fetchFriendsPage = async (
+    userId: number,
+    page: number,
+  ): Promise<User[] | null> => {
+    const searchParams = new URLSearchParams({
+      page: page.toString(),
+      maxUsers: "32",
+    });
+    const friendsResponse = await dataService.fetchData(
+      `/users/${userId}/friends?${searchParams}`,
+      "GET",
+    );
+    if (friendsResponse.status != "ok") {
+      console.error("Couldn't fetch friends: ", friendsResponse);
+      return null;
+    }
+
+    return friendsResponse.friends;
+  };
+
+  const fetchFriends = async (userId: number): Promise<User[] | null> => {
+    let friends = [];
+    let pageEmpty = false;
+    let page = 1;
+
+    while (!pageEmpty) {
+      const friendsPage = await fetchFriendsPage(userId, page);
+      if (friendsPage === null) {
+        return null;
+      }
+
+      if (friendsPage.length > 0) {
+        friends.push(...friendsPage);
+        page += 1;
+      } else {
+        pageEmpty = true;
+      }
+    }
+
+    return friends;
+  };
+
+  const friendsToObject = (friends: User[]): Record<string, User> => {
+    return Object.fromEntries(friends.map((f) => [f.id, f]));
+  };
 
   const updateUserData = async () => {
     const keycloak = keycloakRef.current!;
     const tokenDecoded: any = await keycloak.loadUserInfo();
 
-    const userId = tokenDecoded.sub;
+    const keycloakUserId = tokenDecoded.sub;
     const searchParams = new URLSearchParams({ issuer: "mercury" });
 
     const response = await dataService.fetchData(
-      `/users/${userId}?${searchParams}`,
+      `/users/${keycloakUserId}?${searchParams}`,
       "GET",
     );
     if (response.status != "ok") {
@@ -36,6 +83,10 @@ function KeycloakUserProvider({ children }: { children: React.ReactNode }) {
       return;
     }
 
+    const userId = response.user.id;
+    const newFriendsArray = (await fetchFriends(userId)) || [];
+    const newFriends = friendsToObject(newFriendsArray);
+    setFriends(newFriends);
     setUserLoggedIn(response.user);
   };
 
@@ -200,6 +251,7 @@ function KeycloakUserProvider({ children }: { children: React.ReactNode }) {
         registerUser,
         updateUser,
         deleteUser,
+        friends,
       }}
     >
       {children}

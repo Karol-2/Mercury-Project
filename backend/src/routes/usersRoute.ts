@@ -21,10 +21,16 @@ import {
   getDbUser,
   changePassword,
   getUsersCount,
+  registerUserSchema,
+  RegisterUser,
+  updateUserSchema,
+  UpdateUser,
 } from "../users.js";
 import DbUser from "../models/DbUser.js";
 import { ChangePasswordReq } from "../models/ChangePasswordReq.js";
-import { verifyRegisterUser, verifySearchQuery } from "../misc/verifyRequest.js";
+import { formatError } from "../misc/formatError.js";
+import { Errors } from "../models/Response.js";
+import { searchSchema } from "../models/routes/Search.js";
 
 const usersRouter = Router();
 
@@ -42,7 +48,7 @@ usersRouter.get("/", async (_req: Request, res: UsersErrorResponse) => {
     return res.json({ status: "ok", users });
   } catch (err) {
     console.log("Error:", err);
-    return res.status(404).json({ status: "error", errors: err as object });
+    return res.status(404).json({ status: "error", errors: err as Errors });
   } finally {
     await session.close();
   }
@@ -59,12 +65,13 @@ usersRouter.post(
 usersRouter.get(
   "/search",
   async (req: Request, res: UsersSearchErrorResponse) => {
-    const verify = verifySearchQuery(req.query as any);
-    if (!verify.valid) {
-      return res.status(400).json({ status: "error", errors: verify.errors });
+    const searchParse = searchSchema.safeParse(req.query);
+    if (!searchParse.success) {
+      const errors = formatError(searchParse.error);
+      return res.status(400).json({ status: "error", errors });
     }
 
-    const { page, maxUsers, q: searchTerm, country } = verify.verified;
+    const { page, maxUsers, q: searchTerm, country, userId } = searchParse.data;
     const maxUsersBig = BigInt(maxUsers);
 
     const session = driver.session();
@@ -75,6 +82,7 @@ usersRouter.get(
         country,
         page - 1,
         maxUsers,
+        userId,
       );
       if (userScores === null) {
         return res
@@ -82,16 +90,14 @@ usersRouter.get(
           .json({ status: "error", errors: { searchTerm: "incorrect" } });
       }
 
-      const usersCount = await getUsersCount(session);
-      const pageCount = Number(
-        (usersCount.toBigInt() + maxUsersBig - 1n) / maxUsersBig,
-      );
+      const usersCount = (await getUsersCount(session)).toBigInt() - 1n;
+      const pageCount = Number((usersCount + maxUsersBig - 1n) / maxUsersBig);
       const users = userScores.map((userScore) => userScore[0]);
 
       return res.json({ status: "ok", pageCount, users });
     } catch (err) {
       console.log("Error:", err);
-      return res.status(404).json({ status: "error", errors: err as object });
+      return res.status(404).json({ status: "error", errors: err as Errors });
     } finally {
       await session.close();
     }
@@ -124,7 +130,7 @@ usersRouter.get("/:userId", async (req: Request, res: UserErrorResponse) => {
     return res.json({ status: "ok", user });
   } catch (err) {
     console.log("Error:", err);
-    return res.status(404).json({ status: "error", errors: err as object });
+    return res.status(404).json({ status: "error", errors: err as Errors });
   } finally {
     await session.close();
   }
@@ -180,21 +186,22 @@ usersRouter.put("/meetings/:meetingId", async (req: Request, res) => {
 });
 
 usersRouter.post("/", async (req: Request, res: UserErrorResponse) => {
-  const verify = verifyRegisterUser(req.body);
-  if (!verify.valid) {
-    return res.status(400).json({ status: "error", errors: verify.errors });
+  const userParse = registerUserSchema.safeParse(req.body);
+  if (!userParse.success) {
+    const errors = formatError(userParse.error);
+    return res.status(400).json({ status: "error", errors });
   }
 
-  const verifiedUser = verify.verified;
+  const parsedUser: RegisterUser = userParse.data;
   const { issuer } = req.body;
 
   const session = driver.session();
   try {
     let user: UserCreateResult;
     if (issuer) {
-      user = await registerUser(verifiedUser);
+      user = await registerUser(session, parsedUser);
     } else {
-      user = await createUser(session, verifiedUser);
+      user = await createUser(session, parsedUser);
     }
 
     if ("errors" in user) {
@@ -205,20 +212,25 @@ usersRouter.post("/", async (req: Request, res: UserErrorResponse) => {
     return res.json({ status: "ok", user });
   } catch (err) {
     console.log("Error:", err);
-    return res.status(404).json({ status: "error", errors: err as object });
+    return res.status(404).json({ status: "error", errors: err as Errors });
   } finally {
     await session.close();
   }
 });
 
 usersRouter.put("/:userId", async (req: Request, res: OkErrorResponse) => {
-  // TODO: verify user fields
+  const userParse = updateUserSchema.safeParse(req.body);
+  if (!userParse.success) {
+    const errors = formatError(userParse.error);
+    return res.status(400).json({ status: "error", errors });
+  }
+
+  const parsedUser: UpdateUser = userParse.data;
   const userId = req.params.userId;
-  const newUserProps = req.body;
 
   const session = driver.session();
   try {
-    const newUser = await updateUser(session, userId, newUserProps);
+    const newUser = await updateUser(session, userId, parsedUser);
     if (!newUser) {
       return userNotFoundRes(res);
     }
@@ -226,7 +238,7 @@ usersRouter.put("/:userId", async (req: Request, res: OkErrorResponse) => {
     return res.json({ status: "ok" });
   } catch (err) {
     console.log("Error:", err);
-    return res.status(404).json({ status: "error", errors: err as object });
+    return res.status(404).json({ status: "error", errors: err as Errors });
   } finally {
     await session.close();
   }
@@ -295,7 +307,7 @@ usersRouter.post(
       return res.json({ status: "ok" });
     } catch (err) {
       console.log("Error:", err);
-      return res.status(404).json({ status: "error", errors: err as object });
+      return res.status(404).json({ status: "error", errors: err as Errors });
     } finally {
       await session.close();
     }
@@ -315,7 +327,7 @@ usersRouter.delete("/:userId", async (req: Request, res: OkErrorResponse) => {
     return res.json({ status: "ok" });
   } catch (err) {
     console.log("Error:", err);
-    return res.status(404).json({ status: "error", errors: err as object });
+    return res.status(404).json({ status: "error", errors: err as Errors });
   } finally {
     await session.close();
   }

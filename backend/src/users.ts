@@ -1,16 +1,16 @@
 import neo4j, { Session } from "neo4j-driver";
 import { v4 as uuidv4 } from "uuid";
 import bcrypt from "bcrypt";
-import User from "./models/User.js";
+import User, { userSchema } from "./models/User.js";
 import removeKeys from "./misc/removeKeys.js";
 import wordToVec from "./misc/wordToVec.js";
 import DbUser from "./models/DbUser.js";
 import kcAdminClient from "./kcAdminClient.js";
 import UserRepresentation from "@keycloak/keycloak-admin-client/lib/defs/userRepresentation.js";
-import driver from "./driver/driver.js";
 import { Either } from "./misc/Either.js";
-import NativeUser from "./models/NativeUser.js";
+import NativeUser, { nativeUserSchema } from "./models/NativeUser.js";
 import ExternalUser from "./models/ExternalUser.js";
+import { ZodType } from "zod";
 
 export const filterUser = (user: DbUser): User => {
   if ("password" in user) {
@@ -47,7 +47,18 @@ function getResponse(e: any): Response | null {
 
 export type RegisterUser = Omit<User, "id"> & NativeUser;
 export type CreateUser = Omit<User, "id"> & Either<NativeUser, ExternalUser>;
+export type UpdateUser = Partial<Omit<User, "id">>;
 export type UserCreateResult = User | { errors: Record<string, string> };
+
+export const registerUserSchema = userSchema
+  .omit({ id: true })
+  .merge(nativeUserSchema) satisfies ZodType<RegisterUser>;
+
+export const updateUserSchema = userSchema
+  .omit({
+    id: true,
+  })
+  .partial() satisfies ZodType<UpdateUser>;
 
 async function createUserQuery(
   session: Session,
@@ -123,32 +134,38 @@ export async function createUser(
 }
 
 export async function registerUser(
+  session: Session,
   userData: RegisterUser,
-): Promise<UserCreateResult> {
-  const session = driver.session();
+): Promise<User> {
+  let keycloakId: string = "";
+
   try {
-    const { id: keycloakId } = await kcAdminClient.users.create(
-      registerUserToKeycloakUser(userData),
-    );
-
-    const dbUserData: CreateUser = {
-      ...removeKeys(userData, ["password"]),
-      issuer: "mercury",
-      issuer_id: keycloakId,
-    };
-
-    const user = await createUser(session, dbUserData);
-    return user;
+    keycloakId = (
+      await kcAdminClient.users.create(registerUserToKeycloakUser(userData))
+    ).id;
   } catch (e) {
     const response = getResponse(e);
-    if (response != null && response.status == 409) {
-      return { errors: { id: "already exists" } };
-    } else {
+    if (response == null || response.status != 409) {
       throw e;
     }
-  } finally {
-    await session.close();
   }
+
+  if (!keycloakId) {
+    keycloakId = (
+      await kcAdminClient.users.find({ email: userData.mail, realm: "mercury" })
+    )[0].id!;
+  }
+
+  const dbUserData: CreateUser = {
+    ...removeKeys(userData, ["password"]),
+    issuer: "mercury",
+    issuer_id: keycloakId,
+  };
+
+  await createUser(session, dbUserData);
+
+  const user = await getUser(session, { mail: userData.mail });
+  return user!;
 }
 
 export async function getUser(
@@ -200,6 +217,7 @@ export async function searchUser(
   country: string,
   pageIndex: number,
   pageSize: number,
+  userId: string = "",
 ): Promise<UserScore[] | null> {
   const queryElems = neo4j.int((pageIndex + 1) * pageSize);
   const querySkip = neo4j.int(pageIndex * pageSize);
@@ -210,11 +228,11 @@ export async function searchUser(
   if (!searchTerm) {
     userRequest = await session.run(
       `MATCH (u:User)
-       WHERE $country = "" OR u.country = $country
+       WHERE ($country = "" OR u.country = $country) AND u.id <> $userId
        RETURN u as similarUser, 1.0 as score
        SKIP $querySkip
        LIMIT $queryLimit`,
-      { queryElems, country, querySkip, queryLimit },
+      { queryElems, country, userId, querySkip, queryLimit },
     );
   } else {
     const wordVec = wordToVec(searchTerm);
@@ -226,11 +244,11 @@ export async function searchUser(
     userRequest = await session.run(
       `CALL db.index.vector.queryNodes('user-names', $queryElems, $wordVec)
        YIELD node AS similarUser, score
-       WHERE $country = "" OR similarUser.country = $country
+       WHERE ($country = "" OR similarUser.country = $country) AND similarUser.id <> $userId
        RETURN similarUser, score
        SKIP $querySkip
        LIMIT $queryLimit`,
-      { wordVec, queryElems, country, querySkip, queryLimit },
+      { wordVec, queryElems, userId, country, querySkip, queryLimit },
     );
   }
 
@@ -385,6 +403,25 @@ export async function getFriends(
   return friends;
 }
 
+export async function getFriendsCount(
+  session: Session,
+  userId: string,
+): Promise<neo4j.Integer | null> {
+  const user = await getUser(session, { id: userId });
+  if (!user) {
+    return null;
+  }
+
+  const friendsCountRequest = await session.run(
+    `MATCH (u:User {id: $userId})-[:IS_FRIENDS_WITH]-(f:User)
+     RETURN count(DISTINCT f)`,
+    { userId },
+  );
+
+  const friendsCount = friendsCountRequest.records[0].get(0);
+  return friendsCount;
+}
+
 export async function isFriend(
   session: Session,
   firstUserId: string,
@@ -400,7 +437,7 @@ export async function isFriend(
       { firstUserId, secondUserId },
     );
 
-    return request.records.length > 0;
+    return request.records?.[0].get(0);
   } catch (err) {
     return false;
   }
@@ -435,6 +472,25 @@ export async function getFriendRequests(
   return friends;
 }
 
+export async function getFriendRequestsCount(
+  session: Session,
+  userId: string,
+): Promise<neo4j.Integer | null> {
+  const user = await getUser(session, { id: userId });
+  if (!user) {
+    return null;
+  }
+
+  const friendRequestsCountRequest = await session.run(
+    `MATCH (u:User {id: $userId})<-[:SENT_INVITE_TO]-(f:User)
+     RETURN count(DISTINCT f)`,
+    { userId },
+  );
+
+  const friendRequestsCount = friendRequestsCountRequest.records[0].get(0);
+  return friendRequestsCount;
+}
+
 export async function getFriendSuggestions(
   session: Session,
   userId: string,
@@ -462,4 +518,230 @@ export async function getFriendSuggestions(
     filterUser(s.get("s").properties),
   );
   return friends;
+}
+
+export async function getFriendSuggestionsCount(
+  session: Session,
+  userId: string,
+): Promise<neo4j.Integer | null> {
+  const user = await getUser(session, { id: userId });
+  if (!user) {
+    return null;
+  }
+
+  const friendRequestsCountRequest = await session.run(
+    `MATCH (u:User {id: $userId})-[:IS_FRIENDS_WITH]-(f:User)-[:IS_FRIENDS_WITH]-(s:User)
+     WHERE NOT (u)-[:IS_FRIENDS_WITH]-(s) AND s.id <> $userId
+     RETURN count(DISTINCT s)`,
+    { userId },
+  );
+
+  const friendRequestsCount = friendRequestsCountRequest.records[0].get(0);
+  return friendRequestsCount;
+}
+
+export type CheckFriendsResult = {
+  firstUserExists: boolean;
+  secondUserExists: boolean;
+  areFriends: boolean;
+};
+
+export async function checkFriends(
+  session: Session,
+  userId1: string,
+  userId2: string,
+): Promise<CheckFriendsResult> {
+  const firstUser = await getUser(session, { id: userId1 });
+  const secondUser = await getUser(session, { id: userId2 });
+
+  const firstUserExists = firstUser !== null;
+  const secondUserExists = secondUser !== null;
+
+  if (!firstUserExists || !secondUserExists) {
+    return { firstUserExists, secondUserExists, areFriends: false };
+  }
+
+  const areFriends = await isFriend(session, userId1, userId2);
+  return { firstUserExists, secondUserExists, areFriends };
+}
+
+export type SendFriendInviteResult = {
+  success: boolean;
+  firstUserExists: boolean;
+  secondUserExists: boolean;
+};
+
+export async function sendFriendRequest(
+  session: Session,
+  userId1: string,
+  userId2: string,
+): Promise<SendFriendInviteResult> {
+  const { firstUserExists, secondUserExists, areFriends } = await checkFriends(
+    session,
+    userId1,
+    userId2,
+  );
+
+  if (!firstUserExists || !secondUserExists || areFriends) {
+    return { success: false, firstUserExists, secondUserExists };
+  }
+
+  await session.run(
+    `MATCH (a:User {id: $userId1}), (b:User {id: $userId2})
+     MERGE (a)-[:SENT_INVITE_TO]->(b)`,
+    { userId1, userId2 },
+  );
+
+  return { success: true, firstUserExists, secondUserExists };
+}
+
+export type AcceptFriendRequestResult = {
+  success: boolean;
+  firstUserExists: boolean;
+  secondUserExists: boolean;
+  sentInvite: boolean;
+  alreadyFriends: boolean;
+};
+
+export async function acceptFriendRequest(
+  session: Session,
+  userId1: string,
+  userId2: string,
+): Promise<AcceptFriendRequestResult> {
+  const {
+    firstUserExists,
+    secondUserExists,
+    areFriends: alreadyFriends,
+  } = await checkFriends(session, userId1, userId2);
+
+  if (!firstUserExists || !secondUserExists || alreadyFriends) {
+    return {
+      success: false,
+      firstUserExists,
+      secondUserExists,
+      sentInvite: false,
+      alreadyFriends,
+    };
+  }
+
+  const acceptInviteRequest = await session.run(
+    `MATCH (u1:User {id: $userId1})<-[r:SENT_INVITE_TO]-(u2:User {id: $userId2})
+     DELETE r
+     CREATE (u1)-[:IS_FRIENDS_WITH]->(u2)
+     RETURN true`,
+    { userId1, userId2 },
+  );
+
+  const records = acceptInviteRequest.records;
+  const sentInvite = records.length > 0;
+
+  return {
+    success: sentInvite,
+    firstUserExists,
+    secondUserExists,
+    sentInvite,
+    alreadyFriends,
+  };
+}
+
+export async function addFriend(
+  session: Session,
+  userId1: string,
+  userId2: string,
+) {
+  await session.run(
+    `MATCH (u1:User {id: $userId1}), (u2:User {id: $userId2})
+     CREATE (u1)-[:IS_FRIENDS_WITH]->(u2)
+     RETURN true`,
+    { userId1, userId2 },
+  );
+}
+
+export type DeclineFriendRequestResult = {
+  success: boolean;
+  firstUserExists: boolean;
+  secondUserExists: boolean;
+  wasFriend: boolean;
+  wasInvited: boolean;
+};
+
+export async function declineFriendRequest(
+  session: Session,
+  userId1: string,
+  userId2: string,
+): Promise<DeclineFriendRequestResult> {
+  const {
+    firstUserExists,
+    secondUserExists,
+    areFriends: wasFriend,
+  } = await checkFriends(session, userId1, userId2);
+
+  if (!firstUserExists || !secondUserExists || wasFriend) {
+    return {
+      success: false,
+      firstUserExists,
+      secondUserExists,
+      wasFriend,
+      wasInvited: false,
+    };
+  }
+
+  const acceptInviteRequest = await session.run(
+    `MATCH (u1)<-[r:SENT_INVITE_TO]->(u2)
+     DELETE r
+     RETURN true`,
+    { userId1, userId2 },
+  );
+
+  const wasInvited = acceptInviteRequest.records.length > 0;
+
+  return {
+    success: wasInvited,
+    firstUserExists,
+    secondUserExists,
+    wasFriend,
+    wasInvited,
+  };
+}
+
+export type DeleteFriendResult = {
+  success: boolean;
+  firstUserExists: boolean;
+  secondUserExists: boolean;
+  wasFriend: boolean;
+};
+
+export async function deleteFriend(
+  session: Session,
+  userId1: string,
+  userId2: string,
+): Promise<DeleteFriendResult> {
+  const {
+    firstUserExists,
+    secondUserExists,
+    areFriends: wasFriend,
+  } = await checkFriends(session, userId1, userId2);
+
+  if (!firstUserExists || !secondUserExists || !wasFriend) {
+    return {
+      success: false,
+      firstUserExists,
+      secondUserExists,
+      wasFriend: false,
+    };
+  }
+
+  await session.run(
+    `MATCH (u1)-[r:IS_FRIENDS_WITH]->(u2)
+     DELETE r
+     RETURN true`,
+    { userId1, userId2 },
+  );
+
+  return {
+    success: true,
+    firstUserExists,
+    secondUserExists,
+    wasFriend,
+  };
 }
