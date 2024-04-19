@@ -27,7 +27,7 @@ import {
   UpdateUser,
 } from "../users.js";
 import DbUser from "../models/DbUser.js";
-import { ChangePasswordReq } from "../models/ChangePasswordReq.js";
+import { changePasswordReqSchema } from "../models/ChangePasswordReq.js";
 import { formatError } from "../misc/formatError.js";
 import { Errors } from "../models/Response.js";
 import { searchSchema } from "../models/routes/Search.js";
@@ -250,58 +250,39 @@ usersRouter.post(
   async (req: JWTRequest, res: AuthOkErrorResponse) => {
     const userId = req.params.userId;
 
-    const passwords: ChangePasswordReq = req.body;
-    const { old_password, new_password, repeat_password } = passwords;
+    const passwordsParse = changePasswordReqSchema.safeParse(req.body);
+    if (!passwordsParse.success) {
+      const errors = formatError(passwordsParse.error);
+      return res.status(400).json({ status: "error", errors });
+    }
+
+    const parsedPasswords = passwordsParse.data;
 
     const session = driver.session();
     try {
-      const user = await getDbUser(session, { id: userId });
-
-      if (!user) {
-        return userNotFoundRes(res);
-      }
-
-      if ("password" in user) {
-        const errors: Record<string, string> = {};
-
-        if (!old_password) {
-          errors["old_password"] = "is empty";
-        }
-
-        if (!new_password) {
-          errors["new_password"] = "is empty";
-        }
-
-        if (!repeat_password) {
-          errors["repeat_password"] = "is empty";
-        }
-
-        for (const _ in errors) {
-          return res.status(400).json({ status: "error", errors });
-        }
-      } else {
-        if (!req.token) {
-          return res.status(403).json({ status: "forbidden" });
-        }
-      }
-
-      const changeStatus = await changePassword(
+      const changePasswordResult = await changePassword(
         session,
-        user,
-        old_password,
-        new_password,
-        repeat_password,
+        userId,
+        parsedPasswords,
+        req.token
       );
 
-      if (changeStatus == "verify") {
-        return res
-          .status(400)
-          .json({ status: "error", errors: { "old_password": "incorrect" } });
-      } else if (changeStatus == "repeat") {
-        return res.status(400).json({
-          status: "error",
-          errors: { "repeat_password": "passwords don't match" },
-        });
+      if (!changePasswordResult.success) {
+        const {userExists, isUserIssued, passwordCorrect} = changePasswordResult;
+
+        if (!userExists) {
+          return userNotFoundRes(res)
+        }
+
+        if (isUserIssued) {
+          return res.status(403).json({ status: "forbidden" });
+        }
+
+        if (!passwordCorrect) {
+          return res
+            .status(400)
+            .json({ status: "error", errors: { "old_password": "incorrect" } });
+        }
       }
 
       return res.json({ status: "ok" });

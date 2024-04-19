@@ -11,6 +11,9 @@ import { Either } from "./misc/Either.js";
 import NativeUser, { nativeUserSchema } from "./models/NativeUser.js";
 import ExternalUser from "./models/ExternalUser.js";
 import { ZodType } from "zod";
+import ChangePasswordReq from "./models/ChangePasswordReq.js";
+import jwt from "jsonwebtoken";
+import TokenPayload from "./models/TokenPayload.js";
 
 export const filterUser = (user: DbUser): User => {
   if ("password" in user) {
@@ -349,18 +352,44 @@ export async function updateUser(
   return true;
 }
 
-export type ChangePasswordSuccess = "success";
-export type ChangePasswordError = "verify" | "repeat";
-export type ChangePasswordResult = ChangePasswordSuccess | ChangePasswordError;
+export type ChangePasswordResult = {
+  success: boolean;
+  userExists: boolean;
+  isUserIssued: boolean;
+  passwordCorrect: boolean;
+};
 
 export async function changePassword(
   session: Session,
-  user: DbUser,
-  oldPassword: string,
-  newPassword: string,
-  repeatPassword: string,
+  userId: string,
+  passwords: ChangePasswordReq,
+  token?: TokenPayload,
 ): Promise<ChangePasswordResult> {
-  if (!("password" in user)) {
+  const user = await getDbUser(session, { id: userId });
+  if (!user) {
+    return {
+      success: false,
+      userExists: false,
+      isUserIssued: false,
+      passwordCorrect: false,
+    };
+  }
+
+  const userExists = true;
+  const isUserIssued = !("password" in user);
+
+  if (isUserIssued) {
+    const tokenInvalid = {
+      success: false,
+      userExists,
+      isUserIssued,
+      passwordCorrect: false,
+    };
+
+    if (!token) {
+      return tokenInvalid;
+    }
+
     if (user.issuer == "mercury") {
       const keycloakUser = await kcAdminClient.users.findOne({
         id: user.issuer_id,
@@ -375,29 +404,39 @@ export async function changePassword(
           requiredActions,
         },
       );
-      return "success";
+
+      return { success: true, userExists, isUserIssued, passwordCorrect: true };
     } else {
       throw new Error("not implemented");
     }
   }
 
-  const match: boolean = await bcrypt.compare(oldPassword, user.password);
+  let isEmpty = true;
+  for (const _ in passwords) {
+    isEmpty = false;
+  }
+
+  if (isEmpty) {
+    return { success: false, userExists, isUserIssued, passwordCorrect: false };
+  }
+
+  const { old_password, new_password } = passwords as any;
+
+  const match: boolean = await bcrypt.compare(old_password, user.password);
   if (!match) {
-    return "verify";
+    return { success: false, userExists, isUserIssued, passwordCorrect: false };
   }
 
-  if (newPassword != repeatPassword) {
-    return "repeat";
-  }
-
-  const passwordHashed = await bcrypt.hash(newPassword, 10);
+  const passwordCorrect = true;
+  const passwordHashed = await bcrypt.hash(new_password, 10);
   const updatedUser = { ...user, password: passwordHashed };
 
   await session.run(`MATCH (u:User {id: $userId}) SET u=$user`, {
     userId: user.id,
     user: updatedUser,
   });
-  return "success";
+
+  return { success: true, userExists, isUserIssued, passwordCorrect };
 }
 
 export async function deleteUser(
