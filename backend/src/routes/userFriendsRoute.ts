@@ -8,18 +8,16 @@ import {
   FriendRequestsPageErrorResponse,
   FriendSuggestionsPageErrorResponse,
 } from "../types/userResponse.js";
-import {
-  acceptFriendRequest,
-  declineFriendRequest,
-  deleteFriend,
-  getFriendRequests,
-  getFriendRequestsCount,
-  getFriendSuggestions,
-  getFriendSuggestionsCount,
-  getFriends,
-  getFriendsCount,
-  sendFriendRequest,
-} from "../users.js";
+import { deleteFriend } from "../userFriends.js";
+import { declineFriendRequest } from "../userFriends.js";
+import { acceptFriendRequest } from "../userFriends.js";
+import { sendFriendRequest } from "../userFriends.js";
+import { getFriendSuggestionsCount } from "../userFriends.js";
+import { getFriendSuggestions } from "../userFriends.js";
+import { getFriendRequestsCount } from "../userFriends.js";
+import { getFriendRequests } from "../userFriends.js";
+import { getFriendsCount } from "../userFriends.js";
+import { getFriends } from "../userFriends.js";
 import { userNotFoundRes } from "./usersRoute.js";
 import { Errors } from "../models/Response.js";
 import Page, { pageSchema } from "../models/routes/Page.js";

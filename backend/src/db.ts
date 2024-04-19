@@ -1,7 +1,8 @@
 import driver from "./driver/driver.js";
 
 import userData from "./data/users.js";
-import { addFriend, registerUser } from "./users.js";
+import { registerUser } from "./users.js";
+import { addFriend } from "./userFriends.js";
 
 export async function isDatabaseEmpty() {
   const session = driver.session();
