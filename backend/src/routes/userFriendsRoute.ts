@@ -25,7 +25,7 @@ import { Errors } from "../models/Response.js";
 import Page, { pageSchema } from "../models/routes/Page.js";
 import { formatError } from "../misc/formatError.js";
 
-const friendshipRouter = Router();
+const friendsRouter = Router();
 
 async function userExists(
   session: Session,
@@ -46,7 +46,7 @@ async function userExists(
   return userExistsResult.records[0].get("u").properties as User;
 }
 
-friendshipRouter.get(
+friendsRouter.get(
   "/:userId/friends",
   async (req: Request, res: FriendsPageErrorResponse) => {
     const userId = req.params.userId;
@@ -87,7 +87,7 @@ friendshipRouter.get(
   },
 );
 
-friendshipRouter.get(
+friendsRouter.get(
   "/:userId/friend-requests",
   async (req: Request, res: FriendRequestsPageErrorResponse) => {
     const userId = req.params.userId;
@@ -131,7 +131,7 @@ friendshipRouter.get(
   },
 );
 
-friendshipRouter.get(
+friendsRouter.get(
   "/:userId/friend-suggestions",
   async (req: Request, res: FriendSuggestionsPageErrorResponse) => {
     const userId = req.params.userId;
@@ -178,7 +178,7 @@ friendshipRouter.get(
   },
 );
 
-friendshipRouter.post(
+friendsRouter.post(
   "/:userId1/send-friend-request/:userId2",
   async (req: Request, res: OkErrorResponse) => {
     const session = driver.session();
@@ -212,7 +212,7 @@ friendshipRouter.post(
   },
 );
 
-friendshipRouter.post(
+friendsRouter.post(
   "/:userId1/accept-friend-request/:userId2",
   async (req: Request, res: OkErrorResponse) => {
     const session = driver.session();
@@ -263,7 +263,7 @@ friendshipRouter.post(
   },
 );
 
-friendshipRouter.post(
+friendsRouter.post(
   "/:userId1/decline-friend-request/:userId2",
   async (req: Request, res: OkErrorResponse) => {
     const session = driver.session();
@@ -310,7 +310,7 @@ friendshipRouter.post(
   },
 );
 
-friendshipRouter.delete(
+friendsRouter.delete(
   "/:userId1/delete-friend/:userId2",
   async (req: Request, res: OkErrorResponse) => {
     const session = driver.session();
@@ -348,4 +348,4 @@ friendshipRouter.delete(
   },
 );
 
-export default friendshipRouter;
+export default friendsRouter;
