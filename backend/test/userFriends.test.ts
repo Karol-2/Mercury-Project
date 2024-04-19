@@ -50,7 +50,7 @@ test("Missing page", async () => {
   const { status, errors } = response;
 
   expect(status).toBe("error");
-  expect(errors.page).toBe("not provided");
+  expect(errors.page).toBe("Invalid input");
 });
 
 test("Page as a text", async () => {
@@ -63,7 +63,7 @@ test("Page as a text", async () => {
   const { status, errors } = response;
 
   expect(status).toBe("error");
-  expect(errors.page).toBe("not a number");
+  expect(errors.page).toBe("Expected number, received nan");
 });
 
 test("Missing maxUsers", async () => {
@@ -76,7 +76,7 @@ test("Missing maxUsers", async () => {
   const { status, errors } = response;
 
   expect(status).toBe("error");
-  expect(errors.maxUsers).toBe("not provided");
+  expect(errors.maxUsers).toBe("Invalid input");
 });
 
 test("maxUsers as a text", async () => {
@@ -89,7 +89,7 @@ test("maxUsers as a text", async () => {
   const { status, errors } = response;
 
   expect(status).toBe("error");
-  expect(errors.maxUsers).toBe("not a number");
+  expect(errors.maxUsers).toBe("Expected number, received nan");
 });
 
 test("Missing page and maxUsers", async () => {
@@ -102,8 +102,8 @@ test("Missing page and maxUsers", async () => {
   const { status, errors } = response;
 
   expect(status).toBe("error");
-  expect(errors.page).toBe("not provided");
-  expect(errors.maxUsers).toBe("not provided");
+  expect(errors.page).toBe("Invalid input");
+  expect(errors.maxUsers).toBe("Invalid input");
 });
 
 test("First user", async () => {

@@ -47,7 +47,7 @@ test("Missing page", async () => {
   const { status, errors } = response;
 
   expect(status).toBe("error");
-  expect(errors.page).toBe("not provided");
+  expect(errors.page).toBe("Invalid input");
 });
 
 test("Missing maxUsers", async () => {
@@ -60,7 +60,7 @@ test("Missing maxUsers", async () => {
   const { status, errors } = response;
 
   expect(status).toBe("error");
-  expect(errors.maxUsers).toBe("not provided");
+  expect(errors.maxUsers).toBe("Invalid input");
 });
 
 test("Missing page and maxUsers", async () => {
@@ -73,8 +73,8 @@ test("Missing page and maxUsers", async () => {
   const { status, errors } = response;
 
   expect(status).toBe("error");
-  expect(errors.page).toBe("not provided");
-  expect(errors.maxUsers).toBe("not provided");
+  expect(errors.page).toBe("Invalid input");
+  expect(errors.maxUsers).toBe("Invalid input");
 });
 
 test("maxUsers as a text", async () => {
@@ -87,7 +87,7 @@ test("maxUsers as a text", async () => {
   const { status, errors } = response;
 
   expect(status).toBe("error");
-  expect(errors.maxUsers).toBe("not a number");
+  expect(errors.maxUsers).toBe("Expected number, received nan");
 });
 
 test("Missing page and maxUsers", async () => {
@@ -101,8 +101,8 @@ test("Missing page and maxUsers", async () => {
 
   expect(status).toBe("error");
   expect(errors).toBeDefined();
-  expect(errors.page).toBe("not provided");
-  expect(errors.maxUsers).toBe("not provided");
+  expect(errors.page).toBe("Invalid input");
+  expect(errors.maxUsers).toBe("Invalid input");
 });
 
 test("First user from Lithuania", async () => {
@@ -171,7 +171,7 @@ test("Repeated page", async () => {
 
   expect(status).toBe("error");
   expect(errors).toBeDefined();
-  expect(errors.page).toBe("incorrect");
+  expect(errors.page).toBe("Invalid input");
 });
 
 test("Repeated maxUsers", async () => {
@@ -185,7 +185,7 @@ test("Repeated maxUsers", async () => {
 
   expect(status).toBe("error");
   expect(errors).toBeDefined();
-  expect(errors.maxUsers).toBe("incorrect");
+  expect(errors.maxUsers).toBe("Invalid input");
 });
 
 test("Repeated page and maxUsers", async () => {
@@ -199,8 +199,8 @@ test("Repeated page and maxUsers", async () => {
 
   expect(status).toBe("error");
   expect(errors).toBeDefined();
-  expect(errors.page).toBe("incorrect");
-  expect(errors.maxUsers).toBe("incorrect");
+  expect(errors.page).toBe("Invalid input");
+  expect(errors.maxUsers).toBe("Invalid input");
 });
 
 test("Empty query", async () => {

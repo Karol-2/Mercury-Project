@@ -66,7 +66,7 @@ test("Create user with short first name", async () => {
   const { status, errors } = response;
 
   expect(status).toBe("error");
-  expect(errors.first_name).toBe("too short");
+  expect(errors.first_name).toBe("String must contain at least 2 character(s)");
 });
 
 test("Create user with short last name", async () => {
@@ -82,7 +82,7 @@ test("Create user with short last name", async () => {
   const { status, errors } = response;
 
   expect(status).toBe("error");
-  expect(errors.last_name).toBe("too short");
+  expect(errors.last_name).toBe("String must contain at least 2 character(s)");
 });
 
 test("Create user with short password", async () => {
@@ -98,7 +98,7 @@ test("Create user with short password", async () => {
   const { status, errors } = response;
 
   expect(status).toBe("error");
-  expect(errors.password).toBe("too short");
+  expect(errors.password).toBe("String must contain at least 8 character(s)");
 });
 
 test("Get user by ID", async () => {
@@ -180,7 +180,7 @@ test("Update user with short first name", async () => {
   const { status, errors } = response;
 
   expect(status).toBe("error");
-  expect(errors.first_name).toBe("too short");
+  expect(errors.first_name).toBe("String must contain at least 2 character(s)");
 });
 
 test("Update user with short last name", async () => {
@@ -200,7 +200,7 @@ test("Update user with short last name", async () => {
   const { status, errors } = response;
 
   expect(status).toBe("error");
-  expect(errors.last_name).toBe("too short");
+  expect(errors.last_name).toBe("String must contain at least 2 character(s)");
 });
 
 test("Update user with short password", async () => {
@@ -220,7 +220,7 @@ test("Update user with short password", async () => {
   const { status, errors } = response;
 
   expect(status).toBe("error");
-  expect(errors.password).toBe("too short");
+  expect(errors.password).toBe("String must contain at least 8 character(s)");
 });
 
 test("Delete user by ID", async () => {
