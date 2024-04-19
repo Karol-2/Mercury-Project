@@ -27,25 +27,6 @@ import { formatError } from "../misc/formatError.js";
 
 const friendsRouter = Router();
 
-async function userExists(
-  session: Session,
-  res: Response,
-  userId: string,
-): Promise<Response | User> {
-  const userExistsResult = await session.run(
-    `MATCH (u:User {id: $userId}) RETURN u`,
-    { userId },
-  );
-
-  if (userExistsResult.records.length === 0) {
-    await session.close();
-    const json = { status: "error", errors: { id: "not found" } } as const;
-    return res.status(404).json(json);
-  }
-
-  return userExistsResult.records[0].get("u").properties as User;
-}
-
 friendsRouter.get(
   "/:userId/friends",
   async (req: Request, res: FriendsPageErrorResponse) => {
