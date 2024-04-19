@@ -280,7 +280,7 @@ export async function addFriend(
 ) {
   await session.run(
     `MATCH (u1:User {id: $userId1}), (u2:User {id: $userId2})
-     CREATE (u1)-[:IS_FRIENDS_WITH]->(u2)
+     MERGE (u1)-[:IS_FRIENDS_WITH]-(u2)
      RETURN true`,
     { userId1, userId2 },
   );
@@ -361,7 +361,7 @@ export async function deleteFriend(
   }
 
   await session.run(
-    `MATCH (u1)-[r:IS_FRIENDS_WITH]->(u2)
+    `MATCH (u1:User {id: $userId1})-[r:IS_FRIENDS_WITH]-(u2:User {id: $userId2})
      DELETE r
      RETURN true`,
     { userId1, userId2 },
