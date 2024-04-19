@@ -8,7 +8,7 @@ import {
   UsersErrorResponse,
   UsersSearchErrorResponse,
 } from "../types/userResponse.js";
-import usersFriendsRoute from "./usersFriendsRoute.js";
+import usersFriendsRoute from "./userFriendsRoute.js";
 import {
   getAllUsers,
   searchUser as searchUsers,
