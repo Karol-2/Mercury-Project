@@ -7,6 +7,7 @@ import {
   disconnectFromSocket,
   getAllSockets,
 } from "./sockets.js";
+import { addNotification } from "./notifications.js";
 import { isFriend } from "./users.js";
 import Meeting from "./models/Meeting.js";
 import {
@@ -143,9 +144,10 @@ io.on("connection", async (socket: Socket) => {
     });
   });
 
-  socket.on("notify", async ({senderId, receiverId, type}) => {
+  socket.on("notify", async ({senderId, receiverId, type}: any) => {
     const session = driver.session();
     const receiverSockets = await getAllSockets(session, receiverId);
+    await addNotification(session, senderId, receiverId, type)
     await session.close();
     receiverSockets.forEach((receiverSocket) => {
       socket.to(receiverSocket.id).emit("notify", {senderId, receiverId, type});
