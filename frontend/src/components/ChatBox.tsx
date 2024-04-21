@@ -139,6 +139,7 @@ function ChatBox({ user, socket, friendId }: ChatBoxProps) {
       const notification: Notification = {
         type: "message",
         senderId: user.id,
+        receiverId: friendId,
         senderFullName: `${user.first_name} ${user.last_name}`,
       }
       socket.emit("notify", notification);

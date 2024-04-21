@@ -6,6 +6,7 @@ interface Notification {
     id?: string;
     type: "message" | "friend" | "call";
     senderId: string;
+    receiverId: string;
     senderFullName: string;
     action?: NotificationActionType;
     deleteNotification?: (id: string) => void;
