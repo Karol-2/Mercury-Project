@@ -112,10 +112,10 @@ function KeycloakUserProvider({ children }: { children: React.ReactNode }) {
   }, [socket]);
 
   useEffect(() => {
-    if (userState.status != "logged_in") {
+    if (userState.status === "logged_in") {
       fetchNotifications();
     }
-  }, [userState]);
+  }, [userState.status]);
 
   const redirectToLogin = () => {
     if (!keycloakRef.current) {
