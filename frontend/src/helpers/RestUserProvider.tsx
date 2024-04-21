@@ -49,6 +49,12 @@ function RestUserProvider({ children }: { children: React.ReactNode }) {
     }
   }, [socket]);
 
+  useEffect(() => {
+    if (userState.status != "logged_in") {
+      fetchNotifications();
+    }
+  }, [userState]);
+
   const firstRefresh = useRef(true);
 
   const trySetToken = (tokenStr: string | null): boolean => {
@@ -180,6 +186,21 @@ function RestUserProvider({ children }: { children: React.ReactNode }) {
 
     if (response.status === "ok") {
       setUserAnonymous();
+      return true;
+    }
+
+    console.error("Error from the server", response.errors);
+    return false;
+  };
+
+  const fetchNotifications = async () => {
+    if (userState.status != "logged_in") return true;
+
+    const user = userState.user!;
+    const response = await dataService.fetchData(`/users/notifications/${user.id}`, "GET", {});
+
+    if (response.status === "ok") {
+      setNotifications(response.notifications);
       return true;
     }
 
