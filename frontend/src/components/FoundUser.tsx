@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import User from "../models/User";
+import Notification from "../models/Notification";
 import dataService from "../services/data";
 import { useProtected } from "../helpers/Protected";
 import { useUser } from "../helpers/UserContext";
@@ -45,11 +46,13 @@ function FoundUser(props: FoundUserProps) {
         "POST",
       );
       setRequestSent(true);
-      socket?.emit("notify", {
+      const notification: Notification = {
+        type: "friend",
         senderId: myUserAccount.id,
         receiverId: user.id,
-        type: "friend"
-      })
+        senderFullName: `${myUserAccount.first_name} ${myUserAccount.last_name}`
+      }
+      socket?.emit("notify", notification);
     } catch (error) {
       console.error("Error:", error);
     }
