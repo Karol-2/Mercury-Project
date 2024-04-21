@@ -153,7 +153,7 @@ io.on("connection", async (socket: Socket) => {
     await addNotification(session, id, notification);
     await session.close();
     receiverSockets.forEach((receiverSocket) => {
-      socket.to(receiverSocket.id).emit("notify", notification);
+      socket.to(receiverSocket.id).emit("notify", {...notification, id});
     });
   });
 
