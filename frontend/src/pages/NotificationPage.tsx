@@ -1,5 +1,6 @@
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
+import Notification from "../models/Notification";
 import { useUser } from "../helpers/UserContext";
 import { useMeeting } from "../helpers/MeetingProvider";
 import { useEffect } from "react";
@@ -13,21 +14,35 @@ function NotificationPage() {
           navigate("/meeting");
         }
       }, [meeting]);
-    const invokeAction = (notification: any) => {
-        if (notification.type === "call") {
-            joinMeeting(notification.senderId)
-        } else if (notification.type === "message") {
-            navigate(`/messages/${notification.senderId}`)
+    const addAction = (notification: Notification): Notification => {
+        switch (notification.type) {
+            case "call":
+                return {
+                    ...notification,
+                    action: joinMeeting
+                }
+            case "friend":
+                return {
+                    ...notification,
+                    action: () => navigate(`/friends`)
+                }
+            case "message":
+                return {
+                    ...notification, 
+                    action: () => navigate(`/messages/${notification.senderId}`)
+                }
+            default:
+                break;
         }
+        return notification;
     }
     return (
         <>
             <Navbar />
             <div>
-                {notifications.map((n,i) => <div key={i}>
-                    <span>type: {n.type} </span>
-                    <span>from: {n.senderId}</span>
-                    <button onClick={() => invokeAction(n)}>action</button>
+                {notifications.map(notification => addAction(notification))
+                .map((notification) => <div key={notification.id}>
+                    {notification.type} from {notification.senderFullName}
                 </div>)}
             </div>
             <Footer />
