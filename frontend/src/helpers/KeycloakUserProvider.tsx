@@ -4,6 +4,7 @@ import User, { FrontendUser } from "../models/User";
 import { Socket, io } from "socket.io-client";
 import UserContext from "./UserContext";
 import UserState from "../models/UserState";
+import Notification from "../models/Notification";
 import Keycloak from "keycloak-js";
 import { useNavigate } from "react-router-dom";
 import socketListeners from "../socket/socketListeners";
@@ -15,7 +16,7 @@ function KeycloakUserProvider({ children }: { children: React.ReactNode }) {
   const provider = "keycloak";
   const [play] = useSound(notificationSound);
   const [userState, setUserState] = useState<UserState>({ status: "loading" });
-  const [notifications, setNotifications] = useState<any[]>([]);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
   const user = useMemo(
     () => (userState.status == "logged_in" ? userState.user : null),
     [userState],
