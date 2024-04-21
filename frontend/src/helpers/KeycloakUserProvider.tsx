@@ -111,6 +111,12 @@ function KeycloakUserProvider({ children }: { children: React.ReactNode }) {
     }
   }, [socket]);
 
+  useEffect(() => {
+    if (userState.status != "logged_in") {
+      fetchNotifications();
+    }
+  }, [userState]);
+
   const redirectToLogin = () => {
     if (!keycloakRef.current) {
       return;
@@ -186,6 +192,21 @@ function KeycloakUserProvider({ children }: { children: React.ReactNode }) {
         navigate("/");
       }
 
+      return true;
+    }
+
+    console.error("Error from the server", response.errors);
+    return false;
+  };
+
+  const fetchNotifications = async () => {
+    if (userState.status != "logged_in") return true;
+
+    const user = userState.user!;
+    const response = await dataService.fetchData(`/users/notifications/${user.id}`, "GET", {});
+
+    if (response.status === "ok") {
+      setNotifications(response.notifications);
       return true;
     }
 
