@@ -19,7 +19,7 @@ function NotificationPage() {
             case "call":
                 return {
                     ...notification,
-                    action: joinMeeting
+                    action: () => joinMeeting(notification.senderId)
                 }
             case "friend":
                 return {
@@ -42,7 +42,7 @@ function NotificationPage() {
             <div>
                 {notifications.map(notification => addAction(notification))
                 .map((notification) => <div key={notification.id}>
-                    {notification.type} from {notification.senderFullName}
+                    {notification.type} from {notification.senderFullName} <button onClick={notification.action}>action</button>
                 </div>)}
             </div>
             <Footer />

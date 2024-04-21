@@ -1,6 +1,4 @@
-type NotificationActionType = 
-    ((friendId: string) => Promise<string | void>) | 
-    ((userId: string) => void);
+import { MouseEventHandler } from "react";
 
 interface Notification {
     id?: string;
@@ -8,7 +6,7 @@ interface Notification {
     senderId: string;
     receiverId: string;
     senderFullName: string;
-    action?: NotificationActionType;
+    action?: MouseEventHandler<HTMLButtonElement> | undefined;
     deleteNotification?: (id: string) => void;
 }
 
