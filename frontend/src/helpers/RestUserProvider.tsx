@@ -8,7 +8,6 @@ import UserContext from "./UserContext";
 import UserState from "../models/UserState";
 import Notification from "../models/Notification";
 import { useNavigate } from "react-router-dom";
-import socketListeners from "../socket/socketListeners";
 import useSound from "use-sound";
 import notificationSound from "../misc/notification.mp3";
 
@@ -46,7 +45,22 @@ function RestUserProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (socket !== null) {
-      socketListeners(socket, play, setNotifications);
+        socket.on("notify", (notification: Notification) => {
+          play();
+          switch (notification.type) {
+              case "message":               
+                  setNotifications((prev: Notification[]) => [...prev, notification]);
+                  break;
+              case "call":
+                  setNotifications((prev: Notification[]) => [...prev, notification]);
+                  break;
+              case "friend":
+                  setNotifications((prev: Notification[]) => [...prev, notification]);
+                  break;
+              default:
+                  break;
+          }
+      });
     }
   }, [socket]);
 
