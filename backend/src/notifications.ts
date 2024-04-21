@@ -1,20 +1,24 @@
 import { Session } from "neo4j-driver";
+import Notification from "./models/Notification.js";
+import { v4 } from "uuid";
 
 export async function addNotification(
     session: Session, 
-    senderId: string, 
-    receiverId: string,
-    type: "message" | "friend" | "call"
+    id: string,
+    notification: Notification
 ) {
+    const {receiverId, senderId, type, senderFullName} = notification;
     await session.run(
         `
         MATCH (u:User {id: $receiverId})
-        MERGE (u)-[:HAS_NOTIFICATION]->(n:Notification {senderId: $senderId, type: $type})
+        MERGE (u)-[:HAS_NOTIFICATION]->(n:Notification {id: $id, senderId: $senderId, type: $type, senderFullName: $senderFullName})
         `,
         {
+            id,
             receiverId,
             senderId,
-            type
+            type,
+            senderFullName
         }
     )
 }

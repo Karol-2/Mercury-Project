@@ -10,6 +10,7 @@ import {
 import { addNotification } from "./notifications.js";
 import { isFriend } from "./users.js";
 import Meeting from "./models/Meeting.js";
+import Notification from "./models/Notification.js";
 import {
   createMeeting,
   leaveMeeting,
@@ -17,6 +18,7 @@ import {
   joinMeeting,
 } from "./meetings.js";
 import { addMessageToDb } from "./messages.js";
+import { v4 } from "uuid";
 
 const { io } = servers;
 
@@ -144,13 +146,14 @@ io.on("connection", async (socket: Socket) => {
     });
   });
 
-  socket.on("notify", async ({senderId, receiverId, type}: any) => {
+  socket.on("notify", async (notification: Notification) => {
     const session = driver.session();
-    const receiverSockets = await getAllSockets(session, receiverId);
-    await addNotification(session, senderId, receiverId, type)
+    const receiverSockets = await getAllSockets(session, notification.receiverId);
+    const id = v4();
+    await addNotification(session, id, notification);
     await session.close();
     receiverSockets.forEach((receiverSocket) => {
-      socket.to(receiverSocket.id).emit("notify", {senderId, receiverId, type});
+      socket.to(receiverSocket.id).emit("notify", notification);
     });
   });
 
