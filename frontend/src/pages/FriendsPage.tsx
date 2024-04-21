@@ -9,6 +9,7 @@ import Footer from "../components/Footer";
 import FriendRequest from "../components/FriendRequest";
 import Navbar from "../components/Navbar";
 import User from "../models/User";
+import Notification from "../models/Notification";
 import dataService from "../services/data";
 import Transition from "../components/Transition";
 import { useProtected } from "../helpers/Protected";
@@ -63,11 +64,13 @@ function FriendsPage() {
 
   const handleCreateMeeting = (friendId: string) => {
     createMeeting();
-    socket?.emit("notify", {
+    const notification: Notification = {
+      type: "call",
       senderId: user.id,
-      receiverId: friendId,
-      type: "call"
-    })
+      senderFullName: `${user.first_name} ${user.last_name}`,
+      receiverId: friendId
+    }
+    socket?.emit("notify", notification);
   }
 
   const handleAcceptRequest = async (currentId: string) => {
