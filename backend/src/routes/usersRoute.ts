@@ -162,6 +162,32 @@ usersRouter.get("/meetings/:userId", async (req: Request, res) => {
   }
 });
 
+usersRouter.get("/notifications/:userId", async (req, res) => {
+  try {
+    const session = driver.session();
+    const userId = req.params.userId;
+    const user = await getDbUser(session, { id: userId });
+    if (!user) {
+      await session.close();
+      return res;
+    }
+    const notificationsRequest = await session.run(
+      `MATCH (u:User {id: $userId})-[:HAS_NOTIFICATION]->(n:Notification) RETURN n`,
+      { userId }
+    );
+    await session.close();
+    try {
+      const notifications = notificationsRequest.records.map((notification) => notification.get("n").properties);
+      return res.json({ status: "ok", notifications });
+    } catch (_err) {
+      return res.json({ status: "ok", notifications: [] });
+    }
+  } catch (err) {
+    console.log("Error:", err);
+    return res.status(404).json({ status: "error", errors: err as object });
+  }
+});
+
 usersRouter.put("/meetings/:meetingId", async (req: Request, res) => {
   try {
     const session = driver.session();
