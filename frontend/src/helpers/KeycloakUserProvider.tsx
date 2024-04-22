@@ -214,6 +214,11 @@ function KeycloakUserProvider({ children }: { children: React.ReactNode }) {
     return false;
   };
 
+  const deleteNotification = async (userId: string, notificationId: string) => {
+    await dataService.fetchData(`/users//notifications/${userId}/${notificationId}`, "DELETE", {});
+    setNotifications((prev: Notification[]) => prev.filter(notification => notification.id !== notificationId));
+  }
+
   const fetchNotifications = async () => {
     if (userState.status != "logged_in") return true;
 
