@@ -342,4 +342,18 @@ usersRouter.delete("/:userId", async (req: Request, res: OkErrorResponse) => {
   }
 });
 
+usersRouter.delete("/notifications/:userId/:notificationId", async (req, res) => {
+  const userId = req.params.userId;
+  const notificationId = req.params.notificationId;
+
+  const session = driver.session();
+  try {
+
+  } catch (err) {
+
+  } finally {
+    session.close();
+  }
+});
+
 export default usersRouter;
