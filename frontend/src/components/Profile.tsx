@@ -1,6 +1,7 @@
 import { useState } from "react";
 import User from "../models/User";
 import Modal from "./Modal";
+import countriesData from "../assets/countries.json";
 
 export interface ProfilePageFormProps {
   user: User;
@@ -12,6 +13,8 @@ function Profile(props: ProfilePageFormProps) {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   const { user, handleEditClick, deleteUser } = props;
+
+  const countryName = countriesData.find((v) => v.Code == user.country)?.Country
 
   return (
     <section className="bg-my-darker min-h-screen flex justify-center ">
@@ -27,10 +30,10 @@ function Profile(props: ProfilePageFormProps) {
           <h1 className="text-2xl font-bold">Personal Data</h1>
           <hr className="text-my-orange mb-2"></hr>
           <p>
-            Name: {user.first_name || ""} {user.last_name || ""}
+            Name: {user.first_name} {user.last_name}
           </p>
-          <p>Country: {user.country || ""}</p>
-          <p>E-mail: {user.mail || ""}</p>
+          <p>Country: {countryName || ""}</p>
+          <p>E-mail: {user.mail}</p>
         </div>
         <div className="my-5 grid grid-cols-1 md:grid-cols-2">
           <button

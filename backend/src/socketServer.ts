@@ -7,7 +7,7 @@ import {
   disconnectFromSocket,
   getAllSockets,
 } from "./sockets.js";
-import { isFriend } from "./users.js";
+import { isFriend } from "./userFriends.js";
 import Meeting from "./models/Meeting.js";
 import {
   createMeeting,

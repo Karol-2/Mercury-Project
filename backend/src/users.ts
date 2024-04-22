@@ -11,6 +11,9 @@ import { Either } from "./misc/Either.js";
 import NativeUser, { nativeUserSchema } from "./models/NativeUser.js";
 import ExternalUser from "./models/ExternalUser.js";
 import { ZodType } from "zod";
+import ChangePasswordReq from "./models/ChangePasswordReq.js";
+import jwt from "jsonwebtoken";
+import TokenPayload from "./models/TokenPayload.js";
 
 export const filterUser = (user: DbUser): User => {
   if ("password" in user) {
@@ -99,29 +102,28 @@ export async function createUser(
     }
   }
 
-  const firstNameEmbedding = wordToVec(userData.first_name);
-  const lastNameEmbedding = wordToVec(userData.last_name);
+  const nameEmbeddingResult = await generateNameEmbedding(
+    userData.first_name,
+    userData.last_name,
+  );
+  const { success, firstNameCorrect, lastNameCorrect, nameEmbedding } =
+    nameEmbeddingResult;
 
   const errors: Record<string, string> = {};
 
-  if (firstNameEmbedding.length == 0) {
-    errors["first_name"] = "incorrect";
-  }
+  if (!success) {
+    if (!firstNameCorrect) {
+      errors["first_name"] = "incorrect";
+    }
 
-  if (lastNameEmbedding.length == 0) {
-    errors["last_name"] = "incorrect";
-  }
+    if (!lastNameCorrect) {
+      errors["last_name"] = "incorrect";
+    }
 
-  for (const _ in errors) {
     return { errors };
   }
 
   const id = uuidv4();
-  const nameEmbedding = firstNameEmbedding.map((e1, i) => {
-    const e2 = lastNameEmbedding[i];
-    return (e1 + e2) / 2;
-  });
-
   let user = { ...userData, id, name_embedding: nameEmbedding } as DbUser;
 
   if ("password" in userData) {
@@ -164,8 +166,11 @@ export async function registerUser(
 
   await createUser(session, dbUserData);
 
-  const user = await getUser(session, { mail: userData.mail });
-  return user!;
+  const user = await getDbUser(session, {
+    mail: userData.mail,
+    issuer: "mercury",
+  });
+  return filterUser(user!);
 }
 
 export async function getUser(
@@ -268,6 +273,46 @@ export async function getUsersCount(session: Session): Promise<neo4j.Integer> {
   return usersCount.records[0].get(0);
 }
 
+export type GenerateNameEmbeddingResult = {
+  success: boolean;
+  firstNameCorrect: boolean;
+  lastNameCorrect: boolean;
+  nameEmbedding: number[];
+};
+
+export async function generateNameEmbedding(
+  firstName: string,
+  lastName: string,
+): Promise<GenerateNameEmbeddingResult> {
+  const firstNameEmbedding = wordToVec(firstName);
+  const lastNameEmbedding = wordToVec(lastName);
+
+  const firstNameCorrect = firstNameEmbedding.length > 0;
+  const lastNameCorrect = lastNameEmbedding.length > 0;
+  const success = firstNameCorrect && lastNameCorrect;
+
+  if (!success) {
+    return {
+      success,
+      firstNameCorrect,
+      lastNameCorrect,
+      nameEmbedding: [],
+    };
+  }
+
+  const nameEmbedding = firstNameEmbedding.map((e1, i) => {
+    const e2 = lastNameEmbedding[i];
+    return (e1 + e2) / 2;
+  });
+
+  return {
+    success,
+    firstNameCorrect,
+    lastNameCorrect,
+    nameEmbedding,
+  };
+}
+
 export async function updateUser(
   session: Session,
   userId: string,
@@ -294,7 +339,11 @@ export async function updateUser(
     }
   }
 
-  const newUser = { ...user, ...newUserProps };
+  const { nameEmbedding } = await generateNameEmbedding(
+    newUserProps.first_name || user.first_name,
+    newUserProps.last_name || user.last_name,
+  );
+  const newUser = { ...user, ...newUserProps, name_embedding: nameEmbedding };
   await session.run(`MATCH (u:User {id: $userId}) SET u=$user`, {
     userId,
     user: newUser,
@@ -303,18 +352,44 @@ export async function updateUser(
   return true;
 }
 
-export type ChangePasswordSuccess = "success";
-export type ChangePasswordError = "verify" | "repeat";
-export type ChangePasswordResult = ChangePasswordSuccess | ChangePasswordError;
+export type ChangePasswordResult = {
+  success: boolean;
+  userExists: boolean;
+  isUserIssued: boolean;
+  passwordCorrect: boolean;
+};
 
 export async function changePassword(
   session: Session,
-  user: DbUser,
-  oldPassword: string,
-  newPassword: string,
-  repeatPassword: string,
+  userId: string,
+  passwords: ChangePasswordReq,
+  token?: TokenPayload,
 ): Promise<ChangePasswordResult> {
-  if (!("password" in user)) {
+  const user = await getDbUser(session, { id: userId });
+  if (!user) {
+    return {
+      success: false,
+      userExists: false,
+      isUserIssued: false,
+      passwordCorrect: false,
+    };
+  }
+
+  const userExists = true;
+  const isUserIssued = !("password" in user);
+
+  if (isUserIssued) {
+    const tokenInvalid = {
+      success: false,
+      userExists,
+      isUserIssued,
+      passwordCorrect: false,
+    };
+
+    if (!token) {
+      return tokenInvalid;
+    }
+
     if (user.issuer == "mercury") {
       const keycloakUser = await kcAdminClient.users.findOne({
         id: user.issuer_id,
@@ -329,29 +404,39 @@ export async function changePassword(
           requiredActions,
         },
       );
-      return "success";
+
+      return { success: true, userExists, isUserIssued, passwordCorrect: true };
     } else {
       throw new Error("not implemented");
     }
   }
 
-  const match: boolean = await bcrypt.compare(oldPassword, user.password);
+  let isEmpty = true;
+  for (const _ in passwords) {
+    isEmpty = false;
+  }
+
+  if (isEmpty) {
+    return { success: false, userExists, isUserIssued, passwordCorrect: false };
+  }
+
+  const { old_password, new_password } = passwords as any;
+
+  const match: boolean = await bcrypt.compare(old_password, user.password);
   if (!match) {
-    return "verify";
+    return { success: false, userExists, isUserIssued, passwordCorrect: false };
   }
 
-  if (newPassword != repeatPassword) {
-    return "repeat";
-  }
-
-  const passwordHashed = await bcrypt.hash(newPassword, 10);
+  const passwordCorrect = true;
+  const passwordHashed = await bcrypt.hash(new_password, 10);
   const updatedUser = { ...user, password: passwordHashed };
 
   await session.run(`MATCH (u:User {id: $userId}) SET u=$user`, {
     userId: user.id,
     user: updatedUser,
   });
-  return "success";
+
+  return { success: true, userExists, isUserIssued, passwordCorrect };
 }
 
 export async function deleteUser(
@@ -373,375 +458,4 @@ export async function deleteUser(
   });
 
   return true;
-}
-
-export async function getFriends(
-  session: Session,
-  userId: string,
-  pageIndex: number,
-  pageSize: number,
-): Promise<User[] | null> {
-  const user = await getUser(session, { id: userId });
-  if (!user) {
-    return null;
-  }
-
-  const querySkip = neo4j.int(pageIndex * pageSize);
-  const queryLimit = neo4j.int(pageSize);
-
-  const friendRequest = await session.run(
-    `MATCH (u:User {id: $userId})-[:IS_FRIENDS_WITH]-(f:User)
-     RETURN DISTINCT f
-     SKIP $querySkip
-     LIMIT $queryLimit`,
-    { userId, querySkip, queryLimit },
-  );
-
-  const friends = friendRequest.records.map((f) =>
-    filterUser(f.get("f").properties),
-  );
-  return friends;
-}
-
-export async function getFriendsCount(
-  session: Session,
-  userId: string,
-): Promise<neo4j.Integer | null> {
-  const user = await getUser(session, { id: userId });
-  if (!user) {
-    return null;
-  }
-
-  const friendsCountRequest = await session.run(
-    `MATCH (u:User {id: $userId})-[:IS_FRIENDS_WITH]-(f:User)
-     RETURN count(DISTINCT f)`,
-    { userId },
-  );
-
-  const friendsCount = friendsCountRequest.records[0].get(0);
-  return friendsCount;
-}
-
-export async function isFriend(
-  session: Session,
-  firstUserId: string,
-  secondUserId: string,
-) {
-  try {
-    const request = await session.run(
-      `
-      MATCH (u1:User {id: $firstUserId})
-      MATCH (u2:User {id: $secondUserId})
-      RETURN exists((u1)-[:IS_FRIENDS_WITH]-(u2))
-      `,
-      { firstUserId, secondUserId },
-    );
-
-    return request.records?.[0].get(0);
-  } catch (err) {
-    return false;
-  }
-}
-
-export async function getFriendRequests(
-  session: Session,
-  userId: string,
-  pageIndex: number,
-  pageSize: number,
-): Promise<User[] | null> {
-  const user = await getUser(session, { id: userId });
-  if (!user) {
-    return null;
-  }
-
-  const querySkip = neo4j.int(pageIndex * pageSize);
-  const queryLimit = neo4j.int(pageSize);
-
-  const friendRequestsRequest = await session.run(
-    `MATCH (u:User {id: $userId})<-[:SENT_INVITE_TO]-(f:User)
-     WITH f ORDER BY f.last_name, f.first_name
-     RETURN DISTINCT f
-     SKIP $querySkip
-     LIMIT $queryLimit`,
-    { userId, querySkip, queryLimit },
-  );
-
-  const friends = friendRequestsRequest.records.map((f) =>
-    filterUser(f.get("f").properties),
-  );
-  return friends;
-}
-
-export async function getFriendRequestsCount(
-  session: Session,
-  userId: string,
-): Promise<neo4j.Integer | null> {
-  const user = await getUser(session, { id: userId });
-  if (!user) {
-    return null;
-  }
-
-  const friendRequestsCountRequest = await session.run(
-    `MATCH (u:User {id: $userId})<-[:SENT_INVITE_TO]-(f:User)
-     RETURN count(DISTINCT f)`,
-    { userId },
-  );
-
-  const friendRequestsCount = friendRequestsCountRequest.records[0].get(0);
-  return friendRequestsCount;
-}
-
-export async function getFriendSuggestions(
-  session: Session,
-  userId: string,
-  pageIndex: number,
-  pageSize: number,
-): Promise<User[] | null> {
-  const user = await getUser(session, { id: userId });
-  if (!user) {
-    return null;
-  }
-
-  const querySkip = neo4j.int(pageIndex * pageSize);
-  const queryLimit = neo4j.int(pageSize);
-
-  const friendSuggestionsRequest = await session.run(
-    `MATCH (u:User {id: $userId})-[:IS_FRIENDS_WITH]-(f:User)-[:IS_FRIENDS_WITH]-(s:User)
-     WHERE NOT (u)-[:IS_FRIENDS_WITH]-(s) AND s.id <> $userId
-     RETURN DISTINCT s
-     SKIP $querySkip
-     LIMIT $queryLimit`,
-    { userId, querySkip, queryLimit },
-  );
-
-  const friends = friendSuggestionsRequest.records.map((s) =>
-    filterUser(s.get("s").properties),
-  );
-  return friends;
-}
-
-export async function getFriendSuggestionsCount(
-  session: Session,
-  userId: string,
-): Promise<neo4j.Integer | null> {
-  const user = await getUser(session, { id: userId });
-  if (!user) {
-    return null;
-  }
-
-  const friendRequestsCountRequest = await session.run(
-    `MATCH (u:User {id: $userId})-[:IS_FRIENDS_WITH]-(f:User)-[:IS_FRIENDS_WITH]-(s:User)
-     WHERE NOT (u)-[:IS_FRIENDS_WITH]-(s) AND s.id <> $userId
-     RETURN count(DISTINCT s)`,
-    { userId },
-  );
-
-  const friendRequestsCount = friendRequestsCountRequest.records[0].get(0);
-  return friendRequestsCount;
-}
-
-export type CheckFriendsResult = {
-  firstUserExists: boolean;
-  secondUserExists: boolean;
-  areFriends: boolean;
-};
-
-export async function checkFriends(
-  session: Session,
-  userId1: string,
-  userId2: string,
-): Promise<CheckFriendsResult> {
-  const firstUser = await getUser(session, { id: userId1 });
-  const secondUser = await getUser(session, { id: userId2 });
-
-  const firstUserExists = firstUser !== null;
-  const secondUserExists = secondUser !== null;
-
-  if (!firstUserExists || !secondUserExists) {
-    return { firstUserExists, secondUserExists, areFriends: false };
-  }
-
-  const areFriends = await isFriend(session, userId1, userId2);
-  return { firstUserExists, secondUserExists, areFriends };
-}
-
-export type SendFriendInviteResult = {
-  success: boolean;
-  firstUserExists: boolean;
-  secondUserExists: boolean;
-};
-
-export async function sendFriendRequest(
-  session: Session,
-  userId1: string,
-  userId2: string,
-): Promise<SendFriendInviteResult> {
-  const { firstUserExists, secondUserExists, areFriends } = await checkFriends(
-    session,
-    userId1,
-    userId2,
-  );
-
-  if (!firstUserExists || !secondUserExists || areFriends) {
-    return { success: false, firstUserExists, secondUserExists };
-  }
-
-  await session.run(
-    `MATCH (a:User {id: $userId1}), (b:User {id: $userId2})
-     MERGE (a)-[:SENT_INVITE_TO]->(b)`,
-    { userId1, userId2 },
-  );
-
-  return { success: true, firstUserExists, secondUserExists };
-}
-
-export type AcceptFriendRequestResult = {
-  success: boolean;
-  firstUserExists: boolean;
-  secondUserExists: boolean;
-  sentInvite: boolean;
-  alreadyFriends: boolean;
-};
-
-export async function acceptFriendRequest(
-  session: Session,
-  userId1: string,
-  userId2: string,
-): Promise<AcceptFriendRequestResult> {
-  const {
-    firstUserExists,
-    secondUserExists,
-    areFriends: alreadyFriends,
-  } = await checkFriends(session, userId1, userId2);
-
-  if (!firstUserExists || !secondUserExists || alreadyFriends) {
-    return {
-      success: false,
-      firstUserExists,
-      secondUserExists,
-      sentInvite: false,
-      alreadyFriends,
-    };
-  }
-
-  const acceptInviteRequest = await session.run(
-    `MATCH (u1:User {id: $userId1})<-[r:SENT_INVITE_TO]-(u2:User {id: $userId2})
-     DELETE r
-     CREATE (u1)-[:IS_FRIENDS_WITH]->(u2)
-     RETURN true`,
-    { userId1, userId2 },
-  );
-
-  const records = acceptInviteRequest.records;
-  const sentInvite = records.length > 0;
-
-  return {
-    success: sentInvite,
-    firstUserExists,
-    secondUserExists,
-    sentInvite,
-    alreadyFriends,
-  };
-}
-
-export async function addFriend(
-  session: Session,
-  userId1: string,
-  userId2: string,
-) {
-  await session.run(
-    `MATCH (u1:User {id: $userId1}), (u2:User {id: $userId2})
-     CREATE (u1)-[:IS_FRIENDS_WITH]->(u2)
-     RETURN true`,
-    { userId1, userId2 },
-  );
-}
-
-export type DeclineFriendRequestResult = {
-  success: boolean;
-  firstUserExists: boolean;
-  secondUserExists: boolean;
-  wasFriend: boolean;
-  wasInvited: boolean;
-};
-
-export async function declineFriendRequest(
-  session: Session,
-  userId1: string,
-  userId2: string,
-): Promise<DeclineFriendRequestResult> {
-  const {
-    firstUserExists,
-    secondUserExists,
-    areFriends: wasFriend,
-  } = await checkFriends(session, userId1, userId2);
-
-  if (!firstUserExists || !secondUserExists || wasFriend) {
-    return {
-      success: false,
-      firstUserExists,
-      secondUserExists,
-      wasFriend,
-      wasInvited: false,
-    };
-  }
-
-  const acceptInviteRequest = await session.run(
-    `MATCH (u1)<-[r:SENT_INVITE_TO]->(u2)
-     DELETE r
-     RETURN true`,
-    { userId1, userId2 },
-  );
-
-  const wasInvited = acceptInviteRequest.records.length > 0;
-
-  return {
-    success: wasInvited,
-    firstUserExists,
-    secondUserExists,
-    wasFriend,
-    wasInvited,
-  };
-}
-
-export type DeleteFriendResult = {
-  success: boolean;
-  firstUserExists: boolean;
-  secondUserExists: boolean;
-  wasFriend: boolean;
-};
-
-export async function deleteFriend(
-  session: Session,
-  userId1: string,
-  userId2: string,
-): Promise<DeleteFriendResult> {
-  const {
-    firstUserExists,
-    secondUserExists,
-    areFriends: wasFriend,
-  } = await checkFriends(session, userId1, userId2);
-
-  if (!firstUserExists || !secondUserExists || !wasFriend) {
-    return {
-      success: false,
-      firstUserExists,
-      secondUserExists,
-      wasFriend: false,
-    };
-  }
-
-  await session.run(
-    `MATCH (u1)-[r:IS_FRIENDS_WITH]->(u2)
-     DELETE r
-     RETURN true`,
-    { userId1, userId2 },
-  );
-
-  return {
-    success: true,
-    firstUserExists,
-    secondUserExists,
-    wasFriend,
-  };
 }

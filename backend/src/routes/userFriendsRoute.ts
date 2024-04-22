@@ -8,45 +8,24 @@ import {
   FriendRequestsPageErrorResponse,
   FriendSuggestionsPageErrorResponse,
 } from "../types/userResponse.js";
-import {
-  acceptFriendRequest,
-  declineFriendRequest,
-  deleteFriend,
-  getFriendRequests,
-  getFriendRequestsCount,
-  getFriendSuggestions,
-  getFriendSuggestionsCount,
-  getFriends,
-  getFriendsCount,
-  sendFriendRequest,
-} from "../users.js";
+import { deleteFriend } from "../userFriends.js";
+import { declineFriendRequest } from "../userFriends.js";
+import { acceptFriendRequest } from "../userFriends.js";
+import { sendFriendRequest } from "../userFriends.js";
+import { getFriendSuggestionsCount } from "../userFriends.js";
+import { getFriendSuggestions } from "../userFriends.js";
+import { getFriendRequestsCount } from "../userFriends.js";
+import { getFriendRequests } from "../userFriends.js";
+import { getFriendsCount } from "../userFriends.js";
+import { getFriends } from "../userFriends.js";
 import { userNotFoundRes } from "./usersRoute.js";
 import { Errors } from "../models/Response.js";
 import Page, { pageSchema } from "../models/routes/Page.js";
 import { formatError } from "../misc/formatError.js";
 
-const friendshipRouter = Router();
+const friendsRouter = Router();
 
-async function userExists(
-  session: Session,
-  res: Response,
-  userId: string,
-): Promise<Response | User> {
-  const userExistsResult = await session.run(
-    `MATCH (u:User {id: $userId}) RETURN u`,
-    { userId },
-  );
-
-  if (userExistsResult.records.length === 0) {
-    await session.close();
-    const json = { status: "error", errors: { id: "not found" } } as const;
-    return res.status(404).json(json);
-  }
-
-  return userExistsResult.records[0].get("u").properties as User;
-}
-
-friendshipRouter.get(
+friendsRouter.get(
   "/:userId/friends",
   async (req: Request, res: FriendsPageErrorResponse) => {
     const userId = req.params.userId;
@@ -87,7 +66,7 @@ friendshipRouter.get(
   },
 );
 
-friendshipRouter.get(
+friendsRouter.get(
   "/:userId/friend-requests",
   async (req: Request, res: FriendRequestsPageErrorResponse) => {
     const userId = req.params.userId;
@@ -131,7 +110,7 @@ friendshipRouter.get(
   },
 );
 
-friendshipRouter.get(
+friendsRouter.get(
   "/:userId/friend-suggestions",
   async (req: Request, res: FriendSuggestionsPageErrorResponse) => {
     const userId = req.params.userId;
@@ -178,7 +157,7 @@ friendshipRouter.get(
   },
 );
 
-friendshipRouter.post(
+friendsRouter.post(
   "/:userId1/send-friend-request/:userId2",
   async (req: Request, res: OkErrorResponse) => {
     const session = driver.session();
@@ -212,7 +191,7 @@ friendshipRouter.post(
   },
 );
 
-friendshipRouter.post(
+friendsRouter.post(
   "/:userId1/accept-friend-request/:userId2",
   async (req: Request, res: OkErrorResponse) => {
     const session = driver.session();
@@ -263,7 +242,7 @@ friendshipRouter.post(
   },
 );
 
-friendshipRouter.post(
+friendsRouter.post(
   "/:userId1/decline-friend-request/:userId2",
   async (req: Request, res: OkErrorResponse) => {
     const session = driver.session();
@@ -310,7 +289,7 @@ friendshipRouter.post(
   },
 );
 
-friendshipRouter.delete(
+friendsRouter.delete(
   "/:userId1/delete-friend/:userId2",
   async (req: Request, res: OkErrorResponse) => {
     const session = driver.session();
@@ -348,4 +327,4 @@ friendshipRouter.delete(
   },
 );
 
-export default friendshipRouter;
+export default friendsRouter;
