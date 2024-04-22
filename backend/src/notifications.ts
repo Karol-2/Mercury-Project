@@ -1,6 +1,5 @@
 import { Session } from "neo4j-driver";
 import Notification from "./models/Notification.js";
-import { v4 } from "uuid";
 
 export async function addNotification(
     session: Session, 
