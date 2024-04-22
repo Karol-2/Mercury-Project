@@ -7,7 +7,7 @@ interface Notification {
     receiverId: string;
     senderFullName: string;
     action?: MouseEventHandler<HTMLButtonElement> | undefined;
-    deleteNotification?: (id: string) => void;
+    deleteNotification?: MouseEventHandler<HTMLButtonElement> | undefined;
 }
 
 export default Notification;

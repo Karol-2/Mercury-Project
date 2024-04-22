@@ -1,6 +1,5 @@
 import { Session } from "neo4j-driver";
 import Notification from "./models/Notification.js";
-import { getDbUser } from "./users.js";
 
 export async function addNotification(
     session: Session, 
@@ -27,20 +26,14 @@ export async function deleteNotification(
     session: Session,
     userId: string,
     notificationId: string
-): Promise<boolean> {
-    const user = await getDbUser(session, { id: userId });
-    if (!user) {
-        return false;
-    }
+) {
     await session.run(
         `
-        MATCH (u:User {id: $userId})->[:HAS_NOTIFICATION]-(n:Notification {id: $notificationId})
-        DETACH DELETE n
+        MATCH (u:User {id: $userId})-[:HAS_NOTIFICATION]->(n:Notification {id: $notificationId}) DETACH DELETE n
         `,
         {
             userId, 
             notificationId
         }
     );
-    return true;
 }
