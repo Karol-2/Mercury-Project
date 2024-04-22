@@ -25,6 +25,7 @@ import {
 import DbUser from "../models/DbUser.js";
 import { ChangePasswordReq } from "../models/ChangePasswordReq.js";
 import { verifySearchQuery } from "../misc/verifyRequest.js";
+import { deleteNotification } from "../notifications.js";
 
 const usersRouter = Router();
 
@@ -348,9 +349,11 @@ usersRouter.delete("/notifications/:userId/:notificationId", async (req, res) =>
 
   const session = driver.session();
   try {
-
+    await deleteNotification(session, userId, notificationId);
+    return res.json({status: "ok"});
   } catch (err) {
-
+    console.log("Error:", err);
+    return res.status(404).json({ status: "error", errors: err as object });
   } finally {
     session.close();
   }
