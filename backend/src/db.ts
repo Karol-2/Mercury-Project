@@ -61,7 +61,7 @@ export async function importInitialData() {
 
     return "Initial data has been imported into database.";
   } catch (error) {
-    return "Error importing data:";
+    return "Error importing data:" + error;
   } finally {
     await session.close();
   }

@@ -305,7 +305,7 @@ const userData = [
     "profile_picture":
       "https://cdn.justjaredjr.com/wp-content/uploads/headlines/2022/07/mr-beast-becomes-2nd-person-to-reach-100-million-subscribers.jpg",
     "mail": "obeckmanni@google.com.br",
-    "password": "product",
+    "password": "pro!duct3d",
     "friend_ids": [13, 15, 19],
     "chats": [],
   },
