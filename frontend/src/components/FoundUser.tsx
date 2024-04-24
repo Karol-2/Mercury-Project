@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import User from "../models/User";
 import dataService from "../services/data";
 import countriesData from "../assets/countries.json";
