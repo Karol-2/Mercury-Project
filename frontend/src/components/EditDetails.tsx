@@ -109,9 +109,10 @@ function EditDetails(props: EditDetails) {
     <div className=" flex flex-col gap-2 bg-my-dark p-10 rounded-xl">
       <h1 className="text-3xl font-bold text-my-orange">Edit Details</h1>
       <hr className="text-my-orange"></hr>
+      <div className=" 3xl:mx-40 lg:mx-15">
       <form
         id="details-box"
-        className=" flex flex-col gap-2 bg-my-dark sm:p-10 md:px-44 rounded-xl"
+        className=" flex flex-col gap-2 bg-my-dark sm:p-10 md:px-20 2.5xl:px-72 rounded-xl"
         onSubmit={handleSubmit(submit)}
       >
         <div>First name</div>
@@ -170,6 +171,8 @@ function EditDetails(props: EditDetails) {
           value="Save"
         />
       </form>
+      </div>
+      
       {showPopup && (
         <Popup header="Successful data change!" isVisibleHandler={popupHandler} isVisibleState={showPopup} seconds={3} />
       )}

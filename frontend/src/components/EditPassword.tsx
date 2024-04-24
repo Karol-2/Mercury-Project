@@ -118,9 +118,10 @@ function EditPassword(props: EditDetails) {
     <div className=" flex flex-col gap-2 bg-my-dark p-10 rounded-xl">
       <h1 className="text-3xl font-bold text-my-orange">Change Password</h1>
       <hr className="text-my-orange"></hr>
+      <div className=" 3xl:mx-40 lg:mx-15" id="wrapper">
       <form
         id="password-box"
-        className=" flex flex-col gap-2 bg-my-dark sm:p-10 lg:px-44 rounded-xl"
+        className=" flex flex-col gap-2 bg-my-dark sm:p-10 md:px-20 2.5xl:px-72 rounded-xl"
         onSubmit={formSubmit()}
       >
         {provider == "rest" && (
@@ -168,6 +169,7 @@ function EditPassword(props: EditDetails) {
         />
         {provider == "rest" && <p>WARNING: You will be logged out!</p>}
       </form>
+      </div>
     </div>
   );
 }
