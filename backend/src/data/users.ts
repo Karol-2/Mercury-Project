@@ -40,7 +40,8 @@ const userData = [
     "first_name": "Jan",
     "last_name": "Novák",
     "country": "Czechia (Czech Republic)",
-    "profile_picture": "https://images.unsplash.com/photo-1602471615287-d733c59b79c4?q=80&w=1171&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    "profile_picture":
+      "https://images.unsplash.com/photo-1602471615287-d733c59b79c4?q=80&w=1171&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
     "mail": "kret123@gmail.com",
     "password": "ajoodrawio",
     "friend_ids": [5],
@@ -63,7 +64,8 @@ const userData = [
     "first_name": "Olivia",
     "last_name": "Smith",
     "country": "Seychelles",
-    "profile_picture": "https://images.unsplash.com/photo-1542587329-0f49fcc4bed1?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    "profile_picture":
+      "https://images.unsplash.com/photo-1542587329-0f49fcc4bed1?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
     "mail": "katzee@yahoo.com",
     "password": "biscuitsnotcookies",
     "friend_ids": [],

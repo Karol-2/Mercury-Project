@@ -81,12 +81,12 @@ function EditDetails(props: EditDetails) {
     });
   };
 
-  const popupHandler = ()=>{
-    setShowPopup(!showPopup)
-  }
+  const popupHandler = () => {
+    setShowPopup(!showPopup);
+  };
 
   const submit = async (user: FrontendUser) => {
-    setShowPopup(false)
+    setShowPopup(false);
     try {
       await editUser(user);
 
@@ -110,71 +110,76 @@ function EditDetails(props: EditDetails) {
       <h1 className="text-3xl font-bold text-my-orange">Edit Details</h1>
       <hr className="text-my-orange"></hr>
       <div className=" 3xl:mx-40 lg:mx-15">
-      <form
-        id="details-box"
-        className=" flex flex-col gap-2 bg-my-dark sm:p-10 md:px-20 2.5xl:px-72 rounded-xl"
-        onSubmit={handleSubmit(submit)}
-      >
-        <div>First name</div>
-        <input
-          {...inputProps}
-          {...register("first_name")}
-          value={formData.first_name}
-          onChange={handleChange}
-        />
-        <div {...errorProps}>{errors.first_name?.message}</div>
-        <div>Last Name</div>
-        <input
-          {...inputProps}
-          {...register("last_name")}
-          value={formData.last_name}
-          onChange={handleChange}
-        />
-        <div {...errorProps}>{errors.last_name?.message}</div>
-        <div>
-          <div className="flex gap-2 items-center">
-            <div>Country</div>
-            <Select
-              {...inputProps}
-              {...register("country")}
-              value={countryOptions.find(
-                (option) => option.value === formData.country,
-              )}
-              onChange={handleCountryChange}
-              options={countryOptions}
-            />
-          </div>
-          <div {...errorProps}>{errors.country?.message}</div>
-        </div>
-
-        <div className="py-5">
-          <div>E-mail</div>
+        <form
+          id="details-box"
+          className=" flex flex-col gap-2 bg-my-dark sm:p-10 md:px-20 2.5xl:px-72 rounded-xl"
+          onSubmit={handleSubmit(submit)}
+        >
+          <div>First name</div>
           <input
             {...inputProps}
-            {...register("mail")}
-            placeholder="E-mail"
-            value={formData.mail}
+            {...register("first_name")}
+            value={formData.first_name}
             onChange={handleChange}
           />
-          <div {...errorProps}>{errors.mail?.message}</div>
+          <div {...errorProps}>{errors.first_name?.message}</div>
+          <div>Last Name</div>
+          <input
+            {...inputProps}
+            {...register("last_name")}
+            value={formData.last_name}
+            onChange={handleChange}
+          />
+          <div {...errorProps}>{errors.last_name?.message}</div>
+          <div>
+            <div className="flex gap-2 items-center">
+              <div>Country</div>
+              <Select
+                {...inputProps}
+                {...register("country")}
+                value={countryOptions.find(
+                  (option) => option.value === formData.country,
+                )}
+                onChange={handleCountryChange}
+                options={countryOptions}
+              />
+            </div>
+            <div {...errorProps}>{errors.country?.message}</div>
+          </div>
 
-          <div {...errorProps}>{errors.password?.message}</div>
-        </div>
+          <div className="py-5">
+            <div>E-mail</div>
+            <input
+              {...inputProps}
+              {...register("mail")}
+              placeholder="E-mail"
+              value={formData.mail}
+              onChange={handleChange}
+            />
+            <div {...errorProps}>{errors.mail?.message}</div>
 
-        <div className="pb-4 text-[#f88]">{submitError}</div>
+            <div {...errorProps}>{errors.password?.message}</div>
+          </div>
 
-        <input
-          disabled={isSubmitting}
-          data-testid="Register"
-          type="submit"
-          className="btn small bg-my-orange disabled:bg-my-dark"
-          value="Save"
-        />
-      </form>
+          <div className="pb-4 text-[#f88]">{submitError}</div>
+
+          <input
+            disabled={isSubmitting}
+            data-testid="Register"
+            type="submit"
+            className="btn small bg-my-orange disabled:bg-my-dark"
+            value="Save"
+          />
+        </form>
       </div>
-      
+
       {showPopup && (
-        <Popup header="Successful data change!" isVisibleHandler={popupHandler} isVisibleState={showPopup} seconds={3} />
+        <Popup
+          header="Successful data change!"
+          isVisibleHandler={popupHandler}
+          isVisibleState={showPopup}
+          seconds={3}
+        />
       )}
     </div>
   );
