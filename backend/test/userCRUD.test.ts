@@ -10,6 +10,18 @@ let userData = {
   mail: "john_smith@example.com",
   password: "12345678",
 };
+let token: string;
+
+const login = async (mail: string, password: string) => {
+  const response = await fetchData(`http://localhost:5000/auth/login`, "POST", {
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ mail: mail, password: password }),
+  });
+
+  token = response.token;
+};
 
 test("Get all users", async () => {
   const response = await fetchData(`http://localhost:5000/users`, "GET", {});
@@ -204,23 +216,77 @@ test("Update user with short last name", async () => {
 });
 
 test("Update user with short password", async () => {
-  userData.password = "1234";
+  await login(userData.mail, userData.password);
 
   const response = await fetchData(
-    `http://localhost:5000/users/${userId}`,
-    "PUT",
+    `http://localhost:5000/users/${userId}/change-password`,
+    "POST",
     {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(userData),
+      body: JSON.stringify({
+        token: token,
+        old_password: userData.password,
+        new_password: "1234",
+        repeat_password: "1234",
+      }),
     },
   );
 
   const { status, errors } = response;
 
   expect(status).toBe("error");
-  expect(errors.password).toBe("String must contain at least 8 character(s)");
+  expect(errors).toBeDefined();
+  expect(errors.old_password).toBe("incorrect");
+});
+
+test("Update user with same password", async () => {
+  await login(userData.mail, userData.password);
+
+  const response = await fetchData(
+    `http://localhost:5000/users/${userId}/change-password`,
+    "POST",
+    {
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        token: token,
+        old_password: userData.password,
+        new_password: "12345678",
+        repeat_password: "12345678",
+      }),
+    },
+  );
+
+  const { status } = response;
+
+  expect(status).toBe("ok");
+});
+
+test("Update user with correct password", async () => {
+  await login(userData.mail, userData.password);
+
+  const response = await fetchData(
+    `http://localhost:5000/users/${userId}/change-password`,
+    "POST",
+    {
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        token: token,
+        old_password: userData.password,
+        new_password: "123456789",
+        repeat_password: "123456789",
+      }),
+    },
+  );
+
+  const { status } = response;
+
+  expect(status).toBe("ok");
 });
 
 test("Delete user by ID", async () => {
