@@ -115,7 +115,7 @@ function EditPhoto(props: EditDetails) {
         <div className="pb-4 text-[#f88]">{submitError}</div>
       </div>
       {showPopup && (
-        <Popup header="Successful photo change!" isVisible={showPopup} isVisibleHandler={popupHandler} seconds={3}/>
+        <Popup header="Successful photo change!" isVisibleState={showPopup} isVisibleHandler={popupHandler} seconds={3}/>
       )}
     </div>
   );

@@ -2,14 +2,14 @@ import { motion } from "framer-motion";
 import { useEffect } from "react";
 
 
-interface ModalInterface {
+interface Popup {
   header: string,
   isVisibleState: boolean,
   isVisibleHandler: ()=> void,
   seconds: number
 }
 
-function Popup(props: ModalInterface) {
+function Popup(props: Popup) {
 
     useEffect(() => {
         const timer = setTimeout(() => {

@@ -171,7 +171,7 @@ function EditDetails(props: EditDetails) {
         />
       </form>
       {showPopup && (
-        <Popup header="Successful data change!" isVisibleHandler={popupHandler} isVisible={showPopup} seconds={3} />
+        <Popup header="Successful data change!" isVisibleHandler={popupHandler} isVisibleState={showPopup} seconds={3} />
       )}
     </div>
   );
