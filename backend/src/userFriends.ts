@@ -210,7 +210,7 @@ export async function sendFriendRequest(
   );
   const sameId = userId1 == userId2;
 
-  const success = firstUserExists && secondUserExists && areFriends && !sameId;
+  const success = firstUserExists && secondUserExists && !areFriends && !sameId;
   if (!success) {
     return { success, firstUserExists, secondUserExists };
   }
