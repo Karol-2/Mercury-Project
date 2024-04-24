@@ -10,7 +10,6 @@ services:
       - 7687:7687
     volumes:
       - ./db/data:/data
-      - ./db/conf:/conf
 
   chats:
     image: mongo:4.4.26
