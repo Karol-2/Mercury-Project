@@ -1,7 +1,7 @@
 import driver from "./driver/driver.js";
 
 import userData from "./data/users.js";
-import { registerUser } from "./users.js";
+import { registerUser, registerUserSchema } from "./users.js";
 import { addFriend } from "./userFriends.js";
 
 export async function isDatabaseEmpty() {
@@ -32,11 +32,11 @@ export async function importInitialData() {
     const userIds: string[] = [];
 
     for (const user of userData) {
-      const newUser = await registerUser(session, user);
+      const parsedUser = registerUserSchema.parse(user);
+      const newUser = await registerUser(session, parsedUser);
       userIds.push(newUser.id);
     }
 
-    console.log(userData)
     for (const [userIndex, user] of userData.entries()) {
       const userId = userIds[userIndex];
 
