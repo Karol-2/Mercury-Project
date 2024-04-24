@@ -134,9 +134,9 @@ test("maxUsers equals 0", async () => {
     {},
   );
 
-  const { status, pageCount, friends } = response;
+  const { status, errors } = response;
 
-  expect(status).toBe("ok");
-  expect(pageCount).toBe(10);
-  expect(friends.length).toBe(0);
+  expect(status).toBe("error");
+  expect(errors).toBeDefined();
+  expect(errors.maxUsers).toBe("Number must be greater than or equal to 1");
 });

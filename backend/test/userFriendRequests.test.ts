@@ -25,7 +25,7 @@ test("Check current requests", async () => {
   const { status, pageCount, friendRequests } = response;
 
   expect(status).toBe("ok");
-  expect(pageCount).toBe(10);
+  expect(pageCount).toBe(0);
   expect(friendRequests.length).toBe(0);
 });
 
@@ -106,11 +106,11 @@ test("maxUsers equals 0", async () => {
     {},
   );
 
-  const { status, pageCount, friendRequests } = response;
+  const { status, errors } = response;
 
-  expect(status).toBe("ok");
-  expect(pageCount).toBe(10);
-  expect(friendRequests.length).toBe(0);
+  expect(status).toBe("error");
+  expect(errors).toBeDefined();
+  expect(errors.maxUsers).toBe("Number must be greater than or equal to 1");
 });
 
 test("Send invite", async () => {
