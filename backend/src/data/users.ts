@@ -19,7 +19,7 @@ const userData = [
     "profile_picture":
       "https://www.wingsforlifeworldrun.com/uploads/fit/256/256/users/9qGOWl/avatar.1618305209.jpg",
     "mail": "adasko@malysz.pl",
-    "password": "hophop!",
+    "password": "hophop!23",
     "friend_ids": [],
     "chats": [],
   },
@@ -101,7 +101,7 @@ const userData = [
     "profile_picture":
       "https://t4.ftcdn.net/jpg/03/83/25/83/360_F_383258331_D8imaEMl8Q3lf7EKU2Pi78Cn0R7KkW9o.jpg",
     "mail": "shudghton1@geocities.com",
-    "password": "Cloned",
+    "password": "Huds1l12#",
     "friend_ids": [2, 3, 26],
     "chats": [],
   },
@@ -125,7 +125,7 @@ const userData = [
     "profile_picture":
       "https://static01.nyt.com/images/2022/05/19/opinion/firstpersonPromo/firstpersonPromo-superJumbo.jpg",
     "mail": "cruckman3@archive.org",
-    "password": "core",
+    "password": "coreCar0l;",
     "friend_ids": [0, 11, 4, 15, 18, 13],
     "chats": [],
   },
@@ -197,7 +197,7 @@ const userData = [
     "profile_picture":
       "https://www.eatthis.com/wp-content/uploads/sites/4/2022/09/Prince-Charles-2022.jpg?quality=82&strip=1",
     "mail": "togle9@engadget.com",
-    "password": "Focused",
+    "password": "trixxed3@!",
     "friend_ids": [20, 11, 1, 5, 3, 13],
     "chats": [],
   },
