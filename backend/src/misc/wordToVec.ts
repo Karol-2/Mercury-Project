@@ -46,10 +46,6 @@ function zip<A, B>(a: A[], b: B[]): [A, B][] {
   return a.map((e, i) => [e, b[i]]);
 }
 
-function l1Norm(a: number[]): number {
-  return sum(a.map((x) => Math.abs(x)));
-}
-
 function l2Norm(a: number[]): number {
   return sum(a.map((x) => Math.pow(x, 2)));
 }
