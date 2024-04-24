@@ -115,7 +115,7 @@ test("maxUsers equals 0", async () => {
 
 test("Send invite", async () => {
   const response = await fetchData(
-    `http://localhost:5000/users/${userId}/add/${userId2}`,
+    `http://localhost:5000/users/${userId}/send-friend-request/${userId2}`,
     "POST",
     {
       headers: {
@@ -125,15 +125,14 @@ test("Send invite", async () => {
     },
   );
 
-  const { status, friends } = response;
+  const { status } = response;
 
   expect(status).toBe("ok");
-  expect(friends).toBeDefined();
 });
 
 test("Send invite with incorrect id", async () => {
   const response = await fetchData(
-    `http://localhost:5000/users/${userId}/add/0`,
+    `http://localhost:5000/users/${userId}/send-friend-request/0`,
     "POST",
     {
       headers: {
@@ -147,12 +146,78 @@ test("Send invite with incorrect id", async () => {
 
   expect(status).toBe("error");
   expect(errors).toBeDefined();
-  expect(errors.id).toBe("not found");
+  expect(errors.userId2).toBe("not found");
+});
+
+test("Decline friend request", async () => {
+  const response = await fetchData(
+    `http://localhost:5000/users/${userId}/decline-friend-request/${userId2}`,
+    "POST",
+    {
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({}),
+    },
+  );
+
+  const { status } = response;
+
+  expect(status).toBe("ok");
+});
+
+test("Decline friend request with incorrect id", async () => {
+  const response = await fetchData(
+    `http://localhost:5000/users/${userId}/decline-friend-request/0`,
+    "POST",
+    {
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({}),
+    },
+  );
+
+  const { status, errors } = response;
+
+  expect(status).toBe("error");
+  expect(errors).toBeDefined();
+  expect(errors.userId2).toBe("not found");
+});
+
+test("Accept not invited friend request", async () => {
+  const response = await fetchData(
+    `http://localhost:5000/users/${userId}/accept-friend-request/${userId2}`,
+    "POST",
+    {
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({}),
+    },
+  );
+
+  const { status, errors } = response;
+
+  expect(status).toBe("error");
+  expect(errors).toBeDefined();
+  expect(errors.userId1).toBe("not invited");
 });
 
 test("Accept invite", async () => {
+  await fetchData(
+    `http://localhost:5000/users/${userId}/send-friend-request/${userId2}`,
+    "POST",
+    {
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({}),
+    },
+  );
+
   const response = await fetchData(
-    `http://localhost:5000/users/${userId}/accept/${userId2}`,
+    `http://localhost:5000/users/${userId2}/accept-friend-request/${userId}`,
     "POST",
     {
       headers: {
@@ -167,13 +232,13 @@ test("Accept invite", async () => {
   expect(status).toBe("ok");
 
   const friendsResponse = await fetchData(
-    `http://localhost:5000/users/${userId}/friends?page=1&maxUsers=10`,
+    `http://localhost:5000/users/${userId2}/friends?page=1&maxUsers=10`,
     "GET",
     {},
   );
 
   const friend = friendsResponse.friends.find(
-    (user: User) => user.id == userId2,
+    (user: User) => user.id == userId,
   );
 
   expect(friend).toBeDefined();
@@ -181,7 +246,7 @@ test("Accept invite", async () => {
 
 test("Accept invite with incorrect id", async () => {
   const response = await fetchData(
-    `http://localhost:5000/users/${userId}/accept/0`,
+    `http://localhost:5000/users/${userId}/accept-friend-request/0`,
     "POST",
     {
       headers: {
@@ -195,12 +260,31 @@ test("Accept invite with incorrect id", async () => {
 
   expect(status).toBe("error");
   expect(errors).toBeDefined();
-  expect(errors.id).toBe("not found");
+  expect(errors.userId2).toBe("not found");
 });
 
-test("Delete relations", async () => {
+test("Decline friend request when not invited", async () => {
   const response = await fetchData(
-    `http://localhost:5000/users/${userId}/remove/${userId2}`,
+    `http://localhost:5000/users/${userId2}/decline-friend-request/${userId}`,
+    "POST",
+    {
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({}),
+    },
+  );
+
+  const { status, errors } = response;
+
+  expect(status).toBe("error");
+  expect(errors).toBeDefined();
+  expect(errors.userId1).toBe("not invited");
+});
+
+test("Delete friend", async () => {
+  const response = await fetchData(
+    `http://localhost:5000/users/${userId2}/delete-friend/${userId}`,
     "DELETE",
     {},
   );
@@ -210,9 +294,9 @@ test("Delete relations", async () => {
   expect(status).toBe("ok");
 });
 
-test("Delete relations with incorrect id", async () => {
+test("Delete friend with incorrect id", async () => {
   const response = await fetchData(
-    `http://localhost:5000/users/${userId}/remove/0`,
+    `http://localhost:5000/users/${userId}/delete-friend/0`,
     "DELETE",
     {},
   );
@@ -221,5 +305,5 @@ test("Delete relations with incorrect id", async () => {
 
   expect(status).toBe("error");
   expect(errors).toBeDefined();
-  expect(errors.id).toBe("not found");
+  expect(errors.userId2).toBe("not found");
 });
