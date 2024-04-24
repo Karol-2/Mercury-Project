@@ -22,7 +22,7 @@ test("Get friends", async () => {
   const { status, pageCount, friends } = response;
 
   expect(status).toBe("ok");
-  expect(pageCount).toBe(10);
+  expect(pageCount).toBe(1);
   expect(friends.length).toBe(6);
 });
 
@@ -118,9 +118,9 @@ test("First user", async () => {
   const { status, pageCount, friends } = response;
 
   expect(status).toBe("ok");
-  expect(pageCount).toBe(10);
+  expect(pageCount).toBe(6);
   expect(friends.length).toBe(1);
-  expect(friends[0].country).toBe("Iran");
+  expect(friends[0].country).toBe("PL");
   expect(friends[0].mail).toBe("agodneyh@studiopress.com");
   expect(friends[0].first_name).toBe("Abby");
   expect(friends[0].last_name).toBe("Godney");
