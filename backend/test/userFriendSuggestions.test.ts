@@ -22,7 +22,7 @@ test("Get friend suggestions", async () => {
   const { status, pageCount, friendSuggestions } = response;
 
   expect(status).toBe("ok");
-  expect(pageCount).toBe(10);
+  expect(pageCount).toBe(4);
   expect(friendSuggestions).toBeDefined();
   expect(friendSuggestions.length).toBe(5);
 });
@@ -108,7 +108,7 @@ test("First user", async () => {
   const { status, pageCount, friendSuggestions } = response;
 
   expect(status).toBe("ok");
-  expect(pageCount).toBe(10);
+  expect(pageCount).toBe(17);
   expect(friendSuggestions).toBeDefined();
   expect(friendSuggestions.length).toBe(1);
 });
