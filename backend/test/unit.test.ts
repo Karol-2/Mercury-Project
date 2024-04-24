@@ -53,3 +53,11 @@ test("Cosine similarity equal to word Difference", async () => {
     wordDifference("Really long text", "also really long text") / 64,
   );
 });
+
+test("Word to Vec", async () => {
+  expect(wordToVec("")).toStrictEqual([]);
+  expect(wordToVec("1")).toStrictEqual([]);
+  expect(wordToVec(" ")).toStrictEqual([]);
+  expect(wordToVec("$")).toStrictEqual([]);
+  expect(wordToVec("A")[0]).toStrictEqual(-0.84);
+});
