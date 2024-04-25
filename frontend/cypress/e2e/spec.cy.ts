@@ -1,9 +1,10 @@
-describe("template spec", () => {
-  it("checks login and register buttons on welcome", () => {
+describe("E2E tests", () => {
+  it("Welcome page buttons exist", () => {
     cy.visit("http://localhost:5173");
 
     cy.get('[data-testid="WelcomeLogin"]').should("exist");
     cy.get('[data-testid="WelcomeRegister"]').should("exist");
+    cy.contains("button", "Join Us!").should("exist");
   });
 
   it("Login", () => {
@@ -12,11 +13,14 @@ describe("template spec", () => {
     cy.get('[data-testid="WelcomeLogin"]').click();
 
     cy.origin("http://localhost:3000", () => {
-      cy.get("#username").type("ltruman5@hc360.com");
-      cy.get("#password").type("full-range");
+      cy.get("#username").type("lewy.robi@pzpn.pl");
+      cy.get("#password").type("Euro2012");
       cy.get("#kc-login").should("exist").click();
     });
 
+    cy.wait(2000);
+
+    cy.get('[data-testid="Edit"]').should("exist");
     cy.get('[data-testid="RemoveAccount"]').should("exist");
   });
 
@@ -54,8 +58,10 @@ describe("template spec", () => {
       cy.get("#kc-login").should("exist").click();
     });
 
-    cy.get('[data-testid="RemoveAccount"]').should("exist").click();
-    cy.get('[data-testid="Yes"]').should("exist").click();
+    cy.wait(2000);
+
+    cy.get('[data-testid="Edit"]').should("exist");
+    cy.get('[data-testid="RemoveAccount"]').should("exist");
   });
 
   it("Change password", () => {
@@ -64,12 +70,12 @@ describe("template spec", () => {
     cy.get('[data-testid="WelcomeLogin"]').click();
 
     cy.origin("http://localhost:3000", () => {
-      cy.get("#username").type("ltruman5@hc360.com");
-      cy.get("#password").type("full-range");
+      cy.get("#username").type("johnsmith@mail.com");
+      cy.get("#password").type("password");
       cy.get("#kc-login").should("exist").click();
     });
 
-    cy.wait(4000);
+    cy.wait(2000);
 
     cy.get('[data-testid="Edit"]').should("exist").click();
 
@@ -85,6 +91,26 @@ describe("template spec", () => {
       cy.get('input[type="submit"]').should("exist").click();
     });
 
+    cy.wait(2000);
+
+    cy.get('[data-testid="Edit"]').should("exist");
     cy.get('[data-testid="RemoveAccount"]').should("exist");
+  });
+
+  it("Remove account", () => {
+    cy.visit("http://localhost:5173");
+
+    cy.get('[data-testid="WelcomeLogin"]').click();
+
+    cy.origin("http://localhost:3000", () => {
+      cy.get("#username").type("johnsmith@mail.com");
+      cy.get("#password").type("password2");
+      cy.get("#kc-login").should("exist").click();
+    });
+
+    cy.wait(2000);
+
+    cy.get('[data-testid="RemoveAccount"]').should("exist").click();
+    cy.get('[data-testid="Yes"]').should("exist").click();
   });
 });
