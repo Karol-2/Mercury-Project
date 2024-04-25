@@ -1,14 +1,14 @@
 import { motion } from "framer-motion";
 import { useEffect } from "react";
 
-interface Popup {
+interface PopupProps {
   header: string;
   isVisibleState: boolean;
   isVisibleHandler: () => void;
   seconds: number;
 }
 
-function Popup(props: Popup) {
+function Popup(props: PopupProps) {
   useEffect(() => {
     const timer = setTimeout(() => {
       props.isVisibleHandler();
