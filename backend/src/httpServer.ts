@@ -3,7 +3,7 @@ import servers from "./server.js";
 import usersRouter from "./routes/usersRoute.js";
 import authRouter from "./routes/authRoute.js";
 import chatRouter from "./routes/chatRoute.js";
-import { cleanUpData, importInitialData } from "./db.js";
+import { cleanUpData, importInitialData } from "./importDb.js";
 
 const { app } = servers;
 

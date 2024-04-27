@@ -1,6 +1,6 @@
 import driver from "./driver/driver.js";
 
-import userData from "./data/users.js";
+import userData from "./userData.js";
 import { registerUser, registerUserSchema } from "./users.js";
 import { addFriend } from "./userFriends.js";
 
