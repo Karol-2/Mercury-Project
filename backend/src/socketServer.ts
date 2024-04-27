@@ -1,5 +1,3 @@
-import servers from "./server.js";
-import dotenv from "dotenv";
 import driver from "./driver.js";
 import { Socket } from "socket.io";
 import {
@@ -16,10 +14,17 @@ import {
   joinMeeting,
 } from "./meetings.js";
 import { addMessageToDb } from "./messages.js";
+import { Server as SocketServer } from "socket.io";
+import ClientToServerEvents from "./events/ClientToServerEvents.js";
+import ServerToClientEvents from "./events/ServerToClientEvents.js";
+import { expressServer } from "./httpServer.js";
 
-const { io } = servers;
-
-dotenv.config();
+const io = new SocketServer<ClientToServerEvents, ServerToClientEvents>(
+  expressServer,
+  {
+    cors: { origin: ["http://localhost:5173"] },
+  },
+);
 
 const meetings: Record<string, Meeting> = {};
 
