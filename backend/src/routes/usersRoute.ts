@@ -1,5 +1,5 @@
 import { Router, Request, Response } from "express";
-import driver from "../driver/driver.js";
+import driver from "../driver.js";
 import { JWTRequest, authenticateToken, getToken } from "../misc/jwt.js";
 import {
   AuthOkErrorResponse,

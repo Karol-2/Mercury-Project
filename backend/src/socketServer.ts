@@ -1,6 +1,6 @@
 import servers from "./server.js";
 import dotenv from "dotenv";
-import driver from "./driver/driver.js";
+import driver from "./driver.js";
 import { Socket } from "socket.io";
 import {
   connectToSocket,

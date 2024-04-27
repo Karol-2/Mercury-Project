@@ -1,4 +1,4 @@
-import driver from "./driver/driver.js";
+import driver from "./driver.js";
 
 import userData from "./userData.js";
 import { registerUser, registerUserSchema } from "./users.js";

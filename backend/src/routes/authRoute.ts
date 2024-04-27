@@ -2,7 +2,7 @@ import { Router, Request } from "express";
 
 import bcrypt from "bcrypt";
 
-import driver from "../driver/driver.js";
+import driver from "../driver.js";
 import {
   JWTRequest,
   authenticateToken,

@@ -1,6 +1,6 @@
 import { Router, Request, Response } from "express";
 import { Session } from "neo4j-driver";
-import driver from "../driver/driver.js";
+import driver from "../driver.js";
 import User from "../models/User.js";
 import {
   OkErrorResponse,
