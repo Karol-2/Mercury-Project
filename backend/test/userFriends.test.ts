@@ -1,5 +1,5 @@
 import { expect, test } from "vitest";
-import { fetchData } from "./fetchData.js";
+import { fetchData } from "../src/misc/fetchData.js";
 
 let page: number = 1;
 let maxUsers: number = 10;

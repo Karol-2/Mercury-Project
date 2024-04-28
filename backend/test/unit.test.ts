@@ -12,7 +12,6 @@ test("Letter to Kb", async () => {
   expect(letterToKb("X")).toStrictEqual(-0.36);
   expect(letterToKb("A")).toStrictEqual(-0.84);
   expect(letterToKb("a")).toBeUndefined();
-
   expect(letterToKb("1")).toBeUndefined();
   expect(letterToKb(" ")).toBeUndefined();
 });

@@ -1,5 +1,5 @@
 import { expect, test } from "vitest";
-import { fetchData } from "./fetchData.js";
+import { fetchData } from "../src/misc/fetchData.js";
 import User from "../src/models/User.js";
 
 let page: number = 1;
