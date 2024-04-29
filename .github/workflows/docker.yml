@@ -54,5 +54,13 @@ jobs:
         with:
           compose-file: "compose.yml"
 
+      - name: Wait for containers to start
+        run: |
+          sleep 100
+          docker run \
+            --rm \
+            --network mercury-project_default \
+            alpine/curl -o /dev/null --retry 3 --retry-connrefused backend:5000
+
       - name: Run Cypress Tests
         run: cd frontend; npm i && npm run cy:run
