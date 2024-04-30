@@ -3,7 +3,7 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Socket } from "socket.io-client";
 
 import User from "../models/User";
-import notificationSoundUrl from "../misc/notification.mp3";
+import notificationSoundUrl from "../assets/notification.mp3";
 import Message, { MessageProps } from "./Message";
 import dataService from "../services/data";
 
