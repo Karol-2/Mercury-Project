@@ -12,7 +12,7 @@ interface searchProps {
 
 const Search = (props: searchProps) => {
   const navigate = useNavigate();
-  const {user} = useUser();
+  const { user } = useUser();
 
   // Logic
   const [searchQuery, setSearchQuery] = useState("");
@@ -53,7 +53,7 @@ const Search = (props: searchProps) => {
     const urlSearchParams = new URLSearchParams({
       q: searchQuery,
       country: countryQuery,
-      userId: user?.id || ""
+      userId: user?.id || "",
     });
 
     props.handler(`/users/search?${urlSearchParams}`);

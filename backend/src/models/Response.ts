@@ -9,8 +9,8 @@ export interface CustomResponse<J> extends Response {
 }
 
 export type Errors = {
-  [key: string]: Errors | string
-}
+  [key: string]: Errors | string;
+};
 
 export interface ErrorResponse {
   status: "error";

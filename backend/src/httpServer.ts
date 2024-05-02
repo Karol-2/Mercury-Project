@@ -35,4 +35,4 @@ app.use("/users", usersRouter);
 app.use("/auth", authRouter);
 app.use("/chat", chatRouter);
 
-export {expressServer}
+export { expressServer };
