@@ -10,7 +10,7 @@ export const letterToKb = (c: string) => kbValue[c.charCodeAt(0) - 65];
 
 export const lerp = (a: number, b: number, f: number) => (1 - f) * a + f * b;
 
-const wordVecInterp = (word: string, vecLength: number) => {
+export const wordVecInterp = (word: string, vecLength: number) => {
   const vec = [];
   const wordCapital = word.toUpperCase();
   const factor = (word.length - 1) / (vecLength - 1);
@@ -38,19 +38,19 @@ const keepLettersRegex = /[^a-z]/;
 export const keepLetters = (s: string) => s.replace(keepLettersRegex, "");
 export const sortLetters = (s: string) => [...s].sort().join("");
 
-function sum(lst: number[]): number {
+export function sum(lst: number[]): number {
   return lst.reduce((a, b) => a + b);
 }
 
-function zip<A, B>(a: A[], b: B[]): [A, B][] {
+export function zip<A, B>(a: A[], b: B[]): [A, B][] {
   return a.map((e, i) => [e, b[i]]);
 }
 
-function l2Norm(a: number[]): number {
+export function l2Norm(a: number[]): number {
   return sum(a.map((x) => Math.pow(x, 2)));
 }
 
-function dot(a: number[], b: number[]): number {
+export function dot(a: number[], b: number[]): number {
   return sum(zip(a, b).map(([a, b]) => a * b));
 }
 
