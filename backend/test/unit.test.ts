@@ -12,6 +12,8 @@ import {
   l2Norm,
   dot,
 } from "../src/misc/wordToVec.js";
+import removeKeys from "../src/misc/removeKeys.js";
+
 import wordToVec from "../src/misc/wordToVec.js";
 
 test("Letter to Kb", async () => {
@@ -139,4 +141,31 @@ test("Word to Vec", async () => {
   expect(wordToVec(" ")).toStrictEqual([]);
   expect(wordToVec("$")).toStrictEqual([]);
   expect(wordToVec("A")[0]).toStrictEqual(-0.84);
+});
+
+test("Remove keys", async () => {
+  const User = {
+    first_name: "First name",
+    last_name: "Last name",
+    mail: "mail",
+    password: "password",
+  };
+  expect(removeKeys(User, [])).toStrictEqual({
+    first_name: "First name",
+    last_name: "Last name",
+    mail: "mail",
+    password: "password",
+  });
+  expect(removeKeys(User, ["password"])).toStrictEqual({
+    first_name: "First name",
+    last_name: "Last name",
+    mail: "mail",
+  });
+  expect(removeKeys(User, ["last_name", "mail"])).toStrictEqual({
+    first_name: "First name",
+    password: "password",
+  });
+  expect(
+    removeKeys(User, ["first_name", "last_name", "mail", "password"]),
+  ).toStrictEqual({});
 });
