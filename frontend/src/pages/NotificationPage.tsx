@@ -30,17 +30,26 @@ function NotificationPage() {
             case "call":
                 return {
                     ...notificationWithDeleteMethod,
-                    action: () => joinMeeting(notification.senderId)
+                    action: async () => {
+                        joinMeeting(notification.senderId);
+                        await removeNotification(user!.id, notification.id!);
+                    }
                 }
             case "friend":
                 return {
                     ...notificationWithDeleteMethod,
-                    action: () => navigate(`/friends`)
+                    action: async () => {
+                        navigate(`/friends`);
+                        await removeNotification(user!.id, notification.id!);
+                    }
                 }
             case "message":
                 return {
                     ...notificationWithDeleteMethod, 
-                    action: () => navigate(`/messages/${notification.senderId}`)
+                    action: async () => {
+                        navigate(`/messages/${notification.senderId}`);
+                        await removeNotification(user!.id, notification.id!);
+                    }
                 }
             default:
                 break;
