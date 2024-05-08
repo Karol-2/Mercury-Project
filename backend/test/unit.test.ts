@@ -35,6 +35,18 @@ test("Linear interpolation", async () => {
   expect(lerp(0, 10, -1)).toStrictEqual(-10);
 });
 
+test("WordVecInterp", async () => {
+  expect(wordVecInterp("Text", 0)).toStrictEqual([]);
+  expect(wordVecInterp("A", 1)).toStrictEqual([-0.84]);
+  expect(wordVecInterp("ABC", 2)).toStrictEqual([-0.84, -0.28]);
+  expect(wordVecInterp("ABC", 4)).toStrictEqual([
+    -0.84, -0.14666666666666672, 0.04000000000000001, -0.28,
+  ]);
+  expect(wordVecInterp("0", 1)).toStrictEqual([undefined]);
+  expect(wordVecInterp("00", 1)).toStrictEqual([undefined]);
+  expect(wordVecInterp("00", 3)).toStrictEqual([NaN, NaN, undefined]);
+});
+
 test("Sum", async () => {
   expect(sum([1])).toStrictEqual(1);
   expect(sum([1, 2, 3, 4, 5])).toStrictEqual(15);
