@@ -8,7 +8,7 @@ const kbValue = [...kb].map((c) => (c / 25) * 2 - 1);
 
 export const letterToKb = (c: string) => kbValue[c.charCodeAt(0) - 65];
 
-const lerp = (a: number, b: number, f: number) => (1 - f) * a + f * b;
+export const lerp = (a: number, b: number, f: number) => (1 - f) * a + f * b;
 
 const wordVecInterp = (word: string, vecLength: number) => {
   const vec = [];
