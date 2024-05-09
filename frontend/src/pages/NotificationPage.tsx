@@ -1,16 +1,28 @@
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
+import Transition from "../components/Transition";
 import NotificationComponent from "../components/NotificationComponent";
 import Notification from "../models/Notification";
 import { useUser } from "../helpers/UserContext";
 import { useMeeting } from "../helpers/MeetingProvider";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import dataService from "../services/data";
 function NotificationPage() {
     const navigate = useNavigate();
     const {notifications, setNotifications, user} = useUser();
     const { joinMeeting, meeting } = useMeeting();
+
+    const [showAnimation, setShowAnim] = useState(false);
+    const [showContent, setShowContent] = useState(false);
+
+    useEffect(() => {
+        setShowAnim(true);
+        setTimeout(() => {
+          setShowContent(true);
+        }, 100);
+    }, []);
+
     useEffect(() => {
         if (meeting?.id) {
           navigate("/meeting");
@@ -60,10 +72,15 @@ function NotificationPage() {
     return (
         <>
             <Navbar />
-            <div className="my-20 mx-50">
-                {notifications.map(notification => addAction(notification))
-                .map((notification) => <NotificationComponent key={notification.id} notification={notification} />)}
-            </div>
+            {showAnimation && <Transition startAnimation={showAnimation} />}
+            {showContent ? (
+                <div className="my-20 mx-50">
+                    {notifications.map(notification => addAction(notification))
+                    .map((notification) => <NotificationComponent key={notification.id} notification={notification} />)}
+                </div>
+            ) : (
+                ""
+            )}
             <Footer />
         </>
     )
