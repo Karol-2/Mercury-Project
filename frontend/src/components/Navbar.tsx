@@ -80,13 +80,11 @@ function Navbar(props: NavbarProps) {
             >
               <FontAwesomeIcon icon={link.icon} />
               <span className=" hidden md:inline ml-2">{link.text}</span>
-              {link.text === "Notifications" && notifications.length > 0
-              ? (
+              {link.text === "Notifications" && notifications.length > 0 ? (
                 <span className="ml-2 p-2 rounded-lg bg-my-red">
                   {notifications.length}
-                </span> 
-              )
-              : null}
+                </span>
+              ) : null}
             </Link>
           ))}
           <div

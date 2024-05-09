@@ -45,21 +45,21 @@ function RestUserProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (socket !== null) {
-        socket.on("notify", (notification: Notification) => {
-          play();
-          switch (notification.type) {
-              case "message":               
-                  setNotifications((prev: Notification[]) => [...prev, notification]);
-                  break;
-              case "call":
-                  setNotifications((prev: Notification[]) => [...prev, notification]);
-                  break;
-              case "friend":
-                  setNotifications((prev: Notification[]) => [...prev, notification]);
-                  break;
-              default:
-                  break;
-          }
+      socket.on("notify", (notification: Notification) => {
+        play();
+        switch (notification.type) {
+          case "message":
+            setNotifications((prev: Notification[]) => [...prev, notification]);
+            break;
+          case "call":
+            setNotifications((prev: Notification[]) => [...prev, notification]);
+            break;
+          case "friend":
+            setNotifications((prev: Notification[]) => [...prev, notification]);
+            break;
+          default:
+            break;
+        }
       });
     }
   }, [socket]);
@@ -212,7 +212,11 @@ function RestUserProvider({ children }: { children: React.ReactNode }) {
     if (userState.status != "logged_in") return true;
 
     const user = userState.user!;
-    const response = await dataService.fetchData(`/users/notifications/${user.id}`, "GET", {});
+    const response = await dataService.fetchData(
+      `/users/notifications/${user.id}`,
+      "GET",
+      {},
+    );
 
     if (response.status === "ok") {
       setNotifications(response.notifications);

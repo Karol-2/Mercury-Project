@@ -68,10 +68,10 @@ function FriendsPage() {
       type: "call",
       senderId: user.id,
       senderFullName: `${user.first_name} ${user.last_name}`,
-      receiverId: friendId
-    }
+      receiverId: friendId,
+    };
     socket?.emit("notify", notification);
-  }
+  };
 
   const handleAcceptRequest = async (currentId: string) => {
     if (user) {

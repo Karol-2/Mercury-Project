@@ -12,7 +12,7 @@ interface FoundUserProps {
 }
 
 function FoundUser(props: FoundUserProps) {
-  const {user: myUserAccount} = useProtected();
+  const { user: myUserAccount } = useProtected();
   const { socket } = useUser();
   const [requestSent, setRequestSent] = useState(false);
   const { user, isFriend } = props;
@@ -50,8 +50,8 @@ function FoundUser(props: FoundUserProps) {
         type: "friend",
         senderId: myUserAccount.id,
         receiverId: user.id,
-        senderFullName: `${myUserAccount.first_name} ${myUserAccount.last_name}`
-      }
+        senderFullName: `${myUserAccount.first_name} ${myUserAccount.last_name}`,
+      };
       socket?.emit("notify", notification);
     } catch (error) {
       console.error("Error:", error);

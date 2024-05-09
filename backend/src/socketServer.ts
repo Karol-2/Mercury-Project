@@ -148,12 +148,15 @@ io.on("connection", async (socket: Socket) => {
 
   socket.on("notify", async (notification: Notification) => {
     const session = driver.session();
-    const receiverSockets = await getAllSockets(session, notification.receiverId);
+    const receiverSockets = await getAllSockets(
+      session,
+      notification.receiverId,
+    );
     const id = v4();
     await addNotification(session, id, notification);
     await session.close();
     receiverSockets.forEach((receiverSocket) => {
-      socket.to(receiverSocket.id).emit("notify", {...notification, id});
+      socket.to(receiverSocket.id).emit("notify", { ...notification, id });
     });
   });
 

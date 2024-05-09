@@ -32,7 +32,7 @@ const protectedRoutes = [
   { path: "/friends", element: <FriendsPage /> },
   { path: "/search", element: <SearchPage /> },
   { path: "/meeting", element: <VideoCallPage /> },
-  { path: "/notification", element: <NotificationPage /> }
+  { path: "/notification", element: <NotificationPage /> },
 ];
 
 ReactDOM.createRoot(document.getElementById("root")!).render(

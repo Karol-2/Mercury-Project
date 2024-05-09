@@ -174,11 +174,13 @@ usersRouter.get("/notifications/:userId", async (req, res) => {
     }
     const notificationsRequest = await session.run(
       `MATCH (u:User {id: $userId})-[:HAS_NOTIFICATION]->(n:Notification) RETURN n`,
-      { userId }
+      { userId },
     );
     await session.close();
     try {
-      const notifications = notificationsRequest.records.map((notification) => notification.get("n").properties);
+      const notifications = notificationsRequest.records.map(
+        (notification) => notification.get("n").properties,
+      );
       return res.json({ status: "ok", notifications });
     } catch (_err) {
       return res.json({ status: "ok", notifications: [] });
@@ -343,20 +345,23 @@ usersRouter.delete("/:userId", async (req: Request, res: OkErrorResponse) => {
   }
 });
 
-usersRouter.delete("/notifications/:userId/:notificationId", async (req, res) => {
-  const userId = req.params.userId;
-  const notificationId = req.params.notificationId;
+usersRouter.delete(
+  "/notifications/:userId/:notificationId",
+  async (req, res) => {
+    const userId = req.params.userId;
+    const notificationId = req.params.notificationId;
 
-  const session = driver.session();
-  try {
-    await deleteNotification(session, userId, notificationId);
-    return res.json({status: "ok"});
-  } catch (err) {
-    console.log("Error:", err);
-    return res.status(404).json({ status: "error", errors: err as object });
-  } finally {
-    session.close();
-  }
-});
+    const session = driver.session();
+    try {
+      await deleteNotification(session, userId, notificationId);
+      return res.json({ status: "ok" });
+    } catch (err) {
+      console.log("Error:", err);
+      return res.status(404).json({ status: "error", errors: err as object });
+    } finally {
+      session.close();
+    }
+  },
+);
 
 export default usersRouter;

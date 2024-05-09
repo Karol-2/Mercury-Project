@@ -141,7 +141,7 @@ function ChatBox({ user, socket, friendId }: ChatBoxProps) {
         senderId: user.id,
         receiverId: friendId,
         senderFullName: `${user.first_name} ${user.last_name}`,
-      }
+      };
       socket.emit("notify", notification);
       sendMessage(user.id, text);
       e.currentTarget.value = "";

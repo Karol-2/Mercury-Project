@@ -15,7 +15,9 @@ function MessagingPage() {
   const { user } = useProtected();
 
   useEffect(() => {
-    setNotifications((prev: any[]) => prev.filter(notification => notification.senderId !== friendId))
+    setNotifications((prev: any[]) =>
+      prev.filter((notification) => notification.senderId !== friendId),
+    );
   }, []);
 
   useEffect(() => {
