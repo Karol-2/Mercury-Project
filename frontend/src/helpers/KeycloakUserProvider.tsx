@@ -8,7 +8,7 @@ import Notification from "../models/Notification";
 import Keycloak from "keycloak-js";
 import { useNavigate } from "react-router-dom";
 import useSound from "use-sound";
-import notificationSound from "../misc/notification.mp3";
+import notificationSound from "../assets/notification.mp3";
 
 function KeycloakUserProvider({ children }: { children: React.ReactNode }) {
   const navigate = useNavigate();

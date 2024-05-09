@@ -4,7 +4,7 @@ import { Socket } from "socket.io-client";
 
 import User from "../models/User";
 import Notification from "../models/Notification";
-import notificationSoundUrl from "../misc/notification.mp3";
+import notificationSoundUrl from "../assets/notification.mp3";
 import Message, { MessageProps } from "./Message";
 import dataService from "../services/data";
 
