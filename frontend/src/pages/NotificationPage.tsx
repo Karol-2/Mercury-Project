@@ -1,5 +1,6 @@
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
+import NotificationComponent from "../components/NotificationComponent";
 import Notification from "../models/Notification";
 import { useUser } from "../helpers/UserContext";
 import { useMeeting } from "../helpers/MeetingProvider";
@@ -61,10 +62,7 @@ function NotificationPage() {
             <Navbar />
             <div>
                 {notifications.map(notification => addAction(notification))
-                .map((notification) => <div key={notification.id}>
-                    {notification.type} from {notification.senderFullName} <button onClick={notification.action}>action</button>
-                    <button onClick={notification.deleteNotification}>delete</button>
-                </div>)}
+                .map((notification) => <NotificationComponent key={notification.id} notification={notification} />)}
             </div>
             <Footer />
         </>
