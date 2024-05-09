@@ -29,7 +29,7 @@ function NotificationComponent({notification}: NotificationComponentProps) {
         }
     }, []);
     return (
-        <div className="bg-my-dark p-5 flex items-center">
+        <div className="mx-20 bg-my-dark p-5 flex items-center rounded-xl">
             <div className="flex-1 flex items-center gap-10">
                 <div className="text-4xl">
                     {icon ? <FontAwesomeIcon icon={icon} /> : null}

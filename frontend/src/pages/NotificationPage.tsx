@@ -60,7 +60,7 @@ function NotificationPage() {
     return (
         <>
             <Navbar />
-            <div>
+            <div className="my-20 mx-50">
                 {notifications.map(notification => addAction(notification))
                 .map((notification) => <NotificationComponent key={notification.id} notification={notification} />)}
             </div>
