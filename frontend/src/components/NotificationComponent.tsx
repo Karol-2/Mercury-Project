@@ -29,22 +29,26 @@ function NotificationComponent({notification}: NotificationComponentProps) {
         }
     }, []);
     return (
-        <div>
-            <div>
-                {icon ? <FontAwesomeIcon icon={icon} /> : null}
-            </div>
-            <div>
-                {content}
-            </div>
-            <div>
-                <button onClick={action}>
+        <div className="bg-my-dark p-5 flex items-center">
+            <div className="flex-1 flex items-center gap-10">
+                <div className="text-4xl">
                     {icon ? <FontAwesomeIcon icon={icon} /> : null}
-                </button>
+                </div>
+                <div className="text-2xl">
+                    {content}
+                </div>
             </div>
-            <div>
-                <button onClick={deleteNotification}>
-                    <FontAwesomeIcon icon={faTrash} />
-                </button>
+            <div className="flex-1 flex gap-10 justify-end items-center">
+                <div className="text-3xl w-1/4">
+                    <button className="btn bg-my-green p-3 w-full" onClick={action}>
+                        {icon ? <FontAwesomeIcon icon={icon} /> : null}
+                    </button>
+                </div>
+                <div className="text-3xl w-1/4">
+                    <button className="btn bg-my-red p-3 w-full" onClick={deleteNotification}>
+                        <FontAwesomeIcon icon={faTrash} />
+                    </button>
+                </div>
             </div>
         </div>
     )
