@@ -9,17 +9,20 @@ import Footer from "../components/Footer";
 import FriendRequest from "../components/FriendRequest";
 import Navbar from "../components/Navbar";
 import User from "../models/User";
+import Notification from "../models/Notification";
 import dataService from "../services/data";
 import Transition from "../components/Transition";
 import { useProtected } from "../helpers/Protected";
 import FoundUser from "../components/FoundUser";
 import Friend from "../components/Friend";
 import PaginatorV2 from "../components/PaginatorV2";
+import { useUser } from "../helpers/UserContext";
 
 function FriendsPage() {
   const navigate = useNavigate();
   const { user } = useProtected();
-  const { meeting, createMeeting, joinMeeting } = useMeeting();
+  const { socket } = useUser();
+  const { meeting, createMeeting } = useMeeting();
 
   const [friendsRequests, setFriendsRequests] = useState([]);
   const [refresh, setRefresh] = useState(false);
@@ -42,7 +45,7 @@ function FriendsPage() {
           "GET",
           {},
         );
-        setFriendsRequests(friendsRequestsResponse.friends);
+        setFriendsRequests(friendsRequestsResponse.friendRequests);
       }
     };
     fetchFriendRequests();
@@ -57,6 +60,17 @@ function FriendsPage() {
 
       setRefresh(() => !refresh);
     }
+  };
+
+  const handleCreateMeeting = (friendId: string) => {
+    createMeeting();
+    const notification: Notification = {
+      type: "call",
+      senderId: user.id,
+      senderFullName: `${user.first_name} ${user.last_name}`,
+      receiverId: friendId,
+    };
+    socket?.emit("notify", notification);
   };
 
   const handleAcceptRequest = async (currentId: string) => {
@@ -106,7 +120,7 @@ function FriendsPage() {
                         <Friend
                           friend={user}
                           handleDeclineRequest={handleDeclineRequest}
-                          joinMeeting={joinMeeting}
+                          handleCreateMeeting={handleCreateMeeting}
                         />
                       )}
                     />
@@ -151,7 +165,6 @@ function FriendsPage() {
                       <FoundUser
                         user={resultUser}
                         key={String(1)}
-                        currentId={user.id}
                         isFriend={false}
                       />
                     )}

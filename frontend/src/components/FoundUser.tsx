@@ -1,15 +1,19 @@
 import { useState, useEffect } from "react";
 import User from "../models/User";
+import Notification from "../models/Notification";
 import dataService from "../services/data";
+import { useProtected } from "../helpers/Protected";
+import { useUser } from "../helpers/UserContext";
 
 interface FoundUserProps {
   user: User;
   key: string;
-  currentId: string | null | undefined;
   isFriend: boolean;
 }
 
 function FoundUser(props: FoundUserProps) {
+  const { user: myUserAccount } = useProtected();
+  const { socket } = useUser();
   const [requestSent, setRequestSent] = useState(false);
   const { user, isFriend } = props;
 
@@ -23,7 +27,7 @@ function FoundUser(props: FoundUserProps) {
         );
 
         const isRequestSent = friendsRequestsResponse.friendRequests.some(
-          (friend: User) => String(friend.id) === props.currentId,
+          (friend: User) => String(friend.id) === myUserAccount.id,
         );
 
         setRequestSent(isRequestSent);
@@ -38,10 +42,17 @@ function FoundUser(props: FoundUserProps) {
   const handleAddFriend = async () => {
     try {
       await dataService.fetchData(
-        `/users/${props.currentId}/add/${props.user.id}`,
+        `/users/${myUserAccount.id}/add/${props.user.id}`,
         "POST",
       );
       setRequestSent(true);
+      const notification: Notification = {
+        type: "friend",
+        senderId: myUserAccount.id,
+        receiverId: user.id,
+        senderFullName: `${myUserAccount.first_name} ${myUserAccount.last_name}`,
+      };
+      socket?.emit("notify", notification);
     } catch (error) {
       console.error("Error:", error);
     }

@@ -3,6 +3,7 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Socket } from "socket.io-client";
 
 import User from "../models/User";
+import Notification from "../models/Notification";
 import notificationSoundUrl from "../assets/notification.mp3";
 import Message, { MessageProps } from "./Message";
 import dataService from "../services/data";
@@ -135,7 +136,13 @@ function ChatBox({ user, socket, friendId }: ChatBoxProps) {
       enterPressed.current = true;
       const text = e.currentTarget.value.trim();
       if (!text) return;
-
+      const notification: Notification = {
+        type: "message",
+        senderId: user.id,
+        receiverId: friendId,
+        senderFullName: `${user.first_name} ${user.last_name}`,
+      };
+      socket.emit("notify", notification);
       sendMessage(user.id, text);
       e.currentTarget.value = "";
     }

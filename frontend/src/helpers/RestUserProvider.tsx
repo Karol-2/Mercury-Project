@@ -6,13 +6,17 @@ import User, { FrontendUser } from "../models/User";
 import { Socket, io } from "socket.io-client";
 import UserContext from "./UserContext";
 import UserState from "../models/UserState";
+import Notification from "../models/Notification";
 import { useNavigate } from "react-router-dom";
+import useSound from "use-sound";
+import notificationSound from "../misc/notification.mp3";
 
 function RestUserProvider({ children }: { children: React.ReactNode }) {
   const navigate = useNavigate();
   const provider = "rest";
-
+  const [play] = useSound(notificationSound);
   const [userState, setUserState] = useState<UserState>({ status: "loading" });
+  const [notifications, setNotifications] = useState<Notification[]>([]);
   const user = useMemo(
     () => (userState.status == "logged_in" ? userState.user : null),
     [userState],
@@ -37,6 +41,33 @@ function RestUserProvider({ children }: { children: React.ReactNode }) {
 
     const userId = userState.user.id;
     setSocket(io("http://localhost:5000", { auth: { userId } }));
+  }, [userState]);
+
+  useEffect(() => {
+    if (socket !== null) {
+      socket.on("notify", (notification: Notification) => {
+        play();
+        switch (notification.type) {
+          case "message":
+            setNotifications((prev: Notification[]) => [...prev, notification]);
+            break;
+          case "call":
+            setNotifications((prev: Notification[]) => [...prev, notification]);
+            break;
+          case "friend":
+            setNotifications((prev: Notification[]) => [...prev, notification]);
+            break;
+          default:
+            break;
+        }
+      });
+    }
+  }, [socket]);
+
+  useEffect(() => {
+    if (userState.status != "logged_in") {
+      fetchNotifications();
+    }
   }, [userState]);
 
   const firstRefresh = useRef(true);
@@ -177,6 +208,25 @@ function RestUserProvider({ children }: { children: React.ReactNode }) {
     return false;
   };
 
+  const fetchNotifications = async () => {
+    if (userState.status != "logged_in") return true;
+
+    const user = userState.user!;
+    const response = await dataService.fetchData(
+      `/users/notifications/${user.id}`,
+      "GET",
+      {},
+    );
+
+    if (response.status === "ok") {
+      setNotifications(response.notifications);
+      return true;
+    }
+
+    console.error("Error from the server", response.errors);
+    return false;
+  };
+
   useEffect(() => {
     if (token) {
       const newUserId = (token as any).userId;
@@ -202,6 +252,8 @@ function RestUserProvider({ children }: { children: React.ReactNode }) {
         user,
         userState,
         socket,
+        notifications,
+        setNotifications,
         redirectToLogin,
         login,
         logout,

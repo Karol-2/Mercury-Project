@@ -25,6 +25,7 @@ import {
 import DbUser from "../models/DbUser.js";
 import { ChangePasswordReq } from "../models/ChangePasswordReq.js";
 import { verifySearchQuery } from "../misc/verifyRequest.js";
+import { deleteNotification } from "../notifications.js";
 
 const usersRouter = Router();
 
@@ -155,6 +156,34 @@ usersRouter.get("/meetings/:userId", async (req: Request, res) => {
       return res.json({ status: "ok", meetings });
     } catch (_err) {
       return res.json({ status: "ok", meetings: [] });
+    }
+  } catch (err) {
+    console.log("Error:", err);
+    return res.status(404).json({ status: "error", errors: err as object });
+  }
+});
+
+usersRouter.get("/notifications/:userId", async (req, res) => {
+  try {
+    const session = driver.session();
+    const userId = req.params.userId;
+    const user = await getDbUser(session, { id: userId });
+    if (!user) {
+      await session.close();
+      return res;
+    }
+    const notificationsRequest = await session.run(
+      `MATCH (u:User {id: $userId})-[:HAS_NOTIFICATION]->(n:Notification) RETURN n`,
+      { userId },
+    );
+    await session.close();
+    try {
+      const notifications = notificationsRequest.records.map(
+        (notification) => notification.get("n").properties,
+      );
+      return res.json({ status: "ok", notifications });
+    } catch (_err) {
+      return res.json({ status: "ok", notifications: [] });
     }
   } catch (err) {
     console.log("Error:", err);
@@ -315,5 +344,24 @@ usersRouter.delete("/:userId", async (req: Request, res: OkErrorResponse) => {
     await session.close();
   }
 });
+
+usersRouter.delete(
+  "/notifications/:userId/:notificationId",
+  async (req, res) => {
+    const userId = req.params.userId;
+    const notificationId = req.params.notificationId;
+
+    const session = driver.session();
+    try {
+      await deleteNotification(session, userId, notificationId);
+      return res.json({ status: "ok" });
+    } catch (err) {
+      console.log("Error:", err);
+      return res.status(404).json({ status: "error", errors: err as object });
+    } finally {
+      session.close();
+    }
+  },
+);
 
 export default usersRouter;

@@ -3,6 +3,7 @@ import LogoSVG from "/logo.svg";
 import { useUser } from "../helpers/UserContext";
 import { useState } from "react";
 import {
+  faBell,
   faMagnifyingGlass,
   faUser,
   faUsers,
@@ -19,7 +20,7 @@ function Navbar(props: NavbarProps) {
   const { handleNavigate } = props;
   const [isOpen, setIsOpen] = useState(false);
 
-  const { user, logout } = useUser();
+  const { user, logout, notifications } = useUser();
 
   const handleLogout = async () => {
     const logged_out = await logout();
@@ -30,6 +31,7 @@ function Navbar(props: NavbarProps) {
   };
 
   const navLinks = [
+    { to: "/notification", text: "Notifications", icon: faBell },
     { to: "/search", text: "Search", icon: faMagnifyingGlass },
     { to: "/profile", text: "My Profile", icon: faUser },
     { to: "/friends", text: "Friends", icon: faUsers },
@@ -78,6 +80,11 @@ function Navbar(props: NavbarProps) {
             >
               <FontAwesomeIcon icon={link.icon} />
               <span className=" hidden md:inline ml-2">{link.text}</span>
+              {link.text === "Notifications" && notifications.length > 0 ? (
+                <span className="ml-2 p-2 rounded-lg bg-my-red">
+                  {notifications.length}
+                </span>
+              ) : null}
             </Link>
           ))}
           <div

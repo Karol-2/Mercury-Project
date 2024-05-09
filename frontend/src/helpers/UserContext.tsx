@@ -1,4 +1,4 @@
-import { createContext, useContext } from "react";
+import { Dispatch, SetStateAction, createContext, useContext } from "react";
 import { Socket } from "socket.io-client";
 import User, { FrontendUser } from "../models/User";
 import UserState from "../models/UserState";
@@ -9,6 +9,8 @@ export interface UserContextValue {
   userState: UserState;
   token?: string;
   socket: Socket | null;
+  notifications: any[];
+  setNotifications: Dispatch<SetStateAction<any[]>>;
   login: (mail: string, password: string) => Promise<void>;
   redirectToLogin: () => void;
   logout: () => Promise<boolean>;

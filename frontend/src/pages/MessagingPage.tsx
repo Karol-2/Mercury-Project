@@ -11,8 +11,14 @@ function MessagingPage() {
   const navigate = useNavigate();
   const navigating = useRef<boolean>(false);
   const { friendId } = useParams();
-  const { userState, socket } = useUser();
+  const { userState, socket, setNotifications } = useUser();
   const { user } = useProtected();
+
+  useEffect(() => {
+    setNotifications((prev: any[]) =>
+      prev.filter((notification) => notification.senderId !== friendId),
+    );
+  }, []);
 
   useEffect(() => {
     if (navigating.current) return;
