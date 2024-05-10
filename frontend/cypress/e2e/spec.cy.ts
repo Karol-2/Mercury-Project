@@ -64,6 +64,40 @@ describe("E2E tests", () => {
     cy.get('[data-testid="RemoveAccount"]').should("exist");
   });
 
+  it("Edit data", () => {
+    cy.visit("http://localhost:5173");
+
+    cy.get('[data-testid="WelcomeLogin"]').click();
+
+    cy.origin("http://localhost:3000", () => {
+      cy.get("#username").type("johnsmith@mail.com");
+      cy.get("#password").type("password");
+      cy.get("#kc-login").should("exist").click();
+    });
+
+    cy.wait(2000);
+
+    cy.get('[data-testid="Edit"]').should("exist").click();
+
+    cy.wait(3000);
+
+    cy.get('input[name="first_name"]').clear().type("Johnny");
+    cy.get('input[name="last_name"]').clear().type("Blacksmith");
+    cy.get('input[name="mail"]').clear().type("johnnyblacksmith@mail.com");
+    cy.get('[data-testid="Save"]').should("exist").click();
+
+    cy.wait(2000);
+
+    cy.get('[data-testid="My Profile"]').should("exist").click();
+
+    cy.wait(1000);
+
+    cy.contains("p", "Johnny Blacksmith").should("exist");
+    cy.contains("p", "johnnyblacksmith@mail.com").should("exist");
+    cy.get('[data-testid="Edit"]').should("exist");
+    cy.get('[data-testid="RemoveAccount"]').should("exist");
+  });
+
   it("Change password", () => {
     cy.visit("http://localhost:5173");
 
@@ -79,7 +113,7 @@ describe("E2E tests", () => {
 
     cy.get('[data-testid="Edit"]').should("exist").click();
 
-    cy.wait(4000);
+    cy.wait(3000);
 
     cy.get('[data-testid="Change"]').should("exist").click();
 
@@ -95,6 +129,29 @@ describe("E2E tests", () => {
 
     cy.get('[data-testid="Edit"]').should("exist");
     cy.get('[data-testid="RemoveAccount"]').should("exist");
+  });
+
+  it("Search users", () => {
+    cy.visit("http://localhost:5173");
+
+    cy.get('[data-testid="WelcomeLogin"]').click();
+
+    cy.origin("http://localhost:3000", () => {
+      cy.get("#username").type("johnsmith@mail.com");
+      cy.get("#password").type("password2");
+      cy.get("#kc-login").should("exist").click();
+    });
+
+    cy.wait(2000);
+
+    cy.get('[data-testid="Search"]').should("exist").click();
+    cy.wait(1000);
+    cy.get('[data-testid="SearchBox"]').type("Robert Lewandowski");
+    cy.get('[data-testid="SearchButton"]').should("exist").click();
+
+    cy.wait(1000);
+
+    cy.contains("p", "Robert Lewandowski").should("exist");
   });
 
   it("Remove account", () => {

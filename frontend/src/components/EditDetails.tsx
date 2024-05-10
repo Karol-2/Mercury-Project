@@ -165,7 +165,7 @@ function EditDetails(props: EditDetails) {
 
           <input
             disabled={isSubmitting}
-            data-testid="Register"
+            data-testid="Save"
             type="submit"
             className="btn small bg-my-orange disabled:bg-my-dark"
             value="Save"
