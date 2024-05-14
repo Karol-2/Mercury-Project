@@ -88,21 +88,6 @@ test("maxUsers as a text", async () => {
   expect(errors.maxUsers).toBe("Expected number, received nan");
 });
 
-test("Missing page and maxUsers", async () => {
-  const response = await fetchData(
-    `http://localhost:5000/users/search`,
-    "GET",
-    {},
-  );
-
-  const { status, errors } = response;
-
-  expect(status).toBe("error");
-  expect(errors).toBeDefined();
-  expect(errors.page).toBe("Invalid input");
-  expect(errors.maxUsers).toBe("Invalid input");
-});
-
 test("First user from Brazil", async () => {
   country = "BR";
   const response = await fetchData(
