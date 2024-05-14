@@ -14,7 +14,8 @@ function Profile(props: ProfilePageFormProps) {
 
   const { user, handleEditClick, deleteUser } = props;
 
-  const countryName = countriesData.find((v) => v.Code == user.country)?.Country
+  const countryName = countriesData.find((v) => v.Code == user.country)
+    ?.Country;
 
   return (
     <section className="bg-my-darker min-h-screen flex justify-center ">

@@ -264,14 +264,15 @@ usersRouter.post(
         session,
         userId,
         parsedPasswords,
-        req.token
+        req.token,
       );
 
       if (!changePasswordResult.success) {
-        const {userExists, isUserIssued, passwordCorrect} = changePasswordResult;
+        const { userExists, isUserIssued, passwordCorrect } =
+          changePasswordResult;
 
         if (!userExists) {
-          return userNotFoundRes(res)
+          return userNotFoundRes(res);
         }
 
         if (isUserIssued) {

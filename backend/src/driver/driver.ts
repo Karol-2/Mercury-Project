@@ -4,11 +4,11 @@ const username = process.env.NEO4J_USERNAME;
 const password = process.env.NEO4J_PASSWORD;
 
 if (!username) {
-  throw new Error("NEO4J_USERNAME environment variable not provided!")
+  throw new Error("NEO4J_USERNAME environment variable not provided!");
 }
 
 if (!password) {
-  throw new Error("NEO4J_PASSWORD environment variable not provided!")
+  throw new Error("NEO4J_PASSWORD environment variable not provided!");
 }
 
 const driver = neo4j.driver(
