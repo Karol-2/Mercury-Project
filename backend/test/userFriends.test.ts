@@ -1,5 +1,6 @@
 import { expect, test } from "vitest";
 import { fetchData } from "../src/misc/fetchData.js";
+import User from "../src/models/User.js";
 
 let page: number = 1;
 let maxUsers: number = 10;
@@ -7,7 +8,9 @@ let userId: string = "";
 
 const getFirstUser = async () => {
   const response = await fetchData(`http://localhost:5000/users`, "GET", {});
-  userId = response.users[0].id;
+  userId = response.users.find(
+    (user: User) => user.mail === "bconford2@wikimedia.org",
+  ).id;
 };
 
 await getFirstUser();
@@ -23,7 +26,7 @@ test("Get friends", async () => {
 
   expect(status).toBe("ok");
   expect(pageCount).toBe(1);
-  expect(friends.length).toBe(6);
+  expect(friends.length).toBe(9);
 });
 
 test("Get friends with incorrect ID", async () => {
@@ -118,12 +121,12 @@ test("First user", async () => {
   const { status, pageCount, friends } = response;
 
   expect(status).toBe("ok");
-  expect(pageCount).toBe(6);
+  expect(pageCount).toBe(9);
   expect(friends.length).toBe(1);
-  expect(friends[0].country).toBe("PL");
-  expect(friends[0].mail).toBe("agodneyh@studiopress.com");
-  expect(friends[0].first_name).toBe("Abby");
-  expect(friends[0].last_name).toBe("Godney");
+  expect(friends[0].country).toBe("CN");
+  expect(friends[0].mail).toBe("tshillitoe@state.gov");
+  expect(friends[0].first_name).toBe("Trever");
+  expect(friends[0].last_name).toBe("Shillito");
 });
 
 test("maxUsers equals 0", async () => {

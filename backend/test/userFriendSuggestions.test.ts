@@ -1,5 +1,6 @@
 import { expect, test } from "vitest";
 import { fetchData } from "../src/misc/fetchData.js";
+import User from "../src/models/User.js";
 
 let userId: number;
 let page: number = 3;
@@ -7,7 +8,9 @@ let maxUsers: number = 5;
 
 const getFirstUser = async () => {
   const response = await fetchData(`http://localhost:5000/users`, "GET", {});
-  userId = response.users[0].id;
+  userId = response.users.find(
+    (user: User) => user.mail === "bconford2@wikimedia.org",
+  ).id;
 };
 
 await getFirstUser();
@@ -22,9 +25,9 @@ test("Get friend suggestions", async () => {
   const { status, pageCount, friendSuggestions } = response;
 
   expect(status).toBe("ok");
-  expect(pageCount).toBe(4);
+  expect(pageCount).toBe(3);
   expect(friendSuggestions).toBeDefined();
-  expect(friendSuggestions.length).toBe(5);
+  expect(friendSuggestions.length).toBe(3);
 });
 
 test("Get friend suggestions with incorrect ID", async () => {
@@ -108,7 +111,7 @@ test("First user", async () => {
   const { status, pageCount, friendSuggestions } = response;
 
   expect(status).toBe("ok");
-  expect(pageCount).toBe(17);
+  expect(pageCount).toBe(13);
   expect(friendSuggestions).toBeDefined();
   expect(friendSuggestions.length).toBe(1);
 });

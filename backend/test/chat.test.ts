@@ -1,13 +1,18 @@
 import { expect, test } from "vitest";
 import { fetchData } from "../src/misc/fetchData.js";
+import User from "../src/models/User.js";
 
 let userId1: string = "";
 let userId2: string = "";
 
 const getUsers = async () => {
   const response = await fetchData(`http://localhost:5000/users`, "GET", {});
-  userId1 = response.users[0].id;
-  userId2 = response.users[1].id;
+  userId1 = response.users.find(
+    (user: User) => user.mail === "bconford2@wikimedia.org",
+  ).id;
+  userId2 = response.users.find(
+    (user: User) => user.mail === "cruckman3@archive.org",
+  ).id;
 };
 
 await getUsers();

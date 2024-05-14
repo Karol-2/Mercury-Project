@@ -9,8 +9,12 @@ let userId2: string = "";
 
 const getUsers = async () => {
   const response = await fetchData(`http://localhost:5000/users`, "GET", {});
-  userId = response.users[0].id;
-  userId2 = response.users[1].id;
+  userId = response.users.find(
+    (user: User) => user.mail === "bconford2@wikimedia.org",
+  ).id;
+  userId2 = response.users.find(
+    (user: User) => user.mail === "cruckman3@archive.org",
+  ).id;
 };
 
 await getUsers();
