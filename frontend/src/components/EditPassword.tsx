@@ -115,59 +115,61 @@ function EditPassword(props: EditDetails) {
   };
 
   return (
-    <div className=" flex flex-col gap-2 bg-my-dark p-10 xl:px-44 rounded-xl">
+    <div className=" flex flex-col gap-2 bg-my-dark p-10 rounded-xl">
       <h1 className="text-3xl font-bold text-my-orange">Change Password</h1>
       <hr className="text-my-orange"></hr>
-      <form
-        id="password-box"
-        className=" flex flex-col gap-2 bg-my-dark sm:p-10 lg:px-44 rounded-xl"
-        onSubmit={formSubmit()}
-      >
-        {provider == "rest" && (
-          <>
-            <div>Current password</div>
-            <input
-              {...inputProps}
-              {...register("old_password")}
-              value={formData.old_password}
-              onChange={handleChange}
-              type="password"
-            />
-            <div {...errorProps}>{errors.old_password?.message}</div>
+      <div className=" 3xl:mx-40 lg:mx-15" id="wrapper">
+        <form
+          id="password-box"
+          className=" flex flex-col gap-2 bg-my-dark sm:p-10 md:px-20 2.5xl:px-72 rounded-xl"
+          onSubmit={formSubmit()}
+        >
+          {provider == "rest" && (
+            <>
+              <div>Current password</div>
+              <input
+                {...inputProps}
+                {...register("old_password")}
+                value={formData.old_password}
+                onChange={handleChange}
+                type="password"
+              />
+              <div {...errorProps}>{errors.old_password?.message}</div>
 
-            <div>New password</div>
-            <input
-              {...inputProps}
-              {...register("new_password")}
-              value={formData.new_password}
-              onChange={handleChange}
-              type="password"
-            />
-            <div {...errorProps}>{errors.new_password?.message}</div>
+              <div>New password</div>
+              <input
+                {...inputProps}
+                {...register("new_password")}
+                value={formData.new_password}
+                onChange={handleChange}
+                type="password"
+              />
+              <div {...errorProps}>{errors.new_password?.message}</div>
 
-            <div>Repeat new password</div>
-            <input
-              {...inputProps}
-              {...register("repeat_password")}
-              type="password"
-              value={formData.repeat_password}
-              onChange={handleChange}
-            />
-            <div {...errorProps}>{errors.repeat_password?.message}</div>
+              <div>Repeat new password</div>
+              <input
+                {...inputProps}
+                {...register("repeat_password")}
+                type="password"
+                value={formData.repeat_password}
+                onChange={handleChange}
+              />
+              <div {...errorProps}>{errors.repeat_password?.message}</div>
 
-            <div className="pb-4 text-[#f88]">{submitError}</div>
-          </>
-        )}
+              <div className="pb-4 text-[#f88]">{submitError}</div>
+            </>
+          )}
 
-        <input
-          disabled={isSubmitting}
-          data-testid="Change"
-          type="submit"
-          className="btn small bg-my-orange disabled:bg-my-dark"
-          value="Change"
-        />
-        {provider == "rest" && <p>WARNING: You will be logged out!</p>}
-      </form>
+          <input
+            disabled={isSubmitting}
+            data-testid="Change"
+            type="submit"
+            className="btn small bg-my-orange disabled:bg-my-dark"
+            value="Change"
+          />
+          {provider == "rest" && <p>WARNING: You will be logged out!</p>}
+        </form>
+      </div>
     </div>
   );
 }

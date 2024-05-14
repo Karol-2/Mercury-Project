@@ -37,6 +37,7 @@ function Friend(props: FriendProps) {
             {friend.first_name} {friend.last_name}{" "}
           </span>
           <button
+            data-testid={friend.first_name + "_" + friend.last_name + "_delete"}
             className={` text-my-red text-sm my-2 p-2 rounded-md transition hover:scale-110 hover:bg-my-red hover:text-my-light active:translate-x-2`}
             onClick={() => {
               setShowDeleteModal(true);
@@ -53,6 +54,7 @@ function Friend(props: FriendProps) {
             <FontAwesomeIcon icon={faVideo} />
           </button>
           <button
+            data-testid={friend.first_name + "_" + friend.last_name + "_chat"}
             className={`btn small bg-my-purple text-xs my-2`}
             onClick={() => navigate(`/messages/${friend.id}`)}
           >

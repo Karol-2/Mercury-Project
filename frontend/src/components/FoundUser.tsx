@@ -77,6 +77,7 @@ function FoundUser(props: FoundUserProps) {
         </p>
         <p>{countryName || ""}</p>
         <button
+          data-testid={user.first_name + "_" + user.last_name + "_button"}
           className={`btn small text-xs ${buttonColor}`}
           disabled={isFriend || requestSent}
           onClick={handleAddFriend}
