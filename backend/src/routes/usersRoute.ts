@@ -218,31 +218,35 @@ usersRouter.post("/", async (req: Request, res: UserErrorResponse) => {
   }
 });
 
-usersRouter.put("/:userId", async (req: Request, res: OkErrorResponse) => {
-  const userParse = updateUserSchema.safeParse(req.body);
-  if (!userParse.success) {
-    const errors = formatError(userParse.error);
-    return res.status(400).json({ status: "error", errors });
-  }
-
-  const parsedUser: UpdateUser = userParse.data;
-  const userId = req.params.userId;
-
-  const session = driver.session();
-  try {
-    const newUser = await updateUser(session, userId, parsedUser);
-    if (!newUser) {
-      return userNotFoundRes(res);
+usersRouter.put(
+  "/:userId",
+  authenticateToken,
+  async (req: Request, res: OkErrorResponse) => {
+    const userParse = updateUserSchema.safeParse(req.body);
+    if (!userParse.success) {
+      const errors = formatError(userParse.error);
+      return res.status(400).json({ status: "error", errors });
     }
 
-    return res.json({ status: "ok" });
-  } catch (err) {
-    console.log("Error:", err);
-    return res.status(404).json({ status: "error", errors: err as Errors });
-  } finally {
-    await session.close();
-  }
-});
+    const parsedUser: UpdateUser = userParse.data;
+    const userId = req.params.userId;
+
+    const session = driver.session();
+    try {
+      const newUser = await updateUser(session, userId, parsedUser);
+      if (!newUser) {
+        return userNotFoundRes(res);
+      }
+
+      return res.json({ status: "ok" });
+    } catch (err) {
+      console.log("Error:", err);
+      return res.status(404).json({ status: "error", errors: err as Errors });
+    } finally {
+      await session.close();
+    }
+  },
+);
 
 usersRouter.post(
   "/:userId/change-password",
@@ -296,23 +300,27 @@ usersRouter.post(
   },
 );
 
-usersRouter.delete("/:userId", async (req: Request, res: OkErrorResponse) => {
-  const userId = req.params.userId;
+usersRouter.delete(
+  "/:userId",
+  authenticateToken,
+  async (req: Request, res: OkErrorResponse) => {
+    const userId = req.params.userId;
 
-  const session = driver.session();
-  try {
-    const isDeleted = await deleteUser(session, userId);
-    if (!isDeleted) {
-      return userNotFoundRes(res);
+    const session = driver.session();
+    try {
+      const isDeleted = await deleteUser(session, userId);
+      if (!isDeleted) {
+        return userNotFoundRes(res);
+      }
+
+      return res.json({ status: "ok" });
+    } catch (err) {
+      console.log("Error:", err);
+      return res.status(404).json({ status: "error", errors: err as Errors });
+    } finally {
+      await session.close();
     }
-
-    return res.json({ status: "ok" });
-  } catch (err) {
-    console.log("Error:", err);
-    return res.status(404).json({ status: "error", errors: err as Errors });
-  } finally {
-    await session.close();
-  }
-});
+  },
+);
 
 export default usersRouter;

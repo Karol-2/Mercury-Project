@@ -1,7 +1,7 @@
 import { expect, test } from "vitest";
 import { fetchData } from "../src/misc/fetchData.js";
 
-let userId: number;
+let userId: string;
 let userData = {
   first_name: "John",
   last_name: "Smith",
@@ -21,6 +21,58 @@ const login = async (mail: string, password: string) => {
   });
 
   token = response.token;
+};
+
+const updateUser = async (userId: string, token?: string) => {
+  const response = await fetchData(
+    `http://localhost:5000/users/${userId}`,
+    "PUT",
+    {
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(userData),
+    },
+    token,
+  );
+
+  return response;
+};
+
+const changePassword = async (
+  userId: string,
+  new_password: string,
+  repeat_password: string,
+  token?: string,
+) => {
+  const response = await fetchData(
+    `http://localhost:5000/users/${userId}/change-password`,
+    "POST",
+    {
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        old_password: userData.password,
+        new_password,
+        repeat_password,
+      }),
+    },
+    token,
+  );
+
+  return response;
+};
+
+const deleteUser = async (userId: string, token?: string) => {
+  const response = await fetchData(
+    `http://localhost:5000/users/${userId}`,
+    "DELETE",
+    {},
+    token,
+  );
+
+  return response;
 };
 
 test("Get all users", async () => {
@@ -47,6 +99,7 @@ test("Create user", async () => {
   expect(user.mail).toBe(userData.mail);
 
   userId = user.id;
+  await login(userData.mail, userData.password);
 });
 
 test("Create user with existing mail", async () => {
@@ -142,34 +195,20 @@ test("Get user with incorrect ID", async () => {
   expect(errors.id).toBe("not found");
 });
 
+test("Update user without token", async () => {
+  const { status } = await updateUser(userId);
+  expect(status).toBe("unauthorized");
+});
+
 test("Update user by ID", async () => {
   userData.profile_picture = "https://example.com/new_john_smith.jpg";
 
-  const response = await fetchData(
-    `http://localhost:5000/users/${userId}`,
-    "PUT",
-    {
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(userData),
-    },
-  );
-
-  const { status } = response;
-
+  const { status } = await updateUser(userId, token);
   expect(status).toBe("ok");
 });
 
 test("Update user with incorrect ID", async () => {
-  const response = await fetchData(`http://localhost:5000/users/0`, "PUT", {
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(userData),
-  });
-
-  const { status, errors } = response;
+  const { status, errors } = await updateUser("0", token);
 
   expect(status).toBe("error");
   expect(errors.id).toBe("not found");
@@ -178,18 +217,7 @@ test("Update user with incorrect ID", async () => {
 test("Update user with short first name", async () => {
   userData.first_name = "j";
 
-  const response = await fetchData(
-    `http://localhost:5000/users/${userId}`,
-    "PUT",
-    {
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(userData),
-    },
-  );
-
-  const { status, errors } = response;
+  const { status, errors } = await updateUser(userId, token);
 
   expect(status).toBe("error");
   expect(errors.first_name).toBe("String must contain at least 2 character(s)");
@@ -198,43 +226,19 @@ test("Update user with short first name", async () => {
 test("Update user with short last name", async () => {
   userData.last_name = "s";
 
-  const response = await fetchData(
-    `http://localhost:5000/users/${userId}`,
-    "PUT",
-    {
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(userData),
-    },
-  );
-
-  const { status, errors } = response;
+  const { status, errors } = await updateUser(userId, token);
 
   expect(status).toBe("error");
   expect(errors.last_name).toBe("String must contain at least 2 character(s)");
 });
 
 test("Update user with short password", async () => {
-  await login(userData.mail, userData.password);
-
-  const response = await fetchData(
-    `http://localhost:5000/users/${userId}/change-password`,
-    "POST",
-    {
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        token: token,
-        old_password: userData.password,
-        new_password: "1234",
-        repeat_password: "1234",
-      }),
-    },
+  const { status, errors } = await changePassword(
+    userId,
+    "1234",
+    "1234",
+    token,
   );
-
-  const { status, errors } = response;
 
   expect(status).toBe("error");
   expect(errors).toBeDefined();
@@ -242,72 +246,37 @@ test("Update user with short password", async () => {
 });
 
 test("Update user with same password", async () => {
-  await login(userData.mail, userData.password);
-
-  const response = await fetchData(
-    `http://localhost:5000/users/${userId}/change-password`,
-    "POST",
-    {
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        token: token,
-        old_password: userData.password,
-        new_password: "12345678",
-        repeat_password: "12345678",
-      }),
-    },
+  const { status } = await changePassword(
+    userId,
+    "12345678",
+    "12345678",
+    token,
   );
-
-  const { status } = response;
-
   expect(status).toBe("ok");
 });
 
 test("Update user with correct password", async () => {
-  await login(userData.mail, userData.password);
-
-  const response = await fetchData(
-    `http://localhost:5000/users/${userId}/change-password`,
-    "POST",
-    {
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        token: token,
-        old_password: userData.password,
-        new_password: "123456789",
-        repeat_password: "123456789",
-      }),
-    },
+  const { status } = await changePassword(
+    userId,
+    "123456789",
+    "123456789",
+    token,
   );
-
-  const { status } = response;
-
   expect(status).toBe("ok");
 });
 
+test("Delete user without token", async () => {
+  const { status } = await deleteUser(userId);
+  expect(status).toBe("unauthorized");
+});
+
 test("Delete user by ID", async () => {
-  const response = await fetchData(
-    `http://localhost:5000/users/${userId}`,
-    "DELETE",
-    {},
-  );
-
-  const { status } = response;
-
+  const { status } = await deleteUser(userId, token);
   expect(status).toBe("ok");
 });
 
 test("Delete user with incorrect ID", async () => {
-  const response = await fetchData(
-    `http://localhost:5000/users/🐍`,
-    "DELETE",
-    {},
-  );
-
+  const response = await deleteUser("🐍", token);
   const { status, errors } = response;
 
   expect(status).toBe("error");
