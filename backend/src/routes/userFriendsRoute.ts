@@ -22,6 +22,7 @@ import { userNotFoundRes } from "./usersRoute.js";
 import { Errors } from "../models/Response.js";
 import Page, { pageSchema } from "../models/routes/Page.js";
 import { formatError } from "../misc/formatError.js";
+import { authenticateToken } from "../misc/jwt.js";
 
 const friendsRouter = Router();
 
@@ -159,6 +160,7 @@ friendsRouter.get(
 
 friendsRouter.post(
   "/:userId1/send-friend-request/:userId2",
+  authenticateToken,
   async (req: Request, res: OkErrorResponse) => {
     const session = driver.session();
     const userId1 = req.params.userId1;
@@ -193,6 +195,7 @@ friendsRouter.post(
 
 friendsRouter.post(
   "/:userId1/accept-friend-request/:userId2",
+  authenticateToken,
   async (req: Request, res: OkErrorResponse) => {
     const session = driver.session();
     const userId1 = req.params.userId1;
@@ -244,6 +247,7 @@ friendsRouter.post(
 
 friendsRouter.post(
   "/:userId1/decline-friend-request/:userId2",
+  authenticateToken,
   async (req: Request, res: OkErrorResponse) => {
     const session = driver.session();
     const userId1 = req.params.userId1;
@@ -291,6 +295,7 @@ friendsRouter.post(
 
 friendsRouter.delete(
   "/:userId1/delete-friend/:userId2",
+  authenticateToken,
   async (req: Request, res: OkErrorResponse) => {
     const session = driver.session();
     const userId1 = req.params.userId1;

@@ -7,17 +7,123 @@ let maxUsers: number = 1;
 let userId: string = "";
 let userId2: string = "";
 
+const userMail1 = "bconford2@wikimedia.org";
+const userPassword1 = "heuristic";
+
+const userMail2 = "cruckman3@archive.org";
+const userPassword2 = "coreCar0l;";
+
 const getUsers = async () => {
   const response = await fetchData(`http://localhost:5000/users`, "GET", {});
-  userId = response.users.find(
-    (user: User) => user.mail === "bconford2@wikimedia.org",
-  ).id;
-  userId2 = response.users.find(
-    (user: User) => user.mail === "cruckman3@archive.org",
-  ).id;
+  userId = response.users.find((user: User) => user.mail === userMail1).id;
+  userId2 = response.users.find((user: User) => user.mail === userMail2).id;
+};
+
+const getKeycloakToken = async (
+  mail: string,
+  password: string,
+): Promise<string> => {
+  const urlParams = new URLSearchParams({
+    grant_type: "password",
+    client_id: "mercury-testing",
+    client_secret: "5mwGU0Efyh3cT2WVX7ffA8UAWEAmrBag",
+    username: mail,
+    password: password,
+  });
+
+  const response = await fetchData(
+    `http://localhost:3000/realms/mercury/protocol/openid-connect/token`,
+    "POST",
+    {
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      body: urlParams,
+    },
+  );
+
+  return response.access_token;
 };
 
 await getUsers();
+
+const token1 = await getKeycloakToken(userMail1, userPassword1);
+const token2 = await getKeycloakToken(userMail2, userPassword2);
+
+const sendFriendRequest = async (
+  userId1: string,
+  userId2: string,
+  token?: string,
+) => {
+  const response = await fetchData(
+    `http://localhost:5000/users/${userId1}/send-friend-request/${userId2}`,
+    "POST",
+    {
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({}),
+    },
+    token,
+  );
+
+  return response;
+};
+
+const declineFriendRequest = async (
+  userId1: string,
+  userId2: string,
+  token?: string,
+) => {
+  const response = await fetchData(
+    `http://localhost:5000/users/${userId1}/decline-friend-request/${userId2}`,
+    "POST",
+    {
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({}),
+    },
+    token,
+  );
+
+  return response;
+};
+
+const acceptFriendRequest = async (
+  userId1: string,
+  userId2: string,
+  token?: string,
+) => {
+  const response = await fetchData(
+    `http://localhost:5000/users/${userId1}/accept-friend-request/${userId2}`,
+    "POST",
+    {
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({}),
+    },
+    token,
+  );
+
+  return response;
+};
+
+const deleteFriend = async (
+  userId1: string,
+  userId2: string,
+  token?: string,
+) => {
+  const response = await fetchData(
+    `http://localhost:5000/users/${userId1}/delete-friend/${userId2}`,
+    "DELETE",
+    {},
+    token,
+  );
+
+  return response;
+};
 
 test("Check current requests", async () => {
   const response = await fetchData(
@@ -117,122 +223,59 @@ test("maxUsers equals 0", async () => {
   expect(errors.maxUsers).toBe("Number must be greater than or equal to 1");
 });
 
-test("Send invite", async () => {
-  const response = await fetchData(
-    `http://localhost:5000/users/${userId}/send-friend-request/${userId2}`,
-    "POST",
-    {
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({}),
-    },
-  );
+test("Send friend request without token", async () => {
+  const { status } = await sendFriendRequest(userId, userId2);
+  expect(status).toBe("unauthorized");
+});
 
-  const { status } = response;
-
+test("Send friend request", async () => {
+  const { status } = await sendFriendRequest(userId, userId2, token1);
   expect(status).toBe("ok");
 });
 
-test("Send invite with incorrect id", async () => {
-  const response = await fetchData(
-    `http://localhost:5000/users/${userId}/send-friend-request/0`,
-    "POST",
-    {
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({}),
-    },
-  );
-
-  const { status, errors } = response;
+test("Send friend request with incorrect id", async () => {
+  const { status, errors } = await sendFriendRequest(userId, "0", token1);
 
   expect(status).toBe("error");
   expect(errors).toBeDefined();
   expect(errors.userId2).toBe("not found");
 });
 
+test("Decline friend request without token", async () => {
+  const { status } = await declineFriendRequest(userId2, userId);
+  expect(status).toBe("unauthorized");
+});
+
 test("Decline friend request", async () => {
-  const response = await fetchData(
-    `http://localhost:5000/users/${userId}/decline-friend-request/${userId2}`,
-    "POST",
-    {
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({}),
-    },
-  );
-
-  const { status } = response;
-
+  const { status } = await declineFriendRequest(userId2, userId, token2);
   expect(status).toBe("ok");
 });
 
 test("Decline friend request with incorrect id", async () => {
-  const response = await fetchData(
-    `http://localhost:5000/users/${userId}/decline-friend-request/0`,
-    "POST",
-    {
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({}),
-    },
-  );
-
-  const { status, errors } = response;
+  const { status, errors } = await declineFriendRequest(userId, "0", token2);
 
   expect(status).toBe("error");
   expect(errors).toBeDefined();
   expect(errors.userId2).toBe("not found");
 });
 
-test("Accept not invited friend request", async () => {
-  const response = await fetchData(
-    `http://localhost:5000/users/${userId}/accept-friend-request/${userId2}`,
-    "POST",
-    {
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({}),
-    },
-  );
+test("Accept friend request without token", async () => {
+  const { status } = await acceptFriendRequest(userId2, userId);
+  expect(status).toBe("unauthorized");
+});
 
-  const { status, errors } = response;
+test("Accept friend request when not invited", async () => {
+  const { status, errors } = await acceptFriendRequest(userId2, userId, token2);
 
   expect(status).toBe("error");
   expect(errors).toBeDefined();
   expect(errors.userId1).toBe("not invited");
 });
 
-test("Accept invite", async () => {
-  await fetchData(
-    `http://localhost:5000/users/${userId}/send-friend-request/${userId2}`,
-    "POST",
-    {
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({}),
-    },
-  );
+test("Accept friend request", async () => {
+  await sendFriendRequest(userId, userId2, token1);
 
-  const response = await fetchData(
-    `http://localhost:5000/users/${userId2}/accept-friend-request/${userId}`,
-    "POST",
-    {
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({}),
-    },
-  );
-
-  const { status } = response;
-
+  const { status } = await acceptFriendRequest(userId2, userId, token2);
   expect(status).toBe("ok");
 
   const friendsResponse = await fetchData(
@@ -248,18 +291,8 @@ test("Accept invite", async () => {
   expect(friend).toBeDefined();
 });
 
-test("Accept invite with incorrect id", async () => {
-  const response = await fetchData(
-    `http://localhost:5000/users/${userId}/accept-friend-request/0`,
-    "POST",
-    {
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({}),
-    },
-  );
-
+test("Accept friend request with incorrect id", async () => {
+  const response = await acceptFriendRequest(userId, "0", token1);
   const { status, errors } = response;
 
   expect(status).toBe("error");
@@ -268,43 +301,29 @@ test("Accept invite with incorrect id", async () => {
 });
 
 test("Decline friend request when not invited", async () => {
-  const response = await fetchData(
-    `http://localhost:5000/users/${userId2}/decline-friend-request/${userId}`,
-    "POST",
-    {
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({}),
-    },
+  const { status, errors } = await declineFriendRequest(
+    userId2,
+    userId,
+    token2,
   );
-
-  const { status, errors } = response;
 
   expect(status).toBe("error");
   expect(errors).toBeDefined();
   expect(errors.userId1).toBe("not invited");
 });
 
+test("Delete friend without token", async () => {
+  const { status } = await deleteFriend(userId2, userId);
+  expect(status).toBe("unauthorized");
+});
+
 test("Delete friend", async () => {
-  const response = await fetchData(
-    `http://localhost:5000/users/${userId2}/delete-friend/${userId}`,
-    "DELETE",
-    {},
-  );
-
-  const { status } = response;
-
+  const { status } = await deleteFriend(userId2, userId, token2);
   expect(status).toBe("ok");
 });
 
 test("Delete friend with incorrect id", async () => {
-  const response = await fetchData(
-    `http://localhost:5000/users/${userId}/delete-friend/0`,
-    "DELETE",
-    {},
-  );
-
+  const response = await deleteFriend(userId, "0", token1);
   const { status, errors } = response;
 
   expect(status).toBe("error");
