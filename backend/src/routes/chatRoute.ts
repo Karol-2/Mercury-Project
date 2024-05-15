@@ -1,10 +1,11 @@
 import { Router } from "express";
 import Message from "../models/Message.js";
 import MessageModel from "../mongoDB/MessageModel.js";
+import { authenticateToken } from "../misc/jwt.js";
 
 const chatRouter = Router();
 
-chatRouter.get("/:user1Id/:user2Id", async (req, res) => {
+chatRouter.get("/:user1Id/:user2Id", authenticateToken, async (req, res) => {
   try {
     const { user1Id, user2Id } = req.params;
     const messageRequest = await MessageModel.find({
