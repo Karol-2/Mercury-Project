@@ -15,10 +15,12 @@ import { useProtected } from "../helpers/Protected";
 import FoundUser from "../components/FoundUser";
 import Friend from "../components/Friend";
 import PaginatorV2 from "../components/PaginatorV2";
+import { useUser } from "../helpers/UserContext";
 
 function FriendsPage() {
   const navigate = useNavigate();
   const { user } = useProtected();
+  const { token } = useUser();
   const { meeting, createMeeting, joinMeeting } = useMeeting();
 
   const [friendsRequests, setFriendsRequests] = useState([]);
@@ -53,7 +55,7 @@ function FriendsPage() {
     if (user) {
       await dataService.fetchData(
         `/users/${user.id}/accept-friend-request/${currentId}`,
-        "POST",
+        "POST", {}, token
       );
 
       setRefresh(() => !refresh);
@@ -64,7 +66,7 @@ function FriendsPage() {
     if (user) {
       await dataService.fetchData(
         `/users/${user.id}/decline-friend-request/${friend.id}`,
-        "POST",
+        "POST", {}, token
       );
 
       setRefresh(() => !refresh);
@@ -75,7 +77,7 @@ function FriendsPage() {
     if (user) {
       await dataService.fetchData(
         `/users/${user.id}/delete-friend/${friend.id}`,
-        "DELETE",
+        "DELETE", {}, token
       );
 
       setRefresh(() => !refresh);

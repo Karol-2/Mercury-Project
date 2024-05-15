@@ -17,7 +17,9 @@ function RestUserProvider({ children }: { children: React.ReactNode }) {
     () => (userState.status == "logged_in" ? userState.user : null),
     [userState],
   );
-  const [token, setToken] = useState<object | null>(null);
+  const [decodedToken, setDecodedToken] = useState<object | undefined>();
+  const [token, setToken] = useState<string | undefined>();
+
   const [socket, setSocket] = useState<Socket | null>(null);
 
   const [friends, setFriends] = useState<Record<string, User>>({});
@@ -48,7 +50,8 @@ function RestUserProvider({ children }: { children: React.ReactNode }) {
       const decodedToken = decodeToken(tokenStr);
 
       if (decodedToken && !isExpired(tokenStr)) {
-        setToken(decodedToken);
+        setToken(token)
+        setDecodedToken(decodedToken);
         return true;
       }
     }
@@ -103,7 +106,7 @@ function RestUserProvider({ children }: { children: React.ReactNode }) {
     }
 
     sessionStorage.setItem("token", response.token);
-    setToken(decodeToken(response.token));
+    setDecodedToken(decodeToken(response.token) ?? undefined);
   };
 
   const logout = async () => {
@@ -154,7 +157,7 @@ function RestUserProvider({ children }: { children: React.ReactNode }) {
     const response = await dataService.fetchData(`/users/${user.id}`, "PUT", {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(user),
-    });
+    }, token);
 
     if (response.status === "ok") {
       return true;
@@ -168,7 +171,7 @@ function RestUserProvider({ children }: { children: React.ReactNode }) {
     if (userState.status != "logged_in") return true;
 
     const user = userState.user!;
-    const response = await dataService.fetchData(`/users/${user.id}`, "DELETE");
+    const response = await dataService.fetchData(`/users/${user.id}`, "DELETE", {}, token);
 
     if (response.status === "ok") {
       setUserAnonymous();
@@ -227,8 +230,8 @@ function RestUserProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const handleToken = async () => {
-      if (token) {
-        const newUserId = (token as any).userId;
+      if (decodedToken) {
+        const newUserId = (decodedToken as any).userId;
         const response = await dataService.fetchData(
           `/users/${newUserId}`,
           "GET",
@@ -242,7 +245,7 @@ function RestUserProvider({ children }: { children: React.ReactNode }) {
     };
 
     handleToken();
-  }, [token]);
+  }, [decodedToken]);
 
   if (firstRefresh.current) {
     firstRefresh.current = false;
@@ -259,6 +262,7 @@ function RestUserProvider({ children }: { children: React.ReactNode }) {
         provider,
         user,
         userState,
+        token,
         socket,
         redirectToLogin,
         login,

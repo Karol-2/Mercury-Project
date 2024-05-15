@@ -2,6 +2,7 @@ import { useState } from "react";
 import User from "../models/User";
 import dataService from "../services/data";
 import countriesData from "../assets/countries.json";
+import { useUser } from "../helpers/UserContext";
 
 interface FoundUserProps {
   user: User;
@@ -13,6 +14,7 @@ interface FoundUserProps {
 function FoundUser(props: FoundUserProps) {
   const [requestSent, setRequestSent] = useState(false);
   const { user, isFriend } = props;
+  const { token } = useUser();
   const countryName = countriesData.find((v) => v.Code == user.country)
     ?.Country;
 
@@ -44,6 +46,8 @@ function FoundUser(props: FoundUserProps) {
       await dataService.fetchData(
         `/users/${props.currentId}/send-friend-request/${props.user.id}`,
         "POST",
+        {},
+        token,
       );
       setRequestSent(true);
     } catch (error) {
