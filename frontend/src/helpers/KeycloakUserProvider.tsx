@@ -32,6 +32,8 @@ function KeycloakUserProvider({ children }: { children: React.ReactNode }) {
     const friendsResponse = await dataService.fetchData(
       `/users/${userId}/friends?${searchParams}`,
       "GET",
+      {},
+      token,
     );
     if (friendsResponse.status != "ok") {
       console.error("Couldn't fetch friends: ", friendsResponse);
@@ -199,10 +201,15 @@ function KeycloakUserProvider({ children }: { children: React.ReactNode }) {
     if (userState.status != "logged_in") return false;
 
     const user = { ...userState.user, ...updateUser };
-    const response = await dataService.fetchData(`/users/${user.id}`, "PUT", {
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(user),
-    }, token);
+    const response = await dataService.fetchData(
+      `/users/${user.id}`,
+      "PUT",
+      {
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(user),
+      },
+      token,
+    );
 
     if (response.status === "ok") {
       setUserLoggedIn(user);
@@ -217,7 +224,12 @@ function KeycloakUserProvider({ children }: { children: React.ReactNode }) {
     if (userState.status != "logged_in") return true;
 
     const user = userState.user!;
-    const response = await dataService.fetchData(`/users/${user.id}`, "DELETE", {}, token);
+    const response = await dataService.fetchData(
+      `/users/${user.id}`,
+      "DELETE",
+      {},
+      token,
+    );
 
     if (response.status === "ok") {
       setUserAnonymous();

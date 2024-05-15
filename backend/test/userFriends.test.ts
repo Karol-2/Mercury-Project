@@ -6,6 +6,9 @@ let page: number = 1;
 let maxUsers: number = 10;
 let userId: string = "";
 
+const userMail = "bconford2@wikimedia.org";
+const userPassword = "heuristic";
+
 const getFirstUser = async () => {
   const response = await fetchData(`http://localhost:5000/users`, "GET", {});
   userId = response.users.find(
@@ -13,14 +16,53 @@ const getFirstUser = async () => {
   ).id;
 };
 
+const getKeycloakToken = async (
+  mail: string,
+  password: string,
+): Promise<string> => {
+  const urlParams = new URLSearchParams({
+    grant_type: "password",
+    client_id: "mercury-testing",
+    client_secret: "5mwGU0Efyh3cT2WVX7ffA8UAWEAmrBag",
+    username: mail,
+    password: password,
+  });
+
+  const response = await fetchData(
+    `http://localhost:3000/realms/mercury/protocol/openid-connect/token`,
+    "POST",
+    {
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      body: urlParams,
+    },
+  );
+
+  return response.access_token;
+};
+
 await getFirstUser();
+const token = await getKeycloakToken(userMail, userPassword);
 
 describe("Get friends", () => {
+  test("without token", async () => {
+    const response = await fetchData(
+      `http://localhost:5000/users/0/friends?page=${page}&maxUsers=${maxUsers}`,
+      "GET",
+      {},
+    );
+
+    const { status } = response
+    expect(status).toBe("unauthorized");
+  });
+
   test("incorrect ID", async () => {
     const response = await fetchData(
       `http://localhost:5000/users/0/friends?page=${page}&maxUsers=${maxUsers}`,
       "GET",
       {},
+      token
     );
 
     const { status, errors } = response;
@@ -35,6 +77,7 @@ describe("Get friends", () => {
       `http://localhost:5000/users/${userId}/friends?page=${page}&maxUsers=${maxUsers}`,
       "GET",
       {},
+      token
     );
 
     const { status, pageCount, friends } = response;
@@ -51,6 +94,7 @@ describe("Get friends", () => {
       `http://localhost:5000/users/${userId}/friends?page=${page}&maxUsers=${maxUsers}`,
       "GET",
       {},
+      token
     );
 
     const { status, pageCount, friends } = response;
@@ -71,6 +115,7 @@ describe("Pagination parameters", () => {
       `http://localhost:5000/users/${userId}/friends?maxUsers=${maxUsers}`,
       "GET",
       {},
+      token
     );
 
     const { status, errors } = response;
@@ -84,6 +129,7 @@ describe("Pagination parameters", () => {
       `http://localhost:5000/users/${userId}/friends?page=text?maxUsers=${maxUsers}`,
       "GET",
       {},
+      token
     );
 
     const { status, errors } = response;
@@ -97,6 +143,7 @@ describe("Pagination parameters", () => {
       `http://localhost:5000/users/${userId}/friends?page=${page}`,
       "GET",
       {},
+      token
     );
 
     const { status, errors } = response;
@@ -110,6 +157,7 @@ describe("Pagination parameters", () => {
       `http://localhost:5000/users/${userId}/friends?page=text?page=${page}&maxUsers=text`,
       "GET",
       {},
+      token
     );
 
     const { status, errors } = response;
@@ -123,6 +171,7 @@ describe("Pagination parameters", () => {
       `http://localhost:5000/users/${userId}/friends`,
       "GET",
       {},
+      token
     );
 
     const { status, errors } = response;
@@ -138,6 +187,7 @@ describe("Pagination parameters", () => {
       `http://localhost:5000/users/${userId}/friends?page=${page}&maxUsers=${maxUsers}`,
       "GET",
       {},
+      token
     );
 
     const { status, errors } = response;

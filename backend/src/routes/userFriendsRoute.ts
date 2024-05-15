@@ -28,6 +28,7 @@ const friendsRouter = Router();
 
 friendsRouter.get(
   "/:userId/friends",
+  authenticateToken,
   async (req: Request, res: FriendsPageErrorResponse) => {
     const userId = req.params.userId;
 

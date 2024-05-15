@@ -44,6 +44,7 @@ function FriendsPage() {
           `/users/${user.id}/friend-requests?page=1&maxUsers=32`,
           "GET",
           {},
+          token
         );
         setFriendsRequests(friendsRequestsResponse.friendRequests);
       }
