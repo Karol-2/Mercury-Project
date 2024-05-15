@@ -2,6 +2,9 @@ import KeycloakAdminClient from "@keycloak/keycloak-admin-client";
 
 export const keycloakUri = process.env.KEYCLOAK_URI || "http://localhost:3000";
 export const keycloakIssuer = process.env.KEYCLOAK_ISSUER || keycloakUri;
+export const keycloakCredentials = Buffer.from(
+  `mercury-backend:${process.env.CLIENT_SECRET}`,
+).toString("base64");
 
 const kcAdminClient = new KeycloakAdminClient({
   baseUrl: keycloakUri,
