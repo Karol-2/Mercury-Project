@@ -6,6 +6,7 @@ import User from "../models/User";
 import notificationSoundUrl from "../assets/notification.mp3";
 import Message, { MessageProps } from "./Message";
 import dataService from "../services/data";
+import { useUser } from "../helpers/UserContext";
 
 const notificationSound = new Audio(notificationSoundUrl);
 
@@ -16,6 +17,8 @@ interface ChatBoxProps {
 }
 
 function ChatBox({ user, socket, friendId }: ChatBoxProps) {
+  const { token } = useUser();
+
   const messages = useRef<MessageProps[]>([]);
 
   const handleScroll = (ref: HTMLDivElement | null) => {
@@ -116,7 +119,7 @@ function ChatBox({ user, socket, friendId }: ChatBoxProps) {
       const messageResponse = await dataService.fetchData(
         `/chat/${user.id}/${friendId}`,
         "GET",
-        {},
+        {}, token
       );
 
       await addMessages(messageResponse.messages);
