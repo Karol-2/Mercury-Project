@@ -33,7 +33,7 @@ function RegisterBox() {
   };
 
   const countryOptions = countriesData.map((country) => ({
-    value: country.Country,
+    value: country.Code,
     label: country.Country,
   }));
 

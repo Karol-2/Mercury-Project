@@ -167,6 +167,7 @@ function ChatBox({ user, socket, friendId }: ChatBoxProps) {
         {messageElems}
       </div>
       <textarea
+        data-testid="ChatBox"
         className="w-3/6 text-3xl bg-my-dark form-input"
         rows={4}
         cols={30}

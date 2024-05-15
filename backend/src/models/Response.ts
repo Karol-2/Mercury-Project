@@ -8,7 +8,9 @@ export interface CustomResponse<J> extends Response {
   json: Send<J, this>;
 }
 
-export type Errors = Record<string, any> & { length?: never };
+export type Errors = {
+  [key: string]: Errors | string;
+};
 
 export interface ErrorResponse {
   status: "error";

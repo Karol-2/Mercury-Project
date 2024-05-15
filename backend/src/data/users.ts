@@ -3,7 +3,7 @@ const userData = [
     "id": "e023f020-1f16-49f7-97eb-0efe144d42f0",
     "first_name": "Iga",
     "last_name": "Swiatek",
-    "country": "Poland",
+    "country": "PL",
     "profile_picture":
       "https://images.unsplash.com/photo-1581992652564-44c42f5ad3ad?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
     "mail": "1ga@wta.com",
@@ -15,11 +15,11 @@ const userData = [
     "id": "5facdc9e-2875-4300-a990-af0f6d9951a3",
     "first_name": "Adam",
     "last_name": "Małysz",
-    "country": "Poland",
+    "country": "PL",
     "profile_picture":
       "https://images.unsplash.com/photo-1639149888905-fb39731f2e6c?q=80&w=1364&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
     "mail": "adasko@malysz.pl",
-    "password": "hophop!",
+    "password": "hophop!23",
     "friend_ids": [],
     "chats": [],
   },
@@ -27,7 +27,7 @@ const userData = [
     "id": "f3827527-4ecb-4c6c-a819-ba4d644704de",
     "first_name": "Robert",
     "last_name": "Lewandowski",
-    "country": "Poland",
+    "country": "PL",
     "profile_picture":
       "https://images.unsplash.com/photo-1519456264917-42d0aa2e0625?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
     "mail": "lewy.robi@pzpn.pl",
@@ -51,7 +51,7 @@ const userData = [
     "id": "d47ae6a5-a2ef-4289-b3fa-a5159f934c5b",
     "first_name": "Elon",
     "last_name": "Musk",
-    "country": "United States of America",
+    "country": "US",
     "profile_picture":
       "https://images.unsplash.com/photo-1587049352846-4a222e784d38?q=80&w=2080&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
     "mail": "elonmusk@spacex.com",
@@ -75,7 +75,7 @@ const userData = [
     "id": "629373ab-1d9f-44a5-9ed3-b3d5808353d4",
     "first_name": "Mark",
     "last_name": "Zuckerberg",
-    "country": "United States of America",
+    "country": "US",
     "profile_picture":
       "https://images.unsplash.com/photo-1546557036-57b741df8f5a?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
     "mail": "reptilian@meta.com",
@@ -87,7 +87,7 @@ const userData = [
     "id": "8ec319bf-6dc4-456a-8976-a57c2aecb5d2",
     "first_name": "Selena",
     "last_name": "Halso",
-    "country": "Venezuela",
+    "country": "MA",
     "profile_picture":
       "https://images.unsplash.com/photo-1491604612772-6853927639ef?q=80&w=1287&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
     "mail": "shalso0@nifty.com",
@@ -99,11 +99,11 @@ const userData = [
     "id": "48c1fc1d-3a3d-48c5-9f51-4ad49d1a617a",
     "first_name": "Silva",
     "last_name": "Hudghton",
-    "country": "San Marino",
+    "country": "CN",
     "profile_picture":
       "https://images.unsplash.com/photo-1618780179533-870736eaea58?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTQyfHxwcm9maWxlJTIwcGljdHVyZXxlbnwwfHwwfHx8MA%3D%3D",
     "mail": "shudghton1@geocities.com",
-    "password": "Cloned",
+    "password": "Huds1l12#",
     "friend_ids": [2, 3, 26],
     "chats": [],
   },
@@ -111,7 +111,7 @@ const userData = [
     "id": "bcd120cc-446a-4686-9fe8-e7e8c85ae8b2",
     "first_name": "Bronson",
     "last_name": "Conford",
-    "country": "Norway",
+    "country": "RU",
     "profile_picture":
       "https://images.unsplash.com/photo-1503235930437-8c6293ba41f5?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTU2fHxwcm9maWxlJTIwcGljdHVyZXxlbnwwfHwwfHx8MA%3D%3D",
     "mail": "bconford2@wikimedia.org",
@@ -123,11 +123,11 @@ const userData = [
     "id": "885b500e-43f6-477e-bcde-d19e0945cbdc",
     "first_name": "Carole",
     "last_name": "Ruckman",
-    "country": "Libya",
+    "country": "FI",
     "profile_picture":
       "https://images.unsplash.com/photo-1614460132343-62aa9fa8d6f6?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTQ0fHxwcm9maWxlJTIwcGljdHVyZXxlbnwwfHwwfHx8MA%3D%3D",
     "mail": "cruckman3@archive.org",
-    "password": "core",
+    "password": "coreCar0l;",
     "friend_ids": [0, 11, 4, 15, 18, 13],
     "chats": [],
   },
@@ -135,7 +135,7 @@ const userData = [
     "id": "cadde518-aac1-489e-987e-eda0e5dd7826",
     "first_name": "Gian",
     "last_name": "Blasik",
-    "country": "Guinea",
+    "country": "CN",
     "profile_picture":
       "https://images.unsplash.com/photo-1608493573324-b055427a503e?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTY0fHxwcm9maWxlJTIwcGljdHVyZXxlbnwwfHwwfHx8MA%3D%3D",
     "mail": "gblasik4@umich.edu",
@@ -147,7 +147,7 @@ const userData = [
     "id": "8a7063a4-f0ff-4cb1-add5-6fa972e14e58",
     "first_name": "Lyman",
     "last_name": "Truman",
-    "country": "Dominica",
+    "country": "PT",
     "profile_picture":
       "https://images.unsplash.com/photo-1520592978680-efbdeae5d036?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTY2fHxwcm9maWxlJTIwcGljdHVyZXxlbnwwfHwwfHx8MA%3D%3D",
     "mail": "ltruman5@hc360.com",
@@ -159,7 +159,7 @@ const userData = [
     "id": "2821b350-23ab-4efc-826e-2d0dc0470b87",
     "first_name": "Brooke",
     "last_name": "McMurty",
-    "country": "Cambodia",
+    "country": "GL",
     "profile_picture":
       "https://images.unsplash.com/photo-1522228115018-d838bcce5c3a?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTcxfHxwcm9maWxlJTIwcGljdHVyZXxlbnwwfHwwfHx8MA%3D%3D",
     "mail": "bmcmurty6@photobucket.com",
@@ -171,7 +171,7 @@ const userData = [
     "id": "1bc3c96c-1f5e-4114-a899-faccce69acad",
     "first_name": "Olwen",
     "last_name": "Helbeck",
-    "country": "Italy",
+    "country": "CN",
     "profile_picture":
       "https://images.unsplash.com/photo-1517849845537-4d257902454a?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8M3x8ZG9nfGVufDB8fDB8fHww",
     "mail": "ohelbeck7@sun.com",
@@ -183,7 +183,7 @@ const userData = [
     "id": "7575ee32-c98e-4e8f-bd45-20358a7587e7",
     "first_name": "Jo",
     "last_name": "Carver",
-    "country": "Micronesia",
+    "country": "CO",
     "profile_picture":
       "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8cHJvZmlsZSUyMHBpY3R1cmV8ZW58MHx8MHx8fDA%3D",
     "mail": "jcarver8@infoseek.co.jp",
@@ -195,11 +195,11 @@ const userData = [
     "id": "2a818ac0-f86a-4929-9033-20d1bd215c64",
     "first_name": "Trixy",
     "last_name": "Ogle",
-    "country": "Saudi Arabia",
+    "country": "CO",
     "profile_picture":
       "https://images.unsplash.com/photo-1536164261511-3a17e671d380?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NzB8fHByb2ZpbGUlMjBwaWN0dXJlfGVufDB8fDB8fHww",
     "mail": "togle9@engadget.com",
-    "password": "Focused",
+    "password": "trixxed3@!",
     "friend_ids": [20, 11, 1, 5, 3, 13],
     "chats": [],
   },
@@ -207,7 +207,7 @@ const userData = [
     "id": "0760d7f8-daaf-4d07-9e1d-d84703d24c9d",
     "first_name": "Trefor",
     "last_name": "Kerby",
-    "country": "Saudi Arabia",
+    "country": "CO",
     "profile_picture":
       "https://images.unsplash.com/photo-1463453091185-61582044d556?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTR8fHByb2ZpbGUlMjBwaWN0dXJlJTIwb2xkZXIlMjBwZXJzb258ZW58MHx8MHx8fDA%3D",
     "mail": "tkerbya@shinystat.com",
@@ -219,7 +219,7 @@ const userData = [
     "id": "30db2a37-7025-438c-aa8c-b13c3b48995c",
     "first_name": "Dennis",
     "last_name": "Beinke",
-    "country": "Saudi Arabia",
+    "country": "GR",
     "profile_picture":
       "https://images.unsplash.com/photo-1601233749202-95d04d5b3c00?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NDh8fHByb2ZpbGUlMjBwaWN0dXJlJTIwb2xkZXIlMjBwZXJzb258ZW58MHx8MHx8fDA%3D",
     "mail": "dbeinkeb@blogger.com",
@@ -231,7 +231,7 @@ const userData = [
     "id": "8ee5b4b4-405e-437a-9ce6-0ba015e9805e",
     "first_name": "Filippo",
     "last_name": "Melmore",
-    "country": "Zambia",
+    "country": "SW",
     "profile_picture":
       "https://images.unsplash.com/photo-1522529599102-193c0d76b5b6?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MjR8fG1pZGRsZSUyMGVhc3Rlcm4lMjBwZXJzb258ZW58MHx8MHx8fDA%3D",
     "mail": "fmelmorec@elpais.com",
@@ -243,7 +243,7 @@ const userData = [
     "id": "add0a8dc-da6b-43b3-9459-1d2226508cf2",
     "first_name": "Ann",
     "last_name": "Mooring",
-    "country": "Palestine State",
+    "country": "MN",
     "profile_picture":
       "https://images.unsplash.com/photo-1477276266798-898214c677da?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTZ8fG1pZGRsZSUyMGVhc3Rlcm4lMjBwZXJzb258ZW58MHx8MHx8fDA%3D",
     "mail": "cmooringd@census.gov",
@@ -255,7 +255,7 @@ const userData = [
     "id": "1ed83de4-2496-4f96-883f-d891ebe2c2f9",
     "first_name": "Trever",
     "last_name": "Shillito",
-    "country": "Lithuania",
+    "country": "CN",
     "profile_picture":
       "https://images.unsplash.com/photo-1605664041952-4a2855d9363b?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MjN8fGxhd3llcnxlbnwwfHwwfHx8MA%3D%3D",
     "mail": "tshillitoe@state.gov",
@@ -267,7 +267,7 @@ const userData = [
     "id": "77a97e29-b4d5-458d-a69a-6db84a2fc5e9",
     "first_name": "Heidi",
     "last_name": "Warlawe",
-    "country": "Lithuania",
+    "country": "RU",
     "profile_picture":
       "https://images.unsplash.com/photo-1519419691348-3b3433c4c20e?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTF8fG1pZGRsZSUyMGVhc3Rlcm4lMjBwZXJzb258ZW58MHx8MHx8fDA%3D",
     "mail": "hwarlawef@seattletimes.com",
@@ -279,7 +279,7 @@ const userData = [
     "id": "c650f5e8-fc5b-48a2-95fb-2c0855580f58",
     "first_name": "Ingeberg",
     "last_name": "Cargenven",
-    "country": "Iran",
+    "country": "BR",
     "profile_picture":
       "https://images.unsplash.com/photo-1506863530036-1efeddceb993?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MjR8fHByb2ZpbGUlMjBwaWN0dXJlJTIwb2xkZXIlMjBwZXJzb258ZW58MHx8MHx8fDA%3D",
     "mail": "icargenveng@nasa.gov",
@@ -291,7 +291,7 @@ const userData = [
     "id": "ea3f3aaf-ce06-42d6-8602-57c0cf027fea",
     "first_name": "Abby",
     "last_name": "Godney",
-    "country": "Iran",
+    "country": "PL",
     "profile_picture":
       "https://images.unsplash.com/photo-1620553967344-c6d788133f17?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Njh8fHByb2ZpbGUlMjBwaWN0dXJlJTIwb2xkZXIlMjBwZXJzb258ZW58MHx8MHx8fDA%3D",
     "mail": "agodneyh@studiopress.com",
@@ -303,11 +303,11 @@ const userData = [
     "id": "eaccfdce-1795-4261-bf77-ddf56741c1b7",
     "first_name": "Olivier",
     "last_name": "Beckmann",
-    "country": "Denmark",
+    "country": "PH",
     "profile_picture":
       "https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?w=1000&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Nnx8ZG9jdG9yfGVufDB8fDB8fHww",
     "mail": "obeckmanni@google.com.br",
-    "password": "product",
+    "password": "pro!duct3d",
     "friend_ids": [13, 15, 19],
     "chats": [],
   },

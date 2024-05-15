@@ -7,7 +7,7 @@
   "license": "ISC",
   "scripts": {
     "start": "tsc-watch --noEmit --onSuccess \"tsx ./src/index.ts\"",
-    "test": "vitest",
+    "test": "vitest --single-thread",
     "coverage": "vitest --coverage",
     "build": "tsc",
     "prod": "node build/index.js"
@@ -17,7 +17,6 @@
   "dependencies": {
     "@keycloak/keycloak-admin-client": "^24.0.1",
     "@types/jsonwebtoken": "^9.0.5",
-    "axios": "^1.6.2",
     "bcrypt": "^5.1.1",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
@@ -28,7 +27,8 @@
     "neo4j-driver": "^5.13.0",
     "socket.io": "^4.7.2",
     "unidecode": "^0.1.8",
-    "vite": "^5.2.6"
+    "vite": "^5.2.6",
+    "zod": "^3.22.4"
   },
   "devDependencies": {
     "@types/bcrypt": "^5.0.2",

@@ -12,7 +12,7 @@ import Modal from "./Modal";
 export interface FriendProps {
   friend: User;
   joinMeeting: (friendId: string) => Promise<string | void>;
-  handleDeclineRequest: (friend: User) => Promise<void>;
+  handleDeleteFriend: (friend: User) => Promise<void>;
 }
 
 function Friend(props: FriendProps) {
@@ -22,7 +22,7 @@ function Friend(props: FriendProps) {
 
   const friend: User = props.friend;
   const joinMeeting = props.joinMeeting;
-  const handleDeclineRequest = props.handleDeclineRequest;
+  const { handleDeleteFriend } = props;
 
   return (
     <li key={friend.id} className="flex flex-row mt-5">
@@ -37,6 +37,7 @@ function Friend(props: FriendProps) {
             {friend.first_name} {friend.last_name}{" "}
           </span>
           <button
+            data-testid={friend.first_name + "_" + friend.last_name + "_delete"}
             className={` text-my-red text-sm my-2 p-2 rounded-md transition hover:scale-110 hover:bg-my-red hover:text-my-light active:translate-x-2`}
             onClick={() => {
               setShowDeleteModal(true);
@@ -53,6 +54,7 @@ function Friend(props: FriendProps) {
             <FontAwesomeIcon icon={faVideo} />
           </button>
           <button
+            data-testid={friend.first_name + "_" + friend.last_name + "_chat"}
             className={`btn small bg-my-purple text-xs my-2`}
             onClick={() => navigate(`/messages/${friend.id}`)}
           >
@@ -64,7 +66,7 @@ function Friend(props: FriendProps) {
         <Modal
           text={`Are you sure that you want remove ${friend.first_name} ${friend.last_name} from your friends ?`}
           handleYes={() => {
-            handleDeclineRequest(friend);
+            handleDeleteFriend(friend);
             setShowDeleteModal(false);
           }}
           handleNo={() => setShowDeleteModal(false)}

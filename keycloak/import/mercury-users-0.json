@@ -20,28 +20,20 @@
       "groups": []
     },
     {
-      "id": "4458155c-2881-44b2-8839-c6995faa2b26",
-      "username": "user",
-      "firstName": "John",
-      "lastName": "Smith",
-      "email": "user@example.com",
-      "emailVerified": true,
-      "createdTimestamp": 1709812316448,
+      "id": "2b7c328b-bd51-4192-910b-b0e0a92976dd",
+      "username": "service-account-mercury-testing",
+      "emailVerified": false,
+      "createdTimestamp": 1713953000752,
       "enabled": true,
       "totp": false,
-      "credentials": [
-        {
-          "id": "504c030d-226b-4cc1-a1f3-296f64b372e5",
-          "type": "password",
-          "userLabel": "My password",
-          "createdDate": 1709812346376,
-          "secretData": "{\"value\":\"RX5OoQgC3FjMdqCxBdtVveP2761u5LgIp5AKfOBJQDnoNAGhVsiWDwGB1qzh0yBQSAqm+T0cQXGisbQnOYDNXg==\",\"salt\":\"lVg7FJZXP19QRSFkYqZOaw==\",\"additionalParameters\":{}}",
-          "credentialData": "{\"hashIterations\":210000,\"algorithm\":\"pbkdf2-sha512\",\"additionalParameters\":{}}"
-        }
-      ],
+      "serviceAccountClientId": "mercury-testing",
+      "credentials": [],
       "disableableCredentialTypes": [],
       "requiredActions": [],
       "realmRoles": ["default-roles-mercury"],
+      "clientRoles": {
+        "mercury-testing": ["uma_protection"]
+      },
       "notBefore": 0,
       "groups": []
     }

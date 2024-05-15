@@ -15,6 +15,7 @@ import { TokenErrorResponse } from "../types/authResponse.js";
 import { OkErrorResponse } from "../types/userResponse.js";
 import { leaveMeeting } from "../meetings.js";
 import { getDbUser } from "../users.js";
+import { Errors } from "../models/Response.js";
 
 const authRouter = Router();
 
@@ -51,7 +52,7 @@ authRouter.post("/login", async (req: Request, res: TokenErrorResponse) => {
     res.json({ status: "ok", token });
   } catch (err) {
     console.log("Error:", err);
-    return res.status(404).json({ status: "error", errors: err as object });
+    return res.status(404).json({ status: "error", errors: err as Errors });
   } finally {
     await session.close();
   }
@@ -74,7 +75,7 @@ authRouter.post(
       await session.close();
     } catch (err) {
       console.log("Error:", err);
-      return res.status(404).json({ status: "error", errors: err as object });
+      return res.status(404).json({ status: "error", errors: err as Errors });
     }
 
     res.json({ status: "ok" });

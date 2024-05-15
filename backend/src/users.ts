@@ -1,16 +1,19 @@
 import neo4j, { Session } from "neo4j-driver";
 import { v4 as uuidv4 } from "uuid";
 import bcrypt from "bcrypt";
-import User from "./models/User.js";
+import User, { userSchema } from "./models/User.js";
 import removeKeys from "./misc/removeKeys.js";
 import wordToVec from "./misc/wordToVec.js";
 import DbUser from "./models/DbUser.js";
 import kcAdminClient from "./kcAdminClient.js";
 import UserRepresentation from "@keycloak/keycloak-admin-client/lib/defs/userRepresentation.js";
-import driver from "./driver/driver.js";
 import { Either } from "./misc/Either.js";
-import NativeUser from "./models/NativeUser.js";
+import NativeUser, { nativeUserSchema } from "./models/NativeUser.js";
 import ExternalUser from "./models/ExternalUser.js";
+import { ZodType } from "zod";
+import ChangePasswordReq from "./models/ChangePasswordReq.js";
+import jwt from "jsonwebtoken";
+import TokenPayload from "./models/TokenPayload.js";
 
 export const filterUser = (user: DbUser): User => {
   if ("password" in user) {
@@ -45,9 +48,20 @@ function getResponse(e: any): Response | null {
   return e.response;
 }
 
-type RegisterUser = Omit<User, "id"> & NativeUser;
-type CreateUser = Omit<User, "id"> & Either<NativeUser, ExternalUser>;
+export type RegisterUser = Omit<User, "id"> & NativeUser;
+export type CreateUser = Omit<User, "id"> & Either<NativeUser, ExternalUser>;
+export type UpdateUser = Partial<Omit<User, "id">>;
 export type UserCreateResult = User | { errors: Record<string, string> };
+
+export const registerUserSchema = userSchema
+  .omit({ id: true })
+  .merge(nativeUserSchema) satisfies ZodType<RegisterUser>;
+
+export const updateUserSchema = userSchema
+  .omit({
+    id: true,
+  })
+  .partial() satisfies ZodType<UpdateUser>;
 
 async function createUserQuery(
   session: Session,
@@ -88,29 +102,28 @@ export async function createUser(
     }
   }
 
-  const firstNameEmbedding = wordToVec(userData.first_name);
-  const lastNameEmbedding = wordToVec(userData.last_name);
+  const nameEmbeddingResult = await generateNameEmbedding(
+    userData.first_name,
+    userData.last_name,
+  );
+  const { success, firstNameCorrect, lastNameCorrect, nameEmbedding } =
+    nameEmbeddingResult;
 
   const errors: Record<string, string> = {};
 
-  if (firstNameEmbedding.length == 0) {
-    errors["first_name"] = "incorrect";
-  }
+  if (!success) {
+    if (!firstNameCorrect) {
+      errors["first_name"] = "incorrect";
+    }
 
-  if (lastNameEmbedding.length == 0) {
-    errors["last_name"] = "incorrect";
-  }
+    if (!lastNameCorrect) {
+      errors["last_name"] = "incorrect";
+    }
 
-  for (const _ in errors) {
     return { errors };
   }
 
   const id = uuidv4();
-  const nameEmbedding = firstNameEmbedding.map((e1, i) => {
-    const e2 = lastNameEmbedding[i];
-    return (e1 + e2) / 2;
-  });
-
   let user = { ...userData, id, name_embedding: nameEmbedding } as DbUser;
 
   if ("password" in userData) {
@@ -123,32 +136,41 @@ export async function createUser(
 }
 
 export async function registerUser(
+  session: Session,
   userData: RegisterUser,
-): Promise<UserCreateResult> {
-  const session = driver.session();
+): Promise<User> {
+  let keycloakId: string = "";
+
   try {
-    const { id: keycloakId } = await kcAdminClient.users.create(
-      registerUserToKeycloakUser(userData),
-    );
-
-    const dbUserData: CreateUser = {
-      ...removeKeys(userData, ["password"]),
-      issuer: "mercury",
-      issuer_id: keycloakId,
-    };
-
-    const user = await createUser(session, dbUserData);
-    return user;
+    keycloakId = (
+      await kcAdminClient.users.create(registerUserToKeycloakUser(userData))
+    ).id;
   } catch (e) {
     const response = getResponse(e);
-    if (response != null && response.status == 409) {
-      return { errors: { id: "already exists" } };
-    } else {
+    if (response == null || response.status != 409) {
       throw e;
     }
-  } finally {
-    await session.close();
   }
+
+  if (!keycloakId) {
+    keycloakId = (
+      await kcAdminClient.users.find({ email: userData.mail, realm: "mercury" })
+    )[0].id!;
+  }
+
+  const dbUserData: CreateUser = {
+    ...removeKeys(userData, ["password"]),
+    issuer: "mercury",
+    issuer_id: keycloakId,
+  };
+
+  await createUser(session, dbUserData);
+
+  const user = await getDbUser(session, {
+    mail: userData.mail,
+    issuer: "mercury",
+  });
+  return filterUser(user!);
 }
 
 export async function getUser(
@@ -200,6 +222,7 @@ export async function searchUser(
   country: string,
   pageIndex: number,
   pageSize: number,
+  userId: string = "",
 ): Promise<UserScore[] | null> {
   const queryElems = neo4j.int((pageIndex + 1) * pageSize);
   const querySkip = neo4j.int(pageIndex * pageSize);
@@ -210,11 +233,11 @@ export async function searchUser(
   if (!searchTerm) {
     userRequest = await session.run(
       `MATCH (u:User)
-       WHERE $country = "" OR u.country = $country
+       WHERE ($country = "" OR u.country = $country) AND u.id <> $userId
        RETURN u as similarUser, 1.0 as score
        SKIP $querySkip
        LIMIT $queryLimit`,
-      { queryElems, country, querySkip, queryLimit },
+      { queryElems, country, userId, querySkip, queryLimit },
     );
   } else {
     const wordVec = wordToVec(searchTerm);
@@ -226,11 +249,11 @@ export async function searchUser(
     userRequest = await session.run(
       `CALL db.index.vector.queryNodes('user-names', $queryElems, $wordVec)
        YIELD node AS similarUser, score
-       WHERE $country = "" OR similarUser.country = $country
+       WHERE ($country = "" OR similarUser.country = $country) AND similarUser.id <> $userId
        RETURN similarUser, score
        SKIP $querySkip
        LIMIT $queryLimit`,
-      { wordVec, queryElems, country, querySkip, queryLimit },
+      { wordVec, queryElems, userId, country, querySkip, queryLimit },
     );
   }
 
@@ -248,6 +271,46 @@ export async function getUsersCount(session: Session): Promise<neo4j.Integer> {
   const usersCount = await session.run(`MATCH (u:User) RETURN count(u)`);
 
   return usersCount.records[0].get(0);
+}
+
+export type GenerateNameEmbeddingResult = {
+  success: boolean;
+  firstNameCorrect: boolean;
+  lastNameCorrect: boolean;
+  nameEmbedding: number[];
+};
+
+export async function generateNameEmbedding(
+  firstName: string,
+  lastName: string,
+): Promise<GenerateNameEmbeddingResult> {
+  const firstNameEmbedding = wordToVec(firstName);
+  const lastNameEmbedding = wordToVec(lastName);
+
+  const firstNameCorrect = firstNameEmbedding.length > 0;
+  const lastNameCorrect = lastNameEmbedding.length > 0;
+  const success = firstNameCorrect && lastNameCorrect;
+
+  if (!success) {
+    return {
+      success,
+      firstNameCorrect,
+      lastNameCorrect,
+      nameEmbedding: [],
+    };
+  }
+
+  const nameEmbedding = firstNameEmbedding.map((e1, i) => {
+    const e2 = lastNameEmbedding[i];
+    return (e1 + e2) / 2;
+  });
+
+  return {
+    success,
+    firstNameCorrect,
+    lastNameCorrect,
+    nameEmbedding,
+  };
 }
 
 export async function updateUser(
@@ -276,7 +339,11 @@ export async function updateUser(
     }
   }
 
-  const newUser = { ...user, ...newUserProps };
+  const { nameEmbedding } = await generateNameEmbedding(
+    newUserProps.first_name || user.first_name,
+    newUserProps.last_name || user.last_name,
+  );
+  const newUser = { ...user, ...newUserProps, name_embedding: nameEmbedding };
   await session.run(`MATCH (u:User {id: $userId}) SET u=$user`, {
     userId,
     user: newUser,
@@ -285,18 +352,44 @@ export async function updateUser(
   return true;
 }
 
-export type ChangePasswordSuccess = "success";
-export type ChangePasswordError = "verify" | "repeat";
-export type ChangePasswordResult = ChangePasswordSuccess | ChangePasswordError;
+export type ChangePasswordResult = {
+  success: boolean;
+  userExists: boolean;
+  isUserIssued: boolean;
+  passwordCorrect: boolean;
+};
 
 export async function changePassword(
   session: Session,
-  user: DbUser,
-  oldPassword: string,
-  newPassword: string,
-  repeatPassword: string,
+  userId: string,
+  passwords: ChangePasswordReq,
+  token?: TokenPayload,
 ): Promise<ChangePasswordResult> {
-  if (!("password" in user)) {
+  const user = await getDbUser(session, { id: userId });
+  if (!user) {
+    return {
+      success: false,
+      userExists: false,
+      isUserIssued: false,
+      passwordCorrect: false,
+    };
+  }
+
+  const userExists = true;
+  const isUserIssued = !("password" in user);
+
+  if (isUserIssued) {
+    const tokenInvalid = {
+      success: false,
+      userExists,
+      isUserIssued,
+      passwordCorrect: false,
+    };
+
+    if (!token) {
+      return tokenInvalid;
+    }
+
     if (user.issuer == "mercury") {
       const keycloakUser = await kcAdminClient.users.findOne({
         id: user.issuer_id,
@@ -311,29 +404,39 @@ export async function changePassword(
           requiredActions,
         },
       );
-      return "success";
+
+      return { success: true, userExists, isUserIssued, passwordCorrect: true };
     } else {
       throw new Error("not implemented");
     }
   }
 
-  const match: boolean = await bcrypt.compare(oldPassword, user.password);
+  let isEmpty = true;
+  for (const _ in passwords) {
+    isEmpty = false;
+  }
+
+  if (isEmpty) {
+    return { success: false, userExists, isUserIssued, passwordCorrect: false };
+  }
+
+  const { old_password, new_password } = passwords as any;
+
+  const match: boolean = await bcrypt.compare(old_password, user.password);
   if (!match) {
-    return "verify";
+    return { success: false, userExists, isUserIssued, passwordCorrect: false };
   }
 
-  if (newPassword != repeatPassword) {
-    return "repeat";
-  }
-
-  const passwordHashed = await bcrypt.hash(newPassword, 10);
+  const passwordCorrect = true;
+  const passwordHashed = await bcrypt.hash(new_password, 10);
   const updatedUser = { ...user, password: passwordHashed };
 
   await session.run(`MATCH (u:User {id: $userId}) SET u=$user`, {
     userId: user.id,
     user: updatedUser,
   });
-  return "success";
+
+  return { success: true, userExists, isUserIssued, passwordCorrect };
 }
 
 export async function deleteUser(
@@ -355,111 +458,4 @@ export async function deleteUser(
   });
 
   return true;
-}
-
-export async function getFriends(
-  session: Session,
-  userId: string,
-  pageIndex: number,
-  pageSize: number,
-): Promise<User[] | null> {
-  const user = await getUser(session, { id: userId });
-  if (!user) {
-    return null;
-  }
-
-  const querySkip = neo4j.int(pageIndex * pageSize);
-  const queryLimit = neo4j.int(pageSize);
-
-  const friendRequest = await session.run(
-    `MATCH (u:User {id: $userId})-[:IS_FRIENDS_WITH]-(f:User)
-     RETURN DISTINCT f
-     SKIP $querySkip
-     LIMIT $queryLimit`,
-    { userId, querySkip, queryLimit },
-  );
-
-  const friends = friendRequest.records.map((f) =>
-    filterUser(f.get("f").properties),
-  );
-  return friends;
-}
-
-export async function isFriend(
-  session: Session,
-  firstUserId: string,
-  secondUserId: string,
-) {
-  try {
-    const request = await session.run(
-      `
-      MATCH (u1:User {id: $firstUserId})
-      MATCH (u2:User {id: $secondUserId})
-      RETURN exists((u1)-[:IS_FRIENDS_WITH]-(u2))
-      `,
-      { firstUserId, secondUserId },
-    );
-
-    return request.records.length > 0;
-  } catch (err) {
-    return false;
-  }
-}
-
-export async function getFriendRequests(
-  session: Session,
-  userId: string,
-  pageIndex: number,
-  pageSize: number,
-): Promise<User[] | null> {
-  const user = await getUser(session, { id: userId });
-  if (!user) {
-    return null;
-  }
-
-  const querySkip = neo4j.int(pageIndex * pageSize);
-  const queryLimit = neo4j.int(pageSize);
-
-  const friendRequestsRequest = await session.run(
-    `MATCH (u:User {id: $userId})<-[:SENT_INVITE_TO]-(f:User)
-     WITH f ORDER BY f.last_name, f.first_name
-     RETURN DISTINCT f
-     SKIP $querySkip
-     LIMIT $queryLimit`,
-    { userId, querySkip, queryLimit },
-  );
-
-  const friends = friendRequestsRequest.records.map((f) =>
-    filterUser(f.get("f").properties),
-  );
-  return friends;
-}
-
-export async function getFriendSuggestions(
-  session: Session,
-  userId: string,
-  pageIndex: number,
-  pageSize: number,
-): Promise<User[] | null> {
-  const user = await getUser(session, { id: userId });
-  if (!user) {
-    return null;
-  }
-
-  const querySkip = neo4j.int(pageIndex * pageSize);
-  const queryLimit = neo4j.int(pageSize);
-
-  const friendSuggestionsRequest = await session.run(
-    `MATCH (u:User {id: $userId})-[:IS_FRIENDS_WITH]-(f:User)-[:IS_FRIENDS_WITH]-(s:User)
-     WHERE NOT (u)-[:IS_FRIENDS_WITH]-(s) AND s.id <> $userId
-     RETURN DISTINCT s
-     SKIP $querySkip
-     LIMIT $queryLimit`,
-    { userId, querySkip, queryLimit },
-  );
-
-  const friends = friendSuggestionsRequest.records.map((s) =>
-    filterUser(s.get("s").properties),
-  );
-  return friends;
 }

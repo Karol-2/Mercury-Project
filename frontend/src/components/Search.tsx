@@ -12,6 +12,7 @@ interface searchProps {
 
 const Search = (props: searchProps) => {
   const navigate = useNavigate();
+  const { user } = useUser();
 
   // Logic
   const [searchQuery, setSearchQuery] = useState("");
@@ -32,7 +33,7 @@ const Search = (props: searchProps) => {
   }, [countryList]);
 
   const countryOptions = countryList.map((country) => ({
-    value: country.Country,
+    value: country.Code,
     label: country.Country,
   }));
 
@@ -52,6 +53,7 @@ const Search = (props: searchProps) => {
     const urlSearchParams = new URLSearchParams({
       q: searchQuery,
       country: countryQuery,
+      userId: user?.id || "",
     });
 
     props.handler(`/users/search?${urlSearchParams}`);
@@ -66,6 +68,7 @@ const Search = (props: searchProps) => {
         <div className=" w-full">
           <input
             type="text"
+            data-testid="SearchBox"
             placeholder="Enter your friend's name"
             className="form-input text-my-darker"
             onChange={(e) => setSearchQuery(e.target.value)}
@@ -74,7 +77,9 @@ const Search = (props: searchProps) => {
 
         <button type="submit" className="btn bg-my-purple text-xs px-7 py-5">
           <div className="flex gap-3 items-center text-cente justify-center">
-            <span className=" text-center">Search</span>
+            <span data-testid="SearchButton" className="text-center">
+              Search
+            </span>
             <FontAwesomeIcon icon={faMagnifyingGlass} />
           </div>
         </button>
