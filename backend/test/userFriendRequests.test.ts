@@ -1,4 +1,4 @@
-import { expect, test } from "vitest";
+import { describe, expect, test } from "vitest";
 import { fetchData } from "../src/misc/fetchData.js";
 import User from "../src/models/User.js";
 
@@ -125,208 +125,224 @@ const deleteFriend = async (
   return response;
 };
 
-test("Check current requests", async () => {
-  const response = await fetchData(
-    `http://localhost:5000/users/${userId}/friend-requests?page=${page}&maxUsers=${maxUsers}`,
-    "GET",
-    {},
-  );
+describe("Get current requests", () => {
+  test("correct", async () => {
+    const response = await fetchData(
+      `http://localhost:5000/users/${userId}/friend-requests?page=${page}&maxUsers=${maxUsers}`,
+      "GET",
+      {},
+    );
 
-  const { status, pageCount, friendRequests } = response;
+    const { status, pageCount, friendRequests } = response;
 
-  expect(status).toBe("ok");
-  expect(pageCount).toBe(0);
-  expect(friendRequests.length).toBe(0);
+    expect(status).toBe("ok");
+    expect(pageCount).toBe(0);
+    expect(friendRequests.length).toBe(0);
+  });
+
+  test("incorrect ID", async () => {
+    const response = await fetchData(
+      `http://localhost:5000/users/0/friend-requests?page=${page}&maxUsers=${maxUsers}`,
+      "GET",
+      {},
+    );
+
+    const { status, errors } = response;
+
+    expect(status).toBe("error");
+    expect(errors).toBeDefined();
+    expect(errors.id).toBe("not found");
+  });
 });
 
-test("Check current requests with incorrect ID", async () => {
-  const response = await fetchData(
-    `http://localhost:5000/users/0/friend-requests?page=${page}&maxUsers=${maxUsers}`,
-    "GET",
-    {},
-  );
+describe("Pagination parameters", () => {
+  test("missing page", async () => {
+    const response = await fetchData(
+      `http://localhost:5000/users/${userId}/friend-requests?maxUsers=${maxUsers}`,
+      "GET",
+      {},
+    );
 
-  const { status, errors } = response;
+    const { status, errors } = response;
 
-  expect(status).toBe("error");
-  expect(errors).toBeDefined();
-  expect(errors.id).toBe("not found");
+    expect(status).toBe("error");
+    expect(errors).toBeDefined();
+    expect(errors.page).toBe("Invalid input");
+  });
+
+  test("missing maxUsers", async () => {
+    const response = await fetchData(
+      `http://localhost:5000/users/${userId}/friend-requests?page=${page}`,
+      "GET",
+      {},
+    );
+
+    const { status, errors } = response;
+
+    expect(status).toBe("error");
+    expect(errors).toBeDefined();
+    expect(errors.maxUsers).toBe("Invalid input");
+  });
+
+  test("missing page and maxUsers", async () => {
+    const response = await fetchData(
+      `http://localhost:5000/users/${userId}/friend-requests`,
+      "GET",
+      {},
+    );
+
+    const { status, errors } = response;
+
+    expect(status).toBe("error");
+    expect(errors.page).toBe("Invalid input");
+    expect(errors.maxUsers).toBe("Invalid input");
+  });
+
+  test("maxUsers as a text", async () => {
+    const response = await fetchData(
+      `http://localhost:5000/users/${userId}/friend-requests?page=text?page=${page}&maxUsers=text`,
+      "GET",
+      {},
+    );
+
+    const { status, errors } = response;
+
+    expect(status).toBe("error");
+    expect(errors.maxUsers).toBe("Expected number, received nan");
+  });
+
+  test("maxUsers equals 0", async () => {
+    maxUsers = 0;
+    const response = await fetchData(
+      `http://localhost:5000/users/${userId}/friend-requests?page=${page}&maxUsers=${maxUsers}`,
+      "GET",
+      {},
+    );
+
+    const { status, errors } = response;
+
+    expect(status).toBe("error");
+    expect(errors).toBeDefined();
+    expect(errors.maxUsers).toBe("Number must be greater than or equal to 1");
+  });
 });
 
-test("Missing page", async () => {
-  const response = await fetchData(
-    `http://localhost:5000/users/${userId}/friend-requests?maxUsers=${maxUsers}`,
-    "GET",
-    {},
-  );
+describe("Send friend request", () => {
+  test("without token", async () => {
+    const { status } = await sendFriendRequest(userId, userId2);
+    expect(status).toBe("unauthorized");
+  });
 
-  const { status, errors } = response;
+  test("correct", async () => {
+    const { status } = await sendFriendRequest(userId, userId2, token1);
+    expect(status).toBe("ok");
+  });
 
-  expect(status).toBe("error");
-  expect(errors).toBeDefined();
-  expect(errors.page).toBe("Invalid input");
+  test("incorrect id", async () => {
+    const { status, errors } = await sendFriendRequest(userId, "0", token1);
+
+    expect(status).toBe("error");
+    expect(errors).toBeDefined();
+    expect(errors.userId2).toBe("not found");
+  });
 });
 
-test("Missing maxUsers", async () => {
-  const response = await fetchData(
-    `http://localhost:5000/users/${userId}/friend-requests?page=${page}`,
-    "GET",
-    {},
-  );
+describe("Decline friend request", () => {
+  test("without token", async () => {
+    const { status } = await declineFriendRequest(userId2, userId);
+    expect(status).toBe("unauthorized");
+  });
 
-  const { status, errors } = response;
+  test("correct", async () => {
+    const { status } = await declineFriendRequest(userId2, userId, token2);
+    expect(status).toBe("ok");
+  });
 
-  expect(status).toBe("error");
-  expect(errors).toBeDefined();
-  expect(errors.maxUsers).toBe("Invalid input");
+  test("incorrect id", async () => {
+    const { status, errors } = await declineFriendRequest(userId, "0", token2);
+
+    expect(status).toBe("error");
+    expect(errors).toBeDefined();
+    expect(errors.userId2).toBe("not found");
+  });
+
+  test("not invited", async () => {
+    const { status, errors } = await declineFriendRequest(
+      userId2,
+      userId,
+      token2,
+    );
+
+    expect(status).toBe("error");
+    expect(errors).toBeDefined();
+    expect(errors.userId1).toBe("not invited");
+  });
 });
 
-test("Missing page and maxUsers", async () => {
-  const response = await fetchData(
-    `http://localhost:5000/users/${userId}/friend-requests`,
-    "GET",
-    {},
-  );
+describe("Accept friend request", () => {
+  test("without token", async () => {
+    const { status } = await acceptFriendRequest(userId2, userId);
+    expect(status).toBe("unauthorized");
+  });
 
-  const { status, errors } = response;
+  test("incorrect id", async () => {
+    const response = await acceptFriendRequest(userId, "0", token1);
+    const { status, errors } = response;
 
-  expect(status).toBe("error");
-  expect(errors.page).toBe("Invalid input");
-  expect(errors.maxUsers).toBe("Invalid input");
+    expect(status).toBe("error");
+    expect(errors).toBeDefined();
+    expect(errors.userId2).toBe("not found");
+  });
+
+  test("not invited", async () => {
+    const { status, errors } = await acceptFriendRequest(
+      userId2,
+      userId,
+      token2,
+    );
+
+    expect(status).toBe("error");
+    expect(errors).toBeDefined();
+    expect(errors.userId1).toBe("not invited");
+  });
+
+  test("correct", async () => {
+    await sendFriendRequest(userId, userId2, token1);
+
+    const { status } = await acceptFriendRequest(userId2, userId, token2);
+    expect(status).toBe("ok");
+
+    const friendsResponse = await fetchData(
+      `http://localhost:5000/users/${userId2}/friends?page=1&maxUsers=10`,
+      "GET",
+      {},
+    );
+
+    const friend = friendsResponse.friends.find(
+      (user: User) => user.id == userId,
+    );
+
+    expect(friend).toBeDefined();
+  });
 });
 
-test("maxUsers as a text", async () => {
-  const response = await fetchData(
-    `http://localhost:5000/users/${userId}/friend-requests?page=text?page=${page}&maxUsers=text`,
-    "GET",
-    {},
-  );
+describe("Delete friend", () => {
+  test("without token", async () => {
+    const { status } = await deleteFriend(userId2, userId);
+    expect(status).toBe("unauthorized");
+  });
 
-  const { status, errors } = response;
+  test("incorrect id", async () => {
+    const response = await deleteFriend(userId, "0", token1);
+    const { status, errors } = response;
 
-  expect(status).toBe("error");
-  expect(errors.maxUsers).toBe("Expected number, received nan");
-});
+    expect(status).toBe("error");
+    expect(errors).toBeDefined();
+    expect(errors.userId2).toBe("not found");
+  });
 
-test("maxUsers equals 0", async () => {
-  maxUsers = 0;
-  const response = await fetchData(
-    `http://localhost:5000/users/${userId}/friend-requests?page=${page}&maxUsers=${maxUsers}`,
-    "GET",
-    {},
-  );
-
-  const { status, errors } = response;
-
-  expect(status).toBe("error");
-  expect(errors).toBeDefined();
-  expect(errors.maxUsers).toBe("Number must be greater than or equal to 1");
-});
-
-test("Send friend request without token", async () => {
-  const { status } = await sendFriendRequest(userId, userId2);
-  expect(status).toBe("unauthorized");
-});
-
-test("Send friend request", async () => {
-  const { status } = await sendFriendRequest(userId, userId2, token1);
-  expect(status).toBe("ok");
-});
-
-test("Send friend request with incorrect id", async () => {
-  const { status, errors } = await sendFriendRequest(userId, "0", token1);
-
-  expect(status).toBe("error");
-  expect(errors).toBeDefined();
-  expect(errors.userId2).toBe("not found");
-});
-
-test("Decline friend request without token", async () => {
-  const { status } = await declineFriendRequest(userId2, userId);
-  expect(status).toBe("unauthorized");
-});
-
-test("Decline friend request", async () => {
-  const { status } = await declineFriendRequest(userId2, userId, token2);
-  expect(status).toBe("ok");
-});
-
-test("Decline friend request with incorrect id", async () => {
-  const { status, errors } = await declineFriendRequest(userId, "0", token2);
-
-  expect(status).toBe("error");
-  expect(errors).toBeDefined();
-  expect(errors.userId2).toBe("not found");
-});
-
-test("Accept friend request without token", async () => {
-  const { status } = await acceptFriendRequest(userId2, userId);
-  expect(status).toBe("unauthorized");
-});
-
-test("Accept friend request when not invited", async () => {
-  const { status, errors } = await acceptFriendRequest(userId2, userId, token2);
-
-  expect(status).toBe("error");
-  expect(errors).toBeDefined();
-  expect(errors.userId1).toBe("not invited");
-});
-
-test("Accept friend request", async () => {
-  await sendFriendRequest(userId, userId2, token1);
-
-  const { status } = await acceptFriendRequest(userId2, userId, token2);
-  expect(status).toBe("ok");
-
-  const friendsResponse = await fetchData(
-    `http://localhost:5000/users/${userId2}/friends?page=1&maxUsers=10`,
-    "GET",
-    {},
-  );
-
-  const friend = friendsResponse.friends.find(
-    (user: User) => user.id == userId,
-  );
-
-  expect(friend).toBeDefined();
-});
-
-test("Accept friend request with incorrect id", async () => {
-  const response = await acceptFriendRequest(userId, "0", token1);
-  const { status, errors } = response;
-
-  expect(status).toBe("error");
-  expect(errors).toBeDefined();
-  expect(errors.userId2).toBe("not found");
-});
-
-test("Decline friend request when not invited", async () => {
-  const { status, errors } = await declineFriendRequest(
-    userId2,
-    userId,
-    token2,
-  );
-
-  expect(status).toBe("error");
-  expect(errors).toBeDefined();
-  expect(errors.userId1).toBe("not invited");
-});
-
-test("Delete friend without token", async () => {
-  const { status } = await deleteFriend(userId2, userId);
-  expect(status).toBe("unauthorized");
-});
-
-test("Delete friend", async () => {
-  const { status } = await deleteFriend(userId2, userId, token2);
-  expect(status).toBe("ok");
-});
-
-test("Delete friend with incorrect id", async () => {
-  const response = await deleteFriend(userId, "0", token1);
-  const { status, errors } = response;
-
-  expect(status).toBe("error");
-  expect(errors).toBeDefined();
-  expect(errors.userId2).toBe("not found");
+  test("correct", async () => {
+    const { status } = await deleteFriend(userId2, userId, token2);
+    expect(status).toBe("ok");
+  });
 });

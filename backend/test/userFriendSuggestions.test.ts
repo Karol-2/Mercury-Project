@@ -1,4 +1,4 @@
-import { expect, test } from "vitest";
+import { describe, expect, test } from "vitest";
 import { fetchData } from "../src/misc/fetchData.js";
 import User from "../src/models/User.js";
 
@@ -15,118 +15,122 @@ const getFirstUser = async () => {
 
 await getFirstUser();
 
-test("Get friend suggestions", async () => {
-  const response = await fetchData(
-    `http://localhost:5000/users/${userId}/friend-suggestions?page=${page}&maxUsers=${maxUsers}`,
-    "GET",
-    {},
-  );
+describe("Get friend suggestions", () => {
+  test("incorrect ID", async () => {
+    const response = await fetchData(
+      `http://localhost:5000/users/0/friend-suggestions?page=${page}&maxUsers=${maxUsers}`,
+      "GET",
+      {},
+    );
 
-  const { status, pageCount, friendSuggestions } = response;
+    const { status, errors } = response;
 
-  expect(status).toBe("ok");
-  expect(pageCount).toBe(3);
-  expect(friendSuggestions).toBeDefined();
-  expect(friendSuggestions.length).toBe(3);
+    expect(status).toBe("error");
+    expect(errors).toBeDefined();
+    expect(errors.id).toBe("not found");
+  });
+
+  test("correct", async () => {
+    const response = await fetchData(
+      `http://localhost:5000/users/${userId}/friend-suggestions?page=${page}&maxUsers=${maxUsers}`,
+      "GET",
+      {},
+    );
+
+    const { status, pageCount, friendSuggestions } = response;
+
+    expect(status).toBe("ok");
+    expect(pageCount).toBe(3);
+    expect(friendSuggestions).toBeDefined();
+    expect(friendSuggestions.length).toBe(3);
+  });
+
+  test("first user", async () => {
+    page = 1;
+    maxUsers = 1;
+    const response = await fetchData(
+      `http://localhost:5000/users/${userId}/friend-suggestions?page=${page}&maxUsers=${maxUsers}`,
+      "GET",
+      {},
+    );
+
+    const { status, pageCount, friendSuggestions } = response;
+
+    expect(status).toBe("ok");
+    expect(pageCount).toBe(13);
+    expect(friendSuggestions).toBeDefined();
+    expect(friendSuggestions.length).toBe(1);
+  });
 });
 
-test("Get friend suggestions with incorrect ID", async () => {
-  const response = await fetchData(
-    `http://localhost:5000/users/0/friend-suggestions?page=${page}&maxUsers=${maxUsers}`,
-    "GET",
-    {},
-  );
+describe("Pagination parameters", () => {
+  test("missing page", async () => {
+    const response = await fetchData(
+      `http://localhost:5000/users/${userId}/friend-suggestions?maxUsers=${maxUsers}`,
+      "GET",
+      {},
+    );
 
-  const { status, errors } = response;
+    const { status, errors } = response;
 
-  expect(status).toBe("error");
-  expect(errors).toBeDefined();
-  expect(errors.id).toBe("not found");
-});
+    expect(status).toBe("error");
+    expect(errors).toBeDefined();
+    expect(errors.page).toBe("Invalid input");
+  });
 
-test("Missing page", async () => {
-  const response = await fetchData(
-    `http://localhost:5000/users/${userId}/friend-suggestions?maxUsers=${maxUsers}`,
-    "GET",
-    {},
-  );
+  test("missing maxUsers", async () => {
+    const response = await fetchData(
+      `http://localhost:5000/users/${userId}/friend-suggestions?page=${page}`,
+      "GET",
+      {},
+    );
 
-  const { status, errors } = response;
+    const { status, errors } = response;
 
-  expect(status).toBe("error");
-  expect(errors).toBeDefined();
-  expect(errors.page).toBe("Invalid input");
-});
+    expect(status).toBe("error");
+    expect(errors).toBeDefined();
+    expect(errors.maxUsers).toBe("Invalid input");
+  });
 
-test("Missing maxUsers", async () => {
-  const response = await fetchData(
-    `http://localhost:5000/users/${userId}/friend-suggestions?page=${page}`,
-    "GET",
-    {},
-  );
+  test("missing page and maxUsers", async () => {
+    const response = await fetchData(
+      `http://localhost:5000/users/${userId}/friend-suggestions`,
+      "GET",
+      {},
+    );
 
-  const { status, errors } = response;
+    const { status, errors } = response;
 
-  expect(status).toBe("error");
-  expect(errors).toBeDefined();
-  expect(errors.maxUsers).toBe("Invalid input");
-});
+    expect(status).toBe("error");
+    expect(errors.page).toBe("Invalid input");
+    expect(errors.maxUsers).toBe("Invalid input");
+  });
 
-test("Missing page and maxUsers", async () => {
-  const response = await fetchData(
-    `http://localhost:5000/users/${userId}/friend-suggestions`,
-    "GET",
-    {},
-  );
+  test("maxUsers as a text", async () => {
+    const response = await fetchData(
+      `http://localhost:5000/users/${userId}/friend-suggestions?page=text?page=${page}&maxUsers=text`,
+      "GET",
+      {},
+    );
 
-  const { status, errors } = response;
+    const { status, errors } = response;
 
-  expect(status).toBe("error");
-  expect(errors.page).toBe("Invalid input");
-  expect(errors.maxUsers).toBe("Invalid input");
-});
+    expect(status).toBe("error");
+    expect(errors.maxUsers).toBe("Expected number, received nan");
+  });
 
-test("maxUsers as a text", async () => {
-  const response = await fetchData(
-    `http://localhost:5000/users/${userId}/friend-suggestions?page=text?page=${page}&maxUsers=text`,
-    "GET",
-    {},
-  );
+  test("maxUsers equals 0", async () => {
+    maxUsers = 0;
+    const response = await fetchData(
+      `http://localhost:5000/users/${userId}/friend-suggestions?page=${page}&maxUsers=${maxUsers}`,
+      "GET",
+      {},
+    );
 
-  const { status, errors } = response;
+    const { status, errors } = response;
 
-  expect(status).toBe("error");
-  expect(errors.maxUsers).toBe("Expected number, received nan");
-});
-
-test("First user", async () => {
-  page = 1;
-  maxUsers = 1;
-  const response = await fetchData(
-    `http://localhost:5000/users/${userId}/friend-suggestions?page=${page}&maxUsers=${maxUsers}`,
-    "GET",
-    {},
-  );
-
-  const { status, pageCount, friendSuggestions } = response;
-
-  expect(status).toBe("ok");
-  expect(pageCount).toBe(13);
-  expect(friendSuggestions).toBeDefined();
-  expect(friendSuggestions.length).toBe(1);
-});
-
-test("maxUsers equals 0", async () => {
-  maxUsers = 0;
-  const response = await fetchData(
-    `http://localhost:5000/users/${userId}/friend-suggestions?page=${page}&maxUsers=${maxUsers}`,
-    "GET",
-    {},
-  );
-
-  const { status, errors } = response;
-
-  expect(status).toBe("error");
-  expect(errors).toBeDefined();
-  expect(errors.maxUsers).toBe("Number must be greater than or equal to 1");
+    expect(status).toBe("error");
+    expect(errors).toBeDefined();
+    expect(errors.maxUsers).toBe("Number must be greater than or equal to 1");
+  });
 });

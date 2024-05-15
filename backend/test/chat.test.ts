@@ -1,4 +1,4 @@
-import { expect, test } from "vitest";
+import { describe, expect, test } from "vitest";
 import { fetchData } from "../src/misc/fetchData.js";
 import User from "../src/models/User.js";
 
@@ -9,7 +9,6 @@ const userMail1 = "bconford2@wikimedia.org";
 const userPassword1 = "heuristic";
 
 const userMail2 = "cruckman3@archive.org";
-const userPassword2 = "coreCar0l;";
 
 const getUsers = async () => {
   const response = await fetchData(`http://localhost:5000/users`, "GET", {});
@@ -57,23 +56,25 @@ const getChat = async (userId1: string, userId2: string, token?: string) => {
   return response;
 };
 
-test("Get chat without ids", async () => {
-  const response = await fetch(`http://localhost:5000/chat`);
-  const data = response.headers.get("content-type");
+describe("Get chat messages", () => {
+  test("without IDs", async () => {
+    const response = await fetch(`http://localhost:5000/chat`);
+    const data = response.headers.get("content-type");
 
-  expect(response.status).toBe(404);
-  expect(data).toBe("text/html; charset=utf-8");
-});
+    expect(response.status).toBe(404);
+    expect(data).toBe("text/html; charset=utf-8");
+  });
 
-test("Get chat without token", async () => {
-  const { status } = await getChat(userId1, userId2);
-  expect(status).toBe("unauthorized");
-});
+  test("without token", async () => {
+    const { status } = await getChat(userId1, userId2);
+    expect(status).toBe("unauthorized");
+  });
 
-test("Get chat with ids", async () => {
-  const { status, messages } = await getChat(userId1, userId2, token);
+  test("correct", async () => {
+    const { status, messages } = await getChat(userId1, userId2, token);
 
-  expect(status).toBe("ok");
-  expect(messages).toBeDefined();
-  expect(messages.length).toBe(0);
+    expect(status).toBe("ok");
+    expect(messages).toBeDefined();
+    expect(messages.length).toBe(0);
+  });
 });
