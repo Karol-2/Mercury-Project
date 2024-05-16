@@ -1,5 +1,6 @@
 import { createContext, useContext } from "react";
 import { Socket } from "socket.io-client";
+
 import User, { FrontendUser } from "../models/User";
 import UserState from "../models/UserState";
 

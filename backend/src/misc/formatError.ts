@@ -1,4 +1,5 @@
 import { ZodError } from "zod";
+
 import { Errors } from "../models/Response.js";
 
 export function formatError<T>(error: ZodError<T>): Errors {

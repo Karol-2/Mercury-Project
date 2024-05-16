@@ -1,12 +1,13 @@
 import {
+  faCommentAlt,
   faUserMinus,
   faVideo,
-  faCommentAlt,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import User from "../models/User";
-import { useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+
+import User from "../models/User";
 import Modal from "./Modal";
 
 export interface FriendProps {

@@ -1,6 +1,12 @@
-import { Router, Request, Response } from "express";
-import driver from "../driver/driver.js";
-import { JWTRequest, authenticateToken, getToken } from "../misc/jwt.js";
+import { Request, Response, Router } from "express";
+
+import driver from "../driver.js";
+import { formatError } from "../misc/formatError.js";
+import { authenticateToken, getToken, JWTRequest } from "../misc/jwt.js";
+import { changePasswordReqSchema } from "../models/ChangePasswordReq.js";
+import DbUser from "../models/DbUser.js";
+import { Errors } from "../models/Response.js";
+import { searchSchema } from "../models/routes/Search.js";
 import {
   AuthOkErrorResponse,
   OkErrorResponse,
@@ -8,29 +14,25 @@ import {
   UsersErrorResponse,
   UsersSearchErrorResponse,
 } from "../types/userResponse.js";
-import usersFriendsRoute from "./userFriendsRoute.js";
 import {
-  getAllUsers,
-  searchUser as searchUsers,
-  getUser as getUser,
-  createUser,
-  updateUser,
-  deleteUser,
-  UserCreateResult,
-  registerUser,
-  getDbUser,
   changePassword,
+  createUser,
+  deleteUser,
+  getAllUsers,
+  getDbUser,
+  getTokenDbUser,
+  getUser,
   getUsersCount,
-  registerUserSchema,
+  registerUser,
   RegisterUser,
-  updateUserSchema,
+  registerUserSchema,
+  searchUser as searchUsers,
+  updateUser,
   UpdateUser,
+  updateUserSchema,
+  UserCreateResult,
 } from "../users.js";
-import DbUser from "../models/DbUser.js";
-import { changePasswordReqSchema } from "../models/ChangePasswordReq.js";
-import { formatError } from "../misc/formatError.js";
-import { Errors } from "../models/Response.js";
-import { searchSchema } from "../models/routes/Search.js";
+import usersFriendsRoute from "./userFriendsRoute.js";
 
 const usersRouter = Router();
 
@@ -136,55 +138,6 @@ usersRouter.get("/:userId", async (req: Request, res: UserErrorResponse) => {
   }
 });
 
-usersRouter.get("/meetings/:userId", async (req: Request, res) => {
-  try {
-    const session = driver.session();
-    const userId = req.params.userId;
-
-    const user = await getDbUser(session, { id: userId });
-    if (!user) {
-      await session.close();
-      return res;
-    }
-
-    const meetingsRequest = await session.run(
-      `MATCH (u1:User {id: $userId})-[m:MEETING]-(u2:User) RETURN m, u2`,
-      { userId },
-    );
-    await session.close();
-    try {
-      const meetings = meetingsRequest.records.map((meeting) => {
-        const { meetingId, waiting } = meeting.get(0).properties;
-        const { id, first_name, last_name } = meeting.get(1).properties;
-        return { meetingId, id, first_name, last_name, waiting };
-      });
-      return res.json({ status: "ok", meetings });
-    } catch (_err) {
-      return res.json({ status: "ok", meetings: [] });
-    }
-  } catch (err) {
-    console.log("Error:", err);
-    return res.status(404).json({ status: "error", errors: err as object });
-  }
-});
-
-usersRouter.put("/meetings/:meetingId", async (req: Request, res) => {
-  try {
-    const session = driver.session();
-    const meetingId = req.params.meetingId;
-
-    await session.run(
-      `MATCH (u1:User)-[m:MEETING]-(u2:User) WHERE m.meetingId=$meetingId SET m.waiting = true`,
-      { meetingId },
-    );
-    await session.close();
-    return res.json({ status: "ok" });
-  } catch (err) {
-    console.log("Error:", err);
-    return res.status(404).json({ status: "error", errors: err as object });
-  }
-});
-
 usersRouter.post("/", async (req: Request, res: UserErrorResponse) => {
   const userParse = registerUserSchema.safeParse(req.body);
   if (!userParse.success) {
@@ -218,31 +171,45 @@ usersRouter.post("/", async (req: Request, res: UserErrorResponse) => {
   }
 });
 
-usersRouter.put("/:userId", async (req: Request, res: OkErrorResponse) => {
-  const userParse = updateUserSchema.safeParse(req.body);
-  if (!userParse.success) {
-    const errors = formatError(userParse.error);
-    return res.status(400).json({ status: "error", errors });
-  }
+usersRouter.put(
+  "/:userId",
+  authenticateToken,
+  async (req: JWTRequest, res: AuthOkErrorResponse) => {
+    const session = driver.session();
+    try {
+      const userId = req.params.userId;
+      const user = await getTokenDbUser(session, req.token!);
 
-  const parsedUser: UpdateUser = userParse.data;
-  const userId = req.params.userId;
+      if (!user) {
+        return userNotFoundRes(res);
+      }
 
-  const session = driver.session();
-  try {
-    const newUser = await updateUser(session, userId, parsedUser);
-    if (!newUser) {
-      return userNotFoundRes(res);
+      if (user.id != userId) {
+        return res.status(403).json({ status: "forbidden" });
+      }
+
+      const userParse = updateUserSchema.safeParse(req.body);
+      if (!userParse.success) {
+        const errors = formatError(userParse.error);
+        return res.status(400).json({ status: "error", errors });
+      }
+
+      const parsedUser: UpdateUser = userParse.data;
+
+      const newUser = await updateUser(session, userId, parsedUser);
+      if (!newUser) {
+        return userNotFoundRes(res);
+      }
+
+      return res.json({ status: "ok" });
+    } catch (err) {
+      console.log("Error:", err);
+      return res.status(404).json({ status: "error", errors: err as Errors });
+    } finally {
+      await session.close();
     }
-
-    return res.json({ status: "ok" });
-  } catch (err) {
-    console.log("Error:", err);
-    return res.status(404).json({ status: "error", errors: err as Errors });
-  } finally {
-    await session.close();
-  }
-});
+  },
+);
 
 usersRouter.post(
   "/:userId/change-password",
@@ -296,23 +263,36 @@ usersRouter.post(
   },
 );
 
-usersRouter.delete("/:userId", async (req: Request, res: OkErrorResponse) => {
-  const userId = req.params.userId;
+usersRouter.delete(
+  "/:userId",
+  authenticateToken,
+  async (req: JWTRequest, res: AuthOkErrorResponse) => {
+    const session = driver.session();
+    try {
+      const userId = req.params.userId;
+      const user = await getTokenDbUser(session, req.token!);
 
-  const session = driver.session();
-  try {
-    const isDeleted = await deleteUser(session, userId);
-    if (!isDeleted) {
-      return userNotFoundRes(res);
+      if (!user) {
+        return userNotFoundRes(res);
+      }
+
+      if (user.id != userId) {
+        return res.status(403).json({ status: "forbidden" });
+      }
+
+      const isDeleted = await deleteUser(session, userId);
+      if (!isDeleted) {
+        return userNotFoundRes(res);
+      }
+
+      return res.json({ status: "ok" });
+    } catch (err) {
+      console.log("Error:", err);
+      return res.status(404).json({ status: "error", errors: err as Errors });
+    } finally {
+      await session.close();
     }
-
-    return res.json({ status: "ok" });
-  } catch (err) {
-    console.log("Error:", err);
-    return res.status(404).json({ status: "error", errors: err as Errors });
-  } finally {
-    await session.close();
-  }
-});
+  },
+);
 
 export default usersRouter;

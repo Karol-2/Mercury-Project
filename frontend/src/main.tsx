@@ -15,11 +15,11 @@ import VideoCallPage from "./pages/VideoCallPage.tsx";
 
 import "./styles/styles.scss";
 
-import { store } from "./redux/store.ts";
+import KeycloakUserProvider from "./helpers/KeycloakUserProvider.tsx";
 import MeetingProvider from "./helpers/MeetingProvider.tsx";
 import Protected from "./helpers/Protected.tsx";
-import KeycloakUserProvider from "./helpers/KeycloakUserProvider.tsx";
 import EditDataPage from "./pages/EditDataPage.tsx";
+import { store } from "./redux/store.ts";
 
 const body = document.getElementsByTagName("body")[0]!;
 body.className = "bg-my-darker text-my-light";

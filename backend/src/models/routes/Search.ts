@@ -1,6 +1,7 @@
-import { ZodType, z } from "zod";
-import Page, { pageSchema } from "./Page.js";
+import { z, ZodType } from "zod";
+
 import { userCountrySchema } from "../User.js";
+import Page, { pageSchema } from "./Page.js";
 
 interface Search extends Page {
   q: string;

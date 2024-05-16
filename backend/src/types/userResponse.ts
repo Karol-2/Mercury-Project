@@ -1,15 +1,16 @@
 import {
+  AuthResponse,
   CustomResponse,
   ErrorResponse,
+  FriendRequestsPageResponse,
+  FriendsPageResponse,
+  FriendsResponse,
+  FriendSuggestionsPageResponse,
+  MessagesResponse,
   OkResponse,
   UserResponse,
   UsersResponse,
-  FriendsResponse,
   UsersSearchResponse,
-  AuthResponse,
-  FriendsPageResponse,
-  FriendRequestsPageResponse,
-  FriendSuggestionsPageResponse,
 } from "../models/Response.js";
 
 export type UsersErrorResponse = CustomResponse<UsersResponse | ErrorResponse>;
@@ -25,11 +26,15 @@ export type FriendRequestsPageErrorResponse = CustomResponse<
   FriendRequestsPageResponse | ErrorResponse
 >;
 export type FriendSuggestionsPageErrorResponse = CustomResponse<
-  FriendSuggestionsPageResponse | ErrorResponse
+  AuthResponse | FriendSuggestionsPageResponse | ErrorResponse
 >;
 export type FriendsPageErrorResponse = CustomResponse<
-  FriendsPageResponse | ErrorResponse
+  AuthResponse | FriendsPageResponse | ErrorResponse
 >;
 export type UsersSearchErrorResponse = CustomResponse<
   UsersSearchResponse | ErrorResponse
+>;
+
+export type AuthMessagesErrorResponse = CustomResponse<
+  AuthResponse | MessagesResponse | ErrorResponse
 >;

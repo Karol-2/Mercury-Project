@@ -1,11 +1,11 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
-
 import { Socket } from "socket.io-client";
 
-import User from "../models/User";
 import notificationSoundUrl from "../assets/notification.mp3";
-import Message, { MessageProps } from "./Message";
+import { useUser } from "../helpers/UserContext";
+import User from "../models/User";
 import dataService from "../services/data";
+import Message, { MessageProps } from "./Message";
 
 const notificationSound = new Audio(notificationSoundUrl);
 
@@ -16,6 +16,8 @@ interface ChatBoxProps {
 }
 
 function ChatBox({ user, socket, friendId }: ChatBoxProps) {
+  const { token } = useUser();
+
   const messages = useRef<MessageProps[]>([]);
 
   const handleScroll = (ref: HTMLDivElement | null) => {
@@ -117,6 +119,7 @@ function ChatBox({ user, socket, friendId }: ChatBoxProps) {
         `/chat/${user.id}/${friendId}`,
         "GET",
         {},
+        token,
       );
 
       await addMessages(messageResponse.messages);

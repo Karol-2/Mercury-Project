@@ -1,14 +1,14 @@
-import Navbar from "../components/Navbar";
-import Footer from "../components/Footer";
 import { useEffect, useState } from "react";
+
+import Footer from "../components/Footer";
 import FoundUser from "../components/FoundUser";
+import Navbar from "../components/Navbar";
+import PaginatorV2 from "../components/PaginatorV2";
+import Search from "../components/Search";
+import Transition from "../components/Transition";
+import { useProtected } from "../helpers/Protected";
 import { useUser } from "../helpers/UserContext";
 import User from "../models/User";
-
-import Transition from "../components/Transition";
-import Search from "../components/Search";
-import PaginatorV2 from "../components/PaginatorV2";
-import { useProtected } from "../helpers/Protected";
 
 function SearchPage() {
   // Logic

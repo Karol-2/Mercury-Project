@@ -1,6 +1,7 @@
-import User from "./User.js";
-
 import { Response } from "express";
+
+import Message from "./Message.js";
+import User from "./User.js";
 
 type Send<J, T = Response> = (body?: J) => T;
 
@@ -58,6 +59,11 @@ export interface UsersSearchResponse {
   status: "ok";
   pageCount: number;
   users: User[];
+}
+
+export interface MessagesResponse {
+  status: "ok";
+  messages: Message[];
 }
 
 export interface JWTResponse extends OkResponse {

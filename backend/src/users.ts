@@ -1,19 +1,21 @@
+import UserRepresentation from "@keycloak/keycloak-admin-client/lib/defs/userRepresentation.js";
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 import neo4j, { Session } from "neo4j-driver";
 import { v4 as uuidv4 } from "uuid";
-import bcrypt from "bcrypt";
-import User, { userSchema } from "./models/User.js";
+import { ZodType } from "zod";
+
+import kcAdminClient from "./kcAdminClient.js";
+import { Either } from "./misc/Either.js";
+import { issuers } from "./misc/jwt.js";
 import removeKeys from "./misc/removeKeys.js";
 import wordToVec from "./misc/wordToVec.js";
-import DbUser from "./models/DbUser.js";
-import kcAdminClient from "./kcAdminClient.js";
-import UserRepresentation from "@keycloak/keycloak-admin-client/lib/defs/userRepresentation.js";
-import { Either } from "./misc/Either.js";
-import NativeUser, { nativeUserSchema } from "./models/NativeUser.js";
-import ExternalUser from "./models/ExternalUser.js";
-import { ZodType } from "zod";
 import ChangePasswordReq from "./models/ChangePasswordReq.js";
-import jwt from "jsonwebtoken";
+import DbUser from "./models/DbUser.js";
+import ExternalUser from "./models/ExternalUser.js";
+import NativeUser, { nativeUserSchema } from "./models/NativeUser.js";
 import TokenPayload from "./models/TokenPayload.js";
+import User, { userSchema } from "./models/User.js";
 
 export const filterUser = (user: DbUser): User => {
   if ("password" in user) {
@@ -203,6 +205,41 @@ export async function getDbUser(
   }
 
   const user = userExistsResult.records[0].get("u").properties as DbUser;
+  return user;
+}
+
+type SubProps = {
+  sub?: string;
+  props?: Partial<DbUser>;
+};
+
+function tokenPayloadToSubProps(tokenPayload: TokenPayload): SubProps {
+  const issuer = tokenPayload.iss;
+
+  if (issuer == issuers.mercury) {
+    const sub = tokenPayload.sub;
+    const props = { issuer: "mercury", issuer_id: sub };
+    return { sub, props };
+  } else if (issuer == issuers.rest) {
+    const sub = tokenPayload.userId;
+    const props = { id: sub };
+    return { sub, props };
+  }
+
+  return {};
+}
+
+export async function getTokenDbUser(
+  session: Session,
+  tokenPayload: TokenPayload,
+): Promise<DbUser | null> {
+  let { sub, props } = tokenPayloadToSubProps(tokenPayload);
+
+  if (!sub || !props) {
+    return null;
+  }
+
+  const user = await getDbUser(session, props);
   return user;
 }
 

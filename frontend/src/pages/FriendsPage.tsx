@@ -1,24 +1,25 @@
-import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { useMeeting } from "../helpers/MeetingProvider";
-
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 import Footer from "../components/Footer";
-import FriendRequest from "../components/FriendRequest";
-import Navbar from "../components/Navbar";
-import User from "../models/User";
-import dataService from "../services/data";
-import Transition from "../components/Transition";
-import { useProtected } from "../helpers/Protected";
 import FoundUser from "../components/FoundUser";
 import Friend from "../components/Friend";
+import FriendRequest from "../components/FriendRequest";
+import Navbar from "../components/Navbar";
 import PaginatorV2 from "../components/PaginatorV2";
+import Transition from "../components/Transition";
+import { useMeeting } from "../helpers/MeetingProvider";
+import { useProtected } from "../helpers/Protected";
+import { useUser } from "../helpers/UserContext";
+import User from "../models/User";
+import dataService from "../services/data";
 
 function FriendsPage() {
   const navigate = useNavigate();
   const { user } = useProtected();
+  const { token } = useUser();
   const { meeting, createMeeting, joinMeeting } = useMeeting();
 
   const [friendsRequests, setFriendsRequests] = useState([]);
@@ -42,6 +43,7 @@ function FriendsPage() {
           `/users/${user.id}/friend-requests?page=1&maxUsers=32`,
           "GET",
           {},
+          token,
         );
         setFriendsRequests(friendsRequestsResponse.friendRequests);
       }
@@ -54,6 +56,8 @@ function FriendsPage() {
       await dataService.fetchData(
         `/users/${user.id}/accept-friend-request/${currentId}`,
         "POST",
+        {},
+        token,
       );
 
       setRefresh(() => !refresh);
@@ -65,6 +69,8 @@ function FriendsPage() {
       await dataService.fetchData(
         `/users/${user.id}/decline-friend-request/${friend.id}`,
         "POST",
+        {},
+        token,
       );
 
       setRefresh(() => !refresh);
@@ -76,6 +82,8 @@ function FriendsPage() {
       await dataService.fetchData(
         `/users/${user.id}/delete-friend/${friend.id}`,
         "DELETE",
+        {},
+        token,
       );
 
       setRefresh(() => !refresh);
@@ -110,6 +118,7 @@ function FriendsPage() {
                   {user && (
                     <PaginatorV2
                       endpoint={`/users/${user.id}/friends`}
+                      token={token}
                       refresh={refresh}
                       isSearch={false}
                       itemsPerPage={5}
@@ -155,6 +164,7 @@ function FriendsPage() {
                 {user && (
                   <PaginatorV2
                     endpoint={`/users/${user.id}/friend-suggestions`}
+                    token={token}
                     itemsPerPage={3}
                     refresh={refresh}
                     isSearch={false}

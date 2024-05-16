@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect } from "react";
-import { useUser } from "./UserContext";
+
 import User from "../models/User";
+import { useUser } from "./UserContext";
 
 export interface ProtectedContextValue {
   user: User;

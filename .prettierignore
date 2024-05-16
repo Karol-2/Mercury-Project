@@ -1,2 +1,5 @@
 node_modules/
 coverage/
+frontend/.vite/
+keycloak/
+db/

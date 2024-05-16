@@ -1,25 +1,30 @@
-import servers from "./server.js";
-import dotenv from "dotenv";
-import driver from "./driver/driver.js";
-import { Socket } from "socket.io";
+import { Socket, Server as SocketServer } from "socket.io";
+
+import driver from "./driver.js";
+import ClientToServerEvents from "./events/ClientToServerEvents.js";
+import ServerToClientEvents from "./events/ServerToClientEvents.js";
+import { expressServer } from "./httpServer.js";
+import {
+  createMeeting,
+  isInMeeting,
+  joinMeeting,
+  leaveMeeting,
+} from "./meetings.js";
+import { addMessageToDb } from "./messages.js";
+import Meeting from "./models/Meeting.js";
 import {
   connectToSocket,
   disconnectFromSocket,
   getAllSockets,
 } from "./sockets.js";
 import { isFriend } from "./userFriends.js";
-import Meeting from "./models/Meeting.js";
-import {
-  createMeeting,
-  leaveMeeting,
-  isInMeeting,
-  joinMeeting,
-} from "./meetings.js";
-import { addMessageToDb } from "./messages.js";
 
-const { io } = servers;
-
-dotenv.config();
+const io = new SocketServer<ClientToServerEvents, ServerToClientEvents>(
+  expressServer,
+  {
+    cors: { origin: ["http://localhost:5173"] },
+  },
+);
 
 const meetings: Record<string, Meeting> = {};
 

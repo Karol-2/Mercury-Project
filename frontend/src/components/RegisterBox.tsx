@@ -1,13 +1,14 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
-import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { userRegisterSchema } from "../models/RegisterUserSchema";
-import { FrontendUser } from "../models/User";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { Link } from "react-router-dom";
+import Select from "react-select";
+
+import countriesData from "../assets/countries.json";
 import * as userPlaceholder from "../assets/user-placeholder.jpg";
 import { useUser } from "../helpers/UserContext";
-import Select from "react-select";
-import countriesData from "../assets/countries.json";
+import { userRegisterSchema } from "../models/RegisterUserSchema";
+import { FrontendUser } from "../models/User";
 
 function RegisterBox() {
   const {

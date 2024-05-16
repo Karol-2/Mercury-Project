@@ -1,11 +1,11 @@
 import { useEffect, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
-import Navbar from "../components/Navbar";
-import Footer from "../components/Footer";
 import ChatBox from "../components/ChatBox";
-import { useUser } from "../helpers/UserContext";
+import Footer from "../components/Footer";
+import Navbar from "../components/Navbar";
 import { useProtected } from "../helpers/Protected";
+import { useUser } from "../helpers/UserContext";
 
 function MessagingPage() {
   const navigate = useNavigate();

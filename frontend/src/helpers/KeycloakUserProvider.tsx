@@ -1,11 +1,12 @@
-import React, { useState, useEffect, useRef, useMemo } from "react";
-import dataService from "../services/data";
-import User, { FrontendUser } from "../models/User";
-import { Socket, io } from "socket.io-client";
-import UserContext from "./UserContext";
-import UserState from "../models/UserState";
 import Keycloak from "keycloak-js";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { io, Socket } from "socket.io-client";
+
+import User, { FrontendUser } from "../models/User";
+import UserState from "../models/UserState";
+import dataService from "../services/data";
+import UserContext from "./UserContext";
 
 function KeycloakUserProvider({ children }: { children: React.ReactNode }) {
   const navigate = useNavigate();
@@ -24,6 +25,7 @@ function KeycloakUserProvider({ children }: { children: React.ReactNode }) {
   const fetchFriendsPage = async (
     userId: number,
     page: number,
+    token: string,
   ): Promise<User[] | null> => {
     const searchParams = new URLSearchParams({
       page: page.toString(),
@@ -32,6 +34,8 @@ function KeycloakUserProvider({ children }: { children: React.ReactNode }) {
     const friendsResponse = await dataService.fetchData(
       `/users/${userId}/friends?${searchParams}`,
       "GET",
+      {},
+      token,
     );
     if (friendsResponse.status != "ok") {
       console.error("Couldn't fetch friends: ", friendsResponse);
@@ -41,13 +45,16 @@ function KeycloakUserProvider({ children }: { children: React.ReactNode }) {
     return friendsResponse.friends;
   };
 
-  const fetchFriends = async (userId: number): Promise<User[] | null> => {
+  const fetchFriends = async (
+    userId: number,
+    token: string,
+  ): Promise<User[] | null> => {
     let friends = [];
     let pageEmpty = false;
     let page = 1;
 
     while (!pageEmpty) {
-      const friendsPage = await fetchFriendsPage(userId, page);
+      const friendsPage = await fetchFriendsPage(userId, page, token);
       if (friendsPage === null) {
         return null;
       }
@@ -67,7 +74,7 @@ function KeycloakUserProvider({ children }: { children: React.ReactNode }) {
     return Object.fromEntries(friends.map((f) => [f.id, f]));
   };
 
-  const updateUserData = async () => {
+  const updateUserData = async (token: string) => {
     const keycloak = keycloakRef.current!;
     const tokenDecoded: any = await keycloak.loadUserInfo();
 
@@ -84,7 +91,7 @@ function KeycloakUserProvider({ children }: { children: React.ReactNode }) {
     }
 
     const userId = response.user.id;
-    const newFriendsArray = (await fetchFriends(userId)) || [];
+    const newFriendsArray = (await fetchFriends(userId, token)) || [];
     const newFriends = friendsToObject(newFriendsArray);
     setFriends(newFriends);
     setUserLoggedIn(response.user);
@@ -100,12 +107,12 @@ function KeycloakUserProvider({ children }: { children: React.ReactNode }) {
       realm: "mercury",
       clientId: "mercury-client",
     });
-    keycloak.onAuthSuccess = () => {
-      updateUserData();
-      setToken(keycloak.token);
-    };
-
     keycloakRef.current = keycloak;
+
+    keycloak.onAuthSuccess = () => {
+      setToken(keycloak.token);
+      updateUserData(keycloak.token!);
+    };
   });
 
   useEffect(() => {
@@ -199,10 +206,15 @@ function KeycloakUserProvider({ children }: { children: React.ReactNode }) {
     if (userState.status != "logged_in") return false;
 
     const user = { ...userState.user, ...updateUser };
-    const response = await dataService.fetchData(`/users/${user.id}`, "PUT", {
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(user),
-    });
+    const response = await dataService.fetchData(
+      `/users/${user.id}`,
+      "PUT",
+      {
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(user),
+      },
+      token,
+    );
 
     if (response.status === "ok") {
       setUserLoggedIn(user);
@@ -217,7 +229,12 @@ function KeycloakUserProvider({ children }: { children: React.ReactNode }) {
     if (userState.status != "logged_in") return true;
 
     const user = userState.user!;
-    const response = await dataService.fetchData(`/users/${user.id}`, "DELETE");
+    const response = await dataService.fetchData(
+      `/users/${user.id}`,
+      "DELETE",
+      {},
+      token,
+    );
 
     if (response.status === "ok") {
       setUserAnonymous();

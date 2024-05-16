@@ -1,4 +1,4 @@
-import { ZodType, z } from "zod";
+import { z, ZodType } from "zod";
 
 type NativeUser = {
   password: string;
