@@ -1,6 +1,12 @@
-import { Router, Request, Response } from "express";
+import { Request, Response, Router } from "express";
+
 import driver from "../driver.js";
-import { JWTRequest, authenticateToken, getToken } from "../misc/jwt.js";
+import { formatError } from "../misc/formatError.js";
+import { authenticateToken, getToken, JWTRequest } from "../misc/jwt.js";
+import { changePasswordReqSchema } from "../models/ChangePasswordReq.js";
+import DbUser from "../models/DbUser.js";
+import { Errors } from "../models/Response.js";
+import { searchSchema } from "../models/routes/Search.js";
 import {
   AuthOkErrorResponse,
   OkErrorResponse,
@@ -8,30 +14,25 @@ import {
   UsersErrorResponse,
   UsersSearchErrorResponse,
 } from "../types/userResponse.js";
-import usersFriendsRoute from "./userFriendsRoute.js";
 import {
-  getAllUsers,
-  searchUser as searchUsers,
-  getUser as getUser,
-  createUser,
-  updateUser,
-  deleteUser,
-  UserCreateResult,
-  registerUser,
-  getDbUser,
   changePassword,
-  getUsersCount,
-  registerUserSchema,
-  RegisterUser,
-  updateUserSchema,
-  UpdateUser,
+  createUser,
+  deleteUser,
+  getAllUsers,
+  getDbUser,
   getTokenDbUser,
+  getUser,
+  getUsersCount,
+  registerUser,
+  RegisterUser,
+  registerUserSchema,
+  searchUser as searchUsers,
+  updateUser,
+  UpdateUser,
+  updateUserSchema,
+  UserCreateResult,
 } from "../users.js";
-import DbUser from "../models/DbUser.js";
-import { changePasswordReqSchema } from "../models/ChangePasswordReq.js";
-import { formatError } from "../misc/formatError.js";
-import { Errors } from "../models/Response.js";
-import { searchSchema } from "../models/routes/Search.js";
+import usersFriendsRoute from "./userFriendsRoute.js";
 
 const usersRouter = Router();
 

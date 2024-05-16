@@ -1,14 +1,15 @@
-import { Request, Response, NextFunction } from "express";
+import { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
-import { AuthResponse, CustomResponse } from "../models/Response.js";
-import DecodedData from "../models/DecodedData.js";
-import Issuer from "../models/Issuer.js";
-import TokenPayload from "../models/TokenPayload.js";
+
 import {
   keycloakCredentials,
   keycloakIssuer,
   keycloakUri,
 } from "../kcAdminClient.js";
+import DecodedData from "../models/DecodedData.js";
+import Issuer from "../models/Issuer.js";
+import { AuthResponse, CustomResponse } from "../models/Response.js";
+import TokenPayload from "../models/TokenPayload.js";
 
 export interface JWTRequest extends Request {
   token?: TokenPayload;

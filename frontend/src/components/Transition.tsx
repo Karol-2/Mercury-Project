@@ -1,5 +1,5 @@
-import React, { useEffect } from "react";
 import { motion, useAnimation } from "framer-motion";
+import React, { useEffect } from "react";
 
 interface TransitionProps {
   startAnimation: boolean;

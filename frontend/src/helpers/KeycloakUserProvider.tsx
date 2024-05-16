@@ -1,11 +1,12 @@
-import React, { useState, useEffect, useRef, useMemo } from "react";
-import dataService from "../services/data";
-import User, { FrontendUser } from "../models/User";
-import { Socket, io } from "socket.io-client";
-import UserContext from "./UserContext";
-import UserState from "../models/UserState";
 import Keycloak from "keycloak-js";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { io, Socket } from "socket.io-client";
+
+import User, { FrontendUser } from "../models/User";
+import UserState from "../models/UserState";
+import dataService from "../services/data";
+import UserContext from "./UserContext";
 
 function KeycloakUserProvider({ children }: { children: React.ReactNode }) {
   const navigate = useNavigate();

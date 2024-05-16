@@ -1,30 +1,33 @@
-import { Router, Request, Response } from "express";
+import { Request, Response, Router } from "express";
 import { Session } from "neo4j-driver";
+
 import driver from "../driver.js";
-import User from "../models/User.js";
-import {
-  OkErrorResponse,
-  FriendsPageErrorResponse,
-  FriendRequestsPageErrorResponse,
-  FriendSuggestionsPageErrorResponse,
-  AuthOkErrorResponse,
-} from "../types/userResponse.js";
-import { deleteFriend } from "../userFriends.js";
-import { declineFriendRequest } from "../userFriends.js";
-import { acceptFriendRequest } from "../userFriends.js";
-import { sendFriendRequest } from "../userFriends.js";
-import { getFriendSuggestionsCount } from "../userFriends.js";
-import { getFriendSuggestions } from "../userFriends.js";
-import { getFriendRequestsCount } from "../userFriends.js";
-import { getFriendRequests } from "../userFriends.js";
-import { getFriendsCount } from "../userFriends.js";
-import { getFriends } from "../userFriends.js";
-import { userNotFoundRes } from "./usersRoute.js";
+import { formatError } from "../misc/formatError.js";
+import { authenticateToken, JWTRequest } from "../misc/jwt.js";
 import { Errors } from "../models/Response.js";
 import Page, { pageSchema } from "../models/routes/Page.js";
-import { formatError } from "../misc/formatError.js";
-import { JWTRequest, authenticateToken } from "../misc/jwt.js";
+import User from "../models/User.js";
+import {
+  AuthOkErrorResponse,
+  FriendRequestsPageErrorResponse,
+  FriendsPageErrorResponse,
+  FriendSuggestionsPageErrorResponse,
+  OkErrorResponse,
+} from "../types/userResponse.js";
+import {
+  acceptFriendRequest,
+  declineFriendRequest,
+  deleteFriend,
+  getFriendRequests,
+  getFriendRequestsCount,
+  getFriends,
+  getFriendsCount,
+  getFriendSuggestions,
+  getFriendSuggestionsCount,
+  sendFriendRequest,
+} from "../userFriends.js";
 import { getDbUser, getTokenDbUser } from "../users.js";
+import { userNotFoundRes } from "./usersRoute.js";
 
 const friendsRouter = Router();
 

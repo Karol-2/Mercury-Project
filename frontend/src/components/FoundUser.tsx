@@ -1,8 +1,9 @@
 import { useState } from "react";
-import User from "../models/User";
-import dataService from "../services/data";
+
 import countriesData from "../assets/countries.json";
 import { useUser } from "../helpers/UserContext";
+import User from "../models/User";
+import dataService from "../services/data";
 
 interface FoundUserProps {
   user: User;

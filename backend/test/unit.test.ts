@@ -1,20 +1,19 @@
 import { expect, test } from "vitest";
-import {
-  letterToKb,
-  wordDifference,
-  cosineSimilarity,
-  sortLetters,
-  keepLetters,
-  lerp,
-  wordVecInterp,
-  sum,
-  zip,
-  l2Norm,
-  dot,
-} from "../src/misc/wordToVec.js";
-import removeKeys from "../src/misc/removeKeys.js";
 
-import wordToVec from "../src/misc/wordToVec.js";
+import removeKeys from "../src/misc/removeKeys.js";
+import wordToVec, {
+  cosineSimilarity,
+  dot,
+  keepLetters,
+  l2Norm,
+  lerp,
+  letterToKb,
+  sortLetters,
+  sum,
+  wordDifference,
+  wordVecInterp,
+  zip,
+} from "../src/misc/wordToVec.js";
 
 test("Letter to Kb", async () => {
   expect(letterToKb("Q")).toStrictEqual(-1);

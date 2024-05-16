@@ -1,4 +1,5 @@
 import { describe, expect, test } from "vitest";
+
 import { fetchData } from "../src/misc/fetchData.js";
 
 let userId: string;

@@ -7,8 +7,8 @@ export const fetchData = async (
   if (token) {
     options.headers = {
       ...options.headers,
-      "Authorization": `Bearer ${token}`
-    }
+      "Authorization": `Bearer ${token}`,
+    };
   }
 
   try {

@@ -1,4 +1,5 @@
 import { describe, expect, test } from "vitest";
+
 import { fetchData } from "../src/misc/fetchData.js";
 import User from "../src/models/User.js";
 
@@ -66,7 +67,7 @@ describe("Get friend suggestions", () => {
         `?page=${page}&maxUsers=${maxUsers}`,
       "GET",
       {},
-      token2
+      token2,
     );
     expect(status).toBe("forbidden");
   });

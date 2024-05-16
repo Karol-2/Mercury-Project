@@ -1,10 +1,11 @@
-import { ChangeEvent, FormEvent, useState } from "react";
-import User from "../models/User";
-import { changePasswordSchema } from "../models/RegisterUserSchema";
-import { useNavigate } from "react-router-dom";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { ChangeEvent, FormEvent, useState } from "react";
 import { useForm } from "react-hook-form";
+import { useNavigate } from "react-router-dom";
+
 import { PasswordForm } from "../models/PasswordForm";
+import { changePasswordSchema } from "../models/RegisterUserSchema";
+import User from "../models/User";
 
 export interface EditDetails {
   provider: string;

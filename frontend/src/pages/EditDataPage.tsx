@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
+
+import EditDetails from "../components/EditDetails";
+import EditPassword from "../components/EditPassword";
+import EditPhoto from "../components/EditPhoto";
 import Footer from "../components/Footer";
 import Navbar from "../components/Navbar";
 import Transition from "../components/Transition";
-import EditDetails from "../components/EditDetails";
-import EditPhoto from "../components/EditPhoto";
-import EditPassword from "../components/EditPassword";
 import { useUser } from "../helpers/UserContext";
 
 function EditDataPage() {

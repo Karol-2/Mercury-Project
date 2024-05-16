@@ -1,14 +1,16 @@
-import { Link } from "react-router-dom";
-import LogoSVG from "/logo.svg";
-import { useUser } from "../helpers/UserContext";
-import { useState } from "react";
 import {
   faMagnifyingGlass,
+  faRightFromBracket,
   faUser,
   faUsers,
-  faRightFromBracket,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import LogoSVG from "/logo.svg";
+import { useState } from "react";
+import { Link } from "react-router-dom";
+
+import { useUser } from "../helpers/UserContext";
+
 <FontAwesomeIcon icon={faMagnifyingGlass} />;
 
 export interface NavbarProps {

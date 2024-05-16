@@ -1,5 +1,6 @@
-import User from "../models/User";
 import { useState } from "react";
+
+import User from "../models/User";
 import Popup from "./Popup";
 
 export interface EditDetails {

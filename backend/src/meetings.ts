@@ -1,5 +1,6 @@
 import { Session } from "neo4j-driver";
 import { v4 as uuidv4 } from "uuid";
+
 import Meeting from "./models/Meeting.js";
 
 export async function isInMeeting(session: Session, userId: string) {

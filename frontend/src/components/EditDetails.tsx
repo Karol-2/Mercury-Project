@@ -1,10 +1,11 @@
-import { useForm } from "react-hook-form";
-import User, { FrontendUser } from "../models/User";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { userEditDetails } from "../models/RegisterUserSchema";
 import { ChangeEvent, useState } from "react";
-import countriesData from "../assets/countries.json";
+import { useForm } from "react-hook-form";
 import Select from "react-select";
+
+import countriesData from "../assets/countries.json";
+import { userEditDetails } from "../models/RegisterUserSchema";
+import User, { FrontendUser } from "../models/User";
 import Popup from "./Popup";
 
 export interface EditDetails {

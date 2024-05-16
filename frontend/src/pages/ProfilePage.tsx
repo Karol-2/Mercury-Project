@@ -1,12 +1,13 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+
 import Footer from "../components/Footer";
 import Navbar from "../components/Navbar";
-import { useUser } from "../helpers/UserContext";
 import Profile from "../components/Profile";
 import Transition from "../components/Transition";
 import { useMeeting } from "../helpers/MeetingProvider";
 import { useProtected } from "../helpers/Protected";
+import { useUser } from "../helpers/UserContext";
 
 function ProfilePage() {
   const navigate = useNavigate();

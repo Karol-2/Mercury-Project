@@ -1,6 +1,7 @@
 import * as z from "zod";
-import { FrontendUser } from "./User";
+
 import { PasswordForm } from "./PasswordForm";
+import { FrontendUser } from "./User";
 
 export const userRegisterSchema: z.ZodType<Partial<FrontendUser>> = z.object({
   first_name: z

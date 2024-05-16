@@ -1,20 +1,21 @@
+import UserRepresentation from "@keycloak/keycloak-admin-client/lib/defs/userRepresentation.js";
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 import neo4j, { Session } from "neo4j-driver";
 import { v4 as uuidv4 } from "uuid";
-import bcrypt from "bcrypt";
-import User, { userSchema } from "./models/User.js";
+import { ZodType } from "zod";
+
+import kcAdminClient from "./kcAdminClient.js";
+import { Either } from "./misc/Either.js";
+import { issuers } from "./misc/jwt.js";
 import removeKeys from "./misc/removeKeys.js";
 import wordToVec from "./misc/wordToVec.js";
-import DbUser from "./models/DbUser.js";
-import kcAdminClient from "./kcAdminClient.js";
-import UserRepresentation from "@keycloak/keycloak-admin-client/lib/defs/userRepresentation.js";
-import { Either } from "./misc/Either.js";
-import NativeUser, { nativeUserSchema } from "./models/NativeUser.js";
-import ExternalUser from "./models/ExternalUser.js";
-import { ZodType } from "zod";
 import ChangePasswordReq from "./models/ChangePasswordReq.js";
-import jwt from "jsonwebtoken";
+import DbUser from "./models/DbUser.js";
+import ExternalUser from "./models/ExternalUser.js";
+import NativeUser, { nativeUserSchema } from "./models/NativeUser.js";
 import TokenPayload from "./models/TokenPayload.js";
-import { issuers } from "./misc/jwt.js";
+import User, { userSchema } from "./models/User.js";
 
 export const filterUser = (user: DbUser): User => {
   if ("password" in user) {

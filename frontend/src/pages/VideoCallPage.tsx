@@ -1,21 +1,22 @@
-import Navbar from "../components/Navbar";
-import Footer from "../components/Footer";
-import { useUser } from "../helpers/UserContext";
-import { useEffect, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { Socket } from "socket.io-client";
-import stunServers from "../stun/stunServers";
-import Meeting from "../models/Meeting";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  faPhoneSlash,
   faMicrophone,
   faMicrophoneSlash,
+  faPhoneSlash,
   faVideo,
   faVideoSlash,
 } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { Socket } from "socket.io-client";
+
+import Footer from "../components/Footer";
+import Navbar from "../components/Navbar";
 import { useMeeting } from "../helpers/MeetingProvider";
 import { useProtected } from "../helpers/Protected";
+import { useUser } from "../helpers/UserContext";
+import Meeting from "../models/Meeting";
+import stunServers from "../stun/stunServers";
 
 function VideoCallPage() {
   const { user } = useProtected();

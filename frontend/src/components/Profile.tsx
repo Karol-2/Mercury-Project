@@ -1,7 +1,8 @@
 import { useState } from "react";
+
+import countriesData from "../assets/countries.json";
 import User from "../models/User";
 import Modal from "./Modal";
-import countriesData from "../assets/countries.json";
 
 export interface ProfilePageFormProps {
   user: User;

@@ -1,7 +1,7 @@
+import { Response } from "express";
+
 import Message from "./Message.js";
 import User from "./User.js";
-
-import { Response } from "express";
 
 type Send<J, T = Response> = (body?: J) => T;
 

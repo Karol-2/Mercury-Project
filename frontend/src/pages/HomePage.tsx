@@ -1,9 +1,9 @@
 import Footer from "../components/Footer";
+import CallToAction from "../layout/CallToAction";
 import PhotoAndText from "../layout/PhotoAndText";
 import Reasons from "../layout/Reasons";
-import WelcomeMessage from "../layout/WelcomeMessage";
-import CallToAction from "../layout/CallToAction";
 import Technologies from "../layout/Technologies";
+import WelcomeMessage from "../layout/WelcomeMessage";
 
 function HomePage() {
   return (

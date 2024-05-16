@@ -1,11 +1,12 @@
 import { Router } from "express";
-import Message from "../models/Message.js";
-import MessageModel from "../mongoDB/MessageModel.js";
-import { JWTRequest, authenticateToken } from "../misc/jwt.js";
-import { AuthMessagesErrorResponse } from "../types/userResponse.js";
-import { Errors } from "../models/Response.js";
-import { getTokenDbUser } from "../users.js";
+
 import driver from "../driver.js";
+import { authenticateToken, JWTRequest } from "../misc/jwt.js";
+import Message from "../models/Message.js";
+import { Errors } from "../models/Response.js";
+import MessageModel from "../mongoDB/MessageModel.js";
+import { AuthMessagesErrorResponse } from "../types/userResponse.js";
+import { getTokenDbUser } from "../users.js";
 import { userNotFoundRes } from "./usersRoute.js";
 
 const chatRouter = Router();

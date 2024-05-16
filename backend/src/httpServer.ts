@@ -1,12 +1,12 @@
-import express from "express";
-import cors from "cors";
-import cookieParser from "cookie-parser";
-
 import { createServer } from "node:http";
 
-import usersRouter from "./routes/usersRoute.js";
+import cookieParser from "cookie-parser";
+import cors from "cors";
+import express from "express";
+
 import authRouter from "./routes/authRoute.js";
 import chatRouter from "./routes/chatRoute.js";
+import usersRouter from "./routes/usersRoute.js";
 
 const app = express();
 const port: number = 5000;

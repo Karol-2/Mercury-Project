@@ -1,4 +1,5 @@
 import { describe, expect, test } from "vitest";
+
 import { fetchData } from "../src/misc/fetchData.js";
 import User from "../src/models/User.js";
 

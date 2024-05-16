@@ -1,12 +1,11 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
-
 import { Socket } from "socket.io-client";
 
-import User from "../models/User";
 import notificationSoundUrl from "../assets/notification.mp3";
-import Message, { MessageProps } from "./Message";
-import dataService from "../services/data";
 import { useUser } from "../helpers/UserContext";
+import User from "../models/User";
+import dataService from "../services/data";
+import Message, { MessageProps } from "./Message";
 
 const notificationSound = new Audio(notificationSoundUrl);
 
@@ -119,7 +118,8 @@ function ChatBox({ user, socket, friendId }: ChatBoxProps) {
       const messageResponse = await dataService.fetchData(
         `/chat/${user.id}/${friendId}`,
         "GET",
-        {}, token
+        {},
+        token,
       );
 
       await addMessages(messageResponse.messages);

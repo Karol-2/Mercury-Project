@@ -1,7 +1,8 @@
+import { useEffect, useState } from "react";
+
+import Banner from "../components/Banner";
 import Footer from "../components/Footer";
 import RegisterBox from "../components/RegisterBox";
-import Banner from "../components/Banner";
-import { useEffect, useState } from "react";
 import Transition from "../components/Transition";
 
 function RegisterPage() {

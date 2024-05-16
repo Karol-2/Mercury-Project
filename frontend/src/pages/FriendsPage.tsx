@@ -1,21 +1,20 @@
-import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { useMeeting } from "../helpers/MeetingProvider";
-
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 import Footer from "../components/Footer";
-import FriendRequest from "../components/FriendRequest";
-import Navbar from "../components/Navbar";
-import User from "../models/User";
-import dataService from "../services/data";
-import Transition from "../components/Transition";
-import { useProtected } from "../helpers/Protected";
 import FoundUser from "../components/FoundUser";
 import Friend from "../components/Friend";
+import FriendRequest from "../components/FriendRequest";
+import Navbar from "../components/Navbar";
 import PaginatorV2 from "../components/PaginatorV2";
+import Transition from "../components/Transition";
+import { useMeeting } from "../helpers/MeetingProvider";
+import { useProtected } from "../helpers/Protected";
 import { useUser } from "../helpers/UserContext";
+import User from "../models/User";
+import dataService from "../services/data";
 
 function FriendsPage() {
   const navigate = useNavigate();

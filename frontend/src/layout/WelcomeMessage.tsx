@@ -1,6 +1,7 @@
-import { useUser } from "../helpers/UserContext";
 import LogoSVG from "/logo.svg";
 import { Link } from "react-router-dom";
+
+import { useUser } from "../helpers/UserContext";
 
 const scrollToTop = (): void => {
   window.scrollTo(0, 0);

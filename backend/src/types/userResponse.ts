@@ -1,16 +1,16 @@
 import {
+  AuthResponse,
   CustomResponse,
   ErrorResponse,
+  FriendRequestsPageResponse,
+  FriendsPageResponse,
+  FriendsResponse,
+  FriendSuggestionsPageResponse,
+  MessagesResponse,
   OkResponse,
   UserResponse,
   UsersResponse,
-  FriendsResponse,
   UsersSearchResponse,
-  AuthResponse,
-  FriendsPageResponse,
-  FriendRequestsPageResponse,
-  FriendSuggestionsPageResponse,
-  MessagesResponse,
 } from "../models/Response.js";
 
 export type UsersErrorResponse = CustomResponse<UsersResponse | ErrorResponse>;
