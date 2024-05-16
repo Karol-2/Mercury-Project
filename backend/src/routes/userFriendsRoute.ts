@@ -7,6 +7,7 @@ import {
   FriendsPageErrorResponse,
   FriendRequestsPageErrorResponse,
   FriendSuggestionsPageErrorResponse,
+  AuthOkErrorResponse,
 } from "../types/userResponse.js";
 import { deleteFriend } from "../userFriends.js";
 import { declineFriendRequest } from "../userFriends.js";
@@ -22,27 +23,37 @@ import { userNotFoundRes } from "./usersRoute.js";
 import { Errors } from "../models/Response.js";
 import Page, { pageSchema } from "../models/routes/Page.js";
 import { formatError } from "../misc/formatError.js";
-import { authenticateToken } from "../misc/jwt.js";
+import { JWTRequest, authenticateToken } from "../misc/jwt.js";
+import { getDbUser, getTokenDbUser } from "../users.js";
 
 const friendsRouter = Router();
 
 friendsRouter.get(
   "/:userId/friends",
   authenticateToken,
-  async (req: Request, res: FriendsPageErrorResponse) => {
-    const userId = req.params.userId;
-
-    const pageParse = pageSchema.safeParse(req.query);
-    if (!pageParse.success) {
-      const errors = formatError(pageParse.error);
-      return res.status(400).json({ status: "error", errors });
-    }
-
-    const { page, maxUsers }: Page = pageParse.data;
-    const maxUsersBig = BigInt(maxUsers);
-
+  async (req: JWTRequest, res: FriendsPageErrorResponse) => {
     const session = driver.session();
     try {
+      const userId = req.params.userId;
+      const user = await getTokenDbUser(session, req.token!);
+
+      if (!user) {
+        return userNotFoundRes(res);
+      }
+
+      if (user.id != userId) {
+        return res.status(403).json({ status: "forbidden" });
+      }
+
+      const pageParse = pageSchema.safeParse(req.query);
+      if (!pageParse.success) {
+        const errors = formatError(pageParse.error);
+        return res.status(400).json({ status: "error", errors });
+      }
+
+      const { page, maxUsers }: Page = pageParse.data;
+      const maxUsersBig = BigInt(maxUsers);
+
       const friends = await getFriends(session, userId, page - 1, maxUsers);
       if (friends === null) {
         console.log(friends);
@@ -162,12 +173,22 @@ friendsRouter.get(
 friendsRouter.post(
   "/:userId1/send-friend-request/:userId2",
   authenticateToken,
-  async (req: Request, res: OkErrorResponse) => {
+  async (req: JWTRequest, res: AuthOkErrorResponse) => {
     const session = driver.session();
     const userId1 = req.params.userId1;
     const userId2 = req.params.userId2;
 
     try {
+      const user = await getTokenDbUser(session, req.token!);
+
+      if (!user) {
+        return userNotFoundRes(res);
+      }
+
+      if (user.id != userId1) {
+        return res.status(403).json({ status: "forbidden" });
+      }
+
       const requestResult = await sendFriendRequest(session, userId1, userId2);
       if (!requestResult.success) {
         const { firstUserExists, secondUserExists } = requestResult;
@@ -197,12 +218,22 @@ friendsRouter.post(
 friendsRouter.post(
   "/:userId1/accept-friend-request/:userId2",
   authenticateToken,
-  async (req: Request, res: OkErrorResponse) => {
+  async (req: JWTRequest, res: AuthOkErrorResponse) => {
     const session = driver.session();
     const userId1 = req.params.userId1;
     const userId2 = req.params.userId2;
 
     try {
+      const user = await getTokenDbUser(session, req.token!);
+
+      if (!user) {
+        return userNotFoundRes(res);
+      }
+
+      if (user.id != userId1) {
+        return res.status(403).json({ status: "forbidden" });
+      }
+
       const requestResult = await acceptFriendRequest(
         session,
         userId1,
@@ -249,12 +280,22 @@ friendsRouter.post(
 friendsRouter.post(
   "/:userId1/decline-friend-request/:userId2",
   authenticateToken,
-  async (req: Request, res: OkErrorResponse) => {
+  async (req: JWTRequest, res: AuthOkErrorResponse) => {
     const session = driver.session();
     const userId1 = req.params.userId1;
     const userId2 = req.params.userId2;
 
     try {
+      const user = await getTokenDbUser(session, req.token!);
+
+      if (!user) {
+        return userNotFoundRes(res);
+      }
+
+      if (user.id != userId1) {
+        return res.status(403).json({ status: "forbidden" });
+      }
+
       const requestResult = await declineFriendRequest(
         session,
         userId1,
@@ -297,12 +338,22 @@ friendsRouter.post(
 friendsRouter.delete(
   "/:userId1/delete-friend/:userId2",
   authenticateToken,
-  async (req: Request, res: OkErrorResponse) => {
+  async (req: JWTRequest, res: AuthOkErrorResponse) => {
     const session = driver.session();
     const userId1 = req.params.userId1;
     const userId2 = req.params.userId2;
 
     try {
+      const user = await getTokenDbUser(session, req.token!);
+
+      if (!user) {
+        return userNotFoundRes(res);
+      }
+
+      if (user.id != userId1) {
+        return res.status(403).json({ status: "forbidden" });
+      }
+
       const requestResult = await deleteFriend(session, userId1, userId2);
       if (!requestResult.success) {
         const { firstUserExists, secondUserExists, wasFriend } = requestResult;

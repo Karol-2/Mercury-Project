@@ -6,6 +6,7 @@ import dataService from "../services/data";
 
 interface PaginatorProps {
   endpoint: string;
+  token?: string;
   itemsPerPage: number;
   getItems: (response: any) => User[];
   renderItem: (user: User) => React.ReactNode;
@@ -14,6 +15,8 @@ interface PaginatorProps {
 }
 
 function PaginatorV2(props: PaginatorProps) {
+  const { token } = props;
+
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
   const [error, setError] = useState<string>("");
@@ -38,7 +41,7 @@ function PaginatorV2(props: PaginatorProps) {
       console.log(url);
 
       await dataService
-        .fetchData(url, "GET")
+        .fetchData(url, "GET", {}, token)
         .then((response) => {
           const users = props.getItems(response);
 

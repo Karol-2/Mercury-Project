@@ -25,6 +25,7 @@ import {
   RegisterUser,
   updateUserSchema,
   UpdateUser,
+  getTokenDbUser,
 } from "../users.js";
 import DbUser from "../models/DbUser.js";
 import { changePasswordReqSchema } from "../models/ChangePasswordReq.js";
@@ -172,18 +173,28 @@ usersRouter.post("/", async (req: Request, res: UserErrorResponse) => {
 usersRouter.put(
   "/:userId",
   authenticateToken,
-  async (req: Request, res: OkErrorResponse) => {
-    const userParse = updateUserSchema.safeParse(req.body);
-    if (!userParse.success) {
-      const errors = formatError(userParse.error);
-      return res.status(400).json({ status: "error", errors });
-    }
-
-    const parsedUser: UpdateUser = userParse.data;
-    const userId = req.params.userId;
-
+  async (req: JWTRequest, res: AuthOkErrorResponse) => {
     const session = driver.session();
     try {
+      const userId = req.params.userId;
+      const user = await getTokenDbUser(session, req.token!);
+
+      if (!user) {
+        return userNotFoundRes(res);
+      }
+
+      if (user.id != userId) {
+        return res.status(403).json({ status: "forbidden" });
+      }
+
+      const userParse = updateUserSchema.safeParse(req.body);
+      if (!userParse.success) {
+        const errors = formatError(userParse.error);
+        return res.status(400).json({ status: "error", errors });
+      }
+
+      const parsedUser: UpdateUser = userParse.data;
+
       const newUser = await updateUser(session, userId, parsedUser);
       if (!newUser) {
         return userNotFoundRes(res);
@@ -254,11 +265,20 @@ usersRouter.post(
 usersRouter.delete(
   "/:userId",
   authenticateToken,
-  async (req: Request, res: OkErrorResponse) => {
-    const userId = req.params.userId;
-
+  async (req: JWTRequest, res: AuthOkErrorResponse) => {
     const session = driver.session();
     try {
+      const userId = req.params.userId;
+      const user = await getTokenDbUser(session, req.token!);
+
+      if (!user) {
+        return userNotFoundRes(res);
+      }
+
+      if (user.id != userId) {
+        return res.status(403).json({ status: "forbidden" });
+      }
+
       const isDeleted = await deleteUser(session, userId);
       if (!isDeleted) {
         return userNotFoundRes(res);

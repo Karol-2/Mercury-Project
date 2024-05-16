@@ -233,6 +233,11 @@ describe("Send friend request", () => {
     expect(status).toBe("unauthorized");
   });
 
+  test("with incorrect token", async () => {
+    const { status } = await sendFriendRequest(userId, userId2, token2);
+    expect(status).toBe("forbidden");
+  });
+
   test("correct", async () => {
     const { status } = await sendFriendRequest(userId, userId2, token1);
     expect(status).toBe("ok");
@@ -253,13 +258,18 @@ describe("Decline friend request", () => {
     expect(status).toBe("unauthorized");
   });
 
+  test("with incorrect token", async () => {
+    const { status } = await declineFriendRequest(userId2, userId, token1);
+    expect(status).toBe("forbidden");
+  });
+
   test("correct", async () => {
     const { status } = await declineFriendRequest(userId2, userId, token2);
     expect(status).toBe("ok");
   });
 
   test("incorrect id", async () => {
-    const { status, errors } = await declineFriendRequest(userId, "0", token2);
+    const { status, errors } = await declineFriendRequest(userId2, "0", token2);
 
     expect(status).toBe("error");
     expect(errors).toBeDefined();
@@ -283,6 +293,11 @@ describe("Accept friend request", () => {
   test("without token", async () => {
     const { status } = await acceptFriendRequest(userId2, userId);
     expect(status).toBe("unauthorized");
+  });
+
+  test("with incorrect token", async () => {
+    const { status } = await acceptFriendRequest(userId2, userId, token1);
+    expect(status).toBe("forbidden");
   });
 
   test("incorrect id", async () => {
@@ -316,6 +331,7 @@ describe("Accept friend request", () => {
       `http://localhost:5000/users/${userId2}/friends?page=1&maxUsers=10`,
       "GET",
       {},
+      token2,
     );
 
     const friend = friendsResponse.friends.find(
@@ -330,6 +346,11 @@ describe("Delete friend", () => {
   test("without token", async () => {
     const { status } = await deleteFriend(userId2, userId);
     expect(status).toBe("unauthorized");
+  });
+
+  test("with incorrect token", async () => {
+    const { status } = await deleteFriend(userId2, userId, token1);
+    expect(status).toBe("forbidden");
   });
 
   test("incorrect id", async () => {

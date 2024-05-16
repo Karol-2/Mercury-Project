@@ -9,6 +9,7 @@ const userMail1 = "bconford2@wikimedia.org";
 const userPassword1 = "heuristic";
 
 const userMail2 = "cruckman3@archive.org";
+const userPassword2 = "coreCar0l;";
 
 const getUsers = async () => {
   const response = await fetchData(`http://localhost:5000/users`, "GET", {});
@@ -43,7 +44,8 @@ const getKeycloakToken = async (
 };
 
 await getUsers();
-const token = await getKeycloakToken(userMail1, userPassword1);
+const token1 = await getKeycloakToken(userMail1, userPassword1);
+const token2 = await getKeycloakToken(userMail2, userPassword2);
 
 const getChat = async (userId1: string, userId2: string, token?: string) => {
   const response = await fetchData(
@@ -70,8 +72,13 @@ describe("Get chat messages", () => {
     expect(status).toBe("unauthorized");
   });
 
+  test("with incorrect token", async () => {
+    const { status } = await getChat(userId1, userId2, token2);
+    expect(status).toBe("forbidden");
+  });
+
   test("correct", async () => {
-    const { status, messages } = await getChat(userId1, userId2, token);
+    const { status, messages } = await getChat(userId1, userId2, token1);
 
     expect(status).toBe("ok");
     expect(messages).toBeDefined();

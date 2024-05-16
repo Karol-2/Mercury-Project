@@ -6,14 +6,15 @@ let page: number = 1;
 let maxUsers: number = 10;
 let userId: string = "";
 
-const userMail = "bconford2@wikimedia.org";
-const userPassword = "heuristic";
+const userMail1 = "bconford2@wikimedia.org";
+const userPassword1 = "heuristic";
+
+const userMail2 = "cruckman3@archive.org";
+const userPassword2 = "coreCar0l;";
 
 const getFirstUser = async () => {
   const response = await fetchData(`http://localhost:5000/users`, "GET", {});
-  userId = response.users.find(
-    (user: User) => user.mail === "bconford2@wikimedia.org",
-  ).id;
+  userId = response.users.find((user: User) => user.mail === userMail1).id;
 };
 
 const getKeycloakToken = async (
@@ -43,41 +44,54 @@ const getKeycloakToken = async (
 };
 
 await getFirstUser();
-const token = await getKeycloakToken(userMail, userPassword);
+const token1 = await getKeycloakToken(userMail1, userPassword1);
+const token2 = await getKeycloakToken(userMail2, userPassword2);
 
 describe("Get friends", () => {
   test("without token", async () => {
     const response = await fetchData(
-      `http://localhost:5000/users/0/friends?page=${page}&maxUsers=${maxUsers}`,
+      `http://localhost:5000/users/${userId}/friends?page=${page}&maxUsers=${maxUsers}`,
       "GET",
       {},
     );
 
-    const { status } = response
+    const { status } = response;
     expect(status).toBe("unauthorized");
   });
 
-  test("incorrect ID", async () => {
+  test("with incorrect token", async () => {
     const response = await fetchData(
-      `http://localhost:5000/users/0/friends?page=${page}&maxUsers=${maxUsers}`,
+      `http://localhost:5000/users/${userId}/friends?page=${page}&maxUsers=${maxUsers}`,
       "GET",
       {},
-      token
+      token2,
     );
 
-    const { status, errors } = response;
-
-    expect(status).toBe("error");
-    expect(errors).toBeDefined();
-    expect(errors.id).toBe("not found");
+    const { status } = response;
+    expect(status).toBe("forbidden");
   });
+
+  // test("incorrect ID", async () => {
+  //   const response = await fetchData(
+  //     `http://localhost:5000/users/0/friends?page=${page}&maxUsers=${maxUsers}`,
+  //     "GET",
+  //     {},
+  //     token1
+  //   );
+
+  //   const { status, errors } = response;
+
+  //   expect(status).toBe("error");
+  //   expect(errors).toBeDefined();
+  //   expect(errors.id).toBe("not found");
+  // });
 
   test("correct", async () => {
     const response = await fetchData(
       `http://localhost:5000/users/${userId}/friends?page=${page}&maxUsers=${maxUsers}`,
       "GET",
       {},
-      token
+      token1,
     );
 
     const { status, pageCount, friends } = response;
@@ -94,7 +108,7 @@ describe("Get friends", () => {
       `http://localhost:5000/users/${userId}/friends?page=${page}&maxUsers=${maxUsers}`,
       "GET",
       {},
-      token
+      token1,
     );
 
     const { status, pageCount, friends } = response;
@@ -115,7 +129,7 @@ describe("Pagination parameters", () => {
       `http://localhost:5000/users/${userId}/friends?maxUsers=${maxUsers}`,
       "GET",
       {},
-      token
+      token1,
     );
 
     const { status, errors } = response;
@@ -129,7 +143,7 @@ describe("Pagination parameters", () => {
       `http://localhost:5000/users/${userId}/friends?page=text?maxUsers=${maxUsers}`,
       "GET",
       {},
-      token
+      token1,
     );
 
     const { status, errors } = response;
@@ -143,7 +157,7 @@ describe("Pagination parameters", () => {
       `http://localhost:5000/users/${userId}/friends?page=${page}`,
       "GET",
       {},
-      token
+      token1,
     );
 
     const { status, errors } = response;
@@ -157,7 +171,7 @@ describe("Pagination parameters", () => {
       `http://localhost:5000/users/${userId}/friends?page=text?page=${page}&maxUsers=text`,
       "GET",
       {},
-      token
+      token1,
     );
 
     const { status, errors } = response;
@@ -171,7 +185,7 @@ describe("Pagination parameters", () => {
       `http://localhost:5000/users/${userId}/friends`,
       "GET",
       {},
-      token
+      token1,
     );
 
     const { status, errors } = response;
@@ -187,7 +201,7 @@ describe("Pagination parameters", () => {
       `http://localhost:5000/users/${userId}/friends?page=${page}&maxUsers=${maxUsers}`,
       "GET",
       {},
-      token
+      token1,
     );
 
     const { status, errors } = response;

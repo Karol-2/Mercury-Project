@@ -10,18 +10,50 @@ let userData = {
   mail: "john_smith@example.com",
   password: "12345678",
 };
-let token: string;
+
+const userMail2 = "cruckman3@archive.org";
+const userPassword2 = "coreCar0l;";
+
+const getKeycloakToken = async (
+  mail: string,
+  password: string,
+): Promise<string> => {
+  const urlParams = new URLSearchParams({
+    grant_type: "password",
+    client_id: "mercury-testing",
+    client_secret: "5mwGU0Efyh3cT2WVX7ffA8UAWEAmrBag",
+    username: mail,
+    password: password,
+  });
+
+  const response = await fetchData(
+    `http://localhost:3000/realms/mercury/protocol/openid-connect/token`,
+    "POST",
+    {
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      body: urlParams,
+    },
+  );
+
+  return response.access_token;
+};
 
 const login = async (mail: string, password: string) => {
   const response = await fetchData(`http://localhost:5000/auth/login`, "POST", {
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ mail: mail, password: password }),
+    body: JSON.stringify({ mail, password }),
   });
 
-  token = response.token;
+  return response.token;
 };
+
+// set after creating user
+let token1 = "";
+const token2 = await getKeycloakToken(userMail2, userPassword2);
 
 const updateUser = async (userId: string, token?: string) => {
   const response = await fetchData(
@@ -92,7 +124,7 @@ describe("Create user", () => {
     expect(user.mail).toBe(userData.mail);
 
     userId = user.id;
-    await login(userData.mail, userData.password);
+    token1 = await login(userData.mail, userData.password);
   });
 
   test("existing mail", async () => {
@@ -213,24 +245,29 @@ describe("Update user", () => {
     expect(status).toBe("unauthorized");
   });
 
-  test("incorrect ID", async () => {
-    const { status, errors } = await updateUser("0", token);
-
-    expect(status).toBe("error");
-    expect(errors.id).toBe("not found");
+  test("with incorrect token", async () => {
+    const { status } = await updateUser(userId, token2);
+    expect(status).toBe("forbidden");
   });
+
+  // test("incorrect ID", async () => {
+  //   const { status, errors } = await updateUser("0", token1);
+
+  //   expect(status).toBe("error");
+  //   expect(errors.id).toBe("not found");
+  // });
 
   test("correct", async () => {
     userData.profile_picture = "https://example.com/new_john_smith.jpg";
 
-    const { status } = await updateUser(userId, token);
+    const { status } = await updateUser(userId, token1);
     expect(status).toBe("ok");
   });
 
   test("too short first name", async () => {
     userData.first_name = "j";
 
-    const { status, errors } = await updateUser(userId, token);
+    const { status, errors } = await updateUser(userId, token1);
 
     expect(status).toBe("error");
     expect(errors.first_name).toBe(
@@ -241,7 +278,7 @@ describe("Update user", () => {
   test("too short last name", async () => {
     userData.last_name = "s";
 
-    const { status, errors } = await updateUser(userId, token);
+    const { status, errors } = await updateUser(userId, token1);
 
     expect(status).toBe("error");
     expect(errors.last_name).toBe(
@@ -256,7 +293,7 @@ describe("Change password", () => {
       userId,
       "1234",
       "1234",
-      token,
+      token1,
     );
 
     expect(status).toBe("error");
@@ -269,7 +306,7 @@ describe("Change password", () => {
       userId,
       "12345678",
       "12345678",
-      token,
+      token1,
     );
     expect(status).toBe("ok");
   });
@@ -279,7 +316,7 @@ describe("Change password", () => {
       userId,
       "123456789",
       "123456789",
-      token,
+      token1,
     );
     expect(status).toBe("ok");
   });
@@ -291,16 +328,21 @@ describe("Delete user", () => {
     expect(status).toBe("unauthorized");
   });
 
-  test("incorrect ID", async () => {
-    const response = await deleteUser("🐍", token);
-    const { status, errors } = response;
-
-    expect(status).toBe("error");
-    expect(errors.id).toBe("not found");
+  test("with incorrect token", async () => {
+    const { status } = await deleteUser(userId, token2);
+    expect(status).toBe("forbidden");
   });
 
+  // test("incorrect ID", async () => {
+  //   const response = await deleteUser("🐍", token1);
+  //   const { status, errors } = response;
+
+  //   expect(status).toBe("error");
+  //   expect(errors.id).toBe("not found");
+  // });
+
   test("correct", async () => {
-    const { status } = await deleteUser(userId, token);
+    const { status } = await deleteUser(userId, token1);
     expect(status).toBe("ok");
   });
 });

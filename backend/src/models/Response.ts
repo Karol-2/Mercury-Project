@@ -1,3 +1,4 @@
+import Message from "./Message.js";
 import User from "./User.js";
 
 import { Response } from "express";
@@ -58,6 +59,11 @@ export interface UsersSearchResponse {
   status: "ok";
   pageCount: number;
   users: User[];
+}
+
+export interface MessagesResponse {
+  status: "ok";
+  messages: Message[];
 }
 
 export interface JWTResponse extends OkResponse {

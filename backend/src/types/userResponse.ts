@@ -10,6 +10,7 @@ import {
   FriendsPageResponse,
   FriendRequestsPageResponse,
   FriendSuggestionsPageResponse,
+  MessagesResponse,
 } from "../models/Response.js";
 
 export type UsersErrorResponse = CustomResponse<UsersResponse | ErrorResponse>;
@@ -28,8 +29,12 @@ export type FriendSuggestionsPageErrorResponse = CustomResponse<
   FriendSuggestionsPageResponse | ErrorResponse
 >;
 export type FriendsPageErrorResponse = CustomResponse<
-  FriendsPageResponse | ErrorResponse
+  AuthResponse | FriendsPageResponse | ErrorResponse
 >;
 export type UsersSearchErrorResponse = CustomResponse<
   UsersSearchResponse | ErrorResponse
+>;
+
+export type AuthMessagesErrorResponse = CustomResponse<
+  AuthResponse | MessagesResponse | ErrorResponse
 >;

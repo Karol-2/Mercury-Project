@@ -14,6 +14,7 @@ import { ZodType } from "zod";
 import ChangePasswordReq from "./models/ChangePasswordReq.js";
 import jwt from "jsonwebtoken";
 import TokenPayload from "./models/TokenPayload.js";
+import { issuers } from "./misc/jwt.js";
 
 export const filterUser = (user: DbUser): User => {
   if ("password" in user) {
@@ -203,6 +204,41 @@ export async function getDbUser(
   }
 
   const user = userExistsResult.records[0].get("u").properties as DbUser;
+  return user;
+}
+
+type SubProps = {
+  sub?: string;
+  props?: Partial<DbUser>;
+};
+
+function tokenPayloadToSubProps(tokenPayload: TokenPayload): SubProps {
+  const issuer = tokenPayload.iss;
+
+  if (issuer == issuers.mercury) {
+    const sub = tokenPayload.sub;
+    const props = { issuer: "mercury", issuer_id: sub };
+    return { sub, props };
+  } else if (issuer == issuers.rest) {
+    const sub = tokenPayload.userId;
+    const props = { id: sub };
+    return { sub, props };
+  }
+
+  return {};
+}
+
+export async function getTokenDbUser(
+  session: Session,
+  tokenPayload: TokenPayload,
+): Promise<DbUser | null> {
+  let { sub, props } = tokenPayloadToSubProps(tokenPayload);
+
+  if (!sub || !props) {
+    return null;
+  }
+
+  const user = await getDbUser(session, props);
   return user;
 }
 

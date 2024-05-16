@@ -44,7 +44,7 @@ function FriendsPage() {
           `/users/${user.id}/friend-requests?page=1&maxUsers=32`,
           "GET",
           {},
-          token
+          token,
         );
         setFriendsRequests(friendsRequestsResponse.friendRequests);
       }
@@ -56,7 +56,9 @@ function FriendsPage() {
     if (user) {
       await dataService.fetchData(
         `/users/${user.id}/accept-friend-request/${currentId}`,
-        "POST", {}, token
+        "POST",
+        {},
+        token,
       );
 
       setRefresh(() => !refresh);
@@ -67,7 +69,9 @@ function FriendsPage() {
     if (user) {
       await dataService.fetchData(
         `/users/${user.id}/decline-friend-request/${friend.id}`,
-        "POST", {}, token
+        "POST",
+        {},
+        token,
       );
 
       setRefresh(() => !refresh);
@@ -78,7 +82,9 @@ function FriendsPage() {
     if (user) {
       await dataService.fetchData(
         `/users/${user.id}/delete-friend/${friend.id}`,
-        "DELETE", {}, token
+        "DELETE",
+        {},
+        token,
       );
 
       setRefresh(() => !refresh);
@@ -113,6 +119,7 @@ function FriendsPage() {
                   {user && (
                     <PaginatorV2
                       endpoint={`/users/${user.id}/friends`}
+                      token={token}
                       refresh={refresh}
                       isSearch={false}
                       itemsPerPage={5}
@@ -158,6 +165,7 @@ function FriendsPage() {
                 {user && (
                   <PaginatorV2
                     endpoint={`/users/${user.id}/friend-suggestions`}
+                    token={token}
                     itemsPerPage={3}
                     refresh={refresh}
                     isSearch={false}
