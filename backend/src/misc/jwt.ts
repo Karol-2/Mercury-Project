@@ -15,7 +15,7 @@ export interface JWTRequest extends Request {
   tokenStr?: string;
 }
 
-const issuers: Record<Issuer, string> = {
+export const issuers: Record<Issuer, string> = {
   mercury: `${keycloakIssuer}/realms/mercury`,
   rest: "http://localhost:5000",
 };
