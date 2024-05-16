@@ -59,7 +59,6 @@ friendsRouter.get(
 
       const friends = await getFriends(session, userId, page - 1, maxUsers);
       if (friends === null) {
-        console.log(friends);
         return userNotFoundRes(res);
       }
 
@@ -71,7 +70,6 @@ friendsRouter.get(
       const pageCount = Number(
         (friendsCount.toBigInt() + maxUsersBig - 1n) / maxUsersBig,
       );
-      console.log(pageCount);
       return res.json({ status: "ok", pageCount, friends });
     } catch (err) {
       console.log("Error:", err);
