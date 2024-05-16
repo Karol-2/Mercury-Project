@@ -26,7 +26,7 @@ export type FriendRequestsPageErrorResponse = CustomResponse<
   FriendRequestsPageResponse | ErrorResponse
 >;
 export type FriendSuggestionsPageErrorResponse = CustomResponse<
-  FriendSuggestionsPageResponse | ErrorResponse
+  AuthResponse | FriendSuggestionsPageResponse | ErrorResponse
 >;
 export type FriendsPageErrorResponse = CustomResponse<
   AuthResponse | FriendsPageResponse | ErrorResponse

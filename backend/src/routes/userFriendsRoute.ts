@@ -125,20 +125,31 @@ friendsRouter.get(
 
 friendsRouter.get(
   "/:userId/friend-suggestions",
-  async (req: Request, res: FriendSuggestionsPageErrorResponse) => {
+  authenticateToken,
+  async (req: JWTRequest, res: FriendSuggestionsPageErrorResponse) => {
     const userId = req.params.userId;
-
-    const pageParse = pageSchema.safeParse(req.query);
-    if (!pageParse.success) {
-      const errors = formatError(pageParse.error);
-      return res.status(400).json({ status: "error", errors });
-    }
-
-    const { page, maxUsers }: Page = pageParse.data;
-    const maxUsersBig = BigInt(maxUsers);
 
     const session = driver.session();
     try {
+      const user = await getTokenDbUser(session, req.token!);
+
+      if (!user) {
+        return userNotFoundRes(res);
+      }
+
+      if (user.id != userId) {
+        return res.status(403).json({ status: "forbidden" });
+      }
+
+      const pageParse = pageSchema.safeParse(req.query);
+      if (!pageParse.success) {
+        const errors = formatError(pageParse.error);
+        return res.status(400).json({ status: "error", errors });
+      }
+
+      const { page, maxUsers }: Page = pageParse.data;
+      const maxUsersBig = BigInt(maxUsers);
+
       const friendSuggestions = await getFriendSuggestions(
         session,
         userId,

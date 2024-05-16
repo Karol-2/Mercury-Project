@@ -6,6 +6,12 @@ let userId: number;
 let page: number = 3;
 let maxUsers: number = 5;
 
+const userMail1 = "bconford2@wikimedia.org";
+const userPassword1 = "heuristic";
+
+const userMail2 = "cruckman3@archive.org";
+const userPassword2 = "coreCar0l;";
+
 const getFirstUser = async () => {
   const response = await fetchData(`http://localhost:5000/users`, "GET", {});
   userId = response.users.find(
@@ -13,28 +19,79 @@ const getFirstUser = async () => {
   ).id;
 };
 
+const getKeycloakToken = async (
+  mail: string,
+  password: string,
+): Promise<string> => {
+  const urlParams = new URLSearchParams({
+    grant_type: "password",
+    client_id: "mercury-testing",
+    client_secret: "5mwGU0Efyh3cT2WVX7ffA8UAWEAmrBag",
+    username: mail,
+    password: password,
+  });
+
+  const response = await fetchData(
+    `http://localhost:3000/realms/mercury/protocol/openid-connect/token`,
+    "POST",
+    {
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      body: urlParams,
+    },
+  );
+
+  return response.access_token;
+};
+
 await getFirstUser();
+const token1 = await getKeycloakToken(userMail1, userPassword1);
+const token2 = await getKeycloakToken(userMail2, userPassword2);
 
 describe("Get friend suggestions", () => {
-  test("incorrect ID", async () => {
-    const response = await fetchData(
-      `http://localhost:5000/users/0/friend-suggestions?page=${page}&maxUsers=${maxUsers}`,
+  test("without token", async () => {
+    const { status } = await fetchData(
+      `http://localhost:5000/users/${userId}/friend-suggestions` +
+        `?page=${page}&maxUsers=${maxUsers}`,
       "GET",
       {},
     );
-
-    const { status, errors } = response;
-
-    expect(status).toBe("error");
-    expect(errors).toBeDefined();
-    expect(errors.id).toBe("not found");
+    expect(status).toBe("unauthorized");
   });
+
+  test("with incorrect token", async () => {
+    const { status } = await fetchData(
+      `http://localhost:5000/users/${userId}/friend-suggestions` +
+        `?page=${page}&maxUsers=${maxUsers}`,
+      "GET",
+      {},
+      token2
+    );
+    expect(status).toBe("forbidden");
+  });
+
+  // test("incorrect ID", async () => {
+  //   const response = await fetchData(
+  //     `http://localhost:5000/users/0/friend-suggestions?page=${page}&maxUsers=${maxUsers}`,
+  //     "GET",
+  //     {},
+  //     token1
+  //   );
+
+  //   const { status, errors } = response;
+
+  //   expect(status).toBe("error");
+  //   expect(errors).toBeDefined();
+  //   expect(errors.id).toBe("not found");
+  // });
 
   test("correct", async () => {
     const response = await fetchData(
       `http://localhost:5000/users/${userId}/friend-suggestions?page=${page}&maxUsers=${maxUsers}`,
       "GET",
       {},
+      token1,
     );
 
     const { status, pageCount, friendSuggestions } = response;
@@ -52,6 +109,7 @@ describe("Get friend suggestions", () => {
       `http://localhost:5000/users/${userId}/friend-suggestions?page=${page}&maxUsers=${maxUsers}`,
       "GET",
       {},
+      token1,
     );
 
     const { status, pageCount, friendSuggestions } = response;
@@ -69,6 +127,7 @@ describe("Pagination parameters", () => {
       `http://localhost:5000/users/${userId}/friend-suggestions?maxUsers=${maxUsers}`,
       "GET",
       {},
+      token1,
     );
 
     const { status, errors } = response;
@@ -83,6 +142,7 @@ describe("Pagination parameters", () => {
       `http://localhost:5000/users/${userId}/friend-suggestions?page=${page}`,
       "GET",
       {},
+      token1,
     );
 
     const { status, errors } = response;
@@ -97,6 +157,7 @@ describe("Pagination parameters", () => {
       `http://localhost:5000/users/${userId}/friend-suggestions`,
       "GET",
       {},
+      token1,
     );
 
     const { status, errors } = response;
@@ -111,6 +172,7 @@ describe("Pagination parameters", () => {
       `http://localhost:5000/users/${userId}/friend-suggestions?page=text?page=${page}&maxUsers=text`,
       "GET",
       {},
+      token1,
     );
 
     const { status, errors } = response;
@@ -125,6 +187,7 @@ describe("Pagination parameters", () => {
       `http://localhost:5000/users/${userId}/friend-suggestions?page=${page}&maxUsers=${maxUsers}`,
       "GET",
       {},
+      token1,
     );
 
     const { status, errors } = response;
