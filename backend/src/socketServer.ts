@@ -1,25 +1,30 @@
-import servers from "./server";
-import dotenv from "dotenv";
-import driver from "./driver/driver";
-import { Socket } from "socket.io";
+import { Socket, Server as SocketServer } from "socket.io";
+
+import driver from "./driver.js";
+import ClientToServerEvents from "./events/ClientToServerEvents.js";
+import ServerToClientEvents from "./events/ServerToClientEvents.js";
+import { expressServer } from "./httpServer.js";
+import {
+  createMeeting,
+  isInMeeting,
+  joinMeeting,
+  leaveMeeting,
+} from "./meetings.js";
+import { addMessageToDb } from "./messages.js";
+import Meeting from "./models/Meeting.js";
 import {
   connectToSocket,
   disconnectFromSocket,
   getAllSockets,
-} from "./sockets";
-import { isFriend } from "./users";
-import Meeting from "./models/Meeting";
-import {
-  createMeeting,
-  leaveMeeting,
-  isInMeeting,
-  joinMeeting,
-} from "./meetings";
-import { addMessageToDb } from "./messages";
+} from "./sockets.js";
+import { isFriend } from "./userFriends.js";
 
-const { io } = servers;
-
-dotenv.config();
+const io = new SocketServer<ClientToServerEvents, ServerToClientEvents>(
+  expressServer,
+  {
+    cors: { origin: ["http://localhost:5173"] },
+  },
+);
 
 const meetings: Record<string, Meeting> = {};
 
@@ -45,7 +50,7 @@ io.on("connection", async (socket: Socket) => {
 
   const session = driver.session();
   await connectToSocket(session, userId, socket.id);
-  session.close();
+  await session.close();
 
   console.log("Client connected");
 
@@ -65,7 +70,7 @@ io.on("connection", async (socket: Socket) => {
     }
 
     socket.emit("createdMeeting", getMeeting());
-    session.close();
+    await session.close();
   });
 
   socket.on("joinMeeting", async (message) => {
@@ -90,13 +95,13 @@ io.on("connection", async (socket: Socket) => {
     }
 
     socket.emit("joinedMeeting", getMeeting());
-    session.close();
+    await session.close();
   });
 
   socket.on("leaveMeeting", async () => {
     const session = driver.session();
     await leaveMeeting(session, userId);
-    session.close();
+    await session.close();
 
     setMeeting(null);
     console.log(`User ${userId} left the meeting`);
@@ -117,6 +122,13 @@ io.on("connection", async (socket: Socket) => {
     }
   });
 
+  socket.on("name", (name) => {
+    const meetingRoom = getMeetingRoom();
+    if (meetingRoom) {
+      socket.to(meetingRoom).emit("name", name);
+    }
+  });
+
   socket.on("message", async (message) => {
     const { toUserId } = message;
     await addMessageToDb(message);
@@ -124,7 +136,7 @@ io.on("connection", async (socket: Socket) => {
     const session = driver.session();
     const sendSockets = await getAllSockets(session, userId);
     const receiveSockets = await getAllSockets(session, toUserId);
-    session.close();
+    await session.close();
 
     sendSockets.forEach((userSocket) => {
       socket.to(userSocket.id).emit("message", message);
@@ -140,7 +152,7 @@ io.on("connection", async (socket: Socket) => {
     const session = driver.session();
     await leaveMeeting(session, userId);
     await disconnectFromSocket(session, userId, socket.id);
-    session.close();
+    await session.close();
     setMeeting(null);
     console.log("Client disconnected");
   });

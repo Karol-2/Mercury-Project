@@ -1,11 +1,11 @@
 import {
-  faShield,
   faDesktop,
-  faUsers,
   faGlobe,
+  faShield,
+  faUsers,
 } from "@fortawesome/free-solid-svg-icons";
-
 import { motion } from "framer-motion";
+
 import ReasonCard from "../components/ReasonCard";
 
 export default function Reasons() {

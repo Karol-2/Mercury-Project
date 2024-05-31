@@ -1,4 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
+
+import countriesData from "../assets/countries.json";
+import { useUser } from "../helpers/UserContext";
 import User from "../models/User";
 import dataService from "../services/data";
 
@@ -12,39 +15,40 @@ interface FoundUserProps {
 function FoundUser(props: FoundUserProps) {
   const [requestSent, setRequestSent] = useState(false);
   const { user, isFriend } = props;
+  const { token } = useUser();
+  const countryName = countriesData.find((v) => v.Code == user.country)
+    ?.Country;
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const friendsRequestsResponse = await dataService.fetchData(
-          `/users/${props.user.id}/friend-requests`,
-          "GET",
-          {},
-        );
+  // TODO: get request sent status from backend, pass it in props
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     try {
+  //       const friendsRequestsResponse = await dataService.fetchData(
+  //         `/users/${props.user.id}/friend-requests?page=1&maxUsers=100`,
+  //         "GET",
+  //         {},
+  //       );
 
-        const isRequestSent = friendsRequestsResponse.friends.some(
-          (friend: User) => String(friend.id) === props.currentId,
-        );
+  //       const isRequestSent = friendsRequestsResponse.friendRequests.some(
+  //         (friend: User) => String(friend.id) === props.currentId,
+  //       );
 
-        setRequestSent(isRequestSent);
-      } catch (error) {
-        console.error("Error:", error);
-      }
-    };
+  //       setRequestSent(isRequestSent);
+  //     } catch (error) {
+  //       console.error("Error:", error);
+  //     }
+  //   };
 
-    fetchData();
-  }, []);
+  //   fetchData();
+  // }, []);
 
   const handleAddFriend = async () => {
     try {
       await dataService.fetchData(
-        `/users/${props.currentId}/add/${props.user.id}`,
+        `/users/${props.currentId}/send-friend-request/${props.user.id}`,
         "POST",
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        },
+        {},
+        token,
       );
       setRequestSent(true);
     } catch (error) {
@@ -76,8 +80,9 @@ function FoundUser(props: FoundUserProps) {
         <p className="font-semibold text-3xl">
           {user.first_name + " " + user.last_name}
         </p>
-        <p>{user.country}</p>
+        <p>{countryName || ""}</p>
         <button
+          data-testid={user.first_name + "_" + user.last_name + "_button"}
           className={`btn small text-xs ${buttonColor}`}
           disabled={isFriend || requestSent}
           onClick={handleAddFriend}

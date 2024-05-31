@@ -8,5 +8,7 @@
   "endOfLine": "lf",
   "semi": true,
   "bracketSpacing": true,
-  "quoteProps": "preserve"
+  "quoteProps": "preserve",
+  "plugins": ["@ianvs/prettier-plugin-sort-imports"],
+  "importOrder": ["<BUILTIN_MODULES>", "", "<THIRD_PARTY_MODULES>", "", "^[.]"]
 }

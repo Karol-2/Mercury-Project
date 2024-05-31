@@ -1,9 +1,9 @@
 import {
-  CustomResponse,
-  JWTResponse,
   AuthResponse,
+  CustomResponse,
   ErrorResponse,
-} from "../models/Response";
+  JWTResponse,
+} from "../models/Response.js";
 
 export type TokenErrorResponse = CustomResponse<
   JWTResponse | AuthResponse | ErrorResponse

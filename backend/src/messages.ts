@@ -1,5 +1,5 @@
-import Message from "./models/Message";
-import MessageModel from "./mongoDB/MessageModel";
+import Message from "./models/Message.js";
+import MessageModel from "./mongoDB/MessageModel.js";
 
 export async function addMessageToDb(message: Message) {
   try {

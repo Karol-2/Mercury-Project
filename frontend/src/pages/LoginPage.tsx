@@ -1,7 +1,8 @@
+import { useEffect, useState } from "react";
+
+import Banner from "../components/Banner";
 import Footer from "../components/Footer";
 import LoginBox from "../components/LoginBox";
-import Banner from "../components/Banner";
-import { useEffect, useState } from "react";
 import Transition from "../components/Transition";
 
 function LoginPage() {
