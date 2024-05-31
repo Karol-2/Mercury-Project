@@ -1,4 +1,5 @@
 import { AnimatePresence, motion } from "framer-motion";
+
 import technologies from "../helpers/TechnologiesContent";
 
 export default function Technologies() {

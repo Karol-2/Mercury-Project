@@ -26,7 +26,12 @@ export default {
       "my-lighter": "#F4F4F4",
       "my-green": "#3E4F13",
     },
-    extend: {},
+    extend: {
+      screens: {
+        "2.5xl": "1440px",
+        "3xl": "1920px",
+      },
+    },
   },
   plugins: [],
 };

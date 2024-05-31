@@ -1,7 +1,19 @@
 class DataService {
   private url: string = "http://localhost:5000";
 
-  async fetchData(endpoint: string, method: string, options = {}) {
+  async fetchData(
+    endpoint: string,
+    method: string,
+    options: RequestInit = {},
+    token?: string,
+  ) {
+    if (token) {
+      options.headers = {
+        ...options.headers,
+        "Authorization": `Bearer ${token}`,
+      };
+    }
+
     try {
       const response = await fetch(this.url + endpoint, { ...options, method });
       const data = await response.json();

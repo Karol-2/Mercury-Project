@@ -1,5 +1,5 @@
-import React, { useEffect } from "react";
 import { motion, useAnimation } from "framer-motion";
+import React, { useEffect } from "react";
 
 interface TransitionProps {
   startAnimation: boolean;
@@ -9,8 +9,6 @@ const Transition: React.FC<TransitionProps> = ({ startAnimation }) => {
   const controls = useAnimation();
 
   const animateSquare = async () => {
-    console.log("start anim");
-
     await controls.start({ y: 0, opacity: 1 });
 
     await new Promise((resolve) => setTimeout(resolve, 1));
@@ -21,8 +19,6 @@ const Transition: React.FC<TransitionProps> = ({ startAnimation }) => {
   };
 
   useEffect(() => {
-    console.log(startAnimation);
-
     if (startAnimation) {
       animateSquare();
     }

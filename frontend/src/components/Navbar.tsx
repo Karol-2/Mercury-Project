@@ -1,14 +1,16 @@
-import { Link, useNavigate } from "react-router-dom";
-import LogoSVG from "/logo.svg";
-import { useUser } from "../helpers/UserProvider";
-import { useState } from "react";
 import {
   faMagnifyingGlass,
+  faRightFromBracket,
   faUser,
   faUsers,
-  faRightFromBracket,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import LogoSVG from "/logo.svg";
+import { useState } from "react";
+import { Link } from "react-router-dom";
+
+import { useUser } from "../helpers/UserContext";
+
 <FontAwesomeIcon icon={faMagnifyingGlass} />;
 
 export interface NavbarProps {
@@ -19,14 +21,12 @@ function Navbar(props: NavbarProps) {
   const { handleNavigate } = props;
   const [isOpen, setIsOpen] = useState(false);
 
-  const navigate = useNavigate();
   const { user, logout } = useUser();
 
   const handleLogout = async () => {
     const logged_out = await logout();
-    if (logged_out) {
-      navigate("/");
-    } else {
+
+    if (!logged_out) {
       throw new Error("Couldn't log out");
     }
   };
@@ -73,6 +73,7 @@ function Navbar(props: NavbarProps) {
             <Link
               key={link.to}
               to={link.to}
+              data-testid={link.text}
               className="p-5 rounded-lg transition duration-250 ease-in-out hover:bg-my-orange font-bold text-lg active:translate-y-1"
               onClick={
                 handleNavigate ? () => handleNavigate(link.to) : undefined
@@ -99,12 +100,17 @@ function Navbar(props: NavbarProps) {
             </div>
             {isOpen && (
               <div
+                data-testid="Dropdown-menu"
                 id="dropdown-menu"
                 className={`${menuPosition} ${menuColor} w-28 p-2 flex flex-col rounded-lg`}
                 onMouseEnter={handleDropdownEnter}
                 onMouseLeave={handleDropdownLeave}
               >
-                <button onClick={handleLogout} className={linkStyle}>
+                <button
+                  data-testid="Logout"
+                  onClick={handleLogout}
+                  className={linkStyle}
+                >
                   <FontAwesomeIcon icon={faRightFromBracket}></FontAwesomeIcon>
                   <span className=" ml-2 font-semibold">Logout</span>
                 </button>

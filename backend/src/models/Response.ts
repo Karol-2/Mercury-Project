@@ -1,7 +1,7 @@
-import User from "./User";
-
 import { Response } from "express";
-import { Jwt } from "jsonwebtoken";
+
+import Message from "./Message.js";
+import User from "./User.js";
 
 type Send<J, T = Response> = (body?: J) => T;
 
@@ -9,9 +9,13 @@ export interface CustomResponse<J> extends Response {
   json: Send<J, this>;
 }
 
+export type Errors = {
+  [key: string]: Errors | string;
+};
+
 export interface ErrorResponse {
   status: "error";
-  errors: Record<string, any> & { length?: never };
+  errors: Errors;
 }
 
 export interface OkResponse {
@@ -33,9 +37,33 @@ export interface FriendsResponse {
   friends: User[];
 }
 
+export interface FriendsPageResponse {
+  status: "ok";
+  pageCount: number;
+  friends: User[];
+}
+
+export interface FriendRequestsPageResponse {
+  status: "ok";
+  pageCount: number;
+  friendRequests: User[];
+}
+
+export interface FriendSuggestionsPageResponse {
+  status: "ok";
+  pageCount: number;
+  friendSuggestions: User[];
+}
+
 export interface UsersSearchResponse {
   status: "ok";
-  users: [User, number][];
+  pageCount: number;
+  users: User[];
+}
+
+export interface MessagesResponse {
+  status: "ok";
+  messages: Message[];
 }
 
 export interface JWTResponse extends OkResponse {

@@ -1,27 +1,26 @@
-import Navbar from "../components/Navbar";
-import Footer from "../components/Footer";
-import dataService from "../services/data";
 import { useEffect, useState } from "react";
+
+import Footer from "../components/Footer";
 import FoundUser from "../components/FoundUser";
-import { useUser } from "../helpers/UserProvider";
-import User from "../models/User";
-import { faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { useNavigate } from "react-router-dom";
-import editDistance from "../misc/editDistance";
+import Navbar from "../components/Navbar";
+import PaginatorV2 from "../components/PaginatorV2";
+import Search from "../components/Search";
 import Transition from "../components/Transition";
+import { useProtected } from "../helpers/Protected";
+import { useUser } from "../helpers/UserContext";
+import User from "../models/User";
 
 function SearchPage() {
-  const navigate = useNavigate();
+  // Logic
+  const [queryEndpoint, setQueryEndpoint] = useState<string>("");
+  const [isReadyToSearch, setIsReadyToSearch] = useState<boolean>(false);
 
-  const [searchState, setSearchState] = useState("");
-  const [usersFound, setUsersFound] = useState<[[User, number]]>();
-  const [usersFriends, setUsersFriends] = useState([]);
-
+  // Animation
   const [showAnimation, setShowAnim] = useState(false);
   const [showContent, setShowContent] = useState(false);
 
-  const { user, userId } = useUser();
+  const { user } = useProtected();
+  const { friends } = useUser();
 
   useEffect(() => {
     setShowAnim(true);
@@ -30,127 +29,42 @@ function SearchPage() {
     }, 100);
   }, []);
 
-  useEffect(() => {
-    if (userId === null) navigate("/login");
-
-    const fetchFriends = async () => {
-      const friendsResponse = await dataService.fetchData(
-        `/users/${userId}/friends`,
-        "GET",
-        {},
-      );
-      const friendsIds = friendsResponse.friends.reduce(
-        (prev: string[], curr: User) => {
-          return [...prev, curr.id];
-        },
-        [],
-      );
-      setUsersFriends(friendsIds);
-    };
-    fetchFriends();
-  }, [user]);
-
-  const handleSearch = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-
-    if (userId === null) navigate("/login");
-
-    if (searchState.trim() === "") {
-      return;
-    }
-
-    const response = await dataService.fetchData(
-      `/users/search?q=${searchState}`,
-      "GET",
-    );
-
-    const responseWithoutCurrUser = response.users.filter(
-      (respArr: [User, number]) => respArr[0].id !== user!.id,
-    );
-
-    const usersSorted = sortUsersByDistance(
-      searchState,
-      responseWithoutCurrUser,
-    );
-
-    setUsersFound(usersSorted);
+  const isFriend = (user: User): boolean => {
+    return user.id in friends;
   };
 
-  const isFriend = (friendArr: string[], user: User): boolean => {
-    return friendArr.reduce((prev: boolean, curr: string) => {
-      return prev || curr === String(user.id);
-    }, false);
-  };
-
-  const sortUsersByDistance = (searchTerm: string, users: [[User, number]]) => {
-    const userScores = users.map((respArr: [User, number]) => {
-      const user = respArr[0];
-      const score = editDistance(user.first_name + user.last_name, searchTerm);
-      return [user, score];
-    });
-
-    return userScores.sort((a: any, b: any) => {
-      const [_userA, scoreA] = a;
-      const [_userB, scoreB] = b;
-
-      return scoreA - scoreB;
-    }) as [[User, number]];
+  const foundUsersHandler = (endpoint: string) => {
+    setQueryEndpoint(endpoint);
+    setIsReadyToSearch(() => !isReadyToSearch);
   };
 
   return (
     <>
       <Navbar />
       {showAnimation && <Transition startAnimation={showAnimation} />}
-      {showContent ? (
+      {showContent && (
         <>
           <section className=" min-h-screen mx-50 lg:mx-72 ">
-            <div className="mx-50 my-20 flex justify-center">
-              <form
-                className="flex flex-col md:flex-row gap-5 max-w-3xl w-full mt-5"
-                onSubmit={handleSearch}
-              >
-                <div className=" w-full">
-                  <input
-                    type="text"
-                    placeholder="John Doe"
-                    className="form-input text-my-darker"
-                    onChange={(e) => setSearchState(e.target.value)}
-                  ></input>
-                  <p className="text-lg">
-                    Enter your friend's name in the field above.
-                  </p>
-                </div>
+            <Search handler={foundUsersHandler} />
 
-                <button
-                  type="submit"
-                  className="btn bg-my-purple text-xs px-7 py-5"
-                >
-                  <div className="flex gap-3 items-center text-cente justify-center">
-                    <span className=" text-center">Search</span>
-                    <FontAwesomeIcon icon={faMagnifyingGlass} />
-                  </div>
-                </button>
-              </form>
-            </div>
-            <div>
-              {usersFound && usersFound.length > 0 ? (
-                usersFound.map((user, index) => (
-                  <FoundUser
-                    user={user[0]}
-                    key={String(index)}
-                    currentId={userId}
-                    isFriend={isFriend(usersFriends, user[0])}
-                  />
-                ))
-              ) : (
-                <></>
+            <PaginatorV2
+              endpoint={queryEndpoint}
+              refresh={isReadyToSearch}
+              isSearch={true}
+              itemsPerPage={5}
+              getItems={(response) => response.users}
+              renderItem={(renderUser) => (
+                <FoundUser
+                  user={renderUser}
+                  key={String(0)}
+                  currentId={user.id}
+                  isFriend={isFriend(renderUser)}
+                />
               )}
-            </div>
+            />
           </section>
           <Footer />
         </>
-      ) : (
-        ""
       )}
     </>
   );

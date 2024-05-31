@@ -1,4 +1,4 @@
-import { motion, AnimatePresence } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 
 interface ModalInterface {
   text: string;
@@ -27,6 +27,7 @@ function Modal(props: ModalInterface) {
           <h1 className="font-semibold text-3xl">{props.text}</h1>
           <div className="flex justify-evenly text-my-light mt-10">
             <button
+              data-testid="Yes"
               onClick={props.handleYes}
               className="btn small bg-my-orange"
             >

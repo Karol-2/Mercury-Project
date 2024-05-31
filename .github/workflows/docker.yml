@@ -24,7 +24,7 @@ jobs:
 
       - name: Wait for containers to start
         run: |
-          sleep 18
+          sleep 100
           docker run \
             --rm \
             --network mercury-project_default \
@@ -41,3 +41,26 @@ jobs:
         with:
           commit_message: Apply formatting
           branch: ${{ github.head_ref }}
+
+  cypress:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          ref: ${{ github.ref }}
+
+      - uses: isbang/compose-action@v1.5.1
+        with:
+          compose-file: "compose.yml"
+
+      - name: Wait for containers to start
+        run: |
+          sleep 100
+          docker run \
+            --rm \
+            --network mercury-project_default \
+            alpine/curl -o /dev/null --retry 3 --retry-connrefused backend:5000
+
+      - name: Run Cypress Tests
+        run: cd frontend; npm i && npm run cy:run

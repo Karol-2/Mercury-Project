@@ -1,4 +1,5 @@
 import { combineReducers, createStore } from "redux";
+
 import friendsReducer from "./reducers/friendsReducer";
 
 const rootReducer = combineReducers({

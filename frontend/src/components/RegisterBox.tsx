@@ -1,20 +1,25 @@
-import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { userSchema } from "../models/RegisterUserSchema";
-import { FrontendUser } from "../models/User";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { Link } from "react-router-dom";
+import Select from "react-select";
+
+import countriesData from "../assets/countries.json";
 import * as userPlaceholder from "../assets/user-placeholder.jpg";
+import { useUser } from "../helpers/UserContext";
+import { userRegisterSchema } from "../models/RegisterUserSchema";
+import { FrontendUser } from "../models/User";
 
 function RegisterBox() {
-  const navigate = useNavigate();
   const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm<FrontendUser>({
-    resolver: zodResolver(userSchema),
+    resolver: zodResolver(userRegisterSchema),
   });
+
+  const { registerUser, redirectToLogin } = useUser();
 
   const [submitError, setSubmitError] = useState<string>("");
   const [profilePictureBase64, setProfilePictureBase64] = useState<string>("");
@@ -28,34 +33,16 @@ function RegisterBox() {
     className: "text-my-dark form-input",
   };
 
-  const countryOptions = {
-    onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
-      const input = e.target;
-      const start = input.selectionStart;
-      const end = input.selectionEnd;
+  const countryOptions = countriesData.map((country) => ({
+    value: country.Code,
+    label: country.Country,
+  }));
 
-      input.value = e.target.value.toUpperCase();
-      input.setSelectionRange(start, end);
-    },
-  };
+  const [country, setCountry] = useState(countriesData[0].Country);
 
-  const registerUser = async (user: FrontendUser): Promise<FrontendUser> => {
-    const response = await fetch("http://localhost:5000/users", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(user),
-    });
-
-    if (!response.ok) {
-      throw response;
-    }
-
-    const userJson = await response.json();
-    console.log("Register " + JSON.stringify(userJson));
-
-    return userJson.user;
+  const handleCountryChange = (e: any) => {
+    const selectedCountry = e ? e.value : "";
+    setCountry(selectedCountry);
   };
 
   const encodePicture = async (file: File): Promise<string> => {
@@ -121,10 +108,10 @@ function RegisterBox() {
         user.profile_picture = profilePictureBase64;
       }
 
-      const registered = await registerUser(user);
+      user.country = country;
+      await registerUser(user);
 
-      console.log(registered);
-      navigate("/login");
+      redirectToLogin();
     } catch (e) {
       if (e instanceof Error) {
         setSubmitError("Can't connect to the server");
@@ -145,14 +132,14 @@ function RegisterBox() {
       className="medium:w-[25vw] flex flex-col gap-2 bg-my-dark p-10 px-20 rounded-xl"
       onSubmit={handleSubmit(submit)}
     >
-      <div>First name:</div>
+      <div>First name</div>
       <input
         {...inputProps}
         {...register("first_name")}
         placeholder="First name"
       />
       <div {...errorProps}>{errors.first_name?.message}</div>
-      <div>Last Name:</div>
+      <div>Last Name</div>
       <input
         {...inputProps}
         {...register("last_name")}
@@ -161,17 +148,19 @@ function RegisterBox() {
       <div {...errorProps}>{errors.last_name?.message}</div>
       <div>
         <div className="flex gap-2 items-center">
-          <div>Country Code:</div>
-          <input
+          <div>Country</div>
+          <Select
             {...inputProps}
-            {...register("country", countryOptions)}
-            placeholder="XX"
+            {...register("country")}
+            options={countryOptions}
+            onChange={handleCountryChange}
+            value={countryOptions.find((option) => option.value === country)}
           />
         </div>
         <div {...errorProps}>{errors.country?.message}</div>
       </div>
 
-      <div>Profile picture:</div>
+      <div>Profile picture</div>
       <div className="flex items-center justify-center space-x-4 rounded-xl">
         <label
           htmlFor="upload-button"
@@ -214,11 +203,11 @@ function RegisterBox() {
       <div {...errorProps}>{errors.profile_picture?.message}</div>
 
       <div className="py-5">
-        <div>E-mail:</div>
+        <div>E-mail</div>
         <input {...inputProps} {...register("mail")} placeholder="E-mail" />
         <div {...errorProps}>{errors.mail?.message}</div>
 
-        <div>Password:</div>
+        <div>Password</div>
         <input
           {...inputProps}
           {...register("password")}
@@ -232,6 +221,7 @@ function RegisterBox() {
 
       <input
         disabled={isSubmitting}
+        data-testid="Register"
         type="submit"
         className="btn small bg-my-orange disabled:bg-my-dark"
         value="Register"

@@ -6,11 +6,11 @@ const kb = [
 ];
 const kbValue = [...kb].map((c) => (c / 25) * 2 - 1);
 
-const letterToKb = (c: string) => kbValue[c.charCodeAt(0) - 65];
+export const letterToKb = (c: string) => kbValue[c.charCodeAt(0) - 65];
 
-const lerp = (a: number, b: number, f: number) => (1 - f) * a + f * b;
+export const lerp = (a: number, b: number, f: number) => (1 - f) * a + f * b;
 
-const wordVecInterp = (word: string, vecLength: number) => {
+export const wordVecInterp = (word: string, vecLength: number) => {
   const vec = [];
   const wordCapital = word.toUpperCase();
   const factor = (word.length - 1) / (vecLength - 1);
@@ -35,34 +35,30 @@ const wordVecInterp = (word: string, vecLength: number) => {
 };
 
 const keepLettersRegex = /[^a-z]/;
-const keepLetters = (s: string) => s.replace(keepLettersRegex, "");
-const sortLetters = (s: string) => [...s].sort().join("");
+export const keepLetters = (s: string) => s.replace(keepLettersRegex, "");
+export const sortLetters = (s: string) => [...s].sort().join("");
 
-function sum(lst: number[]): number {
+export function sum(lst: number[]): number {
   return lst.reduce((a, b) => a + b);
 }
 
-function zip<A, B>(a: A[], b: B[]): [A, B][] {
+export function zip<A, B>(a: A[], b: B[]): [A, B][] {
   return a.map((e, i) => [e, b[i]]);
 }
 
-function l1Norm(a: number[]): number {
-  return sum(a.map((x) => Math.abs(x)));
-}
-
-function l2Norm(a: number[]): number {
+export function l2Norm(a: number[]): number {
   return sum(a.map((x) => Math.pow(x, 2)));
 }
 
-function dot(a: number[], b: number[]): number {
+export function dot(a: number[], b: number[]): number {
   return sum(zip(a, b).map(([a, b]) => a * b));
 }
 
-function cosineSimilarity(a: number[], b: number[]): number {
+export function cosineSimilarity(a: number[], b: number[]): number {
   return dot(a, b) / (l2Norm(a) * l2Norm(b));
 }
 
-function wordToVec(word: string) {
+export function wordToVec(word: string) {
   const wordNormalized = unidecode(word);
   const wordFilter = keepLetters(wordNormalized.toLowerCase());
 

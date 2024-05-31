@@ -1,25 +1,24 @@
 import { useEffect, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
-import Navbar from "../components/Navbar";
-import Footer from "../components/Footer";
 import ChatBox from "../components/ChatBox";
-import { useUser } from "../helpers/UserProvider";
+import Footer from "../components/Footer";
+import Navbar from "../components/Navbar";
+import { useProtected } from "../helpers/Protected";
+import { useUser } from "../helpers/UserContext";
 
 function MessagingPage() {
   const navigate = useNavigate();
   const navigating = useRef<boolean>(false);
   const { friendId } = useParams();
-  const { user, socket } = useUser();
+  const { userState, socket } = useUser();
+  const { user } = useProtected();
 
   useEffect(() => {
     if (navigating.current) return;
-    if (user === undefined) return;
+    if (userState.status == "loading") return;
 
-    if (user === null) {
-      navigating.current = true;
-      navigate("/login");
-    } else if (friendId === null) {
+    if (friendId === null) {
       navigating.current = true;
       navigate("/friends");
     }
